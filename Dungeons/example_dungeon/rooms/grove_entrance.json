@@ -1,0 +1,47 @@
+{
+    "name": "Grove Entrance",
+    "enter-message": [
+        {
+            "predicate": {
+                "example_dungeon:boss_defeated": true
+            },
+            "text": "All 3 doors"
+        },
+        {
+            "predicate": {
+                "example_dungeon:boss_defeated": false
+            },
+            "text": "Only 2 doors"
+        },
+        {
+            "predicate": {
+                "example_dungeon:rooms/grove_entrance:data.ritual_staff": false
+            }
+        }
+    ],
+    "exit-message": "",
+    "data": {
+        "ritual_staff": {
+            "type": "loot"
+        }
+    },
+    "interactions": [
+        {
+            "type": "door",
+            "target": "example_dungeon:rooms/left_tunnel",
+            "travel-message": "",
+            "lock-message": "",
+            "locked": false
+        },
+        {
+            "type": "door",
+            "target": "example_dungeon:rooms/left_tunnel"
+        },
+        {
+            "type": "door"
+        },
+        {
+            "parent": "example_dungeon:rooms/grove_entrance:data.ritual_staff"
+        }
+    ]
+}

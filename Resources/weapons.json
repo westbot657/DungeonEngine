@@ -1,0 +1,8 @@
+[
+    {
+        "id": "unnarmed_strike",
+        "name": "Unnarmed Strike",
+        "range": 1,
+        "damage": 1
+    }
+]

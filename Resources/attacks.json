@@ -1,0 +1,32 @@
+[
+    {
+        "id": "punch",
+        "name": "Punch",
+        "damage": 1,
+        "range": 1
+    },
+    {
+        "id": "bite",
+        "name": "Bite",
+        "damage": 1,
+        "range": 1
+    },
+    {
+        "id": "stab",
+        "name": "Stab",
+        "damage": 2,
+        "range": 3
+    },
+    {
+        "id": "slime",
+        "name": "Slime",
+        "damage": 1,
+        "range": 1
+    },
+    {
+        "id": "vine",
+        "name": "Vine whip",
+        "damage": 2,
+        "range": 3
+    }
+]

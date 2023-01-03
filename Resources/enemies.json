@@ -1,0 +1,35 @@
+[
+    {
+        "id": "zombie",
+        "name": "Zombie",
+        "health": 20,
+        "attacks": [
+            "attacks:bite",
+            "attacks:punch"
+        ]
+    },
+    {
+        "id": "goblin",
+        "name": "Goblin",
+        "health": 10,
+        "attacks": [
+            "attacks:punch"
+        ]
+    },
+    {
+        "id": "slime",
+        "name": "Slime",
+        "health": 5,
+        "attacks": [
+            "attacks:slime"
+        ]
+    },
+    {
+        "id": "vine_golem",
+        "name": "Vine Golem",
+        "health": 6,
+        "attacks": [
+            "attacks:vine"
+        ]
+    }
+]

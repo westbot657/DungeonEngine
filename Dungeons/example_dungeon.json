@@ -1,0 +1,18 @@
+{
+    "name": "Example Dungeon",
+    "version": "beta-1.0",
+    "location": [0, 0],
+    "rooms": [
+        {
+            "name": "start",
+            "combat": {
+                "combatants": [
+                    ""
+                ],
+                "start-message": "",
+                "join-message": "",
+                "end-message": ""
+            }
+        }
+    ]
+}

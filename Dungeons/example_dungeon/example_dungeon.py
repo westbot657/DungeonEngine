@@ -1,0 +1,3 @@
+
+class example_dungeon:
+    ...

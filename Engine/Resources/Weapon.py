@@ -8,4 +8,4 @@ class Weapon:
         self.durability = durability
 
     def __repr__(self):
-        return f"{self.name}: damage:{self.damage} range:{self.range}  durability:{self.durability}"
+        return f"Weapon {self.name}: damage:{self.damage} range:{self.range}  durability:{self.durability}"

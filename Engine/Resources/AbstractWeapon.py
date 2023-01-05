@@ -1,7 +1,11 @@
 # pylint: disable=[W,R,C,import-error]
 
-from .Identifier import Identifier
-from .Weapon import Weapon
+try:
+    from .Identifier import Identifier
+    from .Weapon import Weapon
+except ImportError:
+    from Identifier import Identifier
+    from Weapon import Weapon
 
 import glob, json, re
 

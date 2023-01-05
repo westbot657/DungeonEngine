@@ -1,15 +1,16 @@
 # pylint: disable=[W,R,C,import-error]
 
-from .Armor import Armor
-from .Identifier import Identifier
+try:
+    from .Armor import Armor
+    from .Identifier import Identifier
+except ImportError:
+    from Armor import Armor
+    from Identifier import Identifier
 
 class AbstractArmor:
 
-    def __init__(self, identifier:Identifier, data:dict):
+    def __init__(self):
         ...
-
-    def __init_subclass__(cls, *args, **kwargs) -> None:
-        print(f"test?  {args}  {kwargs}")
 
 
 if __name__ == "__main__":
@@ -17,5 +18,7 @@ if __name__ == "__main__":
         def __init__(self, x, y):
             print(x, y)
 
-
     h = Test(2, 3)
+    g = Test(4, 5)
+
+    print(h.identifier)

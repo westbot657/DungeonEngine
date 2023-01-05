@@ -30,13 +30,30 @@ class AbstractAmmo:
         raise Exception(f"Ammo has no name! ({self.identifier})")
     
     def getBonusDamage(self):
-        ...
+        if self.bonus_damage is None:
+            b = self.parent.getBonusDamage() if self.parent else None
+        else:
+            b = self.bonus_damage
+        if b is not None:
+            return b
+        raise Exception(f"Ammo has no bonus-damage! ({self.identifier})")
     
     def getMaxCount(self):
-        ...
+        if self.max_count is None:
+            b = self.parent.getMaxCount() if self.parent else None
+        else:
+            b = self.max_count
+        if b is not None:
+            return b
+        raise Exception(f"Ammo has no max-count! ({self.identifier})")
 
-    def createWeapon(self, **override_values) -> Ammo:
-        ...
+    def createAmmo(self, **override_values) -> Ammo:
+        return Ammo(
+            override_values.get("name", self.getName()),
+            override_values.get("bonus_damage", self.getBonusDamage()),
+            override_values.get("max_count", self.getMaxCount()),
+            override_values.get("count", self.getMaxCount())
+        )
 
     @classmethod
     def loadData(cls) -> list:
@@ -53,6 +70,9 @@ class AbstractAmmo:
                 path: str = d["path"]
                 name: str = d["name"]
                 cls._loaded.update({f"{namespace}:ammo/{name}": cls(Identifier(namespace, path, name), data)})
+
+            elif m := re.match(r"resources/ammo/(?P<name>[a-z0-9_]+)\.json", file):
+                ...
 
         for a, p in cls._link_parents:
             a: AbstractAmmo

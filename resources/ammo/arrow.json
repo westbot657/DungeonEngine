@@ -1,5 +1,5 @@
 {
     "name": "Arrow",
-    "damage-bonus": 0,
-    "max-stack-size": 20
+    "damage_bonus": 0,
+    "max_count": 20
 }

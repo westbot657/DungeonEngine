@@ -20,7 +20,10 @@
             "target": "example_dungeon:right_tunnel"
         },
         {
-            "type": "door"
+            "type": "door",
+            "id": "boss_room_door",
+            "target": "example_dungeon:boss_room",
+            "locked": true
         },
         {
             "type": "loot-item",

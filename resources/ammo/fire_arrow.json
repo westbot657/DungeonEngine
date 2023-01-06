@@ -1,6 +1,6 @@
 {
     "parent": "ammo:arrow",
     "name": "Fire Arrow",
-    "damage-bonus": 3,
-    "max-stack-size": 18
+    "damage_bonus": 3,
+    "max_count": 18
 }

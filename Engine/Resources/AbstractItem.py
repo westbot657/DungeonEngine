@@ -2,8 +2,10 @@
 
 try:
     from .Identifier import Identifier
+    from .Item import Item
 except ImportError:
     from Identifier import Identifier
+    from Item import Item
 
 
 class AbstractItem:
@@ -22,4 +24,11 @@ class AbstractItem:
         self.count = data.get("count", self.max_count)
 
         return self
+
+
+    def createItem(self, **override_values) -> Item:
+        return Item()
+
+
+
 

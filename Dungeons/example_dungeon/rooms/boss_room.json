@@ -4,5 +4,13 @@
     "entry-point": "example_dungeon:grove_entrance",
     "data": {
         "boss_defeated": false
+    },
+    "combat": {
+        "participants": {
+            "shadow_ent": "example_dungeon:shadow_ent"
+        },
+        "start-message": "when first player starts combat",
+        "join-message": "when additional players join this combat",
+        "end-message": "when all enemies are defeated with at least 1 player survivor"
     }
 }

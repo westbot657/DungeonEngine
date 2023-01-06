@@ -1,0 +1,11 @@
+{
+    "name": "Shadow Ent",
+    "max_health": 25,
+    "attacks": [
+        "example_dungeon:natures_wrath",
+        {
+            "parent": "engine:vine_whip",
+            "name": "Branch Thrash"
+        }
+    ]
+}

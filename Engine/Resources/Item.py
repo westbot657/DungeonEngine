@@ -2,15 +2,12 @@
 
 class Item:
 
-    def __new__(cls, data:dict):
-        self = super().__new__(cls)
+    def __init__(self, name:str, max_count:int, count:int, data:dict|None=None):
+        self.name = name
+        self.max_count = max_count
+        self.count = count
+        self.data = data or {}
 
-        self.name = data.get("name", None)
-        self.max_count = data.get("max_count", None)
-        self.count = data.get("count", self.max_count)
-        self.parent = data.get("parent", None)
-
-
-        return self
-
+    def __repr__(self):
+        return f"Item {self.name}: max_count:{self.max_count} count:{self.count} data:{self.data}"
 

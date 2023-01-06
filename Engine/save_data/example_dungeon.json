@@ -3,6 +3,13 @@
         "bass_defeated": true
     },
     "rooms": {
-        
+        "grove_entrance": {
+            "interactions": {
+                "remove": [
+                    "#ritual_staff"
+                ],
+                "add": []
+            }
+        }
     }
 }

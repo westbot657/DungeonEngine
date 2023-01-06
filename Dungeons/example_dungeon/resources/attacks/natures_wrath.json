@@ -1,0 +1,9 @@
+{
+    "name": "Nature's Wrath",
+    "range": 20,
+    "damage": 5,
+    "cooldown": 4,
+    "attack_messages": [
+        "The {enemy} calls forth the wrath of nature, sapping the life from {target}"
+    ]
+}

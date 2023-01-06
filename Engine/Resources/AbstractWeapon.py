@@ -3,9 +3,11 @@
 try:
     from .Identifier import Identifier
     from .Weapon import Weapon
+    from .EngineErrors import InvalidObjectError
 except ImportError:
     from Identifier import Identifier
     from Weapon import Weapon
+    from EngineErrors import InvalidObjectError
 
 import glob, json, re
 
@@ -16,9 +18,9 @@ class AbstractWeapon:
 
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
-        self.children = []
+        self.children: list[AbstractWeapon] = []
 
-        self.parent = None
+        self.parent: AbstractWeapon|None = None
         if "parent" in data:
             AbstractWeapon._link_parents.append((self, data["parent"]))
 
@@ -34,7 +36,7 @@ class AbstractWeapon:
     def getName(self) -> str:
         n = self.name or (self.parent.getName() if self.parent else None)
         if n is not None: return n
-        raise Exception(f"Weapon has no name! ({self.identifier})")
+        raise InvalidObjectError(f"Weapon has no name! ({self.identifier})")
     
     def getDamage(self) -> int:
         if self.damage is None:
@@ -42,7 +44,7 @@ class AbstractWeapon:
         else:
             d = self.damage
         if d is not None: return d
-        raise Exception(f"Weapon has no damage! ({self.identifier})")
+        raise InvalidObjectError(f"Weapon has no damage! ({self.identifier})")
 
     def getRange(self) -> int:
         if self.range is None:
@@ -50,7 +52,7 @@ class AbstractWeapon:
         else:
             r = self.range
         if r is not None: return r
-        raise Exception(f"Weapon has no range! ({self.identifier})")
+        raise InvalidObjectError(f"Weapon has no range! ({self.identifier})")
     
     def getDurability(self) -> int:
         if self.durability is None:
@@ -58,7 +60,7 @@ class AbstractWeapon:
         else:
             d = self.damage
         if d is not None: return d
-        raise Exception(f"Weapon has no durability! ({self.identifier})")
+        raise InvalidObjectError(f"Weapon has no durability! ({self.identifier})")
 
     def createWeapon(self, **value_overrides) -> Weapon:
         return Weapon(
@@ -83,6 +85,11 @@ class AbstractWeapon:
                 path: str = d["path"]
                 name: str = d["name"]
                 cls._loaded.update({f"{namespace}:weapons/{name}": cls(Identifier(namespace, path, name), data)})
+
+            elif m := re.match(r"resources/weapons/(?P<name>[a-z0-9_]+)\.json", file):
+                d: dict = m.groupdict()
+                name: str = d["name"]
+                cls._loaded.update({f"engine:weapons/{name}": cls(Identifier("engine", "resources/weapons/", name), data)})
 
         for w, p in cls._link_parents:
             w: AbstractWeapon

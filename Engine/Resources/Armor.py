@@ -3,6 +3,6 @@
 
 
 class Armor:
-    def __init__(self):
+    def __init__(self, name, damage_reduction, max_durability, durability):
         ...
 

@@ -1,17 +1,23 @@
 # pylint: disable=[W,R,C,import-error]
-from .Ammo import Ammo
-from .Identifier import Identifier
+try:
+    from .Ammo import Ammo
+    from .Identifier import Identifier
+    from .EngineErrors import InvalidObjectError
+except ImportError:
+    from Ammo import Ammo
+    from Identifier import Identifier
+    from EngineErrors import InvalidObjectError
 
 import glob, json, re
 
 class AbstractAmmo:
     _loaded: dict = {}
-    _link_parents = []
+    _link_parents: list = []
 
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
-        self.children = []
-        self.parent = None
+        self.children: list[AbstractAmmo] = []
+        self.parent: AbstractAmmo|None = None
 
         if "parent" in data:
             AbstractAmmo._link_parents.append((self, data["parent"]))
@@ -27,7 +33,7 @@ class AbstractAmmo:
     def getName(self):
         n = self.name or (self.parent.getName() if self.parent else None)
         if n is not None: return n
-        raise Exception(f"Ammo has no name! ({self.identifier})")
+        raise InvalidObjectError(f"Ammo has no name! ({self.identifier})")
     
     def getBonusDamage(self):
         if self.bonus_damage is None:
@@ -36,7 +42,7 @@ class AbstractAmmo:
             b = self.bonus_damage
         if b is not None:
             return b
-        raise Exception(f"Ammo has no bonus-damage! ({self.identifier})")
+        raise InvalidObjectError(f"Ammo has no bonus-damage! ({self.identifier})")
     
     def getMaxCount(self):
         if self.max_count is None:
@@ -45,7 +51,7 @@ class AbstractAmmo:
             b = self.max_count
         if b is not None:
             return b
-        raise Exception(f"Ammo has no max-count! ({self.identifier})")
+        raise InvalidObjectError(f"Ammo has no max-count! ({self.identifier})")
 
     def createAmmo(self, **override_values) -> Ammo:
         return Ammo(
@@ -67,12 +73,14 @@ class AbstractAmmo:
             if m := re.match(r"Dungeons/(?P<namespace>[^/]+)/resources/(?P<path>(?:[^/]+/)+)(?P<name>[a-z0-9_]+)\.json", file):
                 d: dict = m.groupdict()
                 namespace:str = d["namespace"]
-                path: str = d["path"]
+                path: str = f"Dungeons/{namespace}/resources/{d['path']}"
                 name: str = d["name"]
                 cls._loaded.update({f"{namespace}:ammo/{name}": cls(Identifier(namespace, path, name), data)})
 
             elif m := re.match(r"resources/ammo/(?P<name>[a-z0-9_]+)\.json", file):
-                ...
+                d: dict = m.groupdict()
+                name: str = d["name"]
+                cls._loaded.update({f"engine:ammo/{name}": cls(Identifier("engine", "resources/ammo/", name), data)})
 
         for a, p in cls._link_parents:
             a: AbstractAmmo

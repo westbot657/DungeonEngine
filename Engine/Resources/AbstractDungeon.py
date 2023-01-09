@@ -1,15 +1,15 @@
 # pylint: disable=[W,R,C,import-error]
 
 try:
-    from .StatusEffect import StatusEffect
+    from .Dungeon import Dungeon, Room
     from .Identifier import Identifier
 except ImportError:
-    from StatusEffect import StatusEffect
+    from Dungeon import Dungeon, Room
     from Identifier import Identifier
 
-import glob, json, re
 
-class AbstractStatusEffect:
+class AbstractDungeon:
+
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
         self._raw_data = data

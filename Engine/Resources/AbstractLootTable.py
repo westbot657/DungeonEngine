@@ -7,7 +7,7 @@ except ImportError:
     from LootTable import LootTable
     from Identifier import Identifier
 
-
+import glob, json, re
 
 """
 <id>.json
@@ -43,5 +43,8 @@ class AbstractLootTable:
 
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
-        
+        self._raw_data = data
+        self.parent: AbstractLootTable|None = None
+        self.children: list[AbstractLootTable] = []
+
 

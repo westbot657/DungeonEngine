@@ -16,6 +16,7 @@ class AbstractAmmo:
 
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
+        self._raw_data = data
         self.children: list[AbstractAmmo] = []
         self.parent: AbstractAmmo|None = None
 

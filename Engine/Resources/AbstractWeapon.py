@@ -18,9 +18,10 @@ class AbstractWeapon:
 
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
+        self._raw_data = data
         self.children: list[AbstractWeapon] = []
-
         self.parent: AbstractWeapon|None = None
+
         if "parent" in data:
             AbstractWeapon._link_parents.append((self, data["parent"]))
 
@@ -28,6 +29,7 @@ class AbstractWeapon:
         self.damage: int|None = data.get("damage", None)
         self.range: int|None = data.get("range", None)
         self.durability: int|None = data.get("durability", None)
+        
 
     def _set_parent(self, parent):
         self.parent = parent

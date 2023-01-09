@@ -1,7 +1,5 @@
 # pylint: disable=[W,R,C,import-error]
 
-class Dungeon:
+class Room:
     def __init__(self):
         ...
-
-

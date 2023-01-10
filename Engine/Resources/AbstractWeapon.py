@@ -28,8 +28,8 @@ class AbstractWeapon:
         self.name: str|None = data.get("name", None)
         self.damage: int|None = data.get("damage", None)
         self.range: int|None = data.get("range", None)
-        self.durability: int|None = data.get("durability", None)
-        
+        self.max_durability: int|None = data.get("max_durability", None)
+        self.durability: int|None = data.get("durability", self.max_durability)
 
     def _set_parent(self, parent):
         self.parent = parent
@@ -56,11 +56,19 @@ class AbstractWeapon:
         if r is not None: return r
         raise InvalidObjectError(f"Weapon has no range! ({self.identifier})")
     
+    def getMaxDurability(self) -> int:
+        if self.max_durability is None:
+            d = self.parent.getMaxDurability() if self.parent else None
+        else:
+            d = self.max_durability
+        if d is not None: return d
+        raise InvalidObjectError(f"Weapon has no max_durability! ({self.identifier})")
+
     def getDurability(self) -> int:
         if self.durability is None:
-            d = self.parent.getDamage() if self.parent else None
+            d = self.parent.getDurability() if self.parent else None
         else:
-            d = self.damage
+            d = self.durability
         if d is not None: return d
         raise InvalidObjectError(f"Weapon has no durability! ({self.identifier})")
 
@@ -69,6 +77,7 @@ class AbstractWeapon:
             value_overrides.get("name", self.getName()),
             value_overrides.get("damage", self.getDamage()),
             value_overrides.get("range", self.getRange()),
+            value_overrides.get("max_durability", self.getMaxDurability()),
             value_overrides.get("durability", self.getDurability())
         )
 
@@ -97,6 +106,19 @@ class AbstractWeapon:
             w: AbstractWeapon
             p: str
             w._set_parent(cls._loaded.get(p))
+
+        for l, o in cls._loaded.copy().items():
+            l: str
+            o: AbstractWeapon
+            try:
+                o.getName()
+                o.getRange()
+                o.getDamage()
+                o.getMaxDurability()
+                o.getDurability()
+            except InvalidObjectError:
+                e: AbstractWeapon = cls._loaded.pop(l)
+                print(f"Failed to load weapon: {e.identifier}")
 
         return cls._loaded
 

@@ -1,0 +1,43 @@
+{
+    "participants": [
+        "engine:goblin",
+        {
+            "rolls": 1,
+            "pools": [
+                {
+                    "bonus_rolls": 0,
+                    "count": {
+                        "type": "engine:uniform",
+                        "min": 1,
+                        "max": 3
+                    },
+                    "entries": [
+                        "engine:goblin"
+                    ]
+                },
+                {
+                    "bonus_rolls": 0,
+                    "count": {
+                        "type": "engine:uniform",
+                        "min": 1,
+                        "max": 6
+                    },
+                    "entries": [
+                        "engine:zombie"
+                    ]
+                },
+                {
+                    "bonus_rolls": 1,
+                    "count": {
+                        "type": "engine:uniform",
+                        "min": 1,
+                        "max": 5
+                    },
+                    "entries": [
+                        "engine:bandit"
+                    ]
+                }
+            ]
+        }
+    ]
+}

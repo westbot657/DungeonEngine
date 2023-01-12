@@ -1,0 +1,16 @@
+{
+    "rolls": 1,
+    "pools": [
+        {
+            "bonus_rolls": 0,
+            "count": {
+                "type": "engine:uniform",
+                "min": 1,
+                "max": 2
+            },
+            "entries": [
+                "engine:items/stick"
+            ]
+        }
+    ]
+}

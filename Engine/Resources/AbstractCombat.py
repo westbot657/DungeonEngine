@@ -16,8 +16,6 @@ class AbstractCombat:
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
         self._raw_data = data
-        self.parent: AbstractCombat|None = None
-        self.children: list[AbstractCombat] = []
         
     @classmethod
     def loadData(cls) -> list:

@@ -23,6 +23,9 @@ class AbstractItem:
         self.parent: AbstractItem|None = None
         self.children: list[AbstractItem] = []
 
+        if "parent" in data:
+            AbstractItem._link_parents.append((self, data["parent"]))
+
         self.name: str = data.get("name", None)
         self.max_count: int = data.get("max_count", None)
         self.count: int = data.get("count", self.max_count)

@@ -1,0 +1,7 @@
+{
+    "name": "Zombie",
+    "max_health": 8,
+    "attacks": [
+        "engine:bite"
+    ]
+}

@@ -13,12 +13,28 @@ import random
 @EngineFunction.Method(
     Identifier("engine", "random", "uniform"),
     {
-        "min": int,
-        "max": int
+        "args": {
+            "min": int,
+            "max": int
+        }
     }
 )
 def random_uniform_int(min_value, max_value):
     return random.randint(min_value, max_value)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

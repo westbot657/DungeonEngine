@@ -10,6 +10,8 @@ except ImportError:
 import glob, json, re
 
 class AbstractRoom:
+    _loaded = {}
+    _link_parents = []
 
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
@@ -17,6 +19,8 @@ class AbstractRoom:
         self.parent: AbstractRoom|None = None
         self.children: list[AbstractRoom] = []
         
+        if "parent" in data:
+            AbstractRoom._link_parents.append((self, data["parent"]))
 
     @classmethod
     def loadData(cls) -> list:

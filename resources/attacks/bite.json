@@ -1,0 +1,8 @@
+{
+    "name": "Bite",
+    "damage": {
+        "type": "engine:uniform",
+        "min": 1,
+        "max": 2
+    }
+}

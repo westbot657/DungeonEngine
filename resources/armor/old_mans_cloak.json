@@ -1,5 +1,5 @@
 {
     "name": "Deranged Man's Cloak",
     "damage_reduction": 3,
-    "durability": 50
+    "max_durability": 50
 }

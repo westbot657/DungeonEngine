@@ -1,0 +1,8 @@
+{
+    "name": "Goblin",
+    "max_health": 10,
+    "attacks": [
+        "engine:stab",
+        "engine:bite"
+    ]
+}

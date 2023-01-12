@@ -21,6 +21,9 @@ class AbstractArmor:
 
         self.parent: AbstractArmor|None = None
         self.children: list[AbstractArmor] = []
+
+        if "parent" in data:
+            AbstractArmor._link_parents.append((self, data["parent"]))
         
         self.name: str = data.get("name", None)
         self.max_durability: int = data.get("max_durability", None)

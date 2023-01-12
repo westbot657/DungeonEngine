@@ -1,5 +1,6 @@
 {
     "name": "Common Clothes",
     "damage_reduction": 0,
-    "durability": -1
+    "max_durability": -1,
+    "hidden": true
 }

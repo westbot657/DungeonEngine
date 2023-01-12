@@ -1,0 +1,44 @@
+[
+    {
+        "id": "DISCORD ID",
+        "name": "...",
+        "max_health": 20,
+        "health": 19,
+        "location": {
+            "room": "energia_city:west_main_street",
+            "position": [0, 0]
+        },
+        "inventory": [
+            {
+                "type": "armor",
+                "parent": "engine:armor/leather_armor",
+                "data": {
+                    "durability": 15
+                },
+                "equipped": true
+            },
+            {
+                "type": "item",
+                "parent": "engine:items/stick",
+                "data": {
+                    "count": 35
+                }
+            },
+            {
+                "type": "weapon",
+                "parent": "engine:weapons/sword",
+                "data": {
+                    "name": "Rusty Sword",
+                    "durability": 23
+                },
+                "equipped": true
+            }
+        ],
+        "status_effects": [
+            {
+                "effect": "engine:passive_regeneration",
+                "tick": 232
+            }
+        ]
+    }
+]

@@ -1,0 +1,6 @@
+{
+    "name": "Sword",
+    "damage": 3,
+    "range": 2,
+    "max_durability": 30
+}

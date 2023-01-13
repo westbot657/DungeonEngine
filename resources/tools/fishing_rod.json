@@ -1,0 +1,92 @@
+{
+    "name": "Fishing Rod",
+    "max_durability": 100,
+    "events": {
+        "on_use": [
+            {
+                "predicate": {
+                    "environment": {
+                        "fish-habitable": false
+                    }
+                },
+                "function": "engine:tool/cancel_use"
+            },
+            {
+                "predicate": {
+                    "environment": {
+                        "fish-habitable": true
+                    }
+                },
+                "function": "engine:random/weighted",
+                "rolls": 1,
+                "pools": [
+                    {
+                        "bonus_rolls": 0,
+                        "count": 1,
+                        
+                        "entries": [
+                            {
+                                "weight": {
+                                    "functions": [
+                                        {
+                                            "function": "engine:status_effect/get_level",
+                                            "status_effect": {
+                                                "function": "engine:player/get_status_effect",
+                                                "effect_name": "lure",
+                                                "default": {
+                                                    "parent": "engine:status_effects/lure",
+                                                    "level": 0,
+                                                    "duration": -1
+                                                }
+                                            },
+                                            "default": 0,
+                                            "store": "lure_level"
+                                        },
+                                        {
+                                            "function": "engine:math/solve",
+                                            "min": [
+                                                1.0,
+                                                {
+                                                    "add": [
+                                                        0.05,
+                                                        {
+                                                            "multiply": [
+                                                                0.025,
+                                                                {
+                                                                    "ref": "lure_level"
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                "functions": [
+                                    {
+                                        "function": "engine:player/give_item",
+                                        "item": "engine:items/fish"
+                                    },
+                                    {
+                                        "function": "engine:player/message",
+                                        "message": "You caught a fish!"
+                                    }
+                                ]
+                            },
+                            {
+                                "function": "engine:player/message",
+                                "message": "You didn't catch anything"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "on_equip": [],
+        "on_unequip": [],
+        "on_break": [],
+        "on_damage": [],
+        "on_repair": []
+    }
+}

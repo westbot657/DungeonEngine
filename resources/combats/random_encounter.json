@@ -7,7 +7,7 @@
                 {
                     "bonus_rolls": 0,
                     "count": {
-                        "type": "engine:uniform",
+                        "type": "engine:random/uniform",
                         "min": 1,
                         "max": 3
                     },
@@ -18,7 +18,7 @@
                 {
                     "bonus_rolls": 0,
                     "count": {
-                        "type": "engine:uniform",
+                        "type": "engine:random/uniform",
                         "min": 1,
                         "max": 6
                     },
@@ -29,7 +29,7 @@
                 {
                     "bonus_rolls": 1,
                     "count": {
-                        "type": "engine:uniform",
+                        "type": "engine:random/uniform",
                         "min": 1,
                         "max": 5
                     },

@@ -4,7 +4,7 @@
         {
             "bonus_rolls": 0,
             "count": {
-                "type": "engine:uniform",
+                "type": "engine:random/uniform",
                 "min": 1,
                 "max": 2
             },

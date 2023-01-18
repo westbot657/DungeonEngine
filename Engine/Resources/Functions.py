@@ -1,10 +1,10 @@
 # pylint: disable=[W,R,C,import-error]
 
 try:
-    from .EngineFunction import EngineFunction
+    from .LoaderFunction import LoaderFunction
     from .Identifier import Identifier
 except ImportError:
-    from EngineFunction import EngineFunction
+    from LoaderFunction import LoaderFunction
     from Identifier import Identifier
 
 import random, math, re
@@ -60,34 +60,7 @@ engine:armor/set_damage_reduction
 engine:armor/get_max_durability
 engine:armor/set_max_durability
 
-
 """
-
-
-@EngineFunction.Method(
-    Identifier("engine", "random", "uniform"),
-    {
-        "args": {
-            "min": int,
-            "max": int
-        }
-    }
-)
-def random_uniform_int(min_value, max_value):
-    return random.randint(min_value, max_value)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

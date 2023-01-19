@@ -102,6 +102,18 @@ class AbstractArmor:
             a: AbstractArmor
             p: str
             a._set_parent(cls._loaded.get(p))
+        
+        for l, o in cls._loaded.copy().items():
+            l: str
+            o: AbstractArmor
+            try:
+                o.getName()
+                o.getDamageReduction()
+                o.getMaxDurability()
+                o.getDurability()
+            except InvalidObjectError:
+                e: AbstractArmor = cls._loaded.pop(l)
+                print(f"Failed to load armor: {e.identifier}")
 
         return cls._loaded
 

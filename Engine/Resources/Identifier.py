@@ -9,6 +9,9 @@ class Identifier:
     def ID(self):
         return f"{self.namespace}:{self.name}" if self.name else f"{self.namespace}"
 
+    def full(self):
+        return f"{self.namespace}:{self.path}{self.name}"
+
     def __repr__(self):
         if self.name:
             return f"{self.namespace}:{self.name} ({self.path})"

@@ -22,8 +22,6 @@
                 "pools": [
                     {
                         "bonus_rolls": 0,
-                        "count": 1,
-                        
                         "entries": [
                             {
                                 "weight": {
@@ -66,7 +64,8 @@
                                 "functions": [
                                     {
                                         "function": "engine:player/give_item",
-                                        "item": "engine:items/fish"
+                                        "item": "engine:items/fish",
+                                        "count": 1
                                     },
                                     {
                                         "function": "engine:player/message",

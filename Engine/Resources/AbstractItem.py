@@ -53,11 +53,16 @@ class AbstractItem:
         raise InvalidObjectError(f"Item has no max_count! ({self.identifier})")
 
     def getCount(self) -> int:
-        ...
+        if self.count is None:
+            c = self.parent.getCount() if self.parent else None
+        else:
+            c = self.count
+        if c is not None: return c
+        raise InvalidObjectError(f"Item has no count! ({self.identifier})")
     
     def getData(self) -> dict:
         if self.data is None:
-            return self.parent.getData() or {}
+            return self.parent.getData() or {} if self.parent else {}
         return self.data
 
     def createItem(self, **override_values) -> Item:
@@ -94,8 +99,21 @@ class AbstractItem:
             p: str
             w._set_parent(cls._loaded.get(p))
 
+        for l, o in cls._loaded.copy().items():
+            l: str
+            o: AbstractItem
+            try:
+                o.getName()
+                o.getMaxCount()
+                o.getCount()
+                o.getData()
+            except InvalidObjectError:
+                e: AbstractItem = cls._loaded.pop(l)
+                print(f"Failed to load item: {e.identifier}")
+
         return cls._loaded
 
 
-
+if __name__ == "__main__":
+    print(AbstractItem.loadData())
 

@@ -63,7 +63,16 @@ engine:armor/set_max_durability
 """
 
 
+class Engine_Random_Uniform(LoaderFunction):
+    id = Identifier("engine", "random", "uniform")
+    args = {
+        "min": int,
+        "max": int
+    }
 
+    @staticmethod
+    def call(min_val, max_val):
+        return random.randint(min_val, max_val)
 
 
 

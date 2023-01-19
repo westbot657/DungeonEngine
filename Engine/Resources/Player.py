@@ -22,6 +22,7 @@ class Player:
 
     @classmethod
     def loadData(cls) -> list:
+
         with open("Engine/save_data/players.json", "r+", encoding="utf-8") as f:
             data_list: list[dict] = json.load(f)
         

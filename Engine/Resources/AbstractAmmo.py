@@ -26,6 +26,7 @@ class AbstractAmmo:
         self.name: str|None = data.get("name", None)
         self.bonus_damage: int|None = data.get("bonus_damage", "None")
         self.max_count: int|None = data.get("max_count", None)
+        self.count: int|None = data.get("count", self.max_count)
 
     def _set_parent(self, parent):
         self.parent = parent
@@ -54,12 +55,21 @@ class AbstractAmmo:
             return b
         raise InvalidObjectError(f"Ammo has no max-count! ({self.identifier})")
 
+    def getCount(self):
+        if self.count is None:
+            b = self.parent.getCount() if self.parent else None
+        else:
+            b = self.count
+        if b is not None:
+            return b
+        raise InvalidObjectError(f"Ammo has no max-count! ({self.identifier})")
+
     def createAmmo(self, **override_values) -> Ammo:
         return Ammo(
             override_values.get("name", self.getName()),
             override_values.get("bonus_damage", self.getBonusDamage()),
             override_values.get("max_count", self.getMaxCount()),
-            override_values.get("count", self.getMaxCount())
+            override_values.get("count", self.getCount())
         )
 
     @classmethod
@@ -87,6 +97,17 @@ class AbstractAmmo:
             a: AbstractAmmo
             p: str
             a._set_parent(cls._loaded.get(p))
+        
+        for l, o in cls._loaded.copy().items():
+            l: str
+            o: AbstractAmmo
+            try:
+                o.getName()
+                o.getBonusDamage()
+                o.getMaxCount()
+            except InvalidObjectError:
+                e: AbstractAmmo = cls._loaded.pop(l)
+                print(f"Failed to load ammo: {e.identifier}")
 
         return cls._loaded
 

@@ -22,3 +22,10 @@ class Engine:
     def init(self):
         ...
 
+
+    def loadGame(self):
+        ...
+
+    def saveGame(self):
+        ...
+

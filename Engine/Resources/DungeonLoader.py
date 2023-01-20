@@ -11,6 +11,7 @@ try:
     from .AbstractStatusEffect import AbstractStatusEffect
     from .AbstractTool import AbstractTool
     from .AbstractWeapon import AbstractWeapon
+    from .Functions import LoaderFunction
 except ImportError:
     from AbstractAmmo import AbstractAmmo
     from AbstractArmor import AbstractArmor
@@ -22,6 +23,7 @@ except ImportError:
     from AbstractStatusEffect import AbstractStatusEffect
     from AbstractTool import AbstractTool
     from AbstractWeapon import AbstractWeapon
+    from Functions import LoaderFunction
 
 
 class DungeonLoader:
@@ -44,21 +46,45 @@ class DungeonLoader:
         self.abstract_tools: dict[str, AbstractTool] = {}
         self.abstract_weapons: dict[str, AbstractWeapon] = {}
 
-    def evaluateFunction(self, data:dict, symbol_table:dict=None):
-        if not symbol_table: symbol_table = {}
+    def checkPredicate(self, predicate:dict, engine) -> bool:
+        ...
+
+    def evaluateFunction(self, engine, data:dict):
         
         if (funcs := data.get("functions", None)) is not None:
             for func in funcs:
                 result = None
-                res = self.evaluateFunction(func, symbol_table)
+                res = self.evaluateFunction(engine, func)
                 if res: result = res
             return result
         
         elif (func := data.get("function", None)) is not None:
-            ...
-        
+            if f := LoaderFunction.getFunction(func):
+                f: LoaderFunction
+
+                if (predicate := data.get("predicate", None)) is not None:
+                    if not self.checkPredicate(predicate, engine): return None
+
+                args = {}
+                for key, item in data.items():
+                    if key in ["function", "#store"]: continue
+                    if isinstance(item, dict):
+                        args.update({key: self.evaluateFunction(engine, item)})
+                    else:
+                        args.update({key: item})
+                r = f._call(engine, args)
+                if var := data.get("#store", None):
+                    engine.function_memory.update({var: r})
+                return r
+        elif (var := data.get("#ref", None)) is not None:
+            if var in engine.function_memory:
+                return engine.function_memory.get(var)
+            else:
+                print(f"Variable referenced before assignment: '{var}'")
+                return data
+
         else:
-            ... # ?
+            return data
 
 
     def constructAmmo(self, data:dict):
@@ -83,7 +109,7 @@ class DungeonLoader:
         ...
 
 
-    def loadGame(self):
+    def loadGame(self, engine):
         self.abstract_ammo = AbstractAmmo.loadData(self)
         self.abstract_armor = AbstractArmor.loadData(self)
         self.abstract_combats = AbstractCombat.loadData(self)

@@ -38,7 +38,7 @@
                                                 }
                                             },
                                             "default": 0,
-                                            "store": "lure_level"
+                                            "#store": "lure_level"
                                         },
                                         {
                                             "function": "engine:math/solve",
@@ -51,7 +51,7 @@
                                                             "multiply": [
                                                                 0.025,
                                                                 {
-                                                                    "ref": "lure_level"
+                                                                    "#ref": "lure_level"
                                                                 }
                                                             ]
                                                         }

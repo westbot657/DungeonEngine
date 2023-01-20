@@ -16,12 +16,12 @@ except ImportError:
     from AbstractTool import AbstractTool, Tool
     from AbstractWeapon import AbstractWeapon, Weapon
 
-
 class Inventory:
     def __init__(self, contents:list):
+        self.parent = None
         self.contents = contents
 
     @classmethod
-    def from_list(cls, data:list):
+    def from_list(cls, loader, data:list):
         ...
 

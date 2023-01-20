@@ -1,9 +1,9 @@
 {
     "name": "Grove Entrance",
     "enter-message": {
-        "example_dungeon:#boss_defeated=true": "3 doors",
-        "example_dungeon:#boss_defeated=false": "2 doors",
-        "#ritual_staff": "there is a ritual staff in the corner"
+        "example_dungeon.boss_defeated=true": "3 doors",
+        "example_dungeon.boss_defeated=false": "2 doors",
+        ".ritual_staff": "there is a ritual staff in the corner"
     },
     "interactions": [
         {

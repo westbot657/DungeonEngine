@@ -71,7 +71,7 @@ class AbstractArmor:
         raise InvalidObjectError(f"Armor has no damage_reduction! ({self.identifier})")
 
     def createArmor(self, **override_values) -> Armor:
-        return Armor(
+        return Armor(self,
             override_values.get("name", self.getName()),
             override_values.get("damage_reduction", self.getDamageReduction()),
             override_values.get("max_durability", self.getMaxDurability()),
@@ -79,7 +79,7 @@ class AbstractArmor:
         )
 
     @classmethod
-    def loadData(cls) -> list:
+    def loadData(cls, inline_handler) -> list:
         files: list[str] = glob.glob("**/armor/*.json", recursive=True)
         for file in files:
             file: str

@@ -23,6 +23,6 @@ class AbstractStatusEffect:
             AbstractStatusEffect._link_parents.append((self, data["parent"]))
 
     @classmethod
-    def loadData(cls) -> list:
+    def loadData(cls, inline_handler) -> list:
         ...
 

@@ -23,6 +23,6 @@ class AbstractRoom:
             AbstractRoom._link_parents.append((self, data["parent"]))
 
     @classmethod
-    def loadData(cls, namespace:str="engine") -> list:
+    def loadData(cls, inline_handler, namespace:str="engine") -> list:
         ...
 

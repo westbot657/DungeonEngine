@@ -66,7 +66,7 @@ class AbstractItem:
         return self.data
 
     def createItem(self, **override_values) -> Item:
-        return Item(
+        return Item(self,
             override_values.get("name", self.getName()),
             override_values.get("max_count", self.getMaxCount()),
             override_values.get("count", self.getCount()),
@@ -75,7 +75,7 @@ class AbstractItem:
 
 
     @classmethod
-    def loadData(cls) -> list:
+    def loadData(cls, inline_handler) -> list:
         files: list[str] = glob.glob("**/items/*.json", recursive=True)
         for file in files:
             file: str
@@ -115,5 +115,5 @@ class AbstractItem:
 
 
 if __name__ == "__main__":
-    print(AbstractItem.loadData())
+    pass #print(AbstractItem.loadData())
 

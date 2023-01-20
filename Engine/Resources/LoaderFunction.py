@@ -15,6 +15,10 @@ class LoaderFunction:
     @classmethod
     def call(cls, *_, **__):
         return None
+
+    @classmethod
+    def check(cls, args:dict):
+        return None
     
     def __init_subclass__(cls):
         id = cls.id
@@ -27,15 +31,24 @@ class LoaderFunction:
             if cls.call is LoaderFunction.call:
                 print(f"Failed to load function without call: {id.full()}")
                 return
+            if cls.check is LoaderFunction.check:
+                print(f"Failed to load function without check: {id.full()}")
 
-            LoaderFunction._functions.update({id.ID(): cls})
+            LoaderFunction._functions.update({id.full(): cls})
         else:
             print(f"Failed to load function without id: {cls}")
 
     @classmethod
     def _call(cls, data:dict):
         # check args
-        ...
+        match data:
+            case {
+                    "min": int(),
+                    "max": int()
+                }:
+                    print("case 1")
+            case _:
+                print("no match")
         return cls.call(...)
 
 
@@ -51,5 +64,7 @@ if __name__ == "__main__":
         @staticmethod
         def call(a):
             return 5 * a
+
+    LoaderFunction._call({"min": 6, "max": 20})
 
 

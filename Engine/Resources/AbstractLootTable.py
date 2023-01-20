@@ -88,13 +88,13 @@ class AbstractLootTable:
 
     def createLootTable(self, **override_values) -> LootTable:
         # probably check that pools (if given) is valid/needs to be converted from json
-        return LootTable(
+        return LootTable(self,
             override_values.get("rolls", self.getRolls()),
             self.loadPools(override_values.get("pools", self.getPools()))
         )
 
     @classmethod
-    def loadData(cls) -> list:
+    def loadData(cls, inline_handler) -> list:
         files: list[str] = glob.glob("**/loot_tables/*.json", recursive=True)
 
         for file in files:

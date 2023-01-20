@@ -1,7 +1,8 @@
 # pylint: disable=[W,R,C,import-error]
 
 class Ammo:
-    def __init__(self, name:str, bonus_damage:int, max_count:int, count:int=None):
+    def __init__(self, abstract, name:str, bonus_damage:int, max_count:int, count:int=None):
+        self.abstract = abstract
         self.name = name
         self.bonus_damage = bonus_damage
         self.max_count = max_count

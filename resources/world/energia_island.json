@@ -1,0 +1,19 @@
+{
+    "name": "Energia Island",
+    "dungeon_entrances": [
+        {
+            "dungeon": "example_dungeon",
+            "entrances": [
+                {
+                    "position": [0, 0]
+                },
+                {
+                    "position": [3, 1],
+                    "predicate": {
+                        "example_dungeon.boss_defeated": true
+                    }
+                }
+            ]
+        }
+    ]
+}

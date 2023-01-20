@@ -75,7 +75,7 @@ class AbstractDungeon:
         self._raw_data = data
 
     @classmethod
-    def loadData(cls) -> list:
+    def loadData(cls, inline_handler) -> list:
         files: list[str] = glob.glob("Dungeons/**/*.json")#, recursive=True)
 
         print(files)
@@ -99,5 +99,5 @@ class AbstractDungeon:
         return cls._loaded
 
 if __name__ == "__main__":
-    print(AbstractDungeon.loadData())
+    pass #print(AbstractDungeon.loadData())
 

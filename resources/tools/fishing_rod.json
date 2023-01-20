@@ -64,7 +64,7 @@
                                 "functions": [
                                     {
                                         "function": "engine:player/give_item",
-                                        "item": "engine:items/fish",
+                                        "item-parent": "engine:items/fish",
                                         "count": 1
                                     },
                                     {

@@ -23,5 +23,5 @@ class AbstractTool:
         parent.children.append(self)
     
     @classmethod
-    def loadData(cls) -> list:
+    def loadData(cls, inline_handler) -> list:
         ...

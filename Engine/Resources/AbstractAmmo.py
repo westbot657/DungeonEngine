@@ -64,8 +64,24 @@ class AbstractAmmo:
             return b
         raise InvalidObjectError(f"Ammo has no max-count! ({self.identifier})")
 
+    def is_parent_of(self, other):
+        p = other
+        while p is not None:
+            if self == p:
+                return True
+            p = p.parent
+        return False
+    
+    def inherets_from(self, other):
+        p = self
+        while p is not None:
+            if p == other:
+                return True
+            p = p.parent
+        return False
+
     def createAmmo(self, **override_values) -> Ammo:
-        return Ammo(
+        return Ammo(self,
             override_values.get("name", self.getName()),
             override_values.get("bonus_damage", self.getBonusDamage()),
             override_values.get("max_count", self.getMaxCount()),
@@ -73,7 +89,7 @@ class AbstractAmmo:
         )
 
     @classmethod
-    def loadData(cls) -> list:
+    def loadData(cls, inline_handler) -> list:
         files: list[str] = glob.glob("**/ammo/*.json", recursive=True)
 
         for file in files:
@@ -113,5 +129,4 @@ class AbstractAmmo:
 
 
 if __name__ == "__main__":
-    print(AbstractAmmo.loadData())
-
+    pass

@@ -10,7 +10,8 @@ except ImportError:
 
 class LootTable:
 
-    def __init__(self, rolls:int, pools:list[LootPool]):
+    def __init__(self, abstract, rolls:int, pools:list[LootPool]):
+        self.abstract = abstract
         self.rolls = rolls
         self.pools = pools
 

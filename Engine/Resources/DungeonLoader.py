@@ -84,17 +84,17 @@ class DungeonLoader:
 
 
     def loadGame(self):
-        self.abstract_ammo = AbstractAmmo.loadData()
-        self.abstract_armor = AbstractArmor.loadData()
-        self.abstract_combats = AbstractCombat.loadData()
+        self.abstract_ammo = AbstractAmmo.loadData(self)
+        self.abstract_armor = AbstractArmor.loadData(self)
+        self.abstract_combats = AbstractCombat.loadData(self)
 
-        self.abstract_items = AbstractItem.loadData()
-        self.abstract_loot_tables = AbstractLootTable.loadData()
+        self.abstract_items = AbstractItem.loadData(self)
+        self.abstract_loot_tables = AbstractLootTable.loadData(self)
         
-        # self.abstract_rooms = AbstractRoom.loadData()
-        self.abstract_status_effects = AbstractStatusEffect.loadData()
-        self.abstract_tools = AbstractTool.loadData()
-        self.abstract_weapons = AbstractWeapon.loadData()
+        # self.abstract_rooms = AbstractRoom.loadData(self)
+        self.abstract_status_effects = AbstractStatusEffect.loadData(self)
+        self.abstract_tools = AbstractTool.loadData(self)
+        self.abstract_weapons = AbstractWeapon.loadData(self)
 
-        self.abstract_dungeons = AbstractDungeon.loadData()
+        self.abstract_dungeons = AbstractDungeon.loadData(self)
 

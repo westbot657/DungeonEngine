@@ -73,7 +73,7 @@ class AbstractWeapon:
         raise InvalidObjectError(f"Weapon has no durability! ({self.identifier})")
 
     def createWeapon(self, **value_overrides) -> Weapon:
-        return Weapon(
+        return Weapon(self,
             value_overrides.get("name", self.getName()),
             value_overrides.get("damage", self.getDamage()),
             value_overrides.get("range", self.getRange()),
@@ -82,7 +82,7 @@ class AbstractWeapon:
         )
 
     @classmethod
-    def loadData(cls) -> list:
+    def loadData(cls, inline_handler) -> list:
         files: list[str] = glob.glob("**/weapons/*.json", recursive=True)
         #print(files)
         for file in files:
@@ -124,4 +124,4 @@ class AbstractWeapon:
 
 
 if __name__ == "__main__":
-    print(AbstractWeapon.loadData())
+    pass #print(AbstractWeapon.loadData())

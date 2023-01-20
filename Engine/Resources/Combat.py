@@ -2,6 +2,7 @@
 
 class Combat:
 
-    def __init__(self):
+    def __init__(self, abstract):
+        self.abstract = abstract
         ...
 

@@ -17,7 +17,7 @@ engine:tool/set_durability
 engine:tool/set_max_durability
 engine:tool/get_max_durability
 
-engine:random/uniform
+engine:random/uniform X
 engine:random/weighted
 
 engine:player/message
@@ -64,16 +64,35 @@ engine:armor/set_max_durability
 
 
 class Engine_Random_Uniform(LoaderFunction):
-    id = Identifier("engine", "random", "uniform")
-    args = {
-        "min": int,
-        "max": int
-    }
+    id = Identifier("engine", "random/", "uniform")
+
+    @classmethod
+    def check(cls, engine, args):
+        match args:
+            case {
+                "min": int(),
+                "max": int()
+            }: return cls.rand_range
+            case {
+                "rolls": int(),
+                "pools": list()
+            }: return cls.rand_choice
+            case _: return None
 
     @staticmethod
-    def call(min_val, max_val):
-        return random.randint(min_val, max_val)
+    def rand_range(engine, min, max):
+        return random.randint(min, max)
+
+    @staticmethod
+    def rand_choice(engine, pools, rolls):
+        ...
 
 
+class Engine_Random_Weighted(LoaderFunction):
+    id = Identifier("engine", "random/", "weighted")
 
+    @classmethod
+    def check(cls, engine, args):
+        ...
+    
 

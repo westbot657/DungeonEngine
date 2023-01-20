@@ -19,11 +19,11 @@ class LoaderFunction:
         return None
 
     @classmethod
-    def call(cls, *_, **__):
+    def call(cls, engine, *_, **__):
         return None
 
     @classmethod
-    def check(cls, args:dict):
+    def check(cls, engine, args:dict):
         return False
     
     def __init_subclass__(cls):
@@ -42,10 +42,10 @@ class LoaderFunction:
             print(f"Failed to load function without id: {cls}")
 
     @classmethod
-    def _call(cls, data:dict):
+    def _call(cls, engine, data:dict):
         # check args
-        if cls.check(data):
-            return cls.call(**data)
+        if cls.check(engine, data):
+            return cls.call(engine, **data)
         else:
             print(f"Invalid arguments given to function: {cls.id.full()}")
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
         id = Identifier("test", "something/", "idk")
 
         @staticmethod
-        def check(args):
+        def check(engine, args):
             match args:
                 case {
                     "a": int()
@@ -63,9 +63,9 @@ if __name__ == "__main__":
                 case _: return False
 
         @staticmethod
-        def call(a):
+        def call(engine, a):
             return 5 * a
 
-    LoaderFunction._call({"min": 6, "max": 20})
+    LoaderFunction._call(None, {"min": 6, "max": 20})
 
 

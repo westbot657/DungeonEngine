@@ -12,6 +12,7 @@ try:
     from .AbstractTool import AbstractTool
     from .AbstractWeapon import AbstractWeapon
     from .Functions import LoaderFunction
+    from .Identifier import Identifier
 except ImportError:
     from AbstractAmmo import AbstractAmmo
     from AbstractArmor import AbstractArmor
@@ -24,7 +25,9 @@ except ImportError:
     from AbstractTool import AbstractTool
     from AbstractWeapon import AbstractWeapon
     from Functions import LoaderFunction
+    from Identifier import Identifier
 
+import re
 
 class DungeonLoader:
     _loader = None
@@ -107,6 +110,16 @@ class DungeonLoader:
         ...
     def constructWeapon(self, data:dict):
         ...
+
+
+    def getObject(self, identifier:Identifier|str):
+        if isinstance(identifier, str):
+            if m := re.match(r"(?P<namespace>[a-zA-Z0-9_]+):(?P<path>(?:[a-zA-Z0-9_]+/)*)(?P<name>[a-zA-Z0-9_])", identifier):
+                d = m.groupdict()
+                identifier = Identifier(d["namespace"], d["path"], d["name"])
+            else:
+                print(f"Unrecognized identifier: '{identifier}'")
+                return None
 
 
     def loadGame(self, engine):

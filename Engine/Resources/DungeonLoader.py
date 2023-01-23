@@ -6,7 +6,6 @@ try:
     from .AbstractCombat import AbstractCombat
     from .AbstractDungeon import AbstractDungeon
     from .AbstractItem import AbstractItem
-    from .AbstractLootTable import AbstractLootTable
     from .AbstractRoom import AbstractRoom
     from .AbstractStatusEffect import AbstractStatusEffect
     from .AbstractTool import AbstractTool
@@ -19,7 +18,6 @@ except ImportError:
     from AbstractCombat import AbstractCombat
     from AbstractDungeon import AbstractDungeon
     from AbstractItem import AbstractItem
-    from AbstractLootTable import AbstractLootTable
     from AbstractRoom import AbstractRoom
     from AbstractStatusEffect import AbstractStatusEffect
     from AbstractTool import AbstractTool

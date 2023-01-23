@@ -84,8 +84,16 @@ class Engine_Random_Uniform(LoaderFunction):
         return random.randint(min, max)
 
     @staticmethod
-    def rand_choice(engine, pools, rolls):
-        ...
+    def rand_choice(engine, pools:list[dict], rolls:int):
+        roll = 0
+        while roll < rolls:
+            for pool in pools:
+                pool: dict
+                roll -= pool["bonus_rolls"]
+                entries = pool["entries"]
+                
+
+            roll += 1
 
 
 class Engine_Random_Weighted(LoaderFunction):

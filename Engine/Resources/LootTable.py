@@ -10,10 +10,16 @@ except ImportError:
 
 class LootTable:
 
-    def __init__(self, abstract, rolls:int, pools:list[LootPool]):
-        self.abstract = abstract
+    def __init__(self, rolls:int, pools:list[LootPool|dict], weighted:bool=False):
         self.rolls = rolls
         self.pools = pools
+        self.weighted = weighted
+
+    @classmethod
+    def loadTable(cls, data:dict, weighted:bool=False):
+        rolls:int = data.get("rolls", 1)
+        pools:list[dict] = data.get("pools", [])
+        return cls(rolls, pools, weighted)
 
 
 

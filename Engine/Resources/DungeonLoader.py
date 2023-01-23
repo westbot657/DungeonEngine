@@ -41,7 +41,7 @@ class DungeonLoader:
         self.abstract_combats: dict[str, AbstractCombat] = {}
         self.abstract_dungeons: dict[str, AbstractDungeon] = {}
         self.abstract_items: dict[str, AbstractItem] = {}
-        self.abstract_loot_tables: dict[str, AbstractLootTable] = {}
+        #self.abstract_loot_tables: dict[str, AbstractLootTable] = {}
         self.abstract_rooms: dict[str, AbstractRoom] = {}
         self.abstract_status_effects: dict[str, AbstractStatusEffect] = {}
         self.abstract_tools: dict[str, AbstractTool] = {}
@@ -126,7 +126,7 @@ class DungeonLoader:
         self.abstract_combats = AbstractCombat.loadData(self)
 
         self.abstract_items = AbstractItem.loadData(self)
-        self.abstract_loot_tables = AbstractLootTable.loadData(self)
+        #self.abstract_loot_tables = AbstractLootTable.loadData(self)
         
         # self.abstract_rooms = AbstractRoom.loadData(self)
         self.abstract_status_effects = AbstractStatusEffect.loadData(self)

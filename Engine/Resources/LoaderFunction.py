@@ -18,10 +18,13 @@ class LoaderFunction:
         print(f"No loader-function with the id: {identifier}")
         return None
 
+    @staticmethod
+    def _check_dummy_return(*_, **__):
+        pass
 
     @classmethod
     def check(cls, engine, args:dict):
-        return False
+        return cls._check_dummy_return
     
     def __init_subclass__(cls):
         id = cls.id

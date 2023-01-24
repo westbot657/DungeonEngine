@@ -3,9 +3,12 @@
 try:
     from .LoaderFunction import LoaderFunction
     from .Identifier import Identifier
+    from .EngineDummy import Engine
+
 except ImportError:
     from LoaderFunction import LoaderFunction
     from Identifier import Identifier
+    from EngineDummy import Engine
 
 import random, math, re
 
@@ -67,7 +70,7 @@ class Engine_Random_Uniform(LoaderFunction):
     id = Identifier("engine", "random/", "uniform")
 
     @classmethod
-    def check(cls, engine, args):
+    def check(cls, engine:Engine, args):
         match args:
             case {
                 "min": int(),
@@ -84,7 +87,7 @@ class Engine_Random_Uniform(LoaderFunction):
         return random.randint(min, max)
 
     @staticmethod
-    def rand_choice(engine, pools:list[dict], rolls:int):
+    def rand_choice(engine:Engine, pools:list[dict], rolls:int):
         roll = 0
         while roll < rolls:
             for pool in pools:
@@ -100,7 +103,7 @@ class Engine_Random_Weighted(LoaderFunction):
     id = Identifier("engine", "random/", "weighted")
 
     @classmethod
-    def check(cls, engine, args):
+    def check(cls, engine:Engine, args):
         ...
     
 

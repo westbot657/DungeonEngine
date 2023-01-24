@@ -3,7 +3,7 @@ from Resources.AbstractAmmo         import AbstractAmmo, Ammo
 from Resources.AbstractArmor        import AbstractArmor, Armor
 from Resources.AbstractCombat       import AbstractCombat, Combat
 from Resources.AbstractItem         import AbstractItem, Item
-from Resources.AbstractLootTable    import AbstractLootTable, LootTable
+from Resources.LootTable            import LootTable, LootPool, LootEntry
 from Resources.AbstractStatusEffect import AbstractStatusEffect, StatusEffect
 from Resources.AbstractWeapon       import AbstractWeapon, Weapon
 from Resources.Identifier           import Identifier
@@ -23,6 +23,9 @@ class Engine:
     def init(self):
         self.loader = DungeonLoader()
         self.function_memory: dict = {}
+
+    def evaluateFunction(self, data:dict):
+        return self.loader.evaluateFunction(self, data)
 
     def loadGame(self):
         self.loader.loadGame(self)

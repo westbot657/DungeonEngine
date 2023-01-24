@@ -12,6 +12,7 @@ try:
     from .AbstractWeapon import AbstractWeapon
     from .Functions import LoaderFunction
     from .Identifier import Identifier
+    from .EngineDummy import Engine
 except ImportError:
     from AbstractAmmo import AbstractAmmo
     from AbstractArmor import AbstractArmor
@@ -24,6 +25,7 @@ except ImportError:
     from AbstractWeapon import AbstractWeapon
     from Functions import LoaderFunction
     from Identifier import Identifier
+    from EngineDummy import Engine
 
 import re
 
@@ -50,7 +52,7 @@ class DungeonLoader:
     def checkPredicate(self, predicate:dict, engine) -> bool:
         ...
 
-    def evaluateFunction(self, engine, data:dict):
+    def evaluateFunction(self, engine:Engine, data:dict):
         
         if (funcs := data.get("functions", None)) is not None:
             for func in funcs:
@@ -120,7 +122,7 @@ class DungeonLoader:
                 return None
 
 
-    def loadGame(self, engine):
+    def loadGame(self, engine:Engine):
         self.abstract_ammo = AbstractAmmo.loadData(self)
         self.abstract_armor = AbstractArmor.loadData(self)
         self.abstract_combats = AbstractCombat.loadData(self)

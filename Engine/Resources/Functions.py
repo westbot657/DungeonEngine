@@ -187,42 +187,42 @@ class Engine_Weapon_SetDurability(LoaderFunction):
             case {}: ...
             case _: return None
 class Engine_Weapon_GetMaxDurability(LoaderFunction):
-    id = Identifier("engine", "Weapon/", "GetMaxDurability")
+    id = Identifier("engine", "weapon/", "get_max_durability")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Weapon_SetMaxDurability(LoaderFunction):
-    id = Identifier("engine", "Weapon/", "SetMaxDurability")
+    id = Identifier("engine", "weapon/", "set_max_durability")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Weapon_GetDamage(LoaderFunction):
-    id = Identifier("engine", "Weapon/", "GetDamage")
+    id = Identifier("engine", "weapon/", "get_damage")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Weapon_SetDamage(LoaderFunction):
-    id = Identifier("engine", "Weapon/", "SetDamage")
+    id = Identifier("engine", "weapon/", "set_damage")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Weapon_GetAmmoType(LoaderFunction):
-    id = Identifier("engine", "Weapon/", "GetAmmoType")
+    id = Identifier("engine", "weapon/", "get_ammo_type")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Weapon_GetParentType(LoaderFunction):
-    id = Identifier("engine", "Weapon/", "GetParentType")
+    id = Identifier("engine", "weapon/", "get_parent_type")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -235,42 +235,42 @@ class Engine_Weapon_GetParentType(LoaderFunction):
 ####XXX##############XXX####
 
 class Engine_Armor_GetDurability(LoaderFunction):
-    id = Identifier("engine", "Armor/", "GetDurability")
+    id = Identifier("engine", "armor/", "get_durability")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Armor_SetDurability(LoaderFunction):
-    id = Identifier("engine", "Armor/", "SetDurability")
+    id = Identifier("engine", "armor/", "set_durability")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Armor_GetMaxDurability(LoaderFunction):
-    id = Identifier("engine", "Armor/", "GetMaxDurability")
+    id = Identifier("engine", "armor/", "get_max_durability")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Armor_SetMaxDurability(LoaderFunction):
-    id = Identifier("engine", "Armor/", "SetMaxDurability")
+    id = Identifier("engine", "armor/", "set_max_durability")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Armor_GetDamageReduction(LoaderFunction):
-    id = Identifier("engine", "Armor/", "GetDamageReduction")
+    id = Identifier("engine", "armor/", "get_damage_reduction")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Armor_SetDamageReduction(LoaderFunction):
-    id = Identifier("engine", "Armor/", "SetDamageReduction")
+    id = Identifier("engine", "armor/", "set_damage_reduction")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -283,35 +283,35 @@ class Engine_Armor_SetDamageReduction(LoaderFunction):
 ####XXX#############XXX####
 
 class Engine_Ammo_GetCount(LoaderFunction):
-    id = Identifier("engine", "Ammo/", "GetCount")
+    id = Identifier("engine", "ammo/", "get_count")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Ammo_SetCount(LoaderFunction):
-    id = Identifier("engine", "Ammo/", "SetCount")
+    id = Identifier("engine", "ammo/", "set_count")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Ammo_GetMaxCount(LoaderFunction):
-    id = Identifier("engine", "Ammo/", "GetMaxCount")
+    id = Identifier("engine", "ammo/", "get_max_count")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Ammo_GetParentType(LoaderFunction):
-    id = Identifier("engine", "Ammo/", "GetParentType")
+    id = Identifier("engine", "ammo/", "get_parent_type")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Ammo_GetBonusDamage(LoaderFunction):
-    id = Identifier("engine", "Ammo/", "GetBonusDamage")
+    id = Identifier("engine", "ammo/", "get_bonus_damage")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -324,42 +324,42 @@ class Engine_Ammo_GetBonusDamage(LoaderFunction):
 ####XXX#####################XXX####
 
 class Engine_StatusEffect_GetLevel(LoaderFunction):
-    id = Identifier("engine", "StatusEffect/", "GetLevel")
+    id = Identifier("engine", "status_effect/", "get_level")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_StatusEffect_SetLevel(LoaderFunction):
-    id = Identifier("engine", "StatusEffect/", "SetLevel")
+    id = Identifier("engine", "status_effect/", "set_level")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_StatusEffect_GetDuration(LoaderFunction):
-    id = Identifier("engine", "StatusEffect/", "GetDuration")
+    id = Identifier("engine", "status_effect/", "get_duration")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_StatusEffect_SetDuration(LoaderFunction):
-    id = Identifier("engine", "StatusEffect/", "SetDuration")
+    id = Identifier("engine", "status_effect/", "set_duration")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_StatusEffect_GetName(LoaderFunction):
-    id = Identifier("engine", "StatusEffect/", "GetName")
+    id = Identifier("engine", "status_effect/", "get_name")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_StatusEffect_GetCause(LoaderFunction):
-    id = Identifier("engine", "StatusEffect/", "GetCause")
+    id = Identifier("engine", "status_effect/", "get_cause")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -372,21 +372,21 @@ class Engine_StatusEffect_GetCause(LoaderFunction):
 ####XXX#############XXX####
 
 class Engine_Item_GetCount(LoaderFunction):
-    id = Identifier("engine", "Item/", "GetCount")
+    id = Identifier("engine", "item/", "get_count")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Item_SetCount(LoaderFunction):
-    id = Identifier("engine", "Item/", "SetCount")
+    id = Identifier("engine", "item/", "set_count")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Item_GetMaxCount(LoaderFunction):
-    id = Identifier("engine", "Item/", "GetMaxCount")
+    id = Identifier("engine", "item/", "get_max_count")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -399,140 +399,140 @@ class Engine_Item_GetMaxCount(LoaderFunction):
 ####XXX###############XXX####
 
 class Engine_Player_Message(LoaderFunction):
-    id = Identifier("engine", "Player/", "Message")
+    id = Identifier("engine", "player/", "message")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_GetHealth(LoaderFunction):
-    id = Identifier("engine", "Player/", "GetHealth")
+    id = Identifier("engine", "player/", "get_health")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_SetHealth(LoaderFunction):
-    id = Identifier("engine", "Player/", "SetHealth")
+    id = Identifier("engine", "player/", "set_health")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_GetMaxHealth(LoaderFunction):
-    id = Identifier("engine", "Player/", "GetMaxHealth")
+    id = Identifier("engine", "player/", "get_max_health")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_SetMaxHealth(LoaderFunction):
-    id = Identifier("engine", "Player/", "SetMaxHealth")
+    id = Identifier("engine", "player/", "set_max_health")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_AddMaxHealth(LoaderFunction):
-    id = Identifier("engine", "Player/", "AddMaxHealth")
+    id = Identifier("engine", "player/", "add_max_health")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_SubtractMaxHealth(LoaderFunction):
-    id = Identifier("engine", "Player/", "SubtractMaxHealth")
+    id = Identifier("engine", "player/", "subtract_max_health")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_Heal(LoaderFunction):
-    id = Identifier("engine", "Player/", "Heal")
+    id = Identifier("engine", "player/", "heal")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_Damage(LoaderFunction):
-    id = Identifier("engine", "Player/", "Damage")
+    id = Identifier("engine", "player/", "damage")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_GiveObject(LoaderFunction):
-    id = Identifier("engine", "Player/", "GiveObject")
+    id = Identifier("engine", "player/", "give_object")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_GiveStatusEffect(LoaderFunction):
-    id = Identifier("engine", "Player/", "GiveStatusEffect")
+    id = Identifier("engine", "player/", "give_status_effect")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_HasStatusEffect(LoaderFunction):
-    id = Identifier("engine", "Player/", "HasStatusEffect")
+    id = Identifier("engine", "player/", "has_status_effect")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_RemoveStatusEffect(LoaderFunction):
-    id = Identifier("engine", "Player/", "RemoveStatusEffect")
+    id = Identifier("engine", "player/", "remove_status_effect")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_GetStatusEffect(LoaderFunction):
-    id = Identifier("engine", "Player/", "GetStatusEffect")
+    id = Identifier("engine", "player/", "get_status_effect")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_HasItem(LoaderFunction):
-    id = Identifier("engine", "Player/", "HasItem")
+    id = Identifier("engine", "player/", "has_item")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_RemoveItem(LoaderFunction):
-    id = Identifier("engine", "Player/", "RemoveItem")
+    id = Identifier("engine", "player/", "remove_item")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_GetItem(LoaderFunction):
-    id = Identifier("engine", "Player/", "GetItem")
+    id = Identifier("engine", "player/", "get_item")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_GetEquippedArmor(LoaderFunction):
-    id = Identifier("engine", "Player/", "GetEquippedArmor")
+    id = Identifier("engine", "player/", "get_equipped_armor")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_GetEquippedWeapon(LoaderFunction):
-    id = Identifier("engine", "Player/", "GetEquippedWeapon")
+    id = Identifier("engine", "player/", "get_equipped_weapon")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
             case {}: ...
             case _: return None
 class Engine_Player_GetEquippedTool(LoaderFunction):
-    id = Identifier("engine", "Player/", "GetEquippedTool")
+    id = Identifier("engine", "player/", "get_equipped_tool")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:

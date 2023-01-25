@@ -136,15 +136,43 @@ class Engine_Tool_GetDurability(LoaderFunction):
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
-            case {}: ...
-            case _: return None
+            case {
+                "tool": str()|dict() # FIXME: this may be incorrect syntax, I can't tell right now
+            }: return cls.get_durability_given
+            case _:
+                if engine.function_context.tool:
+                    return cls.get_durability_ctx
+                return None
+    @staticmethod
+    def get_durability_given(engine:Engine, tool):
+        ...
+    @staticmethod
+    def get_durability_ctx(engine:Engine):
+        ...
+
 class Engine_Tool_SetDurability(LoaderFunction):
     id = Identifier("engine", "tool/", "set_durability")
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
-            case {}: ...
+            case {
+                "tool": str()|dict(), # FIXME: this may be incorrect syntax, I can't tell right now
+                "durability": int()
+            }: return cls.get_durability_given
+            case {
+                "durability": int()
+            }:
+                if engine.function_context.tool:
+                    return cls.get_durability_ctx
+                return None
             case _: return None
+    @staticmethod
+    def get_durability_given(engine:Engine, tool):
+        ...
+    @staticmethod
+    def get_durability_ctx(engine:Engine):
+        ...
+
 class Engine_Tool_GetMaxDurability(LoaderFunction):
     id = Identifier("engine", "tool/", "get_max_durability")
     @classmethod
@@ -152,6 +180,7 @@ class Engine_Tool_GetMaxDurability(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Tool_GetName(LoaderFunction):
     id = Identifier("engine", "tool/", "get_name")
     @classmethod
@@ -159,6 +188,7 @@ class Engine_Tool_GetName(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Tool_SetName(LoaderFunction):
     id = Identifier("engine", "tool/", "set_name")
     @classmethod

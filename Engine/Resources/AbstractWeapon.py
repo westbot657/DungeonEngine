@@ -3,11 +3,13 @@
 try:
     from .Identifier import Identifier
     from .Weapon import Weapon
+    from .AbstractAmmo import AbstractAmmo
     from .EngineErrors import InvalidObjectError
     from .EngineDummy import Engine
 except ImportError:
     from Identifier import Identifier
     from Weapon import Weapon
+    from AbstractAmmo import AbstractAmmo
     from EngineErrors import InvalidObjectError
     from EngineDummy import Engine
 
@@ -43,6 +45,7 @@ class AbstractWeapon:
         self.range: int|None = data.get("range", None)
         self.max_durability: int|None = data.get("max_durability", None)
         self.durability: int|None = data.get("durability", self.max_durability)
+
         self.ammo_type: str|None = data.get("ammo_type", None)
 
     def _set_parent(self, parent):
@@ -86,6 +89,9 @@ class AbstractWeapon:
         if d is not None: return d
         raise InvalidObjectError(f"Weapon has no durability! ({self.identifier})")
 
+    def getAmmoType(self) -> AbstractAmmo:
+        ...
+
     def createWeapon(self, **value_overrides) -> Weapon:
         return Weapon(self,
             value_overrides.get("name", self.getName()),
@@ -104,17 +110,20 @@ class AbstractWeapon:
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
 
-            if m := re.match(r"Dungeons/(?P<namespace>[^/]+)/resources/(?P<path>(?:[^/]+/)+)(?P<name>[a-z0-9_]+)\.json", file):
-                d: dict = m.groupdict()
-                namespace:str = d["namespace"]
-                path: str = d["path"]
-                name: str = d["name"]
-                cls._loaded.update({f"{namespace}:weapons/{name}": cls(Identifier(namespace, path, name), data)})
+            Id = Identifier.fromFile(file)
+            cls._loaded.update({Id.full(): cls(Id, data)})
 
-            elif m := re.match(r"resources/weapons/(?P<name>[a-z0-9_]+)\.json", file):
-                d: dict = m.groupdict()
-                name: str = d["name"]
-                cls._loaded.update({f"engine:weapons/{name}": cls(Identifier("engine", "resources/weapons/", name), data)})
+            # if m := re.match(r"Dungeons/(?P<namespace>[^/]+)/resources/(?P<path>(?:[^/]+/)+)(?P<name>[a-z0-9_]+)\.json", file):
+            #     d: dict = m.groupdict()
+            #     namespace:str = d["namespace"]
+            #     path: str = d["path"]
+            #     name: str = d["name"]
+            #     cls._loaded.update({f"{namespace}:weapons/{name}": cls(Identifier(namespace, path, name), data)})
+
+            # elif m := re.match(r"resources/weapons/(?P<name>[a-z0-9_]+)\.json", file):
+            #     d: dict = m.groupdict()
+            #     name: str = d["name"]
+            #     cls._loaded.update({f"engine:weapons/{name}": cls(Identifier("engine", "weapons/", name), data)})
 
         for w, p in cls._link_parents:
             w: AbstractWeapon
@@ -130,9 +139,9 @@ class AbstractWeapon:
                 o.getDamage()
                 o.getMaxDurability()
                 o.getDurability()
-            except InvalidObjectError:
+            except InvalidObjectError as err:
                 e: AbstractWeapon = cls._loaded.pop(l)
-                print(f"Failed to load weapon: {e.identifier}")
+                print(f"Failed to load weapon: {e.identifier}  {err}")
 
         return cls._loaded
 

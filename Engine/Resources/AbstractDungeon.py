@@ -94,7 +94,7 @@ class AbstractDungeon:
         for file in files:
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
-            
+
             if m := re.match(r"Dungeons/(?P<dungeon_id>[^/]+)/\1.json", file):
                 d: dict = m.groupdict()
                 dungeon_id = d.get("dungeon_id")

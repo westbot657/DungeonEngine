@@ -97,17 +97,20 @@ class AbstractAmmo:
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
             
-            if m := re.match(r"Dungeons/(?P<namespace>[^/]+)/resources/(?P<path>(?:[^/]+/)+)(?P<name>[a-z0-9_]+)\.json", file):
-                d: dict = m.groupdict()
-                namespace:str = d["namespace"]
-                path: str = f"Dungeons/{namespace}/resources/{d['path']}"
-                name: str = d["name"]
-                cls._loaded.update({f"{namespace}:ammo/{name}": cls(Identifier(namespace, path, name), data)})
+            Id = Identifier.fromFile(file)
+            cls._loaded.update({Id.full(): cls(Id, data)})
 
-            elif m := re.match(r"resources/ammo/(?P<name>[a-z0-9_]+)\.json", file):
-                d: dict = m.groupdict()
-                name: str = d["name"]
-                cls._loaded.update({f"engine:ammo/{name}": cls(Identifier("engine", "resources/ammo/", name), data)})
+            # if m := re.match(r"Dungeons/(?P<namespace>[^/]+)/resources/(?P<path>(?:[^/]+/)+)(?P<name>[a-z0-9_]+)\.json", file):
+            #     d: dict = m.groupdict()
+            #     namespace:str = d["namespace"]
+            #     path: str = f"Dungeons/{namespace}/resources/{d['path']}"
+            #     name: str = d["name"]
+            #     cls._loaded.update({f"{namespace}:ammo/{name}": cls(Identifier(namespace, path, name), data)})
+
+            # elif m := re.match(r"resources/ammo/(?P<name>[a-z0-9_]+)\.json", file):
+            #     d: dict = m.groupdict()
+            #     name: str = d["name"]
+            #     cls._loaded.update({f"engine:ammo/{name}": cls(Identifier("engine", "resources/ammo/", name), data)})
 
         for a, p in cls._link_parents:
             a: AbstractAmmo
@@ -129,4 +132,4 @@ class AbstractAmmo:
 
 
 if __name__ == "__main__":
-    pass
+    print(AbstractAmmo.loadData(None))

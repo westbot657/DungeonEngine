@@ -81,18 +81,21 @@ class AbstractItem:
             file: str
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
+            
+            Id = Identifier.fromFile(file)
+            cls._loaded.update({Id.full(): cls(Id, data)})
 
-            if m := re.match(r"Dungeons/(?P<namespace>[^/]+)/resources/(?P<path>(?:[^/]+/)+)(?P<name>[a-z0-9_]+)\.json", file):
-                d: dict = m.groupdict()
-                namespace:str = d["namespace"]
-                path: str = d["path"]
-                name: str = d["name"]
-                cls._loaded.update({f"{namespace}:items/{name}": cls(Identifier(namespace, path, name), data)})
+            # if m := re.match(r"Dungeons/(?P<namespace>[^/]+)/resources/(?P<path>(?:[^/]+/)+)(?P<name>[a-z0-9_]+)\.json", file):
+            #     d: dict = m.groupdict()
+            #     namespace:str = d["namespace"]
+            #     path: str = d["path"]
+            #     name: str = d["name"]
+            #     cls._loaded.update({f"{namespace}:items/{name}": cls(Identifier(namespace, path, name), data)})
 
-            elif m := re.match(r"resources/items/(?P<name>[a-z0-9_]+)\.json", file):
-                d: dict = m.groupdict()
-                name: str = d["name"]
-                cls._loaded.update({f"engine:items/{name}": cls(Identifier("engine", "resources/items/", name), data)})
+            # elif m := re.match(r"resources/items/(?P<name>[a-z0-9_]+)\.json", file):
+            #     d: dict = m.groupdict()
+            #     name: str = d["name"]
+            #     cls._loaded.update({f"engine:items/{name}": cls(Identifier("engine", "resources/items/", name), data)})
 
         for w, p in cls._link_parents:
             w: AbstractItem

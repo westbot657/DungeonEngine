@@ -1,5 +1,7 @@
 {
     "name": "Ritual Staff",
     "damage": 2,
-    "durability": 20
+    "durability": 20,
+    "range": 1,
+    "max_durability": 20
 }

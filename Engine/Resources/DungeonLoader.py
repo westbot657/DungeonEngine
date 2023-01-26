@@ -52,12 +52,12 @@ class DungeonLoader:
     def checkPredicate(self, predicate:dict, engine) -> bool:
         ...
 
-    def evaluateFunction(self, engine:Engine, data:dict):
+    def evaluateFunction(self, engine:Engine, data:dict, expected_key:str|None=None):
         
         if (funcs := data.get("functions", None)) is not None:
             for func in funcs:
                 result = None
-                res = self.evaluateFunction(engine, func)
+                res = self.evaluateFunction(engine, func, expected_key)
                 if res: result = res
             return result
         
@@ -72,7 +72,7 @@ class DungeonLoader:
                 for key, item in data.items():
                     if key in ["function", "#store"]: continue
                     if isinstance(item, dict):
-                        args.update({key: self.evaluateFunction(engine, item)})
+                        args.update({key: self.evaluateFunction(engine, item, expected_key)})
                     else:
                         args.update({key: item})
                 r = f._call(engine, args)

@@ -71,6 +71,10 @@ engine:ammo/get_max_count
 engine:ammo/get_parent_type
 engine:ammo/get_bonus_damage
 
+engine:text/builder
+
+
+
 """
 
 
@@ -568,4 +572,28 @@ class Engine_Player_GetEquippedTool(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
+
+####XXX#############XXX####
+### XXX Engine Text XXX ###
+####XXX#############XXX####
+class Engine_Text_Builder(LoaderFunction):
+    id = Identifier("engine", "text/", "builder")
+    @classmethod
+    def check(cls, engine:Engine, args:dict):
+        match args:
+            case {
+                "text": list()
+            }: return cls.builder
+            case _: return None
+
+    @staticmethod
+    def builder(engine:Engine, text:list, seperator:str|dict=" "):
+        out_text = []
+
+        for element in text:
+            if isinstance(element, str):
+                out_text.append(element)
+            elif isinstance(element, dict):
+                ...
 

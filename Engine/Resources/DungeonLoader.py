@@ -13,6 +13,7 @@ try:
     from .Functions import LoaderFunction
     from .Identifier import Identifier
     from .EngineDummy import Engine
+    from .EngineErrors import InvalidObjectError, FunctionLoadError
 except ImportError:
     from AbstractAmmo import AbstractAmmo
     from AbstractArmor import AbstractArmor
@@ -26,6 +27,7 @@ except ImportError:
     from Functions import LoaderFunction
     from Identifier import Identifier
     from EngineDummy import Engine
+    from EngineErrors import InvalidObjectError, FunctionLoadError
 
 import re
 
@@ -49,7 +51,7 @@ class DungeonLoader:
         self.abstract_tools: dict[str, AbstractTool] = {}
         self.abstract_weapons: dict[str, AbstractWeapon] = {}
 
-    def checkPredicate(self, predicate:dict, engine) -> bool:
+    def checkPredicate(self, engine:Engine, predicate:dict) -> bool:
         ...
 
     def evaluateFunction(self, engine:Engine, data:dict, expected_key:str|None=None):
@@ -66,7 +68,7 @@ class DungeonLoader:
                 f: LoaderFunction
 
                 if (predicate := data.get("predicate", None)) is not None:
-                    if not self.checkPredicate(predicate, engine): return None
+                    if not self.checkPredicate(engine, predicate): return None
 
                 args = {}
                 for key, item in data.items():
@@ -77,14 +79,17 @@ class DungeonLoader:
                         args.update({key: item})
                 r = f._call(engine, args)
                 if var := data.get("#store", None):
-                    engine.function_memory.update({var: r})
+                    engine.function_memory.store(var, r)
                 return r
+
         elif (var := data.get("#ref", None)) is not None:
-            if var in engine.function_memory:
-                return engine.function_memory.get(var)
-            else:
-                print(f"Variable referenced before assignment: '{var}'")
-                return data
+            return engine.function_memory.ref(var)
+
+        elif isinstance(data, dict):
+            dat = {}
+            for key, item in data.items():
+                dat.update({key, self.evaluateFunction(engine, item, expected_key)})
+            return dat
 
         else:
             return data
@@ -118,9 +123,9 @@ class DungeonLoader:
                 d = m.groupdict()
                 identifier = Identifier(d["namespace"], d["path"], d["name"])
             else:
-                print(f"Unrecognized identifier: '{identifier}'")
-                return None
+                raise InvalidObjectError(f"Unrecognized identifier: '{identifier}'")
 
+        # TODO: actually search for object (however that needs to be done)
 
     def loadGame(self, engine:Engine):
         self.abstract_ammo = AbstractAmmo.loadData(self)

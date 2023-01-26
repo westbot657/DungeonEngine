@@ -8,6 +8,7 @@ from Resources.AbstractStatusEffect import AbstractStatusEffect, StatusEffect
 from Resources.AbstractWeapon       import AbstractWeapon, Weapon
 from Resources.Identifier           import Identifier
 from Resources.DungeonLoader        import DungeonLoader
+from Resources.FunctionMemory       import FunctionMemory
 
 
 import glob, json, re
@@ -21,8 +22,8 @@ class Engine:
         return cls._engine
 
     def init(self):
-        self.loader = DungeonLoader()
-        self.function_memory: dict = {}
+        self.loader: DungeonLoader = DungeonLoader()
+        self.function_memory: FunctionMemory = FunctionMemory()
 
     def evaluateFunction(self, data:dict):
         return self.loader.evaluateFunction(self, data)

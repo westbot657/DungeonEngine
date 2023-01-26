@@ -30,7 +30,7 @@ my_dungeon
 │ ├ room1.json
 │ └ room2.json
 ├ my_dungeon.json
-└ my_dungeon.py
+└ my_dungeon.py   ?
 """
 
 
@@ -73,6 +73,17 @@ class AbstractDungeon:
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
         self._raw_data = data
+
+        self.name: str = data.get("name", None)
+        self.version: float|str|int = data.get("version", None)
+        self.entry_point: str = data.get("entry_point", None)
+        self.enter_message: str|dict = data.get("enter_message")
+        self.exit_message: str|dict = data.get("exit_message")
+        self.data: dict = data.get("data", {})
+
+        room_files: list[str] = glob.glob(f"Dungeons/{self.identifier.name}/rooms/*.json")
+
+        
 
     @classmethod
     def loadData(cls, inline_handler) -> list:

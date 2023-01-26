@@ -1,32 +1,47 @@
 {
     "name": "Grove Entrance",
-    "enter-message": {
-        "example_dungeon.boss_defeated=true": "3 doors",
-        "example_dungeon.boss_defeated=false": "2 doors",
-        ".ritual_staff": "there is a ritual staff in the corner"
-    },
+    "enter_message": [
+        {
+            "predicate": {
+                "example_dungeon.boss_defeated": true
+            },
+            "text": "there are 4 doors"
+        },
+        {
+            "predicate": {
+                "example_dungeon.boss_defeated": false
+            },
+            "text": "there are 3 doors"
+        },
+        {
+            "predicate": {
+                ".ritual_staff": true
+            },
+            "text": "there is a ritual staff in the corner"
+        }
+    ],
     "interactions": [
         {
-            "type": "door",
+            "type": "engine:door",
             "id": "left_tunnel",
             "target": "example_dungeon:left_tunnel",
-            "travel-message": "",
-            "lock-message": "",
+            "travel_message": "",
+            "lock_message": "",
             "locked": false
         },
         {
-            "type": "door",
+            "type": "engine:door",
             "id": "right_tunnel",
             "target": "example_dungeon:right_tunnel"
         },
         {
-            "type": "door",
+            "type": "engine:door",
             "id": "boss_room_door",
             "target": "example_dungeon:boss_room",
             "locked": true
         },
         {
-            "type": "loot-item",
+            "type": "engine:loot",
             "id": "ritual_staff",
             "item": "example_dungeon:weapons/ritual_staff"
         }

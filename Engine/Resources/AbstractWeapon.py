@@ -4,13 +4,26 @@ try:
     from .Identifier import Identifier
     from .Weapon import Weapon
     from .EngineErrors import InvalidObjectError
+    from .EngineDummy import Engine
 except ImportError:
     from Identifier import Identifier
     from Weapon import Weapon
     from EngineErrors import InvalidObjectError
+    from EngineDummy import Engine
 
 import glob, json, re
 
+"""
+{
+    "parent": "engine:weapon/sword",
+    "name": "Longsword",
+    "damage": 3,
+    "range": 2,
+    "max_durability": 100,
+    "durability": 100,
+    "ammo_type": "engine:ammo/none"
+}
+"""
 
 class AbstractWeapon:
     _loaded: dict = {}
@@ -30,6 +43,7 @@ class AbstractWeapon:
         self.range: int|None = data.get("range", None)
         self.max_durability: int|None = data.get("max_durability", None)
         self.durability: int|None = data.get("durability", self.max_durability)
+        self.ammo_type: str|None = data.get("ammo_type", None)
 
     def _set_parent(self, parent):
         self.parent = parent
@@ -82,7 +96,7 @@ class AbstractWeapon:
         )
 
     @classmethod
-    def loadData(cls, inline_handler) -> list:
+    def loadData(cls, engine:Engine) -> list:
         files: list[str] = glob.glob("**/weapons/*.json", recursive=True)
         #print(files)
         for file in files:
@@ -124,4 +138,4 @@ class AbstractWeapon:
 
 
 if __name__ == "__main__":
-    pass #print(AbstractWeapon.loadData())
+    print(AbstractWeapon.loadData(None))

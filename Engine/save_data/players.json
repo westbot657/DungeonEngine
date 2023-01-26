@@ -10,7 +10,7 @@
         },
         "inventory": [
             {
-                "type": "armor",
+                "type": "engine:armor",
                 "parent": "engine:armor/leather_armor",
                 "data": {
                     "durability": 15
@@ -18,14 +18,14 @@
                 "equipped": true
             },
             {
-                "type": "item",
+                "type": "engine:item",
                 "parent": "engine:items/stick",
                 "data": {
                     "count": 35
                 }
             },
             {
-                "type": "weapon",
+                "type": "engine:weapon",
                 "parent": "engine:weapons/sword",
                 "data": {
                     "name": "Rusty Sword",

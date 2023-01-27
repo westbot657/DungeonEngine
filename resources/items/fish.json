@@ -1,17 +1,4 @@
 {
-    "template_item": true,
-    "max_count": "40",
-    "data": {
-        "heal_amount": 2
-    },
-    "events": {
-        "on_use": [
-            {
-                "function": "engine:player/heal",
-                "amount": {
-                    "ref": ".heal_amount"
-                }
-            }
-        ]
-    }
+    "template": true,
+    "parent": "engine:items/food"
 }

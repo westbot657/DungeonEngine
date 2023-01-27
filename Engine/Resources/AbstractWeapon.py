@@ -15,7 +15,7 @@ except ImportError:
 
 import glob, json, re
 
-"""
+""" example_dungeon:weapon/longsword
 {
     "parent": "engine:weapon/sword",
     "name": "Longsword",
@@ -47,6 +47,8 @@ class AbstractWeapon:
         self.durability: int|None = data.get("durability", self.max_durability)
 
         self.ammo_type: str|None = data.get("ammo_type", None)
+
+        self.is_template: bool = data.get("template", False)
 
     def _set_parent(self, parent):
         self.parent = parent
@@ -90,16 +92,32 @@ class AbstractWeapon:
         raise InvalidObjectError(f"Weapon has no durability! ({self.identifier})")
 
     def getAmmoType(self) -> AbstractAmmo:
-        ...
+        if self.ammo_type is None:
+            if self.parent and ((a := self.parent.getAmmoType()) is not None):
+                return a
+            return AbstractAmmo._loaded["engine:ammo/none"]
+        return AbstractAmmo._loaded["engine:ammo/none"]
+
+    def get_children(self, depth:int=-1): # recursive way to get a flat list of all sub children to some depth
+        children = []
+        for child in self.children:
+            children.append(child)
+            if depth != 0:
+                children += child.get_children(depth-1)
+        return children
 
     def createWeapon(self, **value_overrides) -> Weapon:
-        return Weapon(self,
-            value_overrides.get("name", self.getName()),
-            value_overrides.get("damage", self.getDamage()),
-            value_overrides.get("range", self.getRange()),
-            value_overrides.get("max_durability", self.getMaxDurability()),
-            value_overrides.get("durability", self.getDurability())
-        )
+        if self.is_template:
+            ...
+        else:
+            return Weapon(self,
+                value_overrides.get("name", self.getName()),
+                value_overrides.get("damage", self.getDamage()),
+                value_overrides.get("range", self.getRange()),
+                value_overrides.get("max_durability", self.getMaxDurability()),
+                value_overrides.get("durability", self.getDurability()),
+                value_overrides.get("ammo_type", self.getAmmoType())
+            )
 
     @classmethod
     def loadData(cls, engine:Engine) -> list:
@@ -139,12 +157,12 @@ class AbstractWeapon:
                 o.getDamage()
                 o.getMaxDurability()
                 o.getDurability()
+                o.getAmmoType()
             except InvalidObjectError as err:
                 e: AbstractWeapon = cls._loaded.pop(l)
                 print(f"Failed to load weapon: {e.identifier}  {err}")
 
         return cls._loaded
-
 
 if __name__ == "__main__":
     print(AbstractWeapon.loadData(None))

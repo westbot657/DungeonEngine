@@ -22,6 +22,8 @@ class MemoryError(EngineError): # Error with FunctionMemory
     def __init__(self, *args):
         super().__init__("MemoryLoadError:", *args)
 
-
+class IdentifierError(EngineError):
+    def __init__(self, *args):
+        super().__init__("IdentifierError:", *args)
 
 

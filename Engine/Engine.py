@@ -56,10 +56,13 @@ class Engine:
 
     def handleInput(self, player_id:str|int, text:str):
         if player_id not in self.input_queue:
-            self.input_queue.update({player_id: [None, text]})
+            self.input_queue.update({player_id: [self.default_input_handler, text]})
 
     def sendOutput(self, target:str|int, text:str):
         self.io_hook.sendOutput(target, text)
+
+    def default_input_handler(self, player_id, text):
+        ...
 
     def _main_loop_threaded(self):
         self.io_hook.init(self)
@@ -71,12 +74,14 @@ class Engine:
             # Main Loop
 
             # check inputs
-            for player_id, [response_handler, text] in self.input_queue.items():
-                player_id: int|str
-                text: str
-                if text:
-                    if response_handler:
-                        ...
+            while self.input_queue:
+                for key in [k for k in self.input_queue.keys()]:
+                    player_id, [response_handler, text] = self.input_queue.pop(key)
+                    player_id: int|str
+                    text: str
+                    if text:
+                        if response_handler:
+                            ...
                     
 
         self.io_hook.stop()
@@ -84,21 +89,22 @@ class Engine:
 if __name__ == "__main__":
     def test():
         target = "user"
-
         while True:
             response = yield target, "some message to reply to"
-
             if response == "yes":
                 print("yay")
-                return
+                return None, None
             elif response == "no":
                 response = yield target, "why not?"
                 ...
-                return
-
+                return None, None
     t = test()
-
+    t.send(None)
+    i = None
     while t:
-        i = input()
-        ret = t.send(i)
-        print(ret)
+        try:
+            target, text = t.send(i)
+            print(target, text)
+            i = input()
+        except StopIteration:
+            ...

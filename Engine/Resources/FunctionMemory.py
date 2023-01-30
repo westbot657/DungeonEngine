@@ -5,7 +5,7 @@ try:
     from .EngineErrors import MemoryError
 except ImportError:
     from EngineDummy import Engine
-
+    from EngineErrors import MemoryError
 
 
 class FunctionMemory:
@@ -19,7 +19,15 @@ class FunctionMemory:
 
     def init(self):
         self.symbol_table = {}
+        self.context_data = {}
     
+    def prepFunction(self):
+        self.symbol_table.clear()
+        self.context_data.clear()
+
+    def checkPredicate(self, engine:Engine, predicate:dict):
+        ...
+
     def store(self, name:str, value):
         self.symbol_table.update({name, value})
         

@@ -20,7 +20,7 @@ class LoaderFunction:
 
     @staticmethod
     def _check_dummy_return(*_, **__):
-        pass
+        pass # don't need to do anything in the dummy function
 
     @classmethod
     def check(cls, engine, args:dict):

@@ -51,8 +51,6 @@ class DungeonLoader:
         self.abstract_tools: dict[str, AbstractTool] = {}
         self.abstract_weapons: dict[str, AbstractWeapon] = {}
 
-    def checkPredicate(self, engine:Engine, predicate:dict) -> bool:
-        ...
 
     def evaluateFunction(self, engine:Engine, data:dict, expected_key:str|None=None):
         
@@ -68,7 +66,7 @@ class DungeonLoader:
                 f: LoaderFunction
 
                 if (predicate := data.get("predicate", None)) is not None:
-                    if not self.checkPredicate(engine, predicate): return None
+                    if not engine.function_memory.checkPredicate(engine, predicate): return None
 
                 args = {}
                 for key, item in data.items():

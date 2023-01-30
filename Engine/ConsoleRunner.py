@@ -15,9 +15,6 @@ class ConsoleIOHook:
         self.running = False
 
     def sendOutput(self, target:int|str, prompt:str):
-        self.response_hooks.update({
-            target: response_handler
-        })
         self.print_queue.append((target, prompt))
 
     def start(self):
@@ -42,7 +39,7 @@ class ConsoleIOHook:
                 txt = text.replace(d["targeter"], "")
                 self.engine.handleInput(player_id, txt)
 
-            
+
 if __name__ == "__main__":
     from Engine import Engine
     console_hook = ConsoleIOHook()

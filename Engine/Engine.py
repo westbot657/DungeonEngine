@@ -9,11 +9,13 @@ from Resources.AbstractWeapon       import AbstractWeapon, Weapon
 from Resources.Identifier           import Identifier
 from Resources.DungeonLoader        import DungeonLoader
 from Resources.FunctionMemory       import FunctionMemory
+from Resources.EngineOperation      import EngineOperation, _EngineOperation, OpType
+from Resources.EngineErrors         import EngineError
 
 from threading import Thread
 
 import glob, json, re
-import asyncio
+#import asyncio
 
 class Engine:
     _engine = None
@@ -61,10 +63,18 @@ class Engine:
     def sendOutput(self, target:str|int, text:str):
         self.io_hook.sendOutput(target, text)
 
-    def default_input_handler(self, player_id, text):
-        ...
+    def default_input_handler(self):
+        while self.running:
+            player_id, text = yield
+            
+            # TODO: checks for stuff like moving, inventory stuff, etc...
+            
 
     def _main_loop_threaded(self):
+        
+    #    asyncio.run(self._async_main_loop())
+    #async def _async_main_loop(self):
+        
         self.io_hook.init(self)
         self.io_hook.start()
         while self.thread_running:
@@ -72,7 +82,7 @@ class Engine:
                 # Pause Menu thingy?
                 continue
             # Main Loop
-
+            
             # check inputs
             while self.input_queue:
                 for key in [k for k in self.input_queue.keys()]:
@@ -80,11 +90,22 @@ class Engine:
                     player_id: int|str
                     text: str
                     if text:
-                        if response_handler:
-                            ...
-                    
+                        try:
+                            result = response_handler.send(player_id, text)
+                            
+                            if not isinstance(result, _EngineOperation):
+                                raise EngineError("generator did not return an EngineOperation")
+                            print(result)
+                            
+                        except StopIteration:
+                            pass
 
         self.io_hook.stop()
+
+
+    
+
+
 
 if __name__ == "__main__":
     def test():

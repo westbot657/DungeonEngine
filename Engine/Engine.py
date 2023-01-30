@@ -58,7 +58,7 @@ class Engine:
 
     def handleInput(self, player_id:str|int, text:str):
         if player_id not in self.input_queue:
-            self.input_queue.update({player_id: [self.default_input_handler, text]})
+            self.input_queue.update({player_id: [self.default_input_handler(), text]})
 
     def sendOutput(self, target:str|int, text:str):
         self.io_hook.sendOutput(target, text)

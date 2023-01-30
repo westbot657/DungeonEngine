@@ -140,3 +140,6 @@ class DungeonLoader:
 
         self.abstract_dungeons = AbstractDungeon.loadData(self)
 
+    def saveGame(self, engine:Engine):
+        # TODO: implement saving
+        pass

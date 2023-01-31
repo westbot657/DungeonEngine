@@ -14,6 +14,8 @@ from Resources.EngineErrors         import EngineError
 
 from threading import Thread
 
+
+from typing import Any, Generator, Callable
 import glob, json, re
 #import asyncio
 
@@ -32,6 +34,7 @@ class Engine:
         self.io_hook = io_hook
         self.loader: DungeonLoader = DungeonLoader()
         self.function_memory: FunctionMemory = FunctionMemory()
+        self.default_input_handler = self._default_input_handler()
 
     def evaluateFunction(self, data:dict):
         return self.loader.evaluateFunction(self, data)
@@ -58,17 +61,24 @@ class Engine:
 
     def handleInput(self, player_id:str|int, text:str):
         if player_id not in self.input_queue:
-            self.input_queue.update({player_id: [self.default_input_handler(), text]})
+            self.input_queue.update({player_id: [self.default_input_handler, text]})
 
     def sendOutput(self, target:str|int, text:str):
         self.io_hook.sendOutput(target, text)
 
-    def default_input_handler(self):
+    def _default_input_handler(self) -> Generator:
         while self.running:
             player_id, text = yield
             
             # TODO: checks for stuff like moving, inventory stuff, etc...
-            
+
+    def evaluate_result(self, handler:Generator, result:_EngineOperation, player_id:int, text:str):
+        print()
+        match result:
+            case EngineOperation.GetInput():
+                ...
+            case _:
+                raise EngineError("Unknown Operation")
 
     def _main_loop_threaded(self):
         
@@ -87,15 +97,16 @@ class Engine:
             while self.input_queue:
                 for key in [k for k in self.input_queue.keys()]:
                     player_id, [response_handler, text] = self.input_queue.pop(key)
+                    response_handler: Generator
                     player_id: int|str
                     text: str
                     if text:
                         try:
                             result = response_handler.send(player_id, text)
-                            
                             if not isinstance(result, _EngineOperation):
                                 raise EngineError("generator did not return an EngineOperation")
-                            print(result)
+                            #print(result)
+                            self.evaluate_result(response_handler, result, player_id, text)
                             
                         except StopIteration:
                             pass

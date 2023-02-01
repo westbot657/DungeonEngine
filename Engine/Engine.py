@@ -72,10 +72,10 @@ class Engine:
             
             # TODO: checks for stuff like moving, inventory stuff, etc...
 
-    def evaluate_result(self, handler:Generator, result:_EngineOperation, player_id:int, text:str):
-        print()
-        match result:
-            case EngineOperation.GetInput():
+    def evaluate_result(self, handler:Generator, result, player_id:int, text:str):
+        
+        match player_id:
+            case 1:
                 ...
             case _:
                 raise EngineError("Unknown Operation")

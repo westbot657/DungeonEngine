@@ -4,17 +4,19 @@ try:
     from .Identifier import Identifier
     from .Item import Item
     from .EngineErrors import InvalidObjectError
+    from .AbstractGameObject import AbstractGameObject
 except ImportError:
     from Identifier import Identifier
     from Item import Item
     from EngineErrors import InvalidObjectError
+    from AbstractGameObject import AbstractGameObject
 
 import glob, json, re
 
-class AbstractItem:
+class AbstractItem(AbstractGameObject):
     _loaded: dict = {}
     _link_parents: list = []
-
+    identifier: Identifier = Identifier("engine", "abstract/", "item")
     def __init__(self, identifier:Identifier, data:dict):
         
         self.identifier = identifier

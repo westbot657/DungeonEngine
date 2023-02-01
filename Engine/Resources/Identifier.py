@@ -37,16 +37,19 @@ class Identifier:
             return True
 
     @classmethod
-    def fromString(cls, string):
+    def fromString(cls, string:str):
+        if isinstance(string, Identifier): return string
         if m := re.match(r"(?P<namespace>[a-z_][a-z0-9_]*):(?P<path>(?:(?:[a-z_][a-z0-9_]*)/)*)(?P<name>[a-z][a-z0-9_]*)", string):
             d = m.groupdict()
             namespace = d.get("namespace", "")
             path = d.get("path", "")
             name = d.get("name", "")
             return cls(namespace, path, name)
+        raise IdentifierError(f"Unknown identifier format: '{string}'")
     
     @classmethod
     def fromFile(cls, file_name):
+        if isinstance(file_name, Identifier): return file_name
         if m := re.match(r"resources/(?P<path>[a-z_][a-z0-9_]*/)(?P<name>[a-z_][a-z0-9_]*).json", file_name):
             d = m.groupdict()
             namespace = "engine"

@@ -6,14 +6,16 @@ try:
     from .AbstractAmmo import AbstractAmmo
     from .EngineErrors import InvalidObjectError
     from .EngineDummy import Engine
+    from .AbstractGameObject import AbstractGameObject
 except ImportError:
     from Identifier import Identifier
     from Weapon import Weapon
     from AbstractAmmo import AbstractAmmo
     from EngineErrors import InvalidObjectError
     from EngineDummy import Engine
+    from AbstractGameObject import AbstractGameObject
 
-import glob, json, re
+import glob, json
 
 """ example_dungeon:weapon/longsword
 {
@@ -27,10 +29,10 @@ import glob, json, re
 }
 """
 
-class AbstractWeapon:
+class AbstractWeapon(AbstractGameObject):
     _loaded: dict = {}
     _link_parents = []
-
+    identifier: Identifier = Identifier("engine", "abstract/", "weapon")
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
         self._raw_data = data

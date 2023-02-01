@@ -1,6 +1,15 @@
 # pylint: disable=[W,R,C,import-error]
 
-class Ammo:
+try:
+    from .GameObject import GameObject
+    from .Identifier import Identifier
+except ImportError:
+    from GameObject import GameObject
+    from Identifier import Identifier
+
+
+class Ammo(GameObject):
+    identifier = Identifier("engine", "object/", "ammo")
     def __init__(self, abstract, name:str, bonus_damage:int, max_count:int, count:int=None):
         self.abstract = abstract
         self.name = name

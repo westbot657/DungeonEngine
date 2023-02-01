@@ -4,14 +4,16 @@ try:
     from .Identifier import Identifier
     from .Tool import Tool
     from .EngineErrors import InvalidObjectError
+    from .AbstractGameObject import AbstractGameObject
 except ImportError:
     from Identifier import Identifier
     from Tool import Tool
     from EngineErrors import InvalidObjectError
+    from AbstractGameObject import AbstractGameObject
 
 
-class AbstractTool:
-
+class AbstractTool(AbstractGameObject):
+    identifier: Identifier = Identifier("engine", "abstract/", "tool")
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
         self._raw_data = data

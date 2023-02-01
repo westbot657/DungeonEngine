@@ -1,33 +1,37 @@
 # pylint: disable=[W,R,C,import-error]
 
 try:
-    from .AbstractAmmo import AbstractAmmo
-    from .AbstractArmor import AbstractArmor
-    from .AbstractCombat import AbstractCombat
-    from .AbstractDungeon import AbstractDungeon
-    from .AbstractItem import AbstractItem
-    from .AbstractRoom import AbstractRoom
-    from .AbstractStatusEffect import AbstractStatusEffect
-    from .AbstractTool import AbstractTool
-    from .AbstractWeapon import AbstractWeapon
+    from .AbstractAmmo import AbstractAmmo, Ammo
+    from .AbstractArmor import AbstractArmor, Armor
+    from .AbstractCombat import AbstractCombat, Combat
+    from .AbstractDungeon import AbstractDungeon, Dungeon
+    from .AbstractItem import AbstractItem, Item
+    from .AbstractRoom import AbstractRoom, Room
+    from .AbstractStatusEffect import AbstractStatusEffect, StatusEffect
+    from .AbstractTool import AbstractTool, Tool
+    from .AbstractWeapon import AbstractWeapon, Weapon
     from .Functions import LoaderFunction
     from .Identifier import Identifier
     from .EngineDummy import Engine
     from .EngineErrors import InvalidObjectError, FunctionLoadError
+    from .LootTable import LootTable
+    from .AbstractGameObject import AbstractGameObject, GameObject
 except ImportError:
-    from AbstractAmmo import AbstractAmmo
-    from AbstractArmor import AbstractArmor
-    from AbstractCombat import AbstractCombat
-    from AbstractDungeon import AbstractDungeon
-    from AbstractItem import AbstractItem
-    from AbstractRoom import AbstractRoom
-    from AbstractStatusEffect import AbstractStatusEffect
-    from AbstractTool import AbstractTool
-    from AbstractWeapon import AbstractWeapon
+    from AbstractAmmo import AbstractAmmo, Ammo
+    from AbstractArmor import AbstractArmor, Armor
+    from AbstractCombat import AbstractCombat, Combat
+    from AbstractDungeon import AbstractDungeon, Dungeon
+    from AbstractItem import AbstractItem, Item
+    from AbstractRoom import AbstractRoom, Room
+    from AbstractStatusEffect import AbstractStatusEffect, StatusEffect
+    from AbstractTool import AbstractTool, Tool
+    from AbstractWeapon import AbstractWeapon, Weapon
     from Functions import LoaderFunction
     from Identifier import Identifier
     from EngineDummy import Engine
     from EngineErrors import InvalidObjectError, FunctionLoadError
+    from LootTable import LootTable
+    from AbstractGameObject import AbstractGameObject, GameObject
 
 import re
 
@@ -93,35 +97,47 @@ class DungeonLoader:
             return data
 
 
-    def constructAmmo(self, data:dict):
+    def constructAmmo(self, data:dict) -> Ammo:
         ...
-    def constructArmor(self, data:dict):
+    def constructArmor(self, data:dict) -> Armor:
         ...
-    def constructCombat(self, data:dict):
+    def constructCombat(self, data:dict) -> Combat:
         ...
-    # def constructDungeon(self, data:dict): # This shouldn't be needed, there should be no in-line dungeons inside a dungeon
+    # def constructDungeon(self, data:dict) -> Dungeon: # This shouldn't be needed, there should be no in-line dungeons inside a dungeon
     #     ...
-    def constructItem(self, data:dict):
+    def constructItem(self, data:dict) -> Item:
         ...
-    def constructLootTable(self, data:dict):
+    def constructLootTable(self, data:dict) -> LootTable:
         ...
-    # def constructRoom(self, data:dict): # also shouldn't be any in-line rooms
+    # def constructRoom(self, data:dict) -> Room: # also shouldn't be any in-line rooms
     #     ...
-    def constructStatusEffect(self, data:dict):
+    def constructStatusEffect(self, data:dict) -> StatusEffect:
         ...
-    def constructTool(self, data:dict):
+    def constructTool(self, data:dict) -> Tool:
         ...
-    def constructWeapon(self, data:dict):
+    def constructWeapon(self, data:dict) -> Weapon:
         ...
 
+    def getAmmo(self, identifier:Identifier|str) -> AbstractAmmo:
+        identifier: Identifier = Identifier.fromString(identifier)
+        
+    def getArmor(self, identifier:Identifier|str) -> AbstractArmor:
+        identifier: Identifier = Identifier.fromString(identifier)
+    
+    def getItem(self, identifier:Identifier|str) -> AbstractItem:
+        identifier: Identifier = Identifier.fromString(identifier)
+    
+    def getStatusEffect(self, identifier:Identifier|str) -> AbstractStatusEffect:
+        identifier: Identifier = Identifier.fromString(identifier)
 
-    def getObject(self, identifier:Identifier|str):
-        if isinstance(identifier, str):
-            if m := re.match(r"(?P<namespace>[a-zA-Z0-9_]+):(?P<path>(?:[a-zA-Z0-9_]+/)*)(?P<name>[a-zA-Z0-9_])", identifier):
-                d = m.groupdict()
-                identifier = Identifier(d["namespace"], d["path"], d["name"])
-            else:
-                raise InvalidObjectError(f"Unrecognized identifier: '{identifier}'")
+    def getTool(self, identifier:Identifier|str) -> AbstractTool:
+        identifier: Identifier = Identifier.fromString(identifier)
+    
+    def getWeapon(self, identifier:Identifier|str) -> AbstractWeapon:
+        identifier: Identifier = Identifier.fromString(identifier)
+
+    def getGameObject(self, identifier:Identifier|str) -> AbstractGameObject:
+        identifier: Identifier = Identifier.fromString(identifier)
 
         # TODO: actually search for object (however that needs to be done)
 

@@ -163,6 +163,7 @@ class Engine:
                             self.evaluateResult(handler_getter, response_handler, result, player_id, text)
                             continue
 
+            # do other engine stuff
 
 
         self.io_hook.stop()

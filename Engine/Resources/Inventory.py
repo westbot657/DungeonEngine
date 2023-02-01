@@ -7,6 +7,7 @@ try:
     from .AbstractStatusEffect import AbstractStatusEffect, StatusEffect
     from .AbstractTool import AbstractTool, Tool
     from .AbstractWeapon import AbstractWeapon, Weapon
+    from .EngineDummy import Engine
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -15,6 +16,7 @@ except ImportError:
     from AbstractStatusEffect import AbstractStatusEffect, StatusEffect
     from AbstractTool import AbstractTool, Tool
     from AbstractWeapon import AbstractWeapon, Weapon
+    from EngineDummy import Engine
 
 class Inventory:
     def __init__(self, contents:list):
@@ -22,6 +24,8 @@ class Inventory:
         self.contents = contents
 
     @classmethod
-    def from_list(cls, loader, data:list):
-        ...
+    def from_list(cls, engine:Engine, data:list):
+        for element in data:
+            element: dict
+            # TODO: implement this
 

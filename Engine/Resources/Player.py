@@ -3,9 +3,11 @@
 try:
     from .Inventory import Inventory
     from .Location import Location
+    from .EngineDummy import Engine
 except ImportError:
     from Inventory import Inventory
     from Location import Location
+    from EngineDummy import Engine
 
 import json
 
@@ -20,8 +22,10 @@ class Player:
         self.inventory = inventory
         self.location = location
 
+
+
     @classmethod
-    def loadData(cls) -> list:
+    def loadData(cls, engine:Engine) -> list:
 
         with open("Engine/save_data/players.json", "r+", encoding="utf-8") as f:
             data_list: list[dict] = json.load(f)
@@ -37,5 +41,18 @@ class Player:
             location: Location = Location.from_dict(location_dict)
             inventory: Inventory = Inventory.from_list(inv_list)
 
+            p = cls(Id, name, max_health, health, inventory, location)
+            cls._loaded.update({Id: p})
+        print(cls._loaded)
+        return cls._loaded
+
+    @classmethod
+    def saveData(cls, engine:Engine):
+        # TODO: implement this
+        pass
+
+
+if __name__ == "__main__":
+    pass
 
 

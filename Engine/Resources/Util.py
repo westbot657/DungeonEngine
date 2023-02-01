@@ -1,5 +1,5 @@
 # pylint: disable=[W,R,C,import-error]
-
+from typing import Generator
 
 class Util:
     ...
@@ -36,3 +36,8 @@ class Util:
 
         else:
             print(f"[@game]: {player}{sep}{out}".replace("&", "&amp;").replace("\n", "&new;").encode("utf-8"), end=end)
+
+    @staticmethod
+    def generator_started(gen:Generator):
+        return gen.gi_frame.f_lasti != -1
+

@@ -121,20 +121,14 @@ class DungeonLoader:
     def constructGameObject(self, data:dict) -> GameObject:
         if obj_type := data.get("type", None):
             identifier = Identifier.fromString(obj_type)
-            identifier.path = "object/"
-            match identifier.full():
-                case "engine:object/ammo":
-                    return self.constructAmmo(data)
-                case "engine:object/armor":
-                    return self.constructArmor(data)
-                case "engine:object/item":
-                    return self.constructItem(data)
-                case "engine:object/tool":
-                    return self.constructTool(data)
-                case "engine:object/weapon":
-                    return self.constructWeapon(data)
-                case _:
-                    raise InvalidObjectError(f"Unrecognized GameObject type: '{identifier.full()}'")
+            identifier.path = "abstract/"
+            nm = identifier.full()
+            if tp := AbstractGameObject._game_object_types.get(nm, None):
+                if parent := data.get("parent", None):
+                    if abstract := tp._loaded.get(parent, None):
+                        return abstract.createInstance(**data)
+                    raise InvalidObjectError(f"No parent GameObject with id: '{parent}'")
+            raise InvalidObjectError(f"GameObject type: '{nm}' does not exist")
         elif "parent" in data:
             ...
             # determine parent type

@@ -72,7 +72,7 @@ class AbstractArmor(AbstractGameObject):
             return d
         raise InvalidObjectError(f"Armor has no damage_reduction! ({self.identifier})")
 
-    def createArmor(self, **override_values) -> Armor:
+    def createInstance(self, **override_values) -> Armor:
         return Armor(self,
             override_values.get("name", self.getName()),
             override_values.get("damage_reduction", self.getDamageReduction()),

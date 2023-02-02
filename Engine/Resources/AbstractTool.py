@@ -24,6 +24,9 @@ class AbstractTool(AbstractGameObject):
         self.parent = parent
         parent.children.append(self)
     
+    def createInstance(self, **override_values) -> Tool:
+        ...
+    
     @classmethod
     def loadData(cls, inline_handler) -> list:
         ...

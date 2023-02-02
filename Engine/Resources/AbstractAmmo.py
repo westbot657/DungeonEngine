@@ -82,7 +82,7 @@ class AbstractAmmo(AbstractGameObject):
             p = p.parent
         return False
 
-    def createAmmo(self, **override_values) -> Ammo:
+    def createInstance(self, **override_values) -> Ammo:
         return Ammo(self,
             override_values.get("name", self.getName()),
             override_values.get("bonus_damage", self.getBonusDamage()),

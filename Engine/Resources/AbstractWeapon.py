@@ -108,7 +108,7 @@ class AbstractWeapon(AbstractGameObject):
                 children += child.get_children(depth-1)
         return children
 
-    def createWeapon(self, **value_overrides) -> Weapon:
+    def createInstance(self, **value_overrides) -> Weapon:
         if self.is_template:
             ...
         else:

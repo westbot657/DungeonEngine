@@ -67,14 +67,13 @@ class AbstractItem(AbstractGameObject):
             return self.parent.getData() or {} if self.parent else {}
         return self.data
 
-    def createItem(self, **override_values) -> Item:
+    def createInstance(self, **override_values) -> Item:
         return Item(self,
             override_values.get("name", self.getName()),
             override_values.get("max_count", self.getMaxCount()),
             override_values.get("count", self.getCount()),
             override_values.get("data", self.getData())
         )
-
 
     @classmethod
     def loadData(cls, inline_handler) -> list:

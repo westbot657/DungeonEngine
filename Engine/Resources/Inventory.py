@@ -7,6 +7,7 @@ try:
     from .AbstractStatusEffect import AbstractStatusEffect, StatusEffect
     from .AbstractTool import AbstractTool, Tool
     from .AbstractWeapon import AbstractWeapon, Weapon
+    from .AbstractGameObject import AbstractGameObject, GameObject
     from .EngineDummy import Engine
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
@@ -16,12 +17,14 @@ except ImportError:
     from AbstractStatusEffect import AbstractStatusEffect, StatusEffect
     from AbstractTool import AbstractTool, Tool
     from AbstractWeapon import AbstractWeapon, Weapon
+    from AbstractGameObject import AbstractGameObject, GameObject
     from EngineDummy import Engine
 
 class Inventory:
-    def __init__(self, contents:list):
+    def __init__(self, contents:list[GameObject]):
         self.parent = None
         self.contents = contents
+        self.equips = {}
 
     @classmethod
     def from_list(cls, engine:Engine, data:list):

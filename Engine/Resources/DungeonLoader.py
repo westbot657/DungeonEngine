@@ -16,6 +16,7 @@ try:
     from .EngineErrors import InvalidObjectError, FunctionLoadError
     from .LootTable import LootTable
     from .AbstractGameObject import AbstractGameObject, GameObject
+    from .Logger import Log
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -32,6 +33,7 @@ except ImportError:
     from EngineErrors import InvalidObjectError, FunctionLoadError
     from LootTable import LootTable
     from AbstractGameObject import AbstractGameObject, GameObject
+    from Logger import Log
 
 import re
 
@@ -57,7 +59,6 @@ class DungeonLoader:
 
 
     def evaluateFunction(self, engine:Engine, data:dict, expected_key:str|None=None):
-        
         if (funcs := data.get("functions", None)) is not None:
             for func in funcs:
                 result = None
@@ -119,6 +120,7 @@ class DungeonLoader:
         ...
     
     def constructGameObject(self, data:dict) -> GameObject:
+        Log["loadup"]["loader"]("Constructing new GameObject...")
         if obj_type := data.get("type", None):
             identifier = Identifier.fromString(obj_type)
             identifier.path = "abstract/"
@@ -126,10 +128,11 @@ class DungeonLoader:
             if tp := AbstractGameObject._game_object_types.get(nm, None):
                 if parent := data.get("parent", None):
                     if abstract := tp._loaded.get(parent, None):
+                        Log["loadup"]["loader"]("GameObject Construction complete")
                         return abstract.createInstance(**data)
                     raise InvalidObjectError(f"No parent GameObject with id: '{parent}'")
             raise InvalidObjectError(f"GameObject type: '{nm}' does not exist")
-        elif "parent" in data:
+        elif parent := data.get("parent", None):
             ...
             # determine parent type
         else:
@@ -160,19 +163,33 @@ class DungeonLoader:
         # TODO: actually search for object (however that needs to be done)
 
     def loadGame(self, engine:Engine):
+        Log["loadup"]["loader"]("Loading Abstract Ammo...")
         self.abstract_ammo = AbstractAmmo.loadData(self)
+
+        Log["loadup"]["loader"]("Loading Abstract Armors...")
         self.abstract_armor = AbstractArmor.loadData(self)
+
+        Log["loadup"]["loader"]("Loading Abstract Combats...")
         self.abstract_combats = AbstractCombat.loadData(self)
 
+        Log["loadup"]["loader"]("Loading Abstract Items...")
         self.abstract_items = AbstractItem.loadData(self)
         #self.abstract_loot_tables = AbstractLootTable.loadData(self)
         
         # self.abstract_rooms = AbstractRoom.loadData(self)
+        Log["loadup"]["loader"]("Loading Abstract Status Effects...")
         self.abstract_status_effects = AbstractStatusEffect.loadData(self)
+
+        Log["loadup"]["loader"]("Loading Abstract Tools...")
         self.abstract_tools = AbstractTool.loadData(self)
+
+        Log["loadup"]["loader"]("Loading Abstract Weapons...")
         self.abstract_weapons = AbstractWeapon.loadData(self)
 
+        Log["loadup"]["loader"]("Loading Abstract Dungeons...")
         self.abstract_dungeons = AbstractDungeon.loadData(self)
+
+        Log["loadup"]["loader"]("Engine resource loading completed")
 
     def saveGame(self, engine:Engine):
         # TODO: implement saving

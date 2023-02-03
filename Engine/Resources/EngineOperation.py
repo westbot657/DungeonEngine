@@ -1,3 +1,4 @@
+# pylint: disable=[W,R,C,import-error]
 
 
 from enum import Enum, auto

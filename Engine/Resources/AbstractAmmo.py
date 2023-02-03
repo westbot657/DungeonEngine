@@ -30,6 +30,8 @@ class AbstractAmmo(AbstractGameObject):
         self.max_count: int|None = data.get("max_count", None)
         self.count: int|None = data.get("count", self.max_count)
 
+        self.is_template: bool = data.get("template", False)
+
     def _set_parent(self, parent):
         self.parent = parent
         parent.children.append(self)
@@ -83,12 +85,15 @@ class AbstractAmmo(AbstractGameObject):
         return False
 
     def createInstance(self, **override_values) -> Ammo:
-        return Ammo(self,
-            override_values.get("name", self.getName()),
-            override_values.get("bonus_damage", self.getBonusDamage()),
-            override_values.get("max_count", self.getMaxCount()),
-            override_values.get("count", self.getCount())
-        )
+        if self.is_template:
+            ...
+        else:
+            return Ammo(self,
+                override_values.get("name", self.getName()),
+                override_values.get("bonus_damage", self.getBonusDamage()),
+                override_values.get("max_count", self.getMaxCount()),
+                override_values.get("count", self.getCount())
+            )
 
     @classmethod
     def loadData(cls, inline_handler) -> list:

@@ -50,13 +50,13 @@ class Identifier:
     @classmethod
     def fromFile(cls, file_name):
         if isinstance(file_name, Identifier): return file_name
-        if m := re.match(r"resources/(?P<path>[a-z_][a-z0-9_]*/)(?P<name>[a-z_][a-z0-9_]*).json", file_name):
+        if m := re.match(r"resources/(?P<path>[a-z_][a-z0-9_]*/)(?P<name>[a-z_][a-z0-9_]*).json", file_name.replace("\\", "/")):
             d = m.groupdict()
             namespace = "engine"
             path = d.get("path", "")
             name = d.get("name", "")
 
-        elif m := re.match(r"Dungeons/(?P<namespace>[a-z_][a-z0-9_]*)/resources/(?P<path>[a-z_][a-z0-9_]*/)(?P<name>[a-z_][a-z0-9_]*).json", file_name):
+        elif m := re.match(r"Dungeons/(?P<namespace>[a-z_][a-z0-9_]*)/resources/(?P<path>[a-z_][a-z0-9_]*/)(?P<name>[a-z_][a-z0-9_]*).json", file_name.replace("\\", "/")):
             d = m.groupdict()
             namespace = d.get("namespace", "")
             path = d.get("path", "")

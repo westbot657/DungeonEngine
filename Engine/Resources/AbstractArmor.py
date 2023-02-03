@@ -32,6 +32,8 @@ class AbstractArmor(AbstractGameObject):
         self.durability: int = data.get("durability", self.max_durability)
         self.damage_reduction: int = data.get("damage_reduction", None)
 
+        self.is_template: bool = data.get("template", False)
+
     def _set_parent(self, parent):
         self.parent = parent
         parent.children.append(self)
@@ -73,12 +75,15 @@ class AbstractArmor(AbstractGameObject):
         raise InvalidObjectError(f"Armor has no damage_reduction! ({self.identifier})")
 
     def createInstance(self, **override_values) -> Armor:
-        return Armor(self,
-            override_values.get("name", self.getName()),
-            override_values.get("damage_reduction", self.getDamageReduction()),
-            override_values.get("max_durability", self.getMaxDurability()),
-            override_values.get("durability", self.getDurability())
-        )
+        if self.is_template:
+            ...
+        else:
+            return Armor(self,
+                override_values.get("name", self.getName()),
+                override_values.get("damage_reduction", self.getDamageReduction()),
+                override_values.get("max_durability", self.getMaxDurability()),
+                override_values.get("durability", self.getDurability())
+            )
 
     @classmethod
     def loadData(cls, inline_handler) -> list:

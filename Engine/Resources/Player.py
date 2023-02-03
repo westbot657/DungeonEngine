@@ -5,11 +5,13 @@ try:
     from .Entity import Entity
     from .Location import Location
     from .EngineDummy import Engine
+    from .Logger import Log
 except ImportError:
     from Inventory import Inventory
     from Entity import Entity
     from Location import Location
     from EngineDummy import Engine
+    from Logger import Log
 
 import json
 
@@ -23,7 +25,6 @@ class Player(Entity):
         self.health = health
         self.inventory = inventory
         super().__init__(location)
-        
 
     def _get_save(self, engine:Engine):
         data = {
@@ -38,7 +39,7 @@ class Player(Entity):
 
     @classmethod
     def loadData(cls, engine:Engine) -> list:
-
+        Log["loadup"]["player"]("Loading Player Data...")
         with open("Engine/save_data/players.json", "r+", encoding="utf-8") as f:
             data_list: list[dict] = json.load(f)
         
@@ -50,12 +51,13 @@ class Player(Entity):
             location_dict: dict = data.get("location")
             inv_list: list = data.get("inventory")
 
-            location: Location = Location.from_dict(location_dict)
-            inventory: Inventory = Inventory.from_list(inv_list)
-
+            Log["loadup"]["player"]("creating player instance...")
+            location: Location = Location.from_dict(engine, location_dict)
+            inventory: Inventory = Inventory.from_list(engine, inv_list)
             p = cls(Id, name, max_health, health, inventory, location)
             cls._loaded.update({Id: p})
-        print(cls._loaded)
+            Log["loadup"]["player"]("player instance created")
+        Log["loadup"]["player"](f"Loaded players: {cls._loaded}")
         return cls._loaded
 
     @classmethod

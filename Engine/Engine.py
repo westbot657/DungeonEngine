@@ -1,4 +1,12 @@
 # pylint: disable=[W,R,C,import-error]
+from Resources.Logger               import Log
+
+Log._tag_colors = {
+    "loadup": "\033[38;2;10;200;80m",
+    "player": "\033[38;2;10;40;180m",
+    "loader": "\033[38;2;200;200;10m"
+}
+
 from Resources.AbstractAmmo         import AbstractAmmo, Ammo
 from Resources.AbstractArmor        import AbstractArmor, Armor
 from Resources.AbstractCombat       import AbstractCombat, Combat
@@ -45,7 +53,6 @@ class Engine:
     def loadGame(self):
         self.loader.loadGame(self)
         self.players = Player.loadData(self)
-        print(self.players)
 
     def saveGame(self):
         self.loader.saveGame(self)
@@ -114,6 +121,7 @@ class Engine:
         
         self.io_hook.init(self)
         self.io_hook.start()
+        self.loadGame()
         while self.thread_running:
             if not self.running:
                 # Pause Menu thingy?
@@ -165,13 +173,9 @@ class Engine:
 
             # do other engine stuff
 
-
+        self.saveGame()
         self.io_hook.stop()
 
 
-    
-
-
-
 if __name__ == "__main__":
-    pass
+    ...

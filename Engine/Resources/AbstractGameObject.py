@@ -1,3 +1,4 @@
+# pylint: disable=[W,R,C,import-error]
 
 try:
     from .GameObject import GameObject

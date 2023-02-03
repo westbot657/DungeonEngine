@@ -1,3 +1,4 @@
+# pylint: disable=[W,R,C,import-error]
 
 from threading import Thread
 import re
@@ -43,7 +44,7 @@ class ConsoleIOHook:
 if __name__ == "__main__":
     from Engine import Engine
     console_hook = ConsoleIOHook()
-    game_engine = Engine(console_hook)
+    game_engine = Engine(console_hook) # pylint: disable=[not-callable]
     game_engine.start()
     
 

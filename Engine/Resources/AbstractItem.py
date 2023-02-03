@@ -5,11 +5,13 @@ try:
     from .Item import Item
     from .EngineErrors import InvalidObjectError
     from .AbstractGameObject import AbstractGameObject
+    from .Logger import Log
 except ImportError:
     from Identifier import Identifier
     from Item import Item
     from EngineErrors import InvalidObjectError
     from AbstractGameObject import AbstractGameObject
+    from Logger import Log
 
 import glob, json, re
 
@@ -18,7 +20,7 @@ class AbstractItem(AbstractGameObject):
     _link_parents: list = []
     identifier: Identifier = Identifier("engine", "abstract/", "item")
     def __init__(self, identifier:Identifier, data:dict):
-        
+        Log["loadup"]["abstract"]["item"]("Creating new AbstractItem")
         self.identifier = identifier
         self._raw_data = data
 
@@ -32,6 +34,8 @@ class AbstractItem(AbstractGameObject):
         self.max_count: int = data.get("max_count", None)
         self.count: int = data.get("count", self.max_count)
         self.data: dict = data.get("data", None)
+
+        self.is_template: bool = data.get("template", False)
 
     def _set_parent(self, parent):
         self.parent = parent
@@ -68,18 +72,22 @@ class AbstractItem(AbstractGameObject):
         return self.data
 
     def createInstance(self, **override_values) -> Item:
-        return Item(self,
-            override_values.get("name", self.getName()),
-            override_values.get("max_count", self.getMaxCount()),
-            override_values.get("count", self.getCount()),
-            override_values.get("data", self.getData())
-        )
+        if self.is_template:
+            ...
+        else:
+            return Item(self,
+                override_values.get("name", self.getName()),
+                override_values.get("max_count", self.getMaxCount()),
+                override_values.get("count", self.getCount()),
+                override_values.get("data", self.getData())
+            )
 
     @classmethod
     def loadData(cls, inline_handler) -> list:
         files: list[str] = glob.glob("**/items/*.json", recursive=True)
         for file in files:
             file: str
+            Log["loadup"]["abstract"]["item"](f"Loading AbstractItem from '{file}'")
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
             
@@ -97,24 +105,34 @@ class AbstractItem(AbstractGameObject):
             #     d: dict = m.groupdict()
             #     name: str = d["name"]
             #     cls._loaded.update({f"engine:items/{name}": cls(Identifier("engine", "resources/items/", name), data)})
-
+        Log["loadup"]["abstract"]["item"]("linking AbstractItem parents...")
         for w, p in cls._link_parents:
             w: AbstractItem
             p: str
             w._set_parent(cls._loaded.get(p))
 
+        Log["loadup"]["abstract"]["item"]("verifying AbstractItem completion...")
+        Log.track(len(cls._loaded), "loadup", "abstract", "item")
         for l, o in cls._loaded.copy().items():
             l: str
             o: AbstractItem
+            if o.is_template:
+                Log.success()
+                continue
             try:
                 o.getName()
                 o.getMaxCount()
                 o.getCount()
                 o.getData()
+                Log.success()
             except InvalidObjectError:
                 e: AbstractItem = cls._loaded.pop(l)
+                Log.fail()
                 print(f"Failed to load item: {e.identifier}")
 
+        Log.end_track()
+
+        Log["loadup"]["abstract"]["item"]("AbstractItem loading complete")
         return cls._loaded
 
 

@@ -20,7 +20,7 @@ class AbstractItem(AbstractGameObject):
     _link_parents: list = []
     identifier: Identifier = Identifier("engine", "abstract/", "item")
     def __init__(self, identifier:Identifier, data:dict):
-        Log["loadup"]["abstract"]["item"]("Creating new AbstractItem")
+        Log["loadup"]["abstract"]["item"]("creating new AbstractItem")
         self.identifier = identifier
         self._raw_data = data
 
@@ -85,9 +85,10 @@ class AbstractItem(AbstractGameObject):
     @classmethod
     def loadData(cls, inline_handler) -> list:
         files: list[str] = glob.glob("**/items/*.json", recursive=True)
+        Log["loadup"]["abstract"]["item"](f"found {len(files)} item files")
         for file in files:
             file: str
-            Log["loadup"]["abstract"]["item"](f"Loading AbstractItem from '{file}'")
+            Log["loadup"]["abstract"]["item"](f"loading AbstractItem from '{file}'")
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
             
@@ -109,7 +110,13 @@ class AbstractItem(AbstractGameObject):
         for w, p in cls._link_parents:
             w: AbstractItem
             p: str
-            w._set_parent(cls._loaded.get(p))
+            if parent := cls._loaded.get(p, None):
+                if parent is w:
+                    Log["ERROR"]["loadup"]["abstract"]["item"]("cannot set object as it's own parent")
+                    continue
+                w._set_parent(parent)
+            else:
+                Log["ERROR"]["loadup"]["abstract"]["item"](f"parent does not exist: '{p}'")
 
         Log["loadup"]["abstract"]["item"]("verifying AbstractItem completion...")
         Log.track(len(cls._loaded), "loadup", "abstract", "item")
@@ -128,7 +135,7 @@ class AbstractItem(AbstractGameObject):
             except InvalidObjectError:
                 e: AbstractItem = cls._loaded.pop(l)
                 Log.fail()
-                print(f"Failed to load item: {e.identifier}")
+                Log.ERROR("loadup", "abstract", "item", f"failed to load item: {e.identifier}")
 
         Log.end_track()
 

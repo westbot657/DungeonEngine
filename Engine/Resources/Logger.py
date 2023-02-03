@@ -49,7 +49,7 @@ class _Log:
                 out += f"{self._tag_colors[tag]}[{tag}]\033[0m"
             else:
                 out += f"[{tag}]"
-        out += f": {sep.join(str(v) for v in values)}"
+        out += f": \033[38;2;160;160;160m{sep.join(str(v) for v in values)}\033[0m"
         
         print(f"[{time.asctime()[11:19]}] " + out.strip())
         self.tags.clear()
@@ -72,6 +72,16 @@ class _Log:
         self.counted += 1
         self._check_tracking()
     
+    def ERROR(self, *tags):
+        """
+        the last element in the 'tags' tuple will be treated as the output message
+        """
+        tgs = self.tags
+        self.tags = ["ERROR"] + [t for t in tags]
+        o = self.tags.pop(-1)
+        self(o)
+        self.tags = tgs
+
     def skip(self):
         if not self.counting: return
         self.counted += 1
@@ -98,7 +108,7 @@ class _Log:
                 out += "#"
                 skips += 1
             last = stat
-        out += f"\033[0m (\033[38;2;0;200;20m+{passes} \033[38;2;200;20;0m-{fails} \033[38;2;80;80;80m#{skips}\033[0m)"
+        out += f"\033[0m (\033[38;2;0;200;20m+{passes} \033[38;2;200;20;0m-{fails} \033[38;2;80;80;80m#{skips}\033[0m  {passes+fails+skips})"
         self(out)
         self.counting = False
 

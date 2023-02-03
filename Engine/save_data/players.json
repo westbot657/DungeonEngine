@@ -32,6 +32,13 @@
                     "durability": 23
                 },
                 "equipped": true
+            },
+            {
+                "type": "engine:armor",
+                "parent": "a banana",
+                "data": {
+                    "wa": false
+                }
             }
         ],
         "status_effects": [

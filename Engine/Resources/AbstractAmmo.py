@@ -4,11 +4,13 @@ try:
     from .Identifier import Identifier
     from .EngineErrors import InvalidObjectError
     from .AbstractGameObject import AbstractGameObject
+    from .Logger import Log
 except ImportError:
     from Ammo import Ammo
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
     from AbstractGameObject import AbstractGameObject
+    from Logger import Log
 
 import glob, json, re
 
@@ -17,6 +19,7 @@ class AbstractAmmo(AbstractGameObject):
     _link_parents: list = []
     identifier: Identifier = Identifier("engine", "abstract/", "ammo")
     def __init__(self, identifier:Identifier, data:dict):
+        Log["loadup"]["abstract"]["ammo"]("creating new AbstractAmmo")
         self.identifier = identifier
         self._raw_data = data
         self.children: list[AbstractAmmo] = []
@@ -99,8 +102,10 @@ class AbstractAmmo(AbstractGameObject):
     def loadData(cls, inline_handler) -> list:
         files: list[str] = glob.glob("**/ammo/*.json", recursive=True)
 
+        Log["loadup"]["abstract"]["ammo"](f"found {len(files)} ammo files")
         for file in files:
             file: str
+            Log["loadup"]["abstract"]["ammo"](f"loading AbstractAmmo from '{file}'")
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
             
@@ -119,22 +124,38 @@ class AbstractAmmo(AbstractGameObject):
             #     name: str = d["name"]
             #     cls._loaded.update({f"engine:ammo/{name}": cls(Identifier("engine", "resources/ammo/", name), data)})
 
+        Log["loadup"]["abstract"]["ammo"]("linking AbstractAmmo parents...")
         for a, p in cls._link_parents:
             a: AbstractAmmo
             p: str
-            a._set_parent(cls._loaded.get(p))
+            if parent := cls._loaded.get(p, None):
+                if parent is a:
+                    Log["ERROR"]["loadup"]["abstract"]["ammo"]("cannot set object as it's own parent")
+                    continue
+                a._set_parent(parent)
+            else:
+                Log["ERROR"]["loadup"]["abstract"]["ammo"](f"parent does not exist: '{p}'")
         
+        Log["loadup"]["abstract"]["ammo"]("verifying AbstractAmmo completion...")
+        Log.track(len(cls._loaded), "loadup", "abstract", "ammo")
         for l, o in cls._loaded.copy().items():
             l: str
             o: AbstractAmmo
+            if o.is_template:
+                Log.success()
+                continue
             try:
                 o.getName()
                 o.getBonusDamage()
                 o.getMaxCount()
+                Log.success()
             except InvalidObjectError:
                 e: AbstractAmmo = cls._loaded.pop(l)
-                print(f"Failed to load ammo: {e.identifier}")
+                Log.ERROR("loadup", "abstract", "ammo", f"failed to load ammo: {e.identifier}")
 
+        Log.end_track()
+
+        Log["loadup"]["abstract"]["ammo"]("AbstractAmmo loading complete")
         return cls._loaded
 
 

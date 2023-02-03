@@ -6,66 +6,30 @@
 you can ignore this file, I'm juts using it to list possible values of stuff
 
 
-## stuff with all (most) possible values
 
-### dungeon1/dungeon.json
-```json
-{
-    "name": "dungeon1",
-    "version": 0.1,
-    "enter_message": "",
-    "exit_message": "",
-    "data": {
-        "boss_defeated": true|false
-    },
-    "entry_point": "dungeon1:room1"
-}
-```
+Load order:
 
 
-### dungeon1/rooms/room1.json
-```json
-{
-    "name": "Room 1",
-    "interactions": [
-        {
-            "type": "door",
-            "target": "dungeon1:room2",
-            "locked": true|false,
-            "travel_message": "..."
-        }
-    ]
-}
-```
+Ammo (AbstractGameObject)
+Armor (AbstractGameObject)
+Items (AbstractGameObject)
+Tools (AbstractGameObject)
+Weapons (AbstractGameObject)
 
-### dungeon1/rooms/room2.json
-```json
+AbstractGameObject Load order:
+    load files
+    check for parents
+    tie abstracts to their parents
+    verify abstracts are linked to parents and can load all necessary data
 
-```
+Attacks
+Status Effects
+Enemies
+Combat
+Dungeons
 
-### dungeon1/rooms/room3.json
-```json
+Player Data
 
-```
-
-### dungeon1/resources/weapons/excaliber.json
-```json
-
-```
-
-### dungeon1/resources/ammo/acid_arrow.json
-```json
-
-```
-
-### dungeon1/resources/armor/chainmail.json
-```json
-
-```
-
-### 
-
-
-
+Dungeon States
 
 

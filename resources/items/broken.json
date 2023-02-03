@@ -1,0 +1,5 @@
+{
+    "name": "broken",
+    "parent": "engine:items/broken",
+    "banana": true
+}

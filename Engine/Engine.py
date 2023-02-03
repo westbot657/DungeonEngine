@@ -4,7 +4,12 @@ from Resources.Logger               import Log
 Log._tag_colors = {
     "loadup": "\033[38;2;10;200;80m",
     "player": "\033[38;2;10;40;180m",
-    "loader": "\033[38;2;200;200;10m"
+    "loader": "\033[38;2;200;200;10m",
+    "ERROR": "\033[38;2;255;0;0m",
+    "abstract": "\033[38;2;100;100;100m",
+    "object": "\033[38;2;200;200;200m",
+    "inventory": "\033[38;2;0;100;100m",
+    "dungeon": "\033[38;2;0;180;30m"
 }
 
 from Resources.AbstractAmmo         import AbstractAmmo, Ammo

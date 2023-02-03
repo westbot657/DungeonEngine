@@ -10,6 +10,7 @@ try:
     from .AbstractWeapon import AbstractWeapon, Weapon
     from .AbstractGameObject import AbstractGameObject, GameObject
     from .EngineDummy import Engine
+    from .EngineErrors import InvalidObjectError
     from .Logger import Log
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
@@ -21,6 +22,7 @@ except ImportError:
     from AbstractWeapon import AbstractWeapon, Weapon
     from AbstractGameObject import AbstractGameObject, GameObject
     from EngineDummy import Engine
+    from EngineErrors import InvalidObjectError
     from Logger import Log
 
 class Inventory:
@@ -37,7 +39,11 @@ class Inventory:
         for element in data:
             element: dict
             Log["loadup"]["inventory"]("constructing new GameObject")
-            obj: GameObject = engine.loader.constructGameObject(element)
+            try:
+                obj: GameObject = engine.loader.constructGameObject(element)
+            except InvalidObjectError as e:
+                Log["ERROR"]["loadup"]["inventory"](*e.args, sep=" ")
+                continue
             contents.append(obj)
             Log["loadup"]["inventory"]("gameObject added to inventory")
             if element.get("equipped", False):

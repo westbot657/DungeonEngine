@@ -2,16 +2,18 @@
 
 try:
     from .Inventory import Inventory
+    from .Entity import Entity
     from .Location import Location
     from .EngineDummy import Engine
 except ImportError:
     from Inventory import Inventory
+    from Entity import Entity
     from Location import Location
     from EngineDummy import Engine
 
 import json
 
-class Player:
+class Player(Entity):
     _loaded = {}
 
     def __init__(self, discord_id:int, name:str, max_health:int, health:int, inventory:Inventory, location:Location):
@@ -20,9 +22,19 @@ class Player:
         self.max_health = max_health
         self.health = health
         self.inventory = inventory
-        self.location = location
+        super().__init__(location)
+        
 
-
+    def _get_save(self, engine:Engine):
+        data = {
+            "id": self.discord_id,
+            "name": self.name,
+            "max_health": self.max_health,
+            "health": self.health,
+            "location": self.location._get_save(engine),
+            "inventory": self.inventory._get_save(engine),
+            "status_effects": self.status_effects._get_save(engine)
+        }
 
     @classmethod
     def loadData(cls, engine:Engine) -> list:

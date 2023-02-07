@@ -100,16 +100,17 @@ class AbstractWeapon(AbstractGameObject):
             return AbstractAmmo._loaded["engine:ammo/none"]
         return AbstractAmmo._loaded["engine:ammo/none"]
 
-    def get_children(self, depth:int=-1): # recursive way to get a flat list of all sub children to some depth
-        children = []
-        for child in self.children:
-            children.append(child)
-            if depth != 0:
-                children += child.get_children(depth-1)
-        return children
+    def _assertAmmoType(self, tp) -> AbstractAmmo:
+        if isinstance(tp, AbstractAmmo): return tp
+        if abstract := AbstractAmmo._loaded.get(tp, None):
+            return abstract
+        raise InvalidObjectError(f"AmmoType: '{tp}' does not exist")
 
     def createInstance(self, **value_overrides) -> Weapon:
         if self.is_template:
+            # go through children (and sub children probably) and pick a random one?
+            # or
+            # create instance of first non-template child?
             ...
         else:
             return Weapon(self,
@@ -118,7 +119,7 @@ class AbstractWeapon(AbstractGameObject):
                 value_overrides.get("range", self.getRange()),
                 value_overrides.get("max_durability", self.getMaxDurability()),
                 value_overrides.get("durability", self.getDurability()),
-                value_overrides.get("ammo_type", self.getAmmoType())
+                self._assertAmmoType(value_overrides.get("ammo_type", self.getAmmoType()))
             )
 
     @classmethod
@@ -132,18 +133,6 @@ class AbstractWeapon(AbstractGameObject):
 
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})
-
-            # if m := re.match(r"Dungeons/(?P<namespace>[^/]+)/resources/(?P<path>(?:[^/]+/)+)(?P<name>[a-z0-9_]+)\.json", file):
-            #     d: dict = m.groupdict()
-            #     namespace:str = d["namespace"]
-            #     path: str = d["path"]
-            #     name: str = d["name"]
-            #     cls._loaded.update({f"{namespace}:weapons/{name}": cls(Identifier(namespace, path, name), data)})
-
-            # elif m := re.match(r"resources/weapons/(?P<name>[a-z0-9_]+)\.json", file):
-            #     d: dict = m.groupdict()
-            #     name: str = d["name"]
-            #     cls._loaded.update({f"engine:weapons/{name}": cls(Identifier("engine", "weapons/", name), data)})
 
         for w, p in cls._link_parents:
             w: AbstractWeapon

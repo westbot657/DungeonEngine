@@ -11,14 +11,22 @@ except ImportError:
     from EngineDummy import Engine
     from Enemy import Enemy
 
-#
-#
-#
-#
-#
-#
-#
 import glob, json
+
+
+"""
+Example Enemy:
+{
+    "name": "Goblin",
+    "max_health": 10,
+    "attacks": [
+        "engine:attacks/stab",
+        "engine:attacks/bite"
+    ]
+}
+
+"""
+
 
 class AbstractEnemy:
     _loaded: dict = {}
@@ -30,9 +38,27 @@ class AbstractEnemy:
         self.children: list[AbstractEnemy] = []
         self.parent: AbstractEnemy|None = None
     
+        if "parent" in data:
+            AbstractEnemy._link_parents.append((self, data["parent"]))
+        
+        self.name: str|None = data.get("name", None)
+        self.max_health: int|None = data.get("max_health", None)
+        self.health: int|None = data.get("health", self.max_health)
+        self.attacks: list = data.get("attacks", [])
     
+        self.is_template: bool = data.get("template", False)
     
+    def _set_parent(self, parent):
+        self.parent = parent
+        parent.children.append(self)
     
+    def createInstance(self, **override_values) -> Enemy:
+        return Enemy(self,
+            override_values.get("name", self.getName()),
+            override_values.get("max_health", self.getMaxHealth()),
+            override_values.get("health", self.getHealth()),
+            ovveride_values.get("attacks", self.getAttacks())
+        )
     
     @classmethod
     def loadData(cls, engine:Engine) -> list:

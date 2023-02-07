@@ -2,7 +2,7 @@
     "name": "Goblin",
     "max_health": 10,
     "attacks": [
-        "engine:stab",
-        "engine:bite"
+        "engine:attacks/stab",
+        "engine:attacks/bite"
     ]
 }

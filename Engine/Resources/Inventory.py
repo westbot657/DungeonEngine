@@ -31,6 +31,13 @@ class Inventory:
         self.contents = contents
         self.equips = {}
 
+    def fullStats(self):
+        out = []
+        for obj in self.contents:
+            out.append(obj.fullStats(obj in self.equips.values()))
+        if out: return "\n".join(out)
+        return "[no items in inventory]"
+
     @classmethod
     def from_list(cls, engine:Engine, data:list):
         equips = {}

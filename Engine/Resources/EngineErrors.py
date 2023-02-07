@@ -2,6 +2,8 @@
 
 class EngineError(Exception): pass
 
+class EngineBreak(Exception): pass
+
 class InvalidObjectError(EngineError):
     def __init__(self, *args):
         super().__init__("InvalidObjectError:", *args)
@@ -25,5 +27,6 @@ class MemoryError(EngineError): # Error with FunctionMemory
 class IdentifierError(EngineError):
     def __init__(self, *args):
         super().__init__("IdentifierError:", *args)
+
 
 

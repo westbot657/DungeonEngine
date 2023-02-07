@@ -4,12 +4,14 @@ try:
     from .Inventory import Inventory
     from .Entity import Entity
     from .Location import Location
+    from .StatusEffectManager import StatusEffectManager
     from .EngineDummy import Engine
     from .Logger import Log
 except ImportError:
     from Inventory import Inventory
     from Entity import Entity
     from Location import Location
+    from StatusEffectManager import StatusEffectManager
     from EngineDummy import Engine
     from Logger import Log
 
@@ -24,6 +26,7 @@ class Player(Entity):
         self.max_health = max_health
         self.health = health
         self.inventory = inventory
+        self.status_effects = StatusEffectManager()
         super().__init__(location)
 
     def _get_save(self, engine:Engine):
@@ -36,6 +39,17 @@ class Player(Entity):
             "inventory": self.inventory._get_save(engine),
             "status_effects": self.status_effects._get_save(engine)
         }
+
+    def __repr__(self):
+        return self.name
+
+    def fullInventoryStats(self):
+        output = "\n".join([
+            f"{self.name} | {self.health}/{self.max_health} | {self.location}",
+            self.inventory.fullStats(),
+            self.status_effects.fullStats()
+        ]).strip()
+
 
     @classmethod
     def loadData(cls, engine:Engine) -> list:

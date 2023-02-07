@@ -16,5 +16,5 @@ class Location:
     @classmethod
     def from_dict(cls, engine:Engine, data):
         # could check that position is invalid?
-        return cls(data["room"], *data["position"])
+        return cls(data["world_pos"], *data["position"])
 

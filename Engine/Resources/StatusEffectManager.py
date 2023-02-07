@@ -19,6 +19,9 @@ class StatusEffectManager:
     def addEffect(self, effect:StatusEffect):
         ...
 
+    def fullStats(self):
+        return ""
+
     def _get_save(self, engine:Engine):
         ...
     

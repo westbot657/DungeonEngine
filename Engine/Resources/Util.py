@@ -41,3 +41,11 @@ class Util:
     def generator_started(gen:Generator):
         return gen.gi_frame.f_lasti != -1
 
+    @staticmethod
+    def getDurabilityBar(current_value, max_value, bar_width=10):
+        percent = current_value / max_value
+        filled = int(percent * bar_width)
+        unfilled = bar_width - filled
+
+        return f"[{'='*filled}{'-'*unfilled}] {current_value}/{max_value}"
+

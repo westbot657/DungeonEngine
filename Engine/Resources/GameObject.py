@@ -2,10 +2,10 @@
 
 try:
     from .Identifier import Identifier
-    from .EngineErrors import IdentifierError
+    from .EngineErrors import EngineError, IdentifierError
 except ImportError:
     from Identifier import Identifier
-    from EngineErrors import IdentifierError
+    from EngineErrors import EngineError, IdentifierError
 
 class GameObject:
     _game_object_types = {}
@@ -17,6 +17,7 @@ class GameObject:
 
         GameObject._game_object_types.update({cls.identifier.full(): cls})
 
-
+    def fullStats(self, is_equipped=False):
+        raise EngineError(f"game object has not defined fullStats() method!")
 
 

@@ -1,5 +1,5 @@
 # pylint: disable=[W,R,C,import-error]
-from Resources.Logger               import Log
+from Resources.Logger import Log
 
 Log._tag_colors = {
     "loadup": "\033[38;2;10;200;80m",
@@ -19,12 +19,14 @@ from Resources.AbstractItem         import AbstractItem, Item
 from Resources.LootTable            import LootTable, LootPool, LootEntry
 from Resources.AbstractStatusEffect import AbstractStatusEffect, StatusEffect
 from Resources.AbstractWeapon       import AbstractWeapon, Weapon
+from Resources.Inventory            import Inventory
+from Resources.Location             import Location
 from Resources.Identifier           import Identifier
 from Resources.Player               import Player
 from Resources.DungeonLoader        import DungeonLoader
 from Resources.FunctionMemory       import FunctionMemory
 from Resources.EngineOperation      import EngineOperation, _EngineOperation, OpType
-from Resources.EngineErrors         import EngineError
+from Resources.EngineErrors         import EngineError, EngineBreak
 from Resources.Util                 import Util
 
 from threading import Thread
@@ -49,7 +51,8 @@ class Engine:
         self.io_hook = io_hook
         self.loader: DungeonLoader = DungeonLoader()
         self.function_memory: FunctionMemory = FunctionMemory()
-        self.default_input_handler = self._default_input_handler()
+        self.default_input_handler = self._default_input_handler
+        self.players = []
         #self.default_input_handler.send(None)
 
     def evaluateFunction(self, data:dict):
@@ -86,15 +89,39 @@ class Engine:
     def sendOutput(self, target:str|int, text:str):
         self.io_hook.sendOutput(target, text)
 
-    def _default_input_handler(self) -> Generator:
+    def _default_input_handler(self, player_id, text) -> Generator:
         while self.running:
-            player_id, text = yield EngineOperation.Continue()
-            
-            # TODO: checks for stuff like moving, inventory stuff, etc...
+            try:
+                Log["debug"]["input-handler"](f"handling: '{text}' from {player_id}")
+                # TODO: checks for stuff like moving, inventory stuff, etc...
 
-    def getPlayer(self, player_id:int) -> Player:
+                if player_id == 0: # id 0 means engine basically
+                    if m := re.match(r"\<new-player\>:(?P<player_id>\d+):(?P<max_health>\d+):(?P<name>.+)", text):
+                        d = m.groupdict()
+                        new_player_id = int(d["player_id"])
+                        max_health = int(d["max_health"])
+                        name = d["name"].strip()
+                        p = Player(new_player_id, name, max_health, max_health, Inventory([]), Location("energia:spawn", 0, 0))
+                        Player._loaded.update({new_player_id: p})
+                        self.io_hook.sendOutput(new_player_id, f"Thanks for joining, {p}!")
+
+                elif player := self.getPlayer(player_id, None):
+                    ...
+
+                    if re.search(r"\b(inventory|bag|items|)\b", text):
+                        self.io_hook.sendOutput(player_id, player.fullInventoryStats())
+
+                    # Simple command checks
+                
+                # else: do nothing
+
+            except EngineBreak: pass
+            player_id, text = yield EngineOperation.Continue()
+
+    def getPlayer(self, player_id:int, default=...) -> Player:
         if p := Player._loaded.get(player_id, None): return p
-        raise EngineError(f"Player does not exist with id: '{player_id}'")
+        if default is ...: raise EngineError(f"Player does not exist with id: '{player_id}'")
+        return default
 
     def evaluateResult(self, handler_getter:Callable, handler:Generator, result:_EngineOperation, player_id:int, text:str):
         Log["debug"]["engine"]["evaluate-result"](f"result:{result}  id:{player_id} text:'{text}'")
@@ -103,7 +130,7 @@ class Engine:
                 target:int = result.target
                 prompt:str = result.prompt
                 self.io_hook.sendOutput(target, prompt)
-                
+                self.input_queue.pop(player_id)
             case EngineOperation.Restart():
                 gen = self.input_queue[player_id][0]
                 self.input_queue[player_id][1] = gen
@@ -116,7 +143,7 @@ class Engine:
             case EngineOperation.Error():
                 ...
             case EngineOperation.Continue():
-                ...
+                self.input_queue.pop(player_id)
             case _:
                 raise EngineError("Unknown Operation")
 
@@ -136,8 +163,8 @@ class Engine:
             
             # check inputs
             while self.input_queue:
-                for key in [k for k in self.input_queue.keys()]:
-                    player_id, [handler_getter, response_handler, text] = self.input_queue[key]
+                for player_id in [k for k in self.input_queue.keys()]:
+                    handler_getter, response_handler, text = self.input_queue[player_id]
                     handler_getter: Callable
                     response_handler: Generator|Callable
                     player_id: int
@@ -155,7 +182,7 @@ class Engine:
                                     print(e)
                                 continue
                             try:
-                                result = response_handler.send(player_id, text)
+                                result = response_handler.send((player_id, text))
                                 if not isinstance(result, _EngineOperation):
                                     raise EngineError("generator did not yield/return an EngineOperation")
                                 #print(result)

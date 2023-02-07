@@ -16,7 +16,7 @@ import glob, json, re
 class AbstractItem(AbstractGameObject):
     _loaded: dict = {}
     _link_parents: list = []
-    identifier: Identifier = Identifier("engine", "abstract/", "item")
+    identity: Identifier = Identifier("engine", "abstract/", "item")
     def __init__(self, identifier:Identifier, data:dict):
         
         self.identifier = identifier

@@ -10,13 +10,27 @@ except ImportError:
     from EngineDummy import Engine
     from Enemy import Enemy
 
+#
+#
+#
+#
+#
+#
+#
 
 class AbstractEnemy:
     _loaded: dict = {}
     _link_parents: list = []
-    
+    identity: Identifier = Identifier("engine", "abstract/", "enemy")
     def __init__(self, identifier:Identifier, data:dict):
-        ...
+        self.identifier = identifier
+        self._raw_data = data
+        self.children: list[AbstractEnemy] = []
+        self.parent: AbstractEnemy|None = None
+    
+    
+    
+    
     
     @classmethod
     def loadData(cls, engine:Engine) -> list:

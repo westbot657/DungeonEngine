@@ -13,7 +13,7 @@ except ImportError:
 
 
 class AbstractTool(AbstractGameObject):
-    identifier: Identifier = Identifier("engine", "abstract/", "tool")
+    identity: Identifier = Identifier("engine", "abstract/", "tool")
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
         self._raw_data = data

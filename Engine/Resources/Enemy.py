@@ -13,8 +13,12 @@ except:
 class Enemy(Entity):
     ...
     
-    def __init__(self):
-        ...
+    def __init__(self, abstract, name:str, max_health:int, health:int, attacks:list):
+        self.abstract = abstract
+        self.name = name
+        self.max_health = max_health
+        self.health = health
+        self.attacks = attacks
 
 
 

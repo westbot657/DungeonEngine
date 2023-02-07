@@ -32,7 +32,7 @@ import glob, json
 class AbstractWeapon(AbstractGameObject):
     _loaded: dict = {}
     _link_parents = []
-    identifier: Identifier = Identifier("engine", "abstract/", "weapon")
+    identity: Identifier = Identifier("engine", "abstract/", "weapon")
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
         self._raw_data = data

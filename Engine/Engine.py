@@ -97,11 +97,12 @@ class Engine:
         raise EngineError(f"Player does not exist with id: '{player_id}'")
 
     def evaluateResult(self, handler_getter:Callable, handler:Generator, result:_EngineOperation, player_id:int, text:str):
-        
+        Log["debug"]["engine"]["evaluate-result"](f"result:{result}  id:{player_id} text:'{text}'")
         match result:
             case EngineOperation.GetInput():
                 target:int = result.target
                 prompt:str = result.prompt
+                self.io_hook.sendOutput(target, prompt)
                 
             case EngineOperation.Restart():
                 gen = self.input_queue[player_id][0]
@@ -148,14 +149,20 @@ class Engine:
                                 if not isinstance(result, _EngineOperation):
                                     raise EngineError("generator did not yield/return an EngineOperation")
                                 #print(result)
-                                self.evaluateResult(handler_getter, response_handler, result, player_id, text)
+                                try:
+                                    self.evaluateResult(handler_getter, response_handler, result, player_id, text)
+                                except EngineError as e:
+                                    print(e)
                                 continue
                             try:
                                 result = response_handler.send(player_id, text)
                                 if not isinstance(result, _EngineOperation):
                                     raise EngineError("generator did not yield/return an EngineOperation")
                                 #print(result)
-                                self.evaluateResult(handler_getter, response_handler, result, player_id, text)
+                                try:
+                                    self.evaluateResult(handler_getter, response_handler, result, player_id, text)
+                                except EngineError as e:
+                                    print(e)
                                 continue
                                 
                             except StopIteration as e:
@@ -163,7 +170,10 @@ class Engine:
                                 if not isinstance(result, _EngineOperation):
                                     raise EngineError("generator did not yield/return an EngineOperation")
                                 #print(result)
-                                self.evaluateResult(handler_getter, response_handler, result, player_id, text)
+                                try:
+                                    self.evaluateResult(handler_getter, response_handler, result, player_id, text)
+                                except EngineError as e:
+                                    print(e)
                                 continue
                                 
                         elif isinstance(response_handler, Callable):
@@ -173,7 +183,10 @@ class Engine:
                                 result = response_handler.send(None)
                             if not isinstance(result, _EngineOperation):
                                 raise EngineError("function did not return an EngineOperation")
-                            self.evaluateResult(handler_getter, response_handler, result, player_id, text)
+                            try:
+                                self.evaluateResult(handler_getter, response_handler, result, player_id, text)
+                            except EngineError as e:
+                                print(e)
                             continue
 
             # do other engine stuff

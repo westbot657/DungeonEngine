@@ -4,10 +4,12 @@ try:
     from .Dungeon import Dungeon
     from .Identifier import Identifier
     from .EngineErrors import InvalidObjectError
+    from .Logger import Log
 except ImportError:
     from Dungeon import Dungeon
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
+    from Logger import Log
 
 
 import glob, json, re
@@ -83,13 +85,11 @@ class AbstractDungeon:
 
         room_files: list[str] = glob.glob(f"Dungeons/{self.identifier.name}/rooms/*.json")
 
-        
-
     @classmethod
     def loadData(cls, inline_handler) -> list:
         files: list[str] = glob.glob("Dungeons/**/*.json")#, recursive=True)
 
-        print(files)
+        Log["loadup"]["dungeon"](f"Loading {len(files)} dungeons...")
 
         for file in files:
             with open(file, "r+", encoding="utf-8") as f:
@@ -105,7 +105,6 @@ class AbstractDungeon:
                 pass # run getters
             except InvalidObjectError:
                 e = cls._loaded.pop(l)
-                print(f"Failed to load dungeon: {e}")
 
         return cls._loaded
 

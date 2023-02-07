@@ -1,3 +1,4 @@
+# pylint: disable=[W,R,C,import-error]
 
 try:
     from .Identifier import Identifier
@@ -17,6 +18,7 @@ except ImportError:
 #
 #
 #
+import glob, json
 
 class AbstractEnemy:
     _loaded: dict = {}

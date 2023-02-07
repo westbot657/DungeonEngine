@@ -106,9 +106,10 @@ class Engine:
                         self.io_hook.sendOutput(new_player_id, f"Thanks for joining, {p}!")
 
                 elif player := self.getPlayer(player_id, None):
-                    ...
+                    print(f"{player=}")
 
-                    if re.search(r"\b(inventory|bag|items|)\b", text):
+                    if re.search(r"\b(inventory|bag|items)\b", text):
+                        Log["debug"]["console"]("checking inventory?")
                         self.io_hook.sendOutput(player_id, player.fullInventoryStats())
 
                     # Simple command checks

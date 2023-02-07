@@ -44,12 +44,12 @@ class Player(Entity):
         return self.name
 
     def fullInventoryStats(self):
-        output = "\n".join([
+        return "\n".join([
             f"{self.name} | {self.health}/{self.max_health} | {self.location}",
             self.inventory.fullStats(),
             self.status_effects.fullStats()
         ]).strip()
-
+        
 
     @classmethod
     def loadData(cls, engine:Engine) -> list:

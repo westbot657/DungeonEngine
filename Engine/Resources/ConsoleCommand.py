@@ -1,7 +1,7 @@
 # pylint: disable=[W,R,C,import-error]
 
 
-class EngineCommand:
+class ConsoleCommand:
     _commands = {}
 
     def __init__(self, name, args): # TODO: finish this...
@@ -10,4 +10,6 @@ class EngineCommand:
 
     def __call__(self, command_exec):
         self.command_exec = command_exec
+        ConsoleCommand._commands.update({self.name: self})
 
+    def run(self, args)

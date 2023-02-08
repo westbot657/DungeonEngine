@@ -46,6 +46,7 @@ class DungeonLoader:
         return cls._loader
 
     def init(self):
+        self.loader_function = LoaderFunction
         self.abstract_ammo: dict[str, AbstractAmmo] = {}
         self.abstract_armor: dict[str, AbstractArmor] = {}
         self.abstract_combats: dict[str, AbstractCombat] = {}
@@ -66,7 +67,7 @@ class DungeonLoader:
                 if res: result = res
             return result
         elif (func := data.get("function", None)) is not None:
-            if f := LoaderFunction.getFunction(func):
+            if f := self.loader_function.getFunction(func):
                 f: LoaderFunction
 
                 if (predicate := data.get("predicate", None)) is not None:

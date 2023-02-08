@@ -73,8 +73,6 @@ engine:ammo/get_bonus_damage
 
 engine:text/builder
 
-
-
 """
 
 

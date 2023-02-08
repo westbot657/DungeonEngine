@@ -163,28 +163,29 @@ class DungeonLoader:
         # TODO: actually search for object (however that needs to be done)
 
     def loadGame(self, engine:Engine):
+        Log["loadup"]["loader"]("Loading Abstract Status Effects...")
+        self.abstract_status_effects = AbstractStatusEffect.loadData(self)
+
         Log["loadup"]["loader"]("Loading Abstract Ammo...")
         self.abstract_ammo = AbstractAmmo.loadData(self)
 
         Log["loadup"]["loader"]("Loading Abstract Armors...")
         self.abstract_armor = AbstractArmor.loadData(self)
 
-        Log["loadup"]["loader"]("Loading Abstract Combats...")
-        self.abstract_combats = AbstractCombat.loadData(self)
-
-        Log["loadup"]["loader"]("Loading Abstract Items...")
-        self.abstract_items = AbstractItem.loadData(self)
-        #self.abstract_loot_tables = AbstractLootTable.loadData(self)
-        
-        # self.abstract_rooms = AbstractRoom.loadData(self)
-        Log["loadup"]["loader"]("Loading Abstract Status Effects...")
-        self.abstract_status_effects = AbstractStatusEffect.loadData(self)
-
         Log["loadup"]["loader"]("Loading Abstract Tools...")
         self.abstract_tools = AbstractTool.loadData(self)
 
         Log["loadup"]["loader"]("Loading Abstract Weapons...")
         self.abstract_weapons = AbstractWeapon.loadData(self)
+
+        Log["loadup"]["loader"]("Loading Abstract Items...")
+        self.abstract_items = AbstractItem.loadData(self)
+
+        Log["loadup"]["loader"]("Loading Abstract Combats...")
+        self.abstract_combats = AbstractCombat.loadData(self)
+        #self.abstract_loot_tables = AbstractLootTable.loadData(self)
+        
+        # self.abstract_rooms = AbstractRoom.loadData(self)
 
         Log["loadup"]["loader"]("Loading Abstract Dungeons...")
         self.abstract_dungeons = AbstractDungeon.loadData(self)

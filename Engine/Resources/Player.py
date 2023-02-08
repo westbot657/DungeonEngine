@@ -49,10 +49,15 @@ class Player(Entity):
             self.inventory.fullStats(),
             self.status_effects.fullStats()
         ]).strip()
-        
 
     @classmethod
     def loadData(cls, engine:Engine) -> list:
+
+        Inventory._default_equips = {
+            "engine:weapon": engine.loader.abstract_weapons["engine:weapons/unnarmed_strike"],
+            "engine:armor": engine.loader.abstract_armor["engine:armor/common_clothes"]
+        }
+
         Log["loadup"]["player"]("Loading Player Data...")
         with open("Engine/save_data/players.json", "r+", encoding="utf-8") as f:
             data_list: list[dict] = json.load(f)

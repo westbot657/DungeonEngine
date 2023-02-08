@@ -21,8 +21,7 @@ class Ammo(GameObject):
         return f"Ammo {self.name}: bonus-damage:{self.bonus_damage} max-count:{self.max_count}"
 
     def fullStats(self, is_equipped=False):
-        if self.bonus_damage > 0:
-            return f"{self.name} +{self.bonus_damage}dmg {self.count}/{self.max_count}"
-        else:
-            return f"{self.name} {self.count}/{self.max_count}"
+        return f"{self.name} +{self.bonus_damage}dmg {self.count}/{self.max_count}"
 
+    def quickStats(self):
+        return f"{self.name} {self.count}/{self.max_count}"

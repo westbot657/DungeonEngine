@@ -17,6 +17,12 @@ class GameObject:
 
         GameObject._game_object_types.update({cls.identifier.full(): cls})
 
+    def bonuses(self):
+        return None
+
+    def quickStats(self):
+        raise EngineError(f"game object has not defined quickStats() method!")
+
     def fullStats(self, is_equipped=False):
         raise EngineError(f"game object has not defined fullStats() method!")
 

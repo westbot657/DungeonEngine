@@ -20,22 +20,22 @@ class Util:
                 return old
             old = v
 
-    # May not need these? (hopefuly)
-    @staticmethod
-    def output(*values, sep=" ", end="\n"):
-        out = sep.join([str(v) for v in values])
+    # # May not need these? (hopefuly)
+    # @staticmethod
+    # def output(*values, sep=" ", end="\n"):
+    #     out = sep.join([str(v) for v in values])
 
-        print(out.replace("&", "&amp;").replace("\n", "&new;").encode("utf-8"), end=end)
+    #     print(out.replace("&", "&amp;").replace("\n", "&new;").encode("utf-8"), end=end)
 
-    @staticmethod
-    def message(player, *values, sep=" ", end="\n"):
-        out = sep.join([str(v) for v in values])
+    # @staticmethod
+    # def message(player, *values, sep=" ", end="\n"):
+    #     out = sep.join([str(v) for v in values])
 
-        if hasattr(player, "user_id"):
-            print(f"[@game->{player.user_id}]: {out}".replace("&", "&amp;").replace("\n", "&new;").encode("utf-8"), end=end)
+    #     if hasattr(player, "user_id"):
+    #         print(f"[@game->{player.user_id}]: {out}".replace("&", "&amp;").replace("\n", "&new;").encode("utf-8"), end=end)
 
-        else:
-            print(f"[@game]: {player}{sep}{out}".replace("&", "&amp;").replace("\n", "&new;").encode("utf-8"), end=end)
+    #     else:
+    #         print(f"[@game]: {player}{sep}{out}".replace("&", "&amp;").replace("\n", "&new;").encode("utf-8"), end=end)
 
     @staticmethod
     def generator_started(gen:Generator):
@@ -43,9 +43,10 @@ class Util:
 
     @staticmethod
     def getDurabilityBar(current_value, max_value, bar_width=10):
+        if max_value < 0:
+            return f"[{'INFINITE': ^{bar_width}}]"
         percent = current_value / max_value
         filled = int(percent * bar_width)
-        unfilled = bar_width - filled
 
-        return f"[{'='*filled}{'-'*unfilled}] {current_value}/{max_value}"
+        return f"[{'='*filled:-<{bar_width}}] {current_value}/{max_value}"
 

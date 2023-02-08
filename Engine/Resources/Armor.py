@@ -18,6 +18,12 @@ class Armor(GameObject):
         self.max_durability = max_durability
         self.durability = durability
 
+    def bonuses(self):
+        return f"+{self.damage_reduction}def"
+
+    def quickStats(self):
+        return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
+
     def fullStats(self, is_equipped=False):
-        return f"{self.name} -{self.damage_reduction}dmg {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [WEARING]" if is_equipped else "")
+        return f"{self.name} +{self.damage_reduction}def {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [WEARING]" if is_equipped else "")
 

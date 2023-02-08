@@ -96,7 +96,7 @@ class Engine:
                 # TODO: checks for stuff like moving, inventory stuff, etc...
 
                 if player_id == 0: # id 0 means engine basically
-                    if m := re.match(r"\<new-player\>:(?P<player_id>\d+):(?P<max_health>\d+):(?P<name>.+)", text):
+                    if m := re.match(r"\<new-player\> (?P<player_id>\d+) (?P<max_health>\d+) (?P<name>.+)", text):
                         d = m.groupdict()
                         new_player_id = int(d["player_id"])
                         max_health = int(d["max_health"])
@@ -106,11 +106,16 @@ class Engine:
                         self.io_hook.sendOutput(new_player_id, f"Thanks for joining, {p}!")
 
                 elif player := self.getPlayer(player_id, None):
-                    print(f"{player=}")
+                    #print(f"{player=}")
 
                     if re.search(r"\b(inventory|bag|items)\b", text):
                         Log["debug"]["console"]("checking inventory?")
                         self.io_hook.sendOutput(player_id, player.fullInventoryStats())
+
+                    elif m := re.search(r"(?:(?P<keyword>equip|put *on|(?:switch *to|(?:pull|take) *out|wear|draw|take(?: *out)?)(?: *(?:my|an?|the))?) *(?P<obj>.*))", text):
+                        d = m.groupdict()
+                        keyword = d["keyword"]
+                        obj = d["obj"]
 
                     # Simple command checks
                 

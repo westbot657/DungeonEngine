@@ -65,7 +65,6 @@ class DungeonLoader:
                 res = self.evaluateFunction(engine, func, expected_key)
                 if res: result = res
             return result
-        
         elif (func := data.get("function", None)) is not None:
             if f := LoaderFunction.getFunction(func):
                 f: LoaderFunction
@@ -84,16 +83,18 @@ class DungeonLoader:
                 if var := data.get("#store", None):
                     engine.function_memory.store(var, r)
                 return r
-
         elif (var := data.get("#ref", None)) is not None:
             return engine.function_memory.ref(var)
-
         elif isinstance(data, dict):
             dat = {}
             for key, item in data.items():
                 dat.update({key, self.evaluateFunction(engine, item, expected_key)})
             return dat
-
+        elif isinstance(data, list):
+            dat = []
+            for item in data:
+                dat.append(self.evaluateFunction(engine, data, expected_key))
+            return dat
         else:
             return data
 

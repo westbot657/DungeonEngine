@@ -20,6 +20,9 @@ class Identifier:
     def full(self):
         return f"{self.namespace}:{self.path}{self.name}"
 
+    def fullWith(self, **kwargs):
+        return f"{kwargs.get('namespace', self.namespace)}:{kwargs.get('path', self.path)}{kwargs.get('name', self.name)}"
+
     def __repr__(self):
         if self.name:
             return f"{self.namespace}:{self.name} ({self.path})"

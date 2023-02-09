@@ -28,6 +28,7 @@ from Resources.FunctionMemory       import FunctionMemory
 from Resources.EngineOperation      import EngineOperation, _EngineOperation, OpType
 from Resources.EngineErrors         import EngineError, EngineBreak
 from Resources.Util                 import Util
+from Resources.ConsoleCommands      import ConsoleCommand # import the base class through the file that adds sub classes
 
 from threading import Thread
 
@@ -96,14 +97,7 @@ class Engine:
                 # TODO: checks for stuff like moving, inventory stuff, etc...
 
                 if player_id == 0: # id 0 means engine basically
-                    if m := re.match(r"\<new-player\> (?P<player_id>\d+) (?P<max_health>\d+) (?P<name>.+)", text):
-                        d = m.groupdict()
-                        new_player_id = int(d["player_id"])
-                        max_health = int(d["max_health"])
-                        name = d["name"].strip()
-                        p = Player(new_player_id, name, max_health, max_health, Inventory([]), Location("energia:spawn", 0, 0))
-                        Player._loaded.update({new_player_id: p})
-                        self.io_hook.sendOutput(new_player_id, f"Thanks for joining, {p}!")
+                    ConsoleCommand.handle_input(self, text)
 
                 elif player := self.getPlayer(player_id, None):
                     #print(f"{player=}")

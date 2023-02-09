@@ -1,13 +1,13 @@
 # pylint: disable=[W,R,C,import-error]
 
 try:
-    from .EngineErrors import FunctionCallError
+    from .EngineErrors import FunctionCallError, ParseError, IdentifierError
     from .Identifier import Identifier
 except ImportError:
-    from EngineErrors import FunctionCallError
+    from EngineErrors import FunctionCallError, ParseError, IdentifierError
     from Identifier import Identifier
 
-
+import json, re
 
 class ConsoleCommand:
     _commands = {}
@@ -23,6 +23,152 @@ class ConsoleCommand:
 
     def call(self, engine, *args):
         raise FunctionCallError(f"Command: '{self.identity.full()}' is not properly defined")
+
+    @classmethod
+    def _parse_string(cls, text:str) -> tuple[str, str]:
+        string = ""
+        if text.startswith(("'", "\"")):
+            quote = text[0]
+            text = text[1:]
+            while True:
+                if len(text) == 0:
+                    raise ParseError(f"string does not terminate")
+                if m := re.match(r"\\.", text[0:2]):
+                    string += m.group()
+                    text = text[2:]
+                elif text[0] == quote:
+                    string += quote
+                    text = text[1:]
+                    return string, text.strip()
+                else:
+                    string += text[0]
+                    text = text[1:]
+        else:
+            s = text.split(" ", 1)
+            if len(s) == 1: return s + [""]
+            return s
+
+    # @classmethod
+    # def _parse_number(cls, text) -> tuple[int|float, str]:
+    #     num = ""
+    #     while True:
+    #         if len(text) == 0:
+    #             break
+    #         if text[0] in "0123456789":
+    #             num += text[0]
+    #             text = text[1:]
+    #         elif text[0] == ".":
+    #             if "." not in num:
+    #                 num += "."
+    #                 text = text[1:]
+    #             else:
+    #                 raise ParseError("number cannot contain '.' twice")
+    #         elif text[0] == " ":
+    #             break
+    #         else:
+    #             raise ParseError("numbers cannot contain letters")
+
+    #     if "." in num:
+    #         return float(num), text
+    #     return int(num), text
+
+    # @classmethod
+    # def _parse_word(cls, engine, text):
+    #     word, text = text.split(" ", 1)
+    #     if word == "true":
+    #         return True, text
+    #     if word == "false":
+    #         return False, text
+    #     try:
+    #         i = Identifier.fromString(word)
+    #         if s := engine.loader.searchFor(i):
+    #             return s
+    #     except IdentifierError:
+    #         pass
+
+
+    @classmethod
+    def _parse_args(cls, arg_tree:dict|None, text:str) -> list|None:
+        args = []
+        for arg, con in arg_tree.items():
+            arg: str
+            con: dict|None
+            arg_name, arg_types = arg.split("=")
+            arg_types = arg_types.split("|")
+            for tp in arg_types:
+                try:
+                    match tp:
+                        case "str":
+                            string, other = cls._parse_string(text)
+                            text = other
+                            args.append(string)
+                        case "int":
+                            n, other = text.split(" ", 1)
+                            if re.match(r"(\d+|0[Bb][01_]+|0[Oo][0-7_]+|0[Xx][a-fA-F0-9_]+)", n):
+                                if "__" in n: raise ParseError("numbers can only have up to 1 '_' between numeric characters")
+                                args.append(int(n))
+                                text = other
+                            else:
+                                raise ParseError("expected 'int'")
+                        case "float":
+                            n, other = text.split(" ", 1)
+                            if re.match(r"[0-9_]+\.[0-9_]+", n):
+                                if "__" in n: raise ParseError("numbers can only have up to 1 '_' between numeric characters")
+                                args.append(float(n))
+                                text = other
+                            else:
+                                raise ParseError("expected 'float'")
+                        case "bool":
+                            n, other = text.split(" ", 1)
+                            if n == "true":
+                                args.append(True)
+                            elif n == "false":
+                                args.append(False)
+                            else:
+                                raise ParseError("expected 'true' or 'false'")
+                        case "dict":
+                            s = text
+                            out = None
+                            while out is None:
+                                try:
+                                    out = json.loads(s)
+                                except json.decoder.JSONDecodeError as e:
+                                    if e.args:
+                                        if m := re.match(r"Extra data: line \d+ column \d+ \(char (?P<col>\d+)\)", e.args[0]):
+                                            col = m.groupdict()["col"]
+                                            s = s[0:col].strip()
+                        case _:
+                            raise FunctionCallError(f"unrecognized value type: '{tp}'")
+                    if con is None:
+                        return args
+                    if isinstance(con, dict):
+                        a = cls._parse_args(con, text)
+                        if a is None: continue
+                        if isinstance(a, list):
+                            return args + a
+                except ParseError:
+                    pass
+
+
+    def _run(self, text:str):
+        args = ConsoleCommand._parse_args(self.args, text)
+
+
+    @classmethod
+    def handle_input(cls, engine, text:str):
+        values = []
+        cmd, text = text.split(" ", 1)
+
+        if command := cls._commands.get(cmd, None):
+            try:
+                command._run(text)
+            except Exception as e:
+                print(e, e.args)
+                return
+        else:
+            engine.io_hook.sendOutput(0, f"There is no command by the name '{cmd}'")
+            return
+
 
     @classmethod
     def call_command(cls, engine, command:str, args:list):

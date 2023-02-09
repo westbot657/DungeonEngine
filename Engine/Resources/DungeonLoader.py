@@ -99,6 +99,21 @@ class DungeonLoader:
         else:
             return data
 
+    def searchFor(self, identifier:Identifier) -> AbstractGameObject|type[AbstractGameObject]|LoaderFunction|None:
+        if identifier.path:
+            if func := self.loader_function._functions.get(identifier.full(), None):
+                return func
+            if abstractGameObjectType := AbstractGameObject._game_object_types.get(identifier.fullWith(path="abstract/", name=identifier.path.strip('/')), None):
+                abstractGameObjectType: AbstractGameObject
+                if abstractGameObject := abstractGameObjectType._loaded.get(identifier.full(), None):
+                    return abstractGameObject
+        else:
+            if a := AbstractGameObject._game_object_types.get(identifier.fullWith(path="abstract/"), None):
+                return a
+            elif func := self.loader_function._functions.get(identifier.full(), None):
+                return func
+        return None
+
 
     def constructAmmo(self, data:dict) -> Ammo:
         ...

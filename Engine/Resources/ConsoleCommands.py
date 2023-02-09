@@ -25,13 +25,25 @@ def engine_NewPlayer(engine, player_id, max_health, name):
 @ConsoleCommand(
     Identifier("engine", "", "run-function"),
     {
-        "function": None
+        "function:dict": None
     }
 )
 def engine_runFunction(engine, function):
-    engine.loader.evaluateFunction()
+    engine.loader.evaluateFunction(engine, function)
 
 
+@ConsoleCommand(
+    Identifier("engine", "", "give"),
+    {
+        "target:Player": {
+            "objectType:GameObjectType": {
+                "gameObject:str": None
+            }
+        }
+    }
+)
+def engine_giveGameObject(engine, target, objectType, gameObject):
+    ...
 
 
 

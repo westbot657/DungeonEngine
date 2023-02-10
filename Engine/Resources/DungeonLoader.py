@@ -3,8 +3,10 @@
 try:
     from .AbstractAmmo import AbstractAmmo, Ammo
     from .AbstractArmor import AbstractArmor, Armor
+    from .AbstractAttack import AbstractAttack, Attack
     from .AbstractCombat import AbstractCombat, Combat
     from .AbstractDungeon import AbstractDungeon, Dungeon
+    from .AbstractEnemy import AbstractEnemy, Enemy
     from .AbstractItem import AbstractItem, Item
     from .AbstractRoom import AbstractRoom, Room
     from .AbstractStatusEffect import AbstractStatusEffect, StatusEffect
@@ -20,6 +22,8 @@ try:
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
+    from AbstractAttack import AbstractAttack, Attack
+    from AbstractEnemy import AbstractEnemy, Enemy
     from AbstractCombat import AbstractCombat, Combat
     from AbstractDungeon import AbstractDungeon, Dungeon
     from AbstractItem import AbstractItem, Item
@@ -49,8 +53,10 @@ class DungeonLoader:
         self.loader_function = LoaderFunction
         self.abstract_ammo: dict[str, AbstractAmmo] = {}
         self.abstract_armor: dict[str, AbstractArmor] = {}
+        self.abstract_attacks: dict[str, AbstractAttack] = {}
         self.abstract_combats: dict[str, AbstractCombat] = {}
         self.abstract_dungeons: dict[str, AbstractDungeon] = {}
+        self.abstract_enemies: dict[str, AbstractEnemy] = {}
         self.abstract_items: dict[str, AbstractItem] = {}
         #self.abstract_loot_tables: dict[str, AbstractLootTable] = {}
         self.abstract_rooms: dict[str, AbstractRoom] = {}
@@ -119,10 +125,14 @@ class DungeonLoader:
         ...
     def constructArmor(self, data:dict) -> Armor:
         ...
+    def constructAttack(self, data:dict) -> Attack:
+        ...
     def constructCombat(self, data:dict) -> Combat:
         ...
     # def constructDungeon(self, data:dict) -> Dungeon: # This shouldn't be needed, there should be no in-line dungeons inside a dungeon
     #     ...
+    def constructEnemy(self, data:dict) -> Enemy:
+        ...
     def constructItem(self, data:dict) -> Item:
         ...
     def constructLootTable(self, data:dict) -> LootTable:
@@ -154,7 +164,7 @@ class DungeonLoader:
             # determine parent type
         else:
             raise InvalidObjectError("No type or parent given for GameObject")
-            
+
 
     def getAmmo(self, identifier:Identifier|str) -> AbstractAmmo:
         identifier: Identifier = Identifier.fromString(identifier)
@@ -197,6 +207,12 @@ class DungeonLoader:
 
         Log["loadup"]["loader"]("Loading Abstract Items...")
         self.abstract_items = AbstractItem.loadData(self)
+
+        Log["loadup"]["loader"]("Loading Abstract Attacks...")
+        self.abstract_attacks = AbstractAttack.loadData(self)
+
+        Log["loadup"]["loader"]("Loading Abstract Enemies...")
+        self.abstract_enemies = AbstractEnemy.loadData(self)
 
         Log["loadup"]["loader"]("Loading Abstract Combats...")
         self.abstract_combats = AbstractCombat.loadData(self)

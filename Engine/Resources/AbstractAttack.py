@@ -2,8 +2,10 @@
 
 try:
     from .Identifier import Identifier
+    from .Attack import Attack
 except ImportError:
     from Identifier import Identifier
+    from Attack import Attack
 
 class AbstractAttack:
     _loaded = {}

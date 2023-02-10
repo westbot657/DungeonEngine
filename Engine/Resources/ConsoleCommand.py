@@ -88,7 +88,7 @@ class ConsoleCommand:
 
 
     @classmethod
-    def _parse_args(cls, arg_tree:dict|None, text:str) -> list|None:
+    def _parse_args(cls, engine, arg_tree:dict|None, text:str) -> list|None:
         args = []
         for arg, con in arg_tree.items():
             arg: str
@@ -126,7 +126,7 @@ class ConsoleCommand:
                                 args.append(False)
                             else:
                                 raise ParseError("expected 'true' or 'false'")
-                        case "dict":
+                        case "dict" | "list":
                             s = text
                             out = None
                             while out is None:
@@ -137,12 +137,38 @@ class ConsoleCommand:
                                         if m := re.match(r"Extra data: line \d+ column \d+ \(char (?P<col>\d+)\)", e.args[0]):
                                             col = m.groupdict()["col"]
                                             s = s[0:col].strip()
+                                        else:
+                                            raise e
+                        case "engine:ammo":
+                            n, other = text.split(" ", 1)
+                            if a := engine.loader.abstract_ammo.get(n, None):
+                                return a
+                        case "engine:armor":
+                            n, other = text.split(" ", 1)
+                            if a := engine.loader.abstract_armor.get(n, None):
+                                return a
+                        case "engine:attack":
+                            n, other = text.split(" ", 1)
+                            if a := engine.loader.abstract_attacks.get(n, None):
+                                return a
+                        case "engine:item":
+                            n, other = text.split(" ", 1)
+                            if a := engine.loader.abstract_items.get(n, None):
+                                return a
+                        case "engine:tool":
+                            n, other = text.split(" ", 1)
+                            if a := engine.loader.abstract_tools.get(n, None):
+                                return a
+                        case "engine:weapon":
+                            n, other = text.split(" ", 1)
+                            if a := engine.loader.abstract_weapons.get(n, None):
+                                return a
                         case _:
                             raise FunctionCallError(f"unrecognized value type: '{tp}'")
                     if con is None:
                         return args
                     if isinstance(con, dict):
-                        a = cls._parse_args(con, text)
+                        a = cls._parse_args(engine, con, text)
                         if a is None: continue
                         if isinstance(a, list):
                             return args + a
@@ -150,8 +176,8 @@ class ConsoleCommand:
                     pass
 
 
-    def _run(self, text:str):
-        args = ConsoleCommand._parse_args(self.args, text)
+    def _run(self, engine, text:str):
+        args = ConsoleCommand._parse_args(engine, self.args, text)
 
 
     @classmethod
@@ -161,7 +187,7 @@ class ConsoleCommand:
 
         if command := cls._commands.get(cmd, None):
             try:
-                command._run(text)
+                command._run(engine, text)
             except Exception as e:
                 print(e, e.args)
                 return

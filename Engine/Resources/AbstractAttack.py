@@ -14,8 +14,16 @@ class AbstractAttack:
     def __init__(self, data:dict):
         ...
 
+    @classmethod
+    def fromDict(cls, data:dict):
+        atk = cls(data)
+        # TODO: link parent if needed (and whatever else needs to be done)
+        return atk
 
     @classmethod
-    def loadData(cls):
-        ...
+    def loadData(cls, engine):
+
+        # TODO: load attacks
+
+        return cls._loaded
 

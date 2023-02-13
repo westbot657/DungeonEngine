@@ -4,12 +4,16 @@ try:
     from .Identifier import Identifier
     from .EngineErrors import InvalidObjectError
     from .EngineDummy import Engine
+    from .AbstractAttack import AbstractAttack, Attack
     from .Enemy import Enemy
+    from .Logger import Log
 except ImportError:
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
     from EngineDummy import Engine
+    from AbstractAttack import AbstractAttack, Attack
     from Enemy import Enemy
+    from Logger import Log
 
 import glob, json
 
@@ -52,12 +56,64 @@ class AbstractEnemy:
         self.parent = parent
         parent.children.append(self)
     
+    def getName(self):
+        if self.name is None:
+            if self.parent:
+                return self.parent.getName()
+        else:
+            return self.name
+        raise InvalidObjectError(f"Enemy has no name! ({self.identifier})")
+
+    def getMaxHealth(self):
+        if self.max_health is None:
+            if self.parent:
+                return self.parent.getMaxHealth()
+        else:
+            return self.max_health
+        raise InvalidObjectError(f"Enemy has no max_health! ({self.identifier})")
+
+    def getHealth(self):
+        if self.health is None:
+            if self.parent:
+                return self.parent.getHealth()
+        else:
+            return self.health
+        raise InvalidObjectError(f"Enemy has no health! ({self.identifier})")
+
+    def getAttacks(self) -> list[AbstractAttack]:
+
+        out = []
+        for atk in self.attacks:
+            if isinstance(atk, dict):
+                out.append(AbstractAttack.fromDict(atk))
+            elif abstract := AbstractAttack._loaded.get(atk, None):
+                out.append(abstract)
+            else:
+                Log["ERROR"]["loadup"]["abstract"]["enemy"](f"Failed to load attack; does not exist: '{atk}'")
+                continue
+        return out
+
+    def _assertListAttackType(self, attacks) -> list[AbstractAttack]:
+        out = []
+        for atk in attacks:
+            if isinstance(atk, AbstractAttack):
+                out.append(atk)
+            elif isinstance(atk, str):
+                if abstract := AbstractAttack._loaded.get(atk, None):
+                    out.append(abstract)
+                else:
+                    raise InvalidObjectError(f"attack '{atk}' does not exist! ({self.identifier})")
+            else:
+                raise InvalidObjectError(f"invalid attack object: {atk} ({self.identifier})")
+
+        return out
+
     def createInstance(self, **override_values) -> Enemy:
         return Enemy(self,
             override_values.get("name", self.getName()),
             override_values.get("max_health", self.getMaxHealth()),
             override_values.get("health", self.getHealth()),
-            ovveride_values.get("attacks", self.getAttacks())
+            self._assertListAttackType(override_values.get("attacks", self.getAttacks()))
         )
     
     @classmethod
@@ -81,7 +137,10 @@ class AbstractEnemy:
             l: str
             o: AbstractEnemy
             try:
-                ...
+                o.getName()
+                o.getMaxHealth()
+                o.getHealth()
+                o.getAttacks()
             except InvalidObjectError as err:
                 e: AbstractEnemy = cls._loaded.pop(l)
                 print(f"Failed to load enemy: {e.identifier}  {err}")

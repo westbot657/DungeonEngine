@@ -152,6 +152,8 @@ class AbstractWeapon(AbstractGameObject):
             except InvalidObjectError as err:
                 e: AbstractWeapon = cls._loaded.pop(l)
                 print(f"Failed to load weapon: {e.identifier}  {err}")
+                continue
+            
 
         return cls._loaded
 

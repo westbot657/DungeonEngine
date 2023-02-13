@@ -8,6 +8,7 @@ except ImportError:
 class LoaderFunction:
     _functions = {}
     id: Identifier|None = None
+    return_type: list|tuple|tuple = None
 
     @classmethod
     def getFunction(cls, identifier:Identifier|str):
@@ -38,6 +39,9 @@ class LoaderFunction:
             LoaderFunction._functions.update({id.full(): cls})
         else:
             print(f"Failed to load function without id: {cls}")
+        
+        if not isinstance(cls.return_type, (list, tuple)):
+            cls.return_type = [cls.return_type]
 
     @classmethod
     def _call(cls, engine, data:dict):

@@ -6,11 +6,35 @@ try:
     from .LootTable import LootTable
     from .EngineDummy import Engine
 
+    from .AbstractAmmo import AbstractAmmo, Ammo
+    from .AbstractArmor import AbstractArmor, Armor
+    from .AbstractAttack import AbstractAttack, Attack
+    from .AbstractCombat import AbstractCombat, Combat
+    from .AbstractDungeon import AbstractDungeon, Dungeon
+    from .AbstractEnemy import AbstractEnemy, Enemy
+    from .AbstractItem import AbstractItem, Item
+    from .AbstractRoom import AbstractRoom, Room
+    from .AbstractStatusEffect import AbstractStatusEffect, StatusEffect
+    from .AbstractTool import AbstractTool, Tool
+    from .AbstractWeapon import AbstractWeapon, Weapon
+
 except ImportError:
     from LoaderFunction import LoaderFunction
     from Identifier import Identifier
     from LootTable import LootTable
     from EngineDummy import Engine
+
+    from AbstractAmmo import AbstractAmmo, Ammo
+    from AbstractArmor import AbstractArmor, Armor
+    from AbstractAttack import AbstractAttack, Attack
+    from AbstractCombat import AbstractCombat, Combat
+    from AbstractDungeon import AbstractDungeon, Dungeon
+    from AbstractEnemy import AbstractEnemy, Enemy
+    from AbstractItem import AbstractItem, Item
+    from AbstractRoom import AbstractRoom, Room
+    from AbstractStatusEffect import AbstractStatusEffect, StatusEffect
+    from AbstractTool import AbstractTool, Tool
+    from AbstractWeapon import AbstractWeapon, Weapon
 
 import random, math, re
 
@@ -75,15 +99,13 @@ engine:text/builder
 
 """
 
-
-
-
 ####XXX###############XXX####
 ### XXX Engine Random XXX ###
 ####XXX###############XXX####
 
 class Engine_Random_Uniform(LoaderFunction):
     id = Identifier("engine", "random/", "uniform")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -135,6 +157,7 @@ class Engine_Tool_CancelUse(LoaderFunction):
 
 class Engine_Tool_GetDurability(LoaderFunction):
     id = Identifier("engine", "tool/", "get_durability")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -177,6 +200,7 @@ class Engine_Tool_SetDurability(LoaderFunction):
 
 class Engine_Tool_GetMaxDurability(LoaderFunction):
     id = Identifier("engine", "tool/", "get_max_durability")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -185,6 +209,7 @@ class Engine_Tool_GetMaxDurability(LoaderFunction):
 
 class Engine_Tool_GetName(LoaderFunction):
     id = Identifier("engine", "tool/", "get_name")
+    return_type = str
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -206,6 +231,7 @@ class Engine_Tool_SetName(LoaderFunction):
 
 class Engine_Weapon_GetDurability(LoaderFunction):
     id = Identifier("engine", "Weapon/", "GetDurability")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -220,6 +246,7 @@ class Engine_Weapon_SetDurability(LoaderFunction):
             case _: return None
 class Engine_Weapon_GetMaxDurability(LoaderFunction):
     id = Identifier("engine", "weapon/", "get_max_durability")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -234,6 +261,7 @@ class Engine_Weapon_SetMaxDurability(LoaderFunction):
             case _: return None
 class Engine_Weapon_GetDamage(LoaderFunction):
     id = Identifier("engine", "weapon/", "get_damage")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -248,6 +276,7 @@ class Engine_Weapon_SetDamage(LoaderFunction):
             case _: return None
 class Engine_Weapon_GetAmmoType(LoaderFunction):
     id = Identifier("engine", "weapon/", "get_ammo_type")
+    return_type = AbstractAmmo
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -255,6 +284,7 @@ class Engine_Weapon_GetAmmoType(LoaderFunction):
             case _: return None
 class Engine_Weapon_GetParentType(LoaderFunction):
     id = Identifier("engine", "weapon/", "get_parent_type")
+    return_type = AbstractWeapon
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -268,6 +298,7 @@ class Engine_Weapon_GetParentType(LoaderFunction):
 
 class Engine_Armor_GetDurability(LoaderFunction):
     id = Identifier("engine", "armor/", "get_durability")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -282,6 +313,7 @@ class Engine_Armor_SetDurability(LoaderFunction):
             case _: return None
 class Engine_Armor_GetMaxDurability(LoaderFunction):
     id = Identifier("engine", "armor/", "get_max_durability")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -296,6 +328,7 @@ class Engine_Armor_SetMaxDurability(LoaderFunction):
             case _: return None
 class Engine_Armor_GetDamageReduction(LoaderFunction):
     id = Identifier("engine", "armor/", "get_damage_reduction")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -316,6 +349,7 @@ class Engine_Armor_SetDamageReduction(LoaderFunction):
 
 class Engine_Ammo_GetCount(LoaderFunction):
     id = Identifier("engine", "ammo/", "get_count")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -330,6 +364,7 @@ class Engine_Ammo_SetCount(LoaderFunction):
             case _: return None
 class Engine_Ammo_GetMaxCount(LoaderFunction):
     id = Identifier("engine", "ammo/", "get_max_count")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -337,6 +372,7 @@ class Engine_Ammo_GetMaxCount(LoaderFunction):
             case _: return None
 class Engine_Ammo_GetParentType(LoaderFunction):
     id = Identifier("engine", "ammo/", "get_parent_type")
+    return_type = AbstractAmmo
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -344,6 +380,7 @@ class Engine_Ammo_GetParentType(LoaderFunction):
             case _: return None
 class Engine_Ammo_GetBonusDamage(LoaderFunction):
     id = Identifier("engine", "ammo/", "get_bonus_damage")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -357,6 +394,7 @@ class Engine_Ammo_GetBonusDamage(LoaderFunction):
 
 class Engine_StatusEffect_GetLevel(LoaderFunction):
     id = Identifier("engine", "status_effect/", "get_level")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -371,6 +409,7 @@ class Engine_StatusEffect_SetLevel(LoaderFunction):
             case _: return None
 class Engine_StatusEffect_GetDuration(LoaderFunction):
     id = Identifier("engine", "status_effect/", "get_duration")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -385,6 +424,7 @@ class Engine_StatusEffect_SetDuration(LoaderFunction):
             case _: return None
 class Engine_StatusEffect_GetName(LoaderFunction):
     id = Identifier("engine", "status_effect/", "get_name")
+    return_type = str
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -405,6 +445,7 @@ class Engine_StatusEffect_GetCause(LoaderFunction):
 
 class Engine_Item_GetCount(LoaderFunction):
     id = Identifier("engine", "item/", "get_count")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -419,6 +460,7 @@ class Engine_Item_SetCount(LoaderFunction):
             case _: return None
 class Engine_Item_GetMaxCount(LoaderFunction):
     id = Identifier("engine", "item/", "get_max_count")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -439,6 +481,7 @@ class Engine_Player_Message(LoaderFunction):
             case _: return None
 class Engine_Player_GetHealth(LoaderFunction):
     id = Identifier("engine", "player/", "get_health")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -453,6 +496,7 @@ class Engine_Player_SetHealth(LoaderFunction):
             case _: return None
 class Engine_Player_GetMaxHealth(LoaderFunction):
     id = Identifier("engine", "player/", "get_max_health")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -530,6 +574,7 @@ class Engine_Player_GetStatusEffect(LoaderFunction):
             case _: return None
 class Engine_Player_HasItem(LoaderFunction):
     id = Identifier("engine", "player/", "has_item")
+    return_type = bool
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -544,6 +589,7 @@ class Engine_Player_RemoveItem(LoaderFunction):
             case _: return None
 class Engine_Player_GetItem(LoaderFunction):
     id = Identifier("engine", "player/", "get_item")
+    return_type = Item
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -551,6 +597,7 @@ class Engine_Player_GetItem(LoaderFunction):
             case _: return None
 class Engine_Player_GetEquippedArmor(LoaderFunction):
     id = Identifier("engine", "player/", "get_equipped_armor")
+    return_type = Armor
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -558,6 +605,7 @@ class Engine_Player_GetEquippedArmor(LoaderFunction):
             case _: return None
 class Engine_Player_GetEquippedWeapon(LoaderFunction):
     id = Identifier("engine", "player/", "get_equipped_weapon")
+    return_type = Weapon
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -565,6 +613,7 @@ class Engine_Player_GetEquippedWeapon(LoaderFunction):
             case _: return None
 class Engine_Player_GetEquippedTool(LoaderFunction):
     id = Identifier("engine", "player/", "get_equipped_tool")
+    return_type = Tool
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
@@ -577,6 +626,7 @@ class Engine_Player_GetEquippedTool(LoaderFunction):
 ####XXX#############XXX####
 class Engine_Text_Builder(LoaderFunction):
     id = Identifier("engine", "text/", "builder")
+    return_type = str
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:

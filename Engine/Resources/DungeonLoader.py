@@ -39,6 +39,7 @@ except ImportError:
     from AbstractGameObject import AbstractGameObject, GameObject
     from Logger import Log
 
+from typing import Any
 import re
 
 class DungeonLoader:
@@ -64,43 +65,98 @@ class DungeonLoader:
         self.abstract_tools: dict[str, AbstractTool] = {}
         self.abstract_weapons: dict[str, AbstractWeapon] = {}
 
+    # class DynamicValue:
+    #     def __init__(self, raw_data):
+    #         self.raw_data = raw_data
+    #         self.cached_value = None
+    #     def getNew(self, engine:Engine):
+    #         """
+    #         returns the result of passing this value's raw_data to `DungeonLoader.evaluateFunction()`
+    #         """
+    #         self.cached_value = engine.loader.evaluateFunction(engine, self.raw_data, None)
+    #         return self.cached_value
+    #     def getCached(self, engine:Engine):
+    #         """
+    #         returns the same value as the most recent call to `getNew()`.
+    #         If no prior call to `getNew()` has been made, returns None
+    #         """
+    #         return self.cached_value
+    #     def getCachedNew(self, engine:Engine):
+    #         """
+    #         returns the cached value.
+    #         if the cached value is None, makes a call to `getNew()` first.
+    #         """
+    #         if self.cached_value is None:
+    #             return self.getNew(engine)
+    #         return self.cached_value
 
-    def evaluateFunction(self, engine:Engine, data:dict, expected_key:str|None=None):
+    # def getDynamicValue(self, expected_value_types:list[type], data:dict|Any) -> DynamicValue|Any:
+    #     if isinstance(data, dict):
+    #         if (func := data.get("function", None)) is not None:
+    #             if f := self.loader_function.getFunction(func):
+    #                 f: LoaderFunction
+    #                 if all(rt in expected_value_types for rt in f.return_type):
+    #                     # function returns the correct type!
+    #                     return DungeonLoader.DynamicValue(data)
+    #                 else:
+    #                     # function does not return the correct type
+    #                     raise InvalidObjectError(f"value is not the correct type!  value={data}  (returns: {f.return_type}), expected={expected_value_types}")
+            
+    #     else:
+    #         if isinstance(data, expected_value_types):
+    #             # value is correct type
+    #             return DungeonLoader.DynamicValue(data)
+    #         else:
+    #             # value is not correct type
+    #             raise InvalidObjectError(f"value is not the correct type!  value={data}, expected={expected_value_types}")
+
+    def evaluateFunction(self, engine:Engine, data:dict):
+        # TODO: function memory stuff can happen here I guess? (not sure what that is right now though)
+        engine.function_memory.clear()
+        val = self._evaluateFunction(engine, data)
+        return val
+
+    def _evaluateFunction(self, engine:Engine, data:dict):
         if (funcs := data.get("functions", None)) is not None:
+            result = None
             for func in funcs:
-                result = None
-                res = self.evaluateFunction(engine, func, expected_key)
+                res = self._evaluateFunction(engine, func)
                 if res: result = res
             return result
         elif (func := data.get("function", None)) is not None:
             if f := self.loader_function.getFunction(func):
                 f: LoaderFunction
-
+                # Check predicate
                 if (predicate := data.get("predicate", None)) is not None:
                     if not engine.function_memory.checkPredicate(engine, predicate): return None
-
+                # Run function
                 args = {}
-                for key, item in data.items():
-                    if key in ["function", "#store"]: continue
+                for key, item in data.items(): # gather the arguments for the function
+                    if key in ["function", "#store"]: continue # skip the function's id and the special #store operator
                     if isinstance(item, dict):
-                        args.update({key: self.evaluateFunction(engine, item, expected_key)})
+                        args.update({key: self._evaluateFunction(engine, item)})
                     else:
                         args.update({key: item})
                 r = f._call(engine, args)
+                # if a #store operator was present with the function, the function's result is assigned to the name in #store
                 if var := data.get("#store", None):
                     engine.function_memory.store(var, r)
                 return r
         elif (var := data.get("#ref", None)) is not None:
             return engine.function_memory.ref(var)
+        elif (store := data.get("#store", None)) is not None:
+            if isinstance(store, dict):
+                for key, value in store.items():
+                    engine.function_memory.store(key, value)
         elif isinstance(data, dict):
             dat = {}
             for key, item in data.items():
-                dat.update({key, self.evaluateFunction(engine, item, expected_key)})
+                dat.update({key, self._evaluateFunction(engine, item)})
             return dat
         elif isinstance(data, list):
             dat = []
             for item in data:
-                dat.append(self.evaluateFunction(engine, data, expected_key))
+                dat.append(self._evaluateFunction(engine, data))
             return dat
         else:
             return data

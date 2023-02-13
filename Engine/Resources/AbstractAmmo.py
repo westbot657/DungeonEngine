@@ -99,7 +99,7 @@ class AbstractAmmo(AbstractGameObject):
             )
 
     @classmethod
-    def loadData(cls, inline_handler) -> list:
+    def loadData(cls, engine) -> list:
         files: list[str] = glob.glob("**/ammo/*.json", recursive=True)
 
         Log["loadup"]["abstract"]["ammo"](f"found {len(files)} ammo files")

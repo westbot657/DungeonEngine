@@ -4,12 +4,14 @@ try:
     from .Identifier import Identifier
     from .EngineErrors import InvalidObjectError
     from .AbstractGameObject import AbstractGameObject
+    from .DynamicValue import DynamicValue
     from .Logger import Log
 except ImportError:
     from Ammo import Ammo
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
     from AbstractGameObject import AbstractGameObject
+    from DynamicValue import DynamicValue
     from Logger import Log
 
 import glob, json, re
@@ -92,10 +94,10 @@ class AbstractAmmo(AbstractGameObject):
             ...
         else:
             return Ammo(self,
-                override_values.get("name", self.getName()),
-                override_values.get("bonus_damage", self.getBonusDamage()),
-                override_values.get("max_count", self.getMaxCount()),
-                override_values.get("count", self.getCount())
+                DynamicValue(override_values.get("name", self.getName())),
+                DynamicValue(override_values.get("bonus_damage", self.getBonusDamage())),
+                DynamicValue(override_values.get("max_count", self.getMaxCount())),
+                DynamicValue(override_values.get("count", self.getCount()))
             )
 
     @classmethod

@@ -5,11 +5,13 @@ try:
     from .Identifier import Identifier
     from .EngineErrors import InvalidObjectError
     from .AbstractGameObject import AbstractGameObject
+    from .DynamicValue import DynamicValue
 except ImportError:
     from Armor import Armor
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
     from AbstractGameObject import AbstractGameObject
+    from DynamicValue import DynamicValue
 
 import glob, json, re
 
@@ -79,10 +81,10 @@ class AbstractArmor(AbstractGameObject):
             ...
         else:
             return Armor(self,
-                override_values.get("name", self.getName()),
-                override_values.get("damage_reduction", self.getDamageReduction()),
-                override_values.get("max_durability", self.getMaxDurability()),
-                override_values.get("durability", self.getDurability())
+                DynamicValue(override_values.get("name", self.getName())),
+                DynamicValue(override_values.get("damage_reduction", self.getDamageReduction())),
+                DynamicValue(override_values.get("max_durability", self.getMaxDurability())),
+                DynamicValue(override_values.get("durability", self.getDurability()))
             )
 
     @classmethod

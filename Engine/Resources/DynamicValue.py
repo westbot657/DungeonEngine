@@ -14,7 +14,11 @@ class DynamicValue:
         """
         returns the result of passing this value's raw_data to `DungeonLoader.evaluateFunction()`
         """
-        self.cached_value = engine.loader.evaluateFunction(engine, self.raw_data, None)
+        if isinstance(self.raw_data, dict):
+            self.cached_value = engine.loader.evaluateFunction(engine, self.raw_data, None)
+        else:
+            self.cached_value = self.raw_data
+            
         return self.cached_value
     def getCached(self, engine:Engine):
         """

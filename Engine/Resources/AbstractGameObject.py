@@ -26,8 +26,8 @@ class AbstractGameObject:
     def get_children(self, depth:int=-1): # recursive way to get a flat list of all sub children to some depth
         children = []
         for child in self.children:
-            if child.is_template: continue
-            children.append(child)
+            if not child.is_template:
+                children.append(child)
             if depth != 0:
                 children += child.get_children(depth-1)
         return children

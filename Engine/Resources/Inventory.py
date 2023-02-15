@@ -74,12 +74,14 @@ class Inventory:
         Log["loadup"]["inventory"]("loading inventory from list...")
         for element in data:
             element: dict
-            Log["loadup"]["inventory"]("constructing new GameObject")
+            Log["loadup"]["inventory"]("Constructing new GameObject")
+
             try:
                 obj: GameObject = engine.loader.constructGameObject(element)
             except InvalidObjectError as e:
                 Log["ERROR"]["loadup"]["inventory"](*e.args, sep=" ")
                 continue
+            
             contents.append(obj)
             Log["loadup"]["inventory"]("gameObject added to inventory")
             if element.get("equipped", False):

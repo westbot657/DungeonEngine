@@ -15,7 +15,7 @@ except ImportError:
     from Enemy import Enemy
     from Logger import Log
 
-import glob, json
+import glob, json, re
 
 
 """
@@ -85,7 +85,20 @@ class AbstractEnemy:
         out = []
         for atk in self.attacks:
             if isinstance(atk, dict):
-                out.append(AbstractAttack.fromDict(atk))
+                out.append(
+                    AbstractAttack.fromDict(
+                        Identifier(
+                            self.identifier.namespace + "_inline",
+                            path="attack/",
+                            name=re.sub(
+                                r"[ \-!?+()|<>.,:;'\"*&^%$#@~`\[\]\\/=]+",
+                                "_",
+                                atk.get("name", None) or atk.get("parent", "broken_gameobject")
+                            ).lower()
+                        ),
+                        atk
+                    )
+                )
             elif abstract := AbstractAttack._loaded.get(atk, None):
                 out.append(abstract)
             else:

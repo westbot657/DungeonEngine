@@ -132,7 +132,7 @@ class DungeonLoader:
                 # Run function
                 args = {}
                 for key, item in data.items(): # gather the arguments for the function
-                    if key in ["function", "#store"]: continue # skip the function's id and the special #store operator
+                    if key in ["function", "#store", "predicate"]: continue # skip the function's id, predicate, and the special #store operator
                     if isinstance(item, dict):
                         args.update({key: self._evaluateFunction(engine, item)})
                     else:

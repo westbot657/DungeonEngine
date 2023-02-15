@@ -5,6 +5,7 @@ try:
     from .Weapon import Weapon
     from .AbstractAmmo import AbstractAmmo
     from .EngineErrors import InvalidObjectError
+    from .DynamicValue import DynamicValue
     from .EngineDummy import Engine
     from .AbstractGameObject import AbstractGameObject
 except ImportError:
@@ -12,6 +13,7 @@ except ImportError:
     from Weapon import Weapon
     from AbstractAmmo import AbstractAmmo
     from EngineErrors import InvalidObjectError
+    from DynamicValue import DynamicValue
     from EngineDummy import Engine
     from AbstractGameObject import AbstractGameObject
 
@@ -115,10 +117,10 @@ class AbstractWeapon(AbstractGameObject):
         else:
             return Weapon(self,
                 value_overrides.get("name", self.getName()),
-                value_overrides.get("damage", self.getDamage()),
-                value_overrides.get("range", self.getRange()),
+                DynamicValue(value_overrides.get("damage", self.getDamage())),
+                DynamicValue(value_overrides.get("range", self.getRange())),
                 value_overrides.get("max_durability", self.getMaxDurability()),
-                value_overrides.get("durability", self.getDurability()),
+                DynamicValue(value_overrides.get("durability", self.getDurability())),
                 self._assertAmmoType(value_overrides.get("ammo_type", self.getAmmoType()))
             )
 

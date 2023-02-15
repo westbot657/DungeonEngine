@@ -34,3 +34,15 @@ class DynamicValue:
         if self.cached_value is None:
             return self.getNew(engine)
         return self.cached_value
+
+    def quickDisplay(self, engine:Engine):
+        if not isinstance(self.raw_data, dict):
+            return str(self.raw_data)
+        return engine.loader.loader_function.quickDisplay(engine, self.raw_data)
+        
+
+    def fullDisplay(self, engine:Engine):
+        if not isinstance(self.raw_data, dict):
+            return str(self.raw_data)
+        return engine.loader.loader_function.fullDisplay(engine, self.raw_data)
+

@@ -2,8 +2,10 @@
 
 try:
     from .Identifier import Identifier
+    from .EngineDummy import Engine
 except ImportError:
     from Identifier import Identifier
+    from EngineDummy import Engine
 
 class LoaderFunction:
     _functions = {}
@@ -18,6 +20,28 @@ class LoaderFunction:
             return cls._functions[identifier]
         print(f"No loader-function with the id: {identifier}")
         return None
+
+    @classmethod
+    def fullDisplay(cls, engine:Engine, data:dict):
+        ...
+
+    @classmethod
+    def quickDisplay(cls, engine:Engine, data:dict):
+        ...
+
+    def _fullDisplay(self, engine:Engine, data:dict):
+        ...
+    
+    def _quickDisplay(self, engine:Engine, data:dict):
+        ...
+
+    def getFullDisplay(self, engine:Engine, data:dict) -> str:
+        # overridden by functions
+        ...
+    
+    def getQuickDisplay(self, engine:Engine, data:dict) -> str:
+        # overridden by functions
+        ...
 
     @staticmethod
     def _check_dummy_return(*_, **__):

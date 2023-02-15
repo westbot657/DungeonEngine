@@ -72,7 +72,7 @@ class AbstractAttack(AbstractGameObject):
             ...
         else:
             return Attack(self,
-                DynamicValue(override_values.get("name", self.getName())),
+                override_values.get("name", self.getName()),
                 DynamicValue(override_values.get("damage", self.getDamage())),
                 DynamicValue(override_values.get("range", self.getRange()))
             )

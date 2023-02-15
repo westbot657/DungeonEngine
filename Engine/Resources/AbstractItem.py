@@ -4,12 +4,14 @@ try:
     from .Identifier import Identifier
     from .Item import Item
     from .EngineErrors import InvalidObjectError
+    from .DynamicValue import DynamicValue
     from .AbstractGameObject import AbstractGameObject
     from .Logger import Log
 except ImportError:
     from Identifier import Identifier
     from Item import Item
     from EngineErrors import InvalidObjectError
+    from DynamicValue import DynamicValue
     from AbstractGameObject import AbstractGameObject
     from Logger import Log
 
@@ -78,8 +80,8 @@ class AbstractItem(AbstractGameObject):
             return Item(self,
                 override_values.get("name", self.getName()),
                 override_values.get("max_count", self.getMaxCount()),
-                override_values.get("count", self.getCount()),
-                override_values.get("data", self.getData())
+                DynamicValue(override_values.get("count", self.getCount())),
+                DynamicValue(override_values.get("data", self.getData()))
             )
 
     @classmethod

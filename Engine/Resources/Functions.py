@@ -122,7 +122,7 @@ class Engine_Random_Uniform(LoaderFunction):
     def rand_range(engine, min, max):
         return random.randint(min, max)
     @staticmethod
-    def rand_choice(engine:Engine, pools:list[dict], rolls:int):
+    def rand_choice(engine:Engine, rolls:int, pools:list[dict]):
         table = LootTable.fromDict({"rolls": rolls, "pools": pools})
         return table.roll(engine)
 
@@ -525,11 +525,17 @@ class Engine_Player_SubtractMaxHealth(LoaderFunction):
             case _: return None
 class Engine_Player_Heal(LoaderFunction):
     id = Identifier("engine", "player/", "heal")
+    return_type = int
     @classmethod
     def check(cls, engine:Engine, args:dict):
         match args:
-            case {}: ...
+            case {
+                "amount": int() | dict()
+            }: ...
             case _: return None
+    @staticmethod
+    def heal(engine:Engine, amount:int|dict):
+        engine
 class Engine_Player_Damage(LoaderFunction):
     id = Identifier("engine", "player/", "damage")
     @classmethod

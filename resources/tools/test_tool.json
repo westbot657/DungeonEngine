@@ -1,0 +1,16 @@
+{
+    "name": "First Aid Kit",
+    "max_durability": 10,
+    "events": {
+        "on_use": [
+            {
+                "function": "engine:player/heal",
+                "amount": {
+                    "function": "engine:random/uniform",
+                    "min": 1,
+                    "max": 8
+                }
+            }
+        ]
+    }
+}

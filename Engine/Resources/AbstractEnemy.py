@@ -5,6 +5,7 @@ try:
     from .EngineErrors import InvalidObjectError
     from .EngineDummy import Engine
     from .AbstractAttack import AbstractAttack, Attack
+    from .DynamicValue import DynamicValue
     from .Enemy import Enemy
     from .Logger import Log
 except ImportError:
@@ -12,6 +13,7 @@ except ImportError:
     from EngineErrors import InvalidObjectError
     from EngineDummy import Engine
     from AbstractAttack import AbstractAttack, Attack
+    from DynamicValue import DynamicValue
     from Enemy import Enemy
     from Logger import Log
 
@@ -125,7 +127,7 @@ class AbstractEnemy:
         return Enemy(self,
             override_values.get("name", self.getName()),
             override_values.get("max_health", self.getMaxHealth()),
-            override_values.get("health", self.getHealth()),
+            DynamicValue(override_values.get("health", self.getHealth())),
             self._assertListAttackType(override_values.get("attacks", self.getAttacks()))
         )
     

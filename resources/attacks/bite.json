@@ -1,8 +1,7 @@
 {
     "name": "Bite",
     "damage": {
-        "function": "engine:math/random",
-        "type": "engine:uniform",
+        "function": "engine:random/uniform",
         "min": 1,
         "max": 2
     }

@@ -94,9 +94,9 @@ class AbstractAmmo(AbstractGameObject):
             ...
         else:
             return Ammo(self,
-                DynamicValue(override_values.get("name", self.getName())),
+                override_values.get("name", self.getName()),
                 DynamicValue(override_values.get("bonus_damage", self.getBonusDamage())),
-                DynamicValue(override_values.get("max_count", self.getMaxCount())),
+                override_values.get("max_count", self.getMaxCount()),
                 DynamicValue(override_values.get("count", self.getCount()))
             )
 

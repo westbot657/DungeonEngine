@@ -4,12 +4,14 @@ try:
     from .Armor import Armor
     from .Identifier import Identifier
     from .EngineErrors import InvalidObjectError
+    from .EngineDummy import Engine
     from .AbstractGameObject import AbstractGameObject
     from .DynamicValue import DynamicValue
 except ImportError:
     from Armor import Armor
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
+    from EngineDummy import Engine
     from AbstractGameObject import AbstractGameObject
     from DynamicValue import DynamicValue
 
@@ -76,7 +78,7 @@ class AbstractArmor(AbstractGameObject):
             return d
         raise InvalidObjectError(f"Armor has no damage_reduction! ({self.identifier})")
 
-    def createInstance(self, **override_values) -> Armor:
+    def createInstance(self, engine:Engine, **override_values) -> Armor:
         if self.is_template:
             ...
         else:
@@ -84,7 +86,7 @@ class AbstractArmor(AbstractGameObject):
                 override_values.get("name", self.getName()),
                 DynamicValue(override_values.get("damage_reduction", self.getDamageReduction())),
                 override_values.get("max_durability", self.getMaxDurability()),
-                DynamicValue(override_values.get("durability", self.getDurability()))
+                DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(engine)
             )
 
     @classmethod

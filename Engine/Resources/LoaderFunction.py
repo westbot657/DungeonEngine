@@ -111,7 +111,7 @@ class LoaderFunction:
         pass # don't need to do anything in the dummy function
 
     @classmethod
-    def check(cls, engine, args:dict):
+    def check(cls, engine:Engine, args:dict):
         return cls._check_dummy_return
     
     def __init_subclass__(cls):

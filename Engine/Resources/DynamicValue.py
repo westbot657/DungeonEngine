@@ -26,7 +26,7 @@ class DynamicValue:
         If no prior call to `getNew()` has been made, returns None
         """
         return self.cached_value
-    def getCachedNew(self, engine:Engine):
+    def getCachedOrNew(self, engine:Engine):
         """
         returns the cached value.
         if the cached value is None, makes a call to `getNew()` first.

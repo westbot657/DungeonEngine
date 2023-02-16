@@ -25,6 +25,9 @@ class FunctionMemory:
         self.symbol_table.clear()
         self.context_data.clear()
 
+    def addContextData(self, **data):
+        self.context_data.update(data)
+
     def checkPredicate(self, engine:Engine, predicate:dict):
         ...
 

@@ -3,6 +3,7 @@ try:
     from .Ammo import Ammo
     from .Identifier import Identifier
     from .EngineErrors import InvalidObjectError
+    from .EngineDummy import Engine
     from .AbstractGameObject import AbstractGameObject
     from .DynamicValue import DynamicValue
     from .Logger import Log
@@ -10,6 +11,7 @@ except ImportError:
     from Ammo import Ammo
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
+    from EngineDummy import Engine
     from AbstractGameObject import AbstractGameObject
     from DynamicValue import DynamicValue
     from Logger import Log
@@ -89,7 +91,7 @@ class AbstractAmmo(AbstractGameObject):
             p = p.parent
         return False
 
-    def createInstance(self, **override_values) -> Ammo:
+    def createInstance(self, engine:Engine, **override_values) -> Ammo:
         if self.is_template:
             ...
         else:
@@ -97,7 +99,7 @@ class AbstractAmmo(AbstractGameObject):
                 override_values.get("name", self.getName()),
                 DynamicValue(override_values.get("bonus_damage", self.getBonusDamage())),
                 override_values.get("max_count", self.getMaxCount()),
-                DynamicValue(override_values.get("count", self.getCount()))
+                DynamicValue(override_values.get("count", self.getCount())).getCachedOrNew(engine)
             )
 
     @classmethod

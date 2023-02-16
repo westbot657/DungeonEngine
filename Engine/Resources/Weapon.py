@@ -3,15 +3,17 @@
 try:
     from .GameObject import GameObject
     from .Identifier import Identifier
+    from .DynamicValue import DynamicValue
     from .Util import Util
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
+    from DynamicValue import DynamicValue
     from Util import Util
 
 class Weapon(GameObject):
     identifier = Identifier("engine", "object/", "weapon")
-    def __init__(self, abstract, name:str, damage:int, range:int, max_durability:int, durability:int, ammo_type):
+    def __init__(self, abstract, name:str, damage:DynamicValue, range:DynamicValue, max_durability:int, durability:int, ammo_type):
         self.abstract = abstract
         self.name = name
         self.damage = damage
@@ -27,7 +29,7 @@ class Weapon(GameObject):
         return f"+{self.damage}dmg {self.range}ft"
 
     def fullStats(self, is_equipped=False):
-        return f"{self.name} +{self.damage}dmg {self.range}ft {Util.getDurabilityBar(self.durability, self.max_durability)}"
+        return f"{self.name} +{self.damage.fullDisplay()}dmg {self.range.fullDisplay()}ft {Util.getDurabilityBar(self.durability, self.max_durability)}"
 
     def quickStats(self):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"

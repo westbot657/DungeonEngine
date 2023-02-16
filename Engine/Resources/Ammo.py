@@ -12,7 +12,7 @@ except ImportError:
 
 class Ammo(GameObject):
     identifier = Identifier("engine", "object/", "ammo")
-    def __init__(self, abstract, name:str, bonus_damage:DynamicValue, max_count:int, count:DynamicValue=None):
+    def __init__(self, abstract, name:str, bonus_damage:DynamicValue, max_count:int, count:int=None):
         self.abstract = abstract
         self.name = name
         self.bonus_damage = bonus_damage

@@ -5,6 +5,7 @@ try:
     from .Item import Item
     from .EngineErrors import InvalidObjectError
     from .DynamicValue import DynamicValue
+    from .EngineDummy import Engine
     from .AbstractGameObject import AbstractGameObject
     from .Logger import Log
 except ImportError:
@@ -12,6 +13,7 @@ except ImportError:
     from Item import Item
     from EngineErrors import InvalidObjectError
     from DynamicValue import DynamicValue
+    from EngineDummy import Engine
     from AbstractGameObject import AbstractGameObject
     from Logger import Log
 
@@ -73,14 +75,14 @@ class AbstractItem(AbstractGameObject):
             return self.parent.getData() or {} if self.parent else {}
         return self.data
 
-    def createInstance(self, **override_values) -> Item:
+    def createInstance(self, engine:Engine, **override_values) -> Item:
         if self.is_template:
             ...
         else:
             return Item(self,
                 override_values.get("name", self.getName()),
                 override_values.get("max_count", self.getMaxCount()),
-                DynamicValue(override_values.get("count", self.getCount())),
+                DynamicValue(override_values.get("count", self.getCount())).getCachedOrNew(engine),
                 DynamicValue(override_values.get("data", self.getData()))
             )
 

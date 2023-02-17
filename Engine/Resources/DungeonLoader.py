@@ -118,6 +118,8 @@ class DungeonLoader:
 
     def _evaluateFunction(self, engine:Engine, data:dict):
         if (funcs := data.get("functions", None)) is not None:
+            if (predicate := data.get("predicate", None)) is not None:
+                if not engine.function_memory.checkPredicate(engine, predicate): return None
             result = None
             for func in funcs:
                 res = self._evaluateFunction(engine, func)

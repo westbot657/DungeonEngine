@@ -41,6 +41,7 @@ class FunctionMemory:
 
     def clear(self):
         self.symbol_table.clear()
+        self.context_data.clear()
 
     def update(self, data:dict):
         self.symbol_table.update(data)

@@ -48,7 +48,7 @@ class Server:
         self.connections.append(conn)
 
     def service_connection(self, key, mask):
-        sock = key.fileobj
+        sock:socket.socket = key.fileobj
         data = key.data
         if mask & selectors.EVENT_READ:
             try:
@@ -74,6 +74,7 @@ class Server:
                 #sent = sock.send("{}".encode("utf-8"))
                 sent = sock.send(data.outb) # Send data to client that data was recieved from
                 for conn in self.connections:
+                    conn: socket.socket
                     if conn is sock: continue
                     conn.send(data.outb) # Send data to all clients except the one that data was recieved from
                 data.outb = data.outb[sent:]

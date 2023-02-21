@@ -1,5 +1,5 @@
 # pylint: disable=[W,R,C,import-error]
-
+import socket
 
 class Packet:
     _content_builders = {}
@@ -9,5 +9,10 @@ class Packet:
         self.content = content
 
     @classmethod
-    def build(cls, source, content):
-        ...
+    def build(cls, source:str, content:str):
+        if source not in cls._content_builders:
+            cls._content_builders.update({source: ""})
+        cls._content_builders[source] += content
+
+        if ">" in (text := cls._content_builders[source]):
+            ...

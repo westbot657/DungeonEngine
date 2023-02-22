@@ -110,6 +110,9 @@ class Engine:
                         d = m.groupdict()
                         keyword = d["keyword"]
                         obj = d["obj"]
+                    
+                    else:
+                        ...
 
                     # Simple command checks
                 

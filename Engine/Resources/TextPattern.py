@@ -2,72 +2,42 @@
 
 import re
 
-from enum import Enum
+from enum import Enum, auto
 
+from typing import Any
 
-class _TEValue:
-    def __init__(self, parent_TEValue=None):
-        self.parent_TEValue = parent_TEValue
+class _TextElementType(Enum):
+    AMMO = auto()
+    ARMOR = auto()
+    ITEM = auto()
+    TOOL = auto()
+    WEAPON = auto()
+    GAME_OBJECT = auto()
 
-    def isParentOf(self, possible_child):
-        parent = possible_child
-        while parent is not None:
-            if parent is self:
-                return True
+    PLAYER = auto()
+    ENEMY = auto()
+    ENTITY = auto()
 
-            parent = parent.parent_TEValue
-        return False
+    ATTACK = auto()
+    LOCATION = auto()
+    STATUS_EFFECT = auto()
 
-    def __eq__(self, other):
-        return self is other
-
-    def __gt__(self, other):
-        if self is other: return False
-        return self.isParentOf(other)
-
-    def __ge__(self, other):
-        return self.isParentOf(other)
+class TextElement:
+    def __init__(self, types):
+        self.types = list(types)
     
-    def __lt__(self, other):
-        if self is other: return False
-        return other.isParentOf(self)
-    
-    def __le__(self, other):
-        return other.isParentOf(self)
+    def __or__(self, other):
+        if isinstance(other, TextElement):
+            return TextElement(self.types + other.types)
+        raise TypeError(f"unsupported operand type(s) for |: 'TextElement' and '{type(other)}'")
 
-    def __ne__(self, other):
-        return self is not other
-
-    def __or__(self, other): # binary or: x | y
+    def check(self, text:str) -> tuple[Any, str]:
         ...
-
-class TextElement(Enum):
-
-    GAME_OBJECT = _TEValue()
-
-    AMMO = _TEValue(GAME_OBJECT)
-    ARMOR = _TEValue(GAME_OBJECT)
-    WEAPON = _TEValue(GAME_OBJECT)
-    ITEM = _TEValue(GAME_OBJECT)
-    TOOL = _TEValue(GAME_OBJECT)
-
-    ENTITY = _TEValue()
-
-    PLAYER = _TEValue(ENTITY)
-    ENEMY = _TEValue(ENTITY)
-    NPC = _TEValue(ENTITY)
-    
-    LOCATION = _TEValue()
-
-    STATUS_EFFECT = _TEValue()
-
-    ATTACK = _TEValue()
 
 class TextPattern:
 
     def __init__(self, *components):
         self.components: list[TextElement|str] = list(components)
 
-    
-
-
+    def check(self, text:str) -> list[Any]:
+        ...

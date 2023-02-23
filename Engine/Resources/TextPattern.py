@@ -2,37 +2,72 @@
 
 import re
 
-from enum import IntEnum
+from enum import Enum
 
-class TextElement(IntEnum):
 
-    #                 1 #####
-    GAME_OBJECT   = 0x1_00000_0_000_0_0_0
+class _TEValue:
+    def __init__(self, parent_TEValue=None):
+        self.parent_TEValue = parent_TEValue
 
-    AMMO          = 0x1_10000_0_000_0_0_0
-    ARMOR         = 0x1_01000_0_000_0_0_0
-    WEAPON        = 0x1_00100_0_000_0_0_0
-    ITEM          = 0x1_00010_0_000_0_0_0
-    TOOL          = 0x1_00001_0_000_0_0_0
+    def isParentOf(self, possible_child):
+        parent = possible_child
+        while parent is not None:
+            if parent is self:
+                return True
 
-    #                         1 ###
-    ENTITY        = 0x0_00000_1_000_0_0_0
+            parent = parent.parent_TEValue
+        return False
 
-    PLAYER        = 0x0_00000_1_100_0_0_0
-    ENEMY         = 0x0_00000_1_010_0_0_0
-    NPC           = 0x0_00000_1_001_0_0_0
+    def __eq__(self, other):
+        return self is other
+
+    def __gt__(self, other):
+        if self is other: return False
+        return self.isParentOf(other)
+
+    def __ge__(self, other):
+        return self.isParentOf(other)
     
-    #                               # # #
-    LOCATION      = 0x0_00000_0_000_1_0_0
-
-    STATUS_EFFECT = 0x0_00000_0_000_0_1_0
-
-    ATTACK        = 0x0_00000_0_000_0_0_1
+    def __lt__(self, other):
+        if self is other: return False
+        return other.isParentOf(self)
     
+    def __le__(self, other):
+        return other.isParentOf(self)
+
+    def __ne__(self, other):
+        return self is not other
+
+    def __or__(self, other): # binary or: x | y
+        ...
+
+class TextElement(Enum):
+
+    GAME_OBJECT = _TEValue()
+
+    AMMO = _TEValue(GAME_OBJECT)
+    ARMOR = _TEValue(GAME_OBJECT)
+    WEAPON = _TEValue(GAME_OBJECT)
+    ITEM = _TEValue(GAME_OBJECT)
+    TOOL = _TEValue(GAME_OBJECT)
+
+    ENTITY = _TEValue()
+
+    PLAYER = _TEValue(ENTITY)
+    ENEMY = _TEValue(ENTITY)
+    NPC = _TEValue(ENTITY)
+    
+    LOCATION = _TEValue()
+
+    STATUS_EFFECT = _TEValue()
+
+    ATTACK = _TEValue()
 
 class TextPattern:
 
     def __init__(self, *components):
-        self.components = components
+        self.components: list[TextElement|str] = list(components)
+
+    
 
 

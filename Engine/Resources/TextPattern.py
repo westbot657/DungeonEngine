@@ -2,42 +2,44 @@
 
 import re
 
-from enum import Enum, auto
+from enum import IntEnum
 
 from typing import Any
 
-class _TextElementType(Enum):
-    AMMO = auto()
-    ARMOR = auto()
-    ITEM = auto()
-    TOOL = auto()
-    WEAPON = auto()
-    GAME_OBJECT = auto()
+class TextElement(IntEnum):
+    AMMO          = 0b10000_000_0_0_0
+    ARMOR         = 0b01000_000_0_0_0
+    ITEM          = 0b00100_000_0_0_0
+    TOOL          = 0b00010_000_0_0_0
+    WEAPON        = 0b00001_000_0_0_0
+    GAME_OBJECT   = 0b11111_000_0_0_0
 
-    PLAYER = auto()
-    ENEMY = auto()
-    ENTITY = auto()
+    PLAYER        = 0b00000_100_0_0_0
+    ENEMY         = 0b00000_010_0_0_0
+    NPC           = 0b00000_001_0_0_0
+    ENTITY        = 0b00000_111_0_0_0
 
-    ATTACK = auto()
-    LOCATION = auto()
-    STATUS_EFFECT = auto()
+    STATUS_EFFECT = 0b00000_000_1_0_0
+    ATTACK        = 0b00000_000_0_1_0
+    LOCATION      = 0b00000_000_0_0_1
 
-class TextElement:
-    def __init__(self, types):
-        self.types = list(types)
-    
-    def __or__(self, other):
-        if isinstance(other, TextElement):
-            return TextElement(self.types + other.types)
-        raise TypeError(f"unsupported operand type(s) for |: 'TextElement' and '{type(other)}'")
-
-    def check(self, text:str) -> tuple[Any, str]:
-        ...
 
 class TextPattern:
+    def __init__(self, components:list[TextElement]):
+        self.components = components
+        
+    def _build(self, component:int, text:str) -> tuple[Any, str]:
+        return None, text
 
-    def __init__(self, *components):
-        self.components: list[TextElement|str] = list(components)
+    def check(self, text:str):
+        pieces = []
+        for component in self.components:
+            piece, text = self._build(component, text)
+            pieces.append(piece)
 
-    def check(self, text:str) -> list[Any]:
-        ...
+        return pieces
+
+
+
+
+

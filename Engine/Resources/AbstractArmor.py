@@ -7,6 +7,7 @@ try:
     from .EngineDummy import Engine
     from .AbstractGameObject import AbstractGameObject
     from .DynamicValue import DynamicValue
+    from .Logger import Log
 except ImportError:
     from Armor import Armor
     from Identifier import Identifier
@@ -14,6 +15,7 @@ except ImportError:
     from EngineDummy import Engine
     from AbstractGameObject import AbstractGameObject
     from DynamicValue import DynamicValue
+    from Logger import Log
 
 import glob, json, re
 
@@ -112,10 +114,20 @@ class AbstractArmor(AbstractGameObject):
             #     name: str = d["name"]
             #     cls._loaded.update({f"engine:armor/{name}": cls(Identifier("engine", "resources/armor/", name), data)})
 
+        Log["loadup"]["abstract"]["armor"]("linking AbstractArmor parents...")
         for a, p in cls._link_parents:
             a: AbstractArmor
             p: str
-            a._set_parent(cls._loaded.get(p))
+            if parent := cls._loaded.get(p, None):
+                if parent is a:
+                    Log["ERROR"]["loadup"]["abstract"]["armor"]("cannot set object as it's own parent")
+                    continue
+                elif parent in a.get_parent_chain():
+                    Log["ERROR"]["loadup"]["abstract"]["armor"]("circular parent loop found")
+                    continue
+                a._set_parent(parent)
+            else:
+                Log["ERROR"]["loadup"]["abstract"]["armor"](f"parent does not exist: '{p}'")
         
         for l, o in cls._loaded.copy().items():
             l: str

@@ -8,6 +8,7 @@ try:
     from .DynamicValue import DynamicValue
     from .EngineDummy import Engine
     from .AbstractGameObject import AbstractGameObject
+    from .Logger import Log
 except ImportError:
     from Identifier import Identifier
     from Weapon import Weapon
@@ -16,6 +17,7 @@ except ImportError:
     from DynamicValue import DynamicValue
     from EngineDummy import Engine
     from AbstractGameObject import AbstractGameObject
+    from Logger import Log
 
 import glob, json
 
@@ -27,8 +29,16 @@ import glob, json
     "range": 2,
     "max_durability": 100,
     "durability": 100,
-    "ammo_type": "engine:ammo/none"
+    "ammo_type": "engine:ammo/none",
 }
+
+
+# Paramater Break down:
+{
+    "parent": <identifier of another object>
+}
+
+
 """
 
 class AbstractWeapon(AbstractGameObject):
@@ -136,10 +146,20 @@ class AbstractWeapon(AbstractGameObject):
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})
 
-        for w, p in cls._link_parents:
-            w: AbstractWeapon
+        Log["loadup"]["abstract"]["weapon"]("linking AbstractWeapon parents...")
+        for a, p in cls._link_parents:
+            a: AbstractWeapon
             p: str
-            w._set_parent(cls._loaded.get(p))
+            if parent := cls._loaded.get(p, None):
+                if parent is a:
+                    Log["ERROR"]["loadup"]["abstract"]["weapon"]("cannot set object as it's own parent")
+                    continue
+                elif parent in a.get_parent_chain():
+                    Log["ERROR"]["loadup"]["abstract"]["weapon"]("circular parent loop found")
+                    continue
+                a._set_parent(parent)
+            else:
+                Log["ERROR"]["loadup"]["abstract"]["weapon"](f"parent does not exist: '{p}'")
 
         for l, o in cls._loaded.copy().items():
             l: str

@@ -56,7 +56,7 @@ class AbstractItem(AbstractGameObject):
 
     def getMaxCount(self) -> int:
         if self.max_count is None:
-            c = self.parent.getMaxCount() if self.parent else None
+            c = self.parent.getMaxCount() if self.parent is not None else None
         else:
             c = self.max_count
         if c is not None: return c
@@ -117,6 +117,12 @@ class AbstractItem(AbstractGameObject):
             if parent := cls._loaded.get(p, None):
                 if parent is w:
                     Log["ERROR"]["loadup"]["abstract"]["item"]("cannot set object as it's own parent")
+                    #cls._loaded.pop(w.identifier.full())
+                    continue
+                elif w in parent.get_parent_chain():
+                    Log["ERROR"]["loadup"]["abstract"]["item"]("circular parent loop found")
+                    #cls._loaded.pop(w.identifier.full())
+                    #cls._loaded.pop(parent.identifier.full())
                     continue
                 w._set_parent(parent)
             else:

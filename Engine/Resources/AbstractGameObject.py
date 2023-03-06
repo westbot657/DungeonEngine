@@ -32,5 +32,10 @@ class AbstractGameObject:
                 children += child.get_children(depth-1)
         return children
 
+    def get_parent_chain(self):
+        if self.parent is None:
+            return []
+        else:
+            return [self.parent] + self.parent.get_parent_chain()
 
 

@@ -124,6 +124,9 @@ class AbstractAmmo(AbstractGameObject):
                 if parent is a:
                     Log["ERROR"]["loadup"]["abstract"]["ammo"]("cannot set object as it's own parent")
                     continue
+                elif parent in a.get_parent_chain():
+                    Log["ERROR"]["loadup"]["abstract"]["ammo"]("circular parent loop found")
+                    continue
                 a._set_parent(parent)
             else:
                 Log["ERROR"]["loadup"]["abstract"]["ammo"](f"parent does not exist: '{p}'")

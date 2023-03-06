@@ -6,12 +6,14 @@ try:
     from .EngineErrors import InvalidObjectError
     from .EngineDummy import Engine
     from .AbstractGameObject import AbstractGameObject
+    from .Logger import Log
 except ImportError:
     from Identifier import Identifier
     from Tool import Tool
     from EngineErrors import InvalidObjectError
     from EngineDummy import Engine
     from AbstractGameObject import AbstractGameObject
+    from Logger import Log
 
 import glob, json
 
@@ -51,10 +53,20 @@ class AbstractTool(AbstractGameObject):
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})
 
-        for w, p in cls._link_parents:
-            w: AbstractTool
+        Log["loadup"]["abstract"]["tool"]("linking AbstractTool parents...")
+        for a, p in cls._link_parents:
+            a: AbstractTool
             p: str
-            w._set_parent(cls._loaded.get(p))
+            if parent := cls._loaded.get(p, None):
+                if parent is a:
+                    Log["ERROR"]["loadup"]["abstract"]["tool"]("cannot set object as it's own parent")
+                    continue
+                elif parent in a.get_parent_chain():
+                    Log["ERROR"]["loadup"]["abstract"]["tool"]("circular parent loop found")
+                    continue
+                a._set_parent(parent)
+            else:
+                Log["ERROR"]["loadup"]["abstract"]["tool"](f"parent does not exist: '{p}'")
 
         for l, o in cls._loaded.copy().items():
             l: str

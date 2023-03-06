@@ -28,13 +28,13 @@ except ImportError:
 class Inventory:
     _default_equips = {}
 
-    def __init__(self, contents:list[GameObject]):
+    def __init__(self, engine:Engine, contents:list[GameObject]):
         self.parent = None
         self.contents = contents
         self.equips = {}
         self.defaults = {}
         for key, abstract in Inventory._default_equips.items():
-            self.defaults.update({key: abstract.createInstance()})
+            self.defaults.update({key: abstract.createInstance(engine)})
             self.equips.update({key: self.defaults[key]})
 
     def equip(self, objectType:str, gameObject:GameObject):
@@ -77,7 +77,7 @@ class Inventory:
             Log["loadup"]["inventory"]("Constructing new GameObject")
 
             try:
-                obj: GameObject = engine.loader.constructGameObject(element)
+                obj: GameObject = engine.loader.constructGameObject(engine, element)
             except InvalidObjectError as e:
                 Log["ERROR"]["loadup"]["inventory"](*e.args, sep=" ")
                 continue
@@ -86,7 +86,7 @@ class Inventory:
             Log["loadup"]["inventory"]("gameObject added to inventory")
             if element.get("equipped", False):
                 equips.update({obj.identifier.ID(): obj})
-        inv = cls(contents)
+        inv = cls(engine, contents)
         inv.equips = equips
         Log["loadup"]["inventory"]("Inventory Construction finished")
         return inv

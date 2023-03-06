@@ -204,7 +204,7 @@ class DungeonLoader:
     def constructWeapon(self, data:dict) -> Weapon:
         ...
     
-    def constructGameObject(self, data:dict) -> GameObject:
+    def constructGameObject(self, engine, data:dict) -> GameObject:
         Log["loadup"]["loader"]("Constructing new GameObject...")
         if obj_type := data.get("type", None):
             identifier = Identifier.fromString(obj_type)
@@ -214,7 +214,7 @@ class DungeonLoader:
                 if parent := data.get("parent", None):
                     if abstract := tp._loaded.get(parent, None):
                         Log["loadup"]["loader"]("GameObject Construction complete")
-                        return abstract.createInstance(**data)
+                        return abstract.createInstance(engine, **data)
                     raise InvalidObjectError(f"No parent GameObject with id: '{parent}'")
             raise InvalidObjectError(f"GameObject type: '{nm}' does not exist")
         elif parent := data.get("parent", None):

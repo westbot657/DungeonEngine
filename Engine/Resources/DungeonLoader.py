@@ -186,7 +186,7 @@ class DungeonLoader:
     @TextPattern(r"\b(?:equip) *(?P<item_name>.*)\b")
     @staticmethod
     def checkTextEquip(engine:Engine, player:Player, raw_text:str, groupdict:dict):
-        item_name: str = groupdict["item_name"]
+        item_name: str = groupdict["item_name"].strip()
 
         for weapon in player.inventory.getOfType(Weapon):
             weapon: Weapon
@@ -207,6 +207,13 @@ class DungeonLoader:
                         break
                 else:
                     engine.sendOutput(player, f"You have no Weapon, Armor, or Tool called '{item_name}'")
+
+    @TextPattern(r"\b(?P<keyword>use|eat|throw|apply|drink)(?: *(?P<amount>[1-9][0-9]*|an?|the|(?:some|all) *(?:(?:of *)?(?:the|my)))?)? *(?P<item_name>.*)\b")
+    @staticmethod
+    def checkTextUse(engine:Engine, player:Player, raw_text:str, groupdict:dict):
+        keyword: str = groupdict["keyword"]
+        amount: str = groupdict["amount"]
+        item_name: str = groupdict["item_name"]
 
     @TextPattern(r"\b(inventory|bag|items)\b", TextPattern.CheckType.SEARCH)
     @staticmethod

@@ -47,14 +47,24 @@ class Inventory:
                 self.equips[key] = self.defaults.get(key, None)
                 return
     
+    def getOfType(self, objectType:type|tuple[type]):
+        matches = []
+        for c in self.contents:
+            if isinstance(c, objectType):
+                matches.append(c)
+        return matches
+
+    def isEquipped(self, gameObject:GameObject):
+        return gameObject in self.equips.values()
+
     def unequipType(self, objectType:str):
         if objectType in self.equips:
             self.equips[objectType] = self.defaults.get(objectType, None)
 
-    def fullStats(self):
+    def fullStats(self, engine):
         equip_stats = []
         for v in self.equips.values():
-            if (b := v.bonuses()) is not None: equip_stats.append(b)
+            if (b := v.bonuses(engine)) is not None: equip_stats.append(b)
         
         out = []
         st = ""
@@ -63,7 +73,7 @@ class Inventory:
         
         
         for obj in self.contents:
-            out.append(obj.fullStats(obj in self.equips.values()))
+            out.append(obj.fullStats(engine, obj in self.equips.values()))
         if out: return "\n".join([st, *out])
         return f"{st}\n[no items in inventory]"
 

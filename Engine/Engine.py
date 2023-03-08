@@ -25,6 +25,7 @@ from Resources.Identifier           import Identifier
 from Resources.Player               import Player
 from Resources.DungeonLoader        import DungeonLoader
 from Resources.FunctionMemory       import FunctionMemory
+from Resources.TextPattern          import TextPattern
 from Resources.EngineOperation      import EngineOperation, _EngineOperation, OpType
 from Resources.EngineErrors         import EngineError, EngineBreak
 from Resources.Util                 import Util
@@ -93,7 +94,7 @@ class Engine:
     def _default_input_handler(self, player_id, text) -> Generator:
         while self.running:
             try:
-                Log["debug"]["input-handler"](f"handling: '{text}' from {player_id}")
+                Log["debug"]["engine"]["input-handler"](f"handling: '{text}' from {player_id}")
                 # TODO: checks for stuff like moving, inventory stuff, etc...
 
                 if player_id == 0: # id 0 means engine basically
@@ -102,17 +103,19 @@ class Engine:
                 elif player := self.getPlayer(player_id, None):
                     #print(f"{player=}")
 
-                    if re.search(r"\b(inventory|bag|items)\b", text):
-                        Log["debug"]["console"]("checking inventory?")
-                        self.io_hook.sendOutput(player_id, player.fullInventoryStats())
+                    #try:
+                    TextPattern.handleInput(self, player, text)
+                    #except Exception as e:
+                    #    Log["ERROR"]["engine"]["input-handler"]("\n" + "\n".join(e.args))
+                        
+                    # if re.search(r"\b(inventory|bag|items)\b", text):
+                    #     Log["debug"]["console"]("checking inventory")
+                    #     self.io_hook.sendOutput(player_id, player.fullInventoryStats())
 
-                    elif m := re.search(r"(?:(?P<keyword>equip|put *on|(?:switch *to|(?:pull|take) *out|wear|draw|take(?: *out)?)(?: *(?:my|an?|the))?) *(?P<obj>.*))", text):
-                        d = m.groupdict()
-                        keyword = d["keyword"]
-                        obj = d["obj"]
-                    
-                    else:
-                        ...
+
+
+                    # else:
+                    #     ...
 
                     # Simple command checks
                 

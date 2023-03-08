@@ -25,11 +25,11 @@ class Weapon(GameObject):
     def __repr__(self):
         return f"Weapon {self.name}: damage:{self.damage} range:{self.range}  durability:{self.durability}"
 
-    def bonuses(self):
-        return f"+{self.damage}dmg {self.range}ft"
+    def bonuses(self, engine):
+        return f"+{self.damage.quickDisplay(engine)}dmg {self.range.quickDisplay(engine)}ft"
 
-    def fullStats(self, is_equipped=False):
-        return f"{self.name} +{self.damage.fullDisplay()}dmg {self.range.fullDisplay()}ft {Util.getDurabilityBar(self.durability, self.max_durability)}"
+    def fullStats(self, engine, is_equipped=False):
+        return f"{self.name} +{self.damage.fullDisplay(engine)}dmg {self.range.fullDisplay(engine)}ft {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [EQUIPPED]" if is_equipped else "")
 
-    def quickStats(self):
+    def quickStats(self, engine):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"

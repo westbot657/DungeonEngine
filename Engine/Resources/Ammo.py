@@ -22,8 +22,8 @@ class Ammo(GameObject):
     def __repr__(self):
         return f"Ammo {self.name}: bonus-damage:{self.bonus_damage} max-count:{self.max_count}"
 
-    def fullStats(self, is_equipped=False):
-        return f"{self.name} +{self.bonus_damage}dmg {self.count}/{self.max_count}"
+    def fullStats(self, engine, is_equipped=False):
+        return f"{self.name} +{self.bonus_damage.fullDisplay(engine)}dmg {self.count}/{self.max_count}"
 
-    def quickStats(self):
+    def quickStats(self, engine):
         return f"{self.name} {self.count}/{self.max_count}"

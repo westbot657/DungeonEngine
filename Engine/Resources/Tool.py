@@ -89,10 +89,10 @@ class Tool(GameObject):
     def __repr__(self):
         return f"Tool: {self.name} {self.durability}/{self.max_durability}"
 
-    def fullStats(self, is_equipped=False):
+    def fullStats(self, engine, is_equipped=False):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" EQUIPPED" if is_equipped else "")
 
-    def quickStats(self):
+    def quickStats(self, engine):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
 
 

@@ -38,6 +38,8 @@ class AbstractItem(AbstractGameObject):
         self.max_count: int = data.get("max_count", None)
         self.count: int = data.get("count", self.max_count)
         self.data: dict = data.get("data", None)
+        self.events: dict = data.get("events", None)
+        self.keywords: list = data.get("keywords", None)
 
         self.is_template: bool = data.get("template", False)
 
@@ -74,6 +76,22 @@ class AbstractItem(AbstractGameObject):
         if self.data is None:
             return self.parent.getData() or {} if self.parent else {}
         return self.data
+
+    def getKeywords(self) -> list:
+        if self.keywords is None:
+            if self.parent:
+                words = self.parent.getKeywords()
+                if "use" not in words: words.append("use")
+                return words
+            return ["use"]
+        words = self.keywords.copy()
+        if self.parent:
+            words += [word for word in self.parent.getKeywords() if word not in words]
+        return words
+
+    def getEvents(self) -> dict:
+        ...
+        return {}
 
     def createInstance(self, engine:Engine, **override_values) -> Item:
         if self.is_template:
@@ -141,6 +159,7 @@ class AbstractItem(AbstractGameObject):
                 o.getMaxCount()
                 o.getCount()
                 o.getData()
+                o.getKeywords()
                 Log.success()
             except InvalidObjectError:
                 e: AbstractItem = cls._loaded.pop(l)

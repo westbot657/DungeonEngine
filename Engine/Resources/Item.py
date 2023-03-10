@@ -18,6 +18,9 @@ class Item(GameObject):
         self.count = count
         self.data = data or {}
 
+    def checkKeyword(self, keyword):
+        return keyword in self.abstract.getKeywords()
+
     def __repr__(self):
         return f"Item {self.name}: max_count:{self.max_count} count:{self.count} data:{self.data}"
 

@@ -217,8 +217,11 @@ class DungeonLoader:
         
         item_name: str = groupdict["item_name"]
 
-        for tool in player.inventory.getOfType(Tool):
-            
+        for item in player.inventory.getOfType(Item):
+            item: Item
+            if item.name.lower().strip() == item_name.lower().strip():
+                if item.checkKeyword(keyword):
+                    ...
 
         amount: int = TextPattern.interpretAmount(groupdict["amount"])
 

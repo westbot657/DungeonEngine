@@ -69,13 +69,13 @@ class TextPattern:
         if amount.isnumeric():
             return int(amount)
 
-        elif re.search(r"(all|every)", amount):
+        elif re.search(r"\b(all|every)\b", amount):
             return max_available
 
-        elif re.search(r"(half|1/2)", amount):
+        elif re.search(r"\b(half|1/2)\b", amount):
             return int(max_available/2)
 
-        elif re.search(r"(an?|the|some)", amount): # this has to go last, as it tries to find "a" as a valid match
+        elif re.search(r"\b(an?|the|some)\b", amount): # this has to go last, as it tries to find "a" as a valid match
             return 1
 
         else:

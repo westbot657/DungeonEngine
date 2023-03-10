@@ -20,6 +20,7 @@ try:
     from .TextPattern import TextPattern
     from .Player import Player
     from .AbstractGameObject import AbstractGameObject, GameObject
+    from .Util import Util
     from .Logger import Log
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
@@ -41,6 +42,7 @@ except ImportError:
     from TextPattern import TextPattern
     from Player import Player
     from AbstractGameObject import AbstractGameObject, GameObject
+    from Util import Util
     from Logger import Log
 
 from typing import Any
@@ -212,8 +214,14 @@ class DungeonLoader:
     @staticmethod
     def checkTextUse(engine:Engine, player:Player, raw_text:str, groupdict:dict):
         keyword: str = groupdict["keyword"]
-        amount: str = groupdict["amount"]
+        
         item_name: str = groupdict["item_name"]
+
+        for tool in player.inventory.getOfType(Tool):
+            
+
+        amount: int = TextPattern.interpretAmount(groupdict["amount"])
+
 
     @TextPattern(r"\b(inventory|bag|items)\b", TextPattern.CheckType.SEARCH)
     @staticmethod

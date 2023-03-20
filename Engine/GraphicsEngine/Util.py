@@ -63,9 +63,16 @@ class Vector2d:
         """
         ...
     
-    def stretch(self, length):
+    def extend(self, length):
         """
-        stretches the vector by length in the direction it points
+        extends the vector by `length` in the direction it points
         """
         ...
+
+
+
+
+
+
+
 

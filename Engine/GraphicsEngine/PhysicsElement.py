@@ -6,5 +6,6 @@ Base class for anything that moves
 """
 class PhysicsElement:
 
-    def __init__(self):
+    def update(self, screen, relativePosition):
         ...
+

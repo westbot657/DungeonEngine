@@ -1,11 +1,21 @@
 # pylint: disable=[W,R,C,import-error]
 
+try:
+    from .Util import Vector2d
+except ImportError:
+    from Util import Vector2d
+
 
 """
 Base class for anything that renders on to the screen
 """
 class VisualElement:
 
-    def __init__(self):
+    def getWidth(self):
+        ...
+    def getHeight(self):
+        ...
+    
+    def render(self, screen, relativePosition:Vector2d):
         ...
 

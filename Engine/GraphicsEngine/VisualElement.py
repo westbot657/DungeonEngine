@@ -16,6 +16,6 @@ class VisualElement:
     def getHeight(self):
         ...
     
-    def render(self, screen, relativePosition:Vector2d):
+    def render(self, engine, surface, relativePosition:Vector2d):
         ...
 

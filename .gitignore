@@ -132,3 +132,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+**/__pycache__/*.cpython-310.pyc

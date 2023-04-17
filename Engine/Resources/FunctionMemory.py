@@ -21,33 +21,35 @@ Variable Types:
 """
 
 class FunctionMemory:
-    _instance = None
+    #_instance = None
 
     with open(f"./resources/environment_variables.json", "r+", encoding="utf-8") as f:
         global_environment_variables = json.load(f)
 
-    def __new__(cls):
-        if not cls._instance:
-            cls._instance = super().__new__(cls)
-            cls._instance.init()
-        return cls._instance
+    # def __new__(cls):
+    #     if not cls._instance:
+    #         cls._instance = super().__new__(cls)
+    #         cls._instance.init()
+    #     return cls._instance
 
-    def init(self):
+    def __init__(self, engine:Engine):
         self.symbol_table = {}
         self.context_data = {}
+        self.engine = engine
     
-    def prepFunction(self):
-        self.symbol_table.clear()
-        self.context_data.clear()
+    # def prepFunction(self):
+    #     self.symbol_table.clear()
+    #     self.context_data.clear()
 
     def addContextData(self, data:dict):
         self.context_data.update(data)
 
-    def checkPredicate(self, engine:Engine, predicate:dict):
+    def checkPredicate(self, predicate:dict):
+        return True
         ...
 
     def store(self, name:str, value):
-        self.symbol_table.update({name, value})
+        self.symbol_table.update({name: value})
         
     def ref(self, name:str):
 

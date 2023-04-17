@@ -52,13 +52,13 @@ class Engine:
         self.input_queue = {}
         self.io_hook = io_hook
         self.loader: DungeonLoader = DungeonLoader()
-        self.function_memory: FunctionMemory = FunctionMemory()
+        #self.function_memory: FunctionMemory = FunctionMemory()
         self.default_input_handler = self._default_input_handler
         self.players = []
         #self.default_input_handler.send(None)
 
     def evaluateFunction(self, data:dict):
-        return self.loader.evaluateFunction(self, data)
+        return self.loader.evaluateFunction(FunctionMemory(self), data)
 
     def loadGame(self):
         self.loader.loadGame(self)

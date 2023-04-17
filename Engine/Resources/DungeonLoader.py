@@ -22,6 +22,7 @@ try:
     from .AbstractGameObject import AbstractGameObject, GameObject
     from .Util import Util
     from .Logger import Log
+    from .FunctionMemory import FunctionMemory
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -44,6 +45,7 @@ except ImportError:
     from AbstractGameObject import AbstractGameObject, GameObject
     from Util import Util
     from Logger import Log
+    from FunctionMemory import FunctionMemory
 
 from typing import Any
 import re
@@ -71,58 +73,61 @@ class DungeonLoader:
         self.abstract_tools: dict[str, AbstractTool] = {}
         self.abstract_weapons: dict[str, AbstractWeapon] = {}
 
-    def evaluateFunction(self, engine:Engine, data:dict):
+    def evaluateFunction(self, function_memory:FunctionMemory, data:dict):
         # TODO: function memory stuff can happen here I guess? (not sure what that is right now though)
-        engine.function_memory.clear()
-        val = self._evaluateFunction(engine, data)
+        function_memory.clear()
+        val = self._evaluateFunction(function_memory, data)
         return val
 
-    def _evaluateFunction(self, engine:Engine, data:dict):
-        if (funcs := data.get("functions", None)) is not None:
-            if (predicate := data.get("predicate", None)) is not None:
-                if not engine.function_memory.checkPredicate(engine, predicate): return None
-            result = None
-            for func in funcs:
-                res = self._evaluateFunction(engine, func)
-                if res: result = res
-            return result
-        elif (func := data.get("function", None)) is not None:
-            if f := self.loader_function.getFunction(func):
-                f: LoaderFunction
-                # Check predicate
+    def _evaluateFunction(self, function_memory:FunctionMemory, data:dict):
+        engine = function_memory.engine
+        
+        if isinstance(data, dict):
+            if (funcs := data.get("functions", None)) is not None:
                 if (predicate := data.get("predicate", None)) is not None:
-                    if not engine.function_memory.checkPredicate(engine, predicate): return None
-                # Run function
-                args = {}
-                for key, item in data.items(): # gather the arguments for the function
-                    if key in ["function", "#store", "predicate"]: continue # skip the function's id, predicate, and the special #store operator
-                    if isinstance(item, dict):
-                        args.update({key: self._evaluateFunction(engine, item)})
-                    else:
-                        args.update({key: item})
-                r = f._call(engine, args)
-                # if a #store operator was present with the function, the function's result is assigned to the name in #store
-                if var := data.get("#store", None):
-                    var: str
-                    if var.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{var}'")
-                    engine.function_memory.store(var, r)
-                return r
-        elif (var := data.get("#ref", None)) is not None:
-            return engine.function_memory.ref(var)
-        elif (store := data.get("#store", None)) is not None:
-            if isinstance(store, dict):
-                for key, value in store.items():
-                    if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
-                    engine.function_memory.store(key, value)
-        elif isinstance(data, dict):
-            dat = {}
-            for key, item in data.items():
-                dat.update({key, self._evaluateFunction(engine, item)})
-            return dat
+                    if not function_memory.checkPredicate(predicate): return None
+                result = None
+                for func in funcs:
+                    res = self._evaluateFunction(function_memory, func)
+                    if res: result = res
+                return result
+            elif (func := data.get("function", None)) is not None:
+                if f := self.loader_function.getFunction(func):
+                    f: LoaderFunction
+                    # Check predicate
+                    if (predicate := data.get("predicate", None)) is not None:
+                        if not function_memory.checkPredicate(predicate): return None
+                    # Run function
+                    args = {}
+                    for key, item in data.items(): # gather the arguments for the function
+                        if key in ["function", "#store", "predicate"]: continue # skip the function's id, predicate, and the special #store operator
+                        if isinstance(item, dict):
+                            args.update({key: self._evaluateFunction(function_memory, item)})
+                        else:
+                            args.update({key: item})
+                    r = f._call(function_memory, args)
+                    # if a #store operator was present with the function, the function's result is assigned to the name in #store
+                    if var := data.get("#store", None):
+                        var: str
+                        if var.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{var}'")
+                        function_memory.store(var, r)
+                    return r
+            elif (var := data.get("#ref", None)) is not None:
+                return function_memory.ref(var)
+            elif (store := data.get("#store", None)) is not None:
+                if isinstance(store, dict):
+                    for key, value in store.items():
+                        if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
+                        function_memory.store(key, value)
+            else:
+                dat = {}
+                for key, item in data.items():
+                    dat.update({key: self._evaluateFunction(function_memory, item)})
+                return dat
         elif isinstance(data, list):
             dat = []
             for item in data:
-                dat.append(self._evaluateFunction(engine, data))
+                dat.append(self._evaluateFunction(function_memory, item))
             return dat
         else:
             return data
@@ -228,7 +233,13 @@ class DungeonLoader:
             if item.name.lower().strip() == item_name.lower().strip():
                 found_item = True
                 if item.checkKeyword(keyword):
-                    item.onUse(engine, amount)
+                    
+                    function_memory = FunctionMemory(engine)
+                    function_memory.addContextData({
+                        "#player": player,
+                        "#item": item
+                    })
+                    item.onUse(function_memory, amount)
 
         if not found_item:
             if tool := player.inventory.getEquipped(Tool):
@@ -236,7 +247,12 @@ class DungeonLoader:
                 if tool.name.lower().strip() == item_name.lower().strip():
                     found_item = True
                     if tool.checkKeyword(keyword):
-                        tool.onUse(engine, amount)
+                        function_memory = FunctionMemory(engine)
+                        function_memory.addContextData({
+                            "#player": player,
+                            "#tool": tool
+                        })
+                        tool.onUse(function_memory, amount)
 
         if not found_item:
             engine.sendOutput(player, f"You do not have '{item_name}'")

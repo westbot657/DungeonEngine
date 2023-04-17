@@ -7,9 +7,13 @@ except ImportError:
     from EngineDummy import Engine
     from EngineErrors import MemoryError
 
+import json
 
 class FunctionMemory:
     _instance = None
+
+    with open(f"./resources/environment_variables.json", "r+", encoding="utf-8") as f:
+        global_environment_variables = json.load(f)
 
     def __new__(cls):
         if not cls._instance:
@@ -35,9 +39,21 @@ class FunctionMemory:
         self.symbol_table.update({name, value})
         
     def ref(self, name:str):
-        if name in self.symbol_table:
-            return self.symbol_table[name]
-        raise MemoryError(f"Variable referenced before assignment: '{name}'")
+
+        if name.startswith("%"):
+            if name in self.global_environment_variables:
+                return self.global_environment_variables[name]
+            raise MemoryError(f"Global environment variable not defined: '{name}'")
+
+        elif name.startswith("."):
+            if name in self.context_data:
+                return self.context_data[name]
+            raise MemoryError(f"Local context variable not defined: '{name}'")
+
+        else:
+            if name in self.symbol_table:
+                return self.symbol_table[name]
+            raise MemoryError(f"Variable referenced before assignment: '{name}'")
 
     def clear(self):
         self.symbol_table.clear()
@@ -46,5 +62,9 @@ class FunctionMemory:
     def update(self, data:dict):
         self.symbol_table.update(data)
     
+
+
+if __name__ == "__main__":
+    pass
 
 

@@ -46,9 +46,6 @@ engine:tool/set_durability
 engine:tool/set_max_durability
 engine:tool/get_max_durability
 
-engine:random/uniform X
-engine:random/weighted
-
 engine:player/message
 engine:player/give_item
 engine:player/get_status_effect
@@ -63,6 +60,9 @@ engine:player/get_equipped_weapon
 engine:player/get_equipped_armor
 engine:player/has_item
 engine:player/get_item
+engine:player/get_input
+engine:player/set_location
+engine:player/get_location
 
 engine:status_effect/get_level
 engine:status_effect/set_level
@@ -95,52 +95,19 @@ engine:ammo/get_max_count
 engine:ammo/get_parent_type
 engine:ammo/get_bonus_damage
 
+
 engine:text/builder
 
+
+engine:random/uniform X
+engine:random/weighted
+
+engine:logic/compare
+
+engine:math/solve
+
+
 """
-
-####XXX###############XXX####
-### XXX Engine Random XXX ###
-####XXX###############XXX####
-
-class Engine_Random_Uniform(LoaderFunction):
-    id = Identifier("engine", "random/", "uniform")
-    return_type = int
-    @classmethod
-    def check(cls, engine:Engine, args:dict):
-        match args:
-            case {
-                "min": int(),
-                "max": int()
-            }: return cls.rand_range
-            case {
-                "rolls": int(),
-                "pools": list()
-            }: return cls.rand_choice
-            case _: return None
-    @staticmethod
-    def rand_range(engine, min, max):
-        return random.randint(min, max)
-    @staticmethod
-    def rand_choice(engine:Engine, rolls:int, pools:list[dict]):
-        table = LootTable.fromDict({"rolls": rolls, "pools": pools})
-        return table.roll(engine)
-
-class Engine_Random_Weighted(LoaderFunction):
-    id = Identifier("engine", "random/", "weighted")
-    @classmethod
-    def check(cls, engine:Engine, args:dict):
-        match args:
-            case {
-                "rolls": int(),
-                "pools": list()
-            }: return cls.weighted_table
-            case _: return None
-    @staticmethod
-    def weighted_table(engine:Engine, rolls:int, pools:list[dict]):
-        table = LootTable.fromDict({"rolls": rolls, "pools": pools})
-        return table.roll(engine)
-
 
 ####XXX#############XXX####
 ### XXX Engine Tool XXX####
@@ -626,6 +593,76 @@ class Engine_Player_GetEquippedTool(LoaderFunction):
             case {}: ...
             case _: return None
 
+class Engine_Player_GetInput(LoaderFunction): # NOTE: this function may (probably will) require special implementation
+    id = Identifier("engine", "player/", "get_input")
+    return_type = Tool
+    @classmethod
+    def check(cls, engine:Engine, args:dict):
+        match args:
+            case {}: ...
+            case _: return None
+
+class Engine_Player_SetLocation(LoaderFunction):
+    id = Identifier("engine", "player/", "set_location")
+    return_type = Tool
+    @classmethod
+    def check(cls, engine:Engine, args:dict):
+        match args:
+            case {}: ...
+            case _: return None
+            
+class Engine_Player_GetLocation(LoaderFunction):
+    id = Identifier("engine", "player/", "get_location")
+    return_type = Tool
+    @classmethod
+    def check(cls, engine:Engine, args:dict):
+        match args:
+            case {}: ...
+            case _: return None
+
+
+####XXX###############XXX####
+### XXX Engine Random XXX ###
+####XXX###############XXX####
+
+class Engine_Random_Uniform(LoaderFunction):
+    id = Identifier("engine", "random/", "uniform")
+    return_type = int
+    @classmethod
+    def check(cls, engine:Engine, args:dict):
+        match args:
+            case {
+                "min": int(),
+                "max": int()
+            }: return cls.rand_range
+            case {
+                "rolls": int(),
+                "pools": list()
+            }: return cls.rand_choice
+            case _: return None
+    @staticmethod
+    def rand_range(engine, min, max):
+        return random.randint(min, max)
+    @staticmethod
+    def rand_choice(engine:Engine, rolls:int, pools:list[dict]):
+        table = LootTable.fromDict({"rolls": rolls, "pools": pools})
+        return table.roll(engine)
+
+class Engine_Random_Weighted(LoaderFunction):
+    id = Identifier("engine", "random/", "weighted")
+    @classmethod
+    def check(cls, engine:Engine, args:dict):
+        match args:
+            case {
+                "rolls": int(),
+                "pools": list()
+            }: return cls.weighted_table
+            case _: return None
+    @staticmethod
+    def weighted_table(engine:Engine, rolls:int, pools:list[dict]):
+        table = LootTable.fromDict({"rolls": rolls, "pools": pools})
+        return table.roll(engine)
+
 
 ####XXX#############XXX####
 ### XXX Engine Text XXX ###
@@ -650,4 +687,30 @@ class Engine_Text_Builder(LoaderFunction):
                 out_text.append(element)
             elif isinstance(element, dict):
                 ...
+
+####XXX##############XXX####
+### XXX Engine Logic XXX ###
+####XXX##############XXX####
+class Engine_Logic_Compare(LoaderFunction):
+    id = Identifier("engine", "logic/", "compare")
+    return_type = Tool
+    @classmethod
+    def check(cls, engine:Engine, args:dict):
+        match args:
+            case {}: ...
+            case _: return None
+
+####XXX#############XXX####
+### XXX Engine Math XXX ###
+####XXX#############XXX####
+class Engine_Math_Solve(LoaderFunction):
+    id = Identifier("engine", "math/", "solve")
+    return_type = Tool
+    @classmethod
+    def check(cls, engine:Engine, args:dict):
+        match args:
+            case {}: ...
+            case _: return None
+
+
 

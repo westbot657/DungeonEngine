@@ -1,0 +1,8 @@
+{
+    "name": "Center Street",
+    "interactions": [
+        {
+            "type": "engine:passage"
+        }
+    ]
+}

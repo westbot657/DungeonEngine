@@ -1,0 +1,87 @@
+{
+    "fields": {
+        "target": {
+            "type": "engine:location",
+            "required": true
+        },
+        "travel_message": {
+            "type": "engine:text",
+            "required": false,
+            "default": "You enter the door."
+        },
+        "locked": {
+            "type": "engine:boolean",
+            "required": false,
+            "default": true
+        },
+        "lock_message": {
+            "type": "engine:text",
+            "required": false,
+            "default": "The door is locked."
+        },
+        "open_message": {
+            "type": "engine:text",
+            "required": false,
+            "default": "The door is open. Go through?"
+        },
+        "disengage_message": {
+            "type": "engine:text",
+            "required": false,
+            "default": "You step back from the door."
+        }
+    },
+    "interaction": [
+        {
+            "function": "engine:logic/compare",
+            "compare": {
+                "#ref": ".locked"
+            },
+            "true": {
+                "function": "engine:player/message",
+                "message": {
+                    "#ref": ".lock_message"
+                }
+            },
+            "false": {
+                "function": "engine:text/match",
+                "text": {
+                    "function" : "engine:player/get_input",
+                    "prompt": {
+                        "#ref": ".open_message"
+                    },
+                    "#store": "response"
+                },
+                "matches": [
+                    {
+                        "pattern": {
+                            "#ref": "%pattern/affirmation"
+                        },
+                        "functions": [
+                            {
+                                "function": "engine:player/message",
+                                "message": {
+                                    "#ref": ".travel_message"
+                                }
+                            },
+                            {
+                                "function": "engine:player/set_location",
+                                "location": {
+                                    "#ref": ".target"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "pattern": {
+                            "#ref": "%pattern/denial"
+                        },
+                        "function": "engine:player/message",
+                        "message": {
+                            "#ref": ".disengage_message"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

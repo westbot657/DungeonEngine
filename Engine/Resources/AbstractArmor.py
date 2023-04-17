@@ -129,6 +129,8 @@ class AbstractArmor(AbstractGameObject):
             else:
                 Log["ERROR"]["loadup"]["abstract"]["armor"](f"parent does not exist: '{p}'")
         
+        Log["loadup"]["abstract"]["armor"]("verifying AbstractArmor completion...")
+        Log.track(len(cls._loaded), "loadup", "abstract", "armor")
         for l, o in cls._loaded.copy().items():
             l: str
             o: AbstractArmor
@@ -137,10 +139,14 @@ class AbstractArmor(AbstractGameObject):
                 o.getDamageReduction()
                 o.getMaxDurability()
                 o.getDurability()
+                Log.success()
             except InvalidObjectError:
                 e: AbstractArmor = cls._loaded.pop(l)
-                print(f"Failed to load armor: {e.identifier}")
+                Log.ERROR("loadup", "abstract", "armor", f"failed to load armor: {e.identifier}")
 
+        Log.end_track()
+
+        Log["loadup"]["abstract"]["armor"]("AbstractArmor loading complete")
         return cls._loaded
 
 

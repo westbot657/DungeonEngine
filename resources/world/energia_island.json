@@ -1,11 +1,20 @@
 {
     "name": "Energia Island",
+    "default_dungeon": "energia_city",
     "dungeon_entrances": [
+        {
+            "dungeon": "energia_city",
+            "entrances": [
+                {
+                    "position": [0, 0]
+                }
+            ]
+        },
         {
             "dungeon": "example_dungeon",
             "entrances": [
                 {
-                    "position": [0, 0]
+                    "position": [0, 1]
                 },
                 {
                     "position": [3, 1],

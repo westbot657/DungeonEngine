@@ -66,6 +66,8 @@ class TextPattern:
 
     @staticmethod
     def interpretAmount(amount:str, max_available:int=-1) -> int:
+        if amount is None: return 1
+        
         if amount.isnumeric():
             return int(amount)
 

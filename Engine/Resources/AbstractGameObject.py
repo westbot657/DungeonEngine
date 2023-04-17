@@ -23,6 +23,22 @@ class AbstractGameObject:
         self.parent: AbstractGameObject|None = None
         self.is_template: bool = False
 
+    def is_parent_of(self, other):
+        p = other
+        while p is not None:
+            if self == p:
+                return True
+            p = p.parent
+        return False
+    
+    def inherets_from(self, other):
+        p = self
+        while p is not None:
+            if p == other:
+                return True
+            p = p.parent
+        return False
+
     def get_children(self, depth:int=-1): # recursive way to get a flat list of all sub children to some depth
         children = []
         for child in self.children:

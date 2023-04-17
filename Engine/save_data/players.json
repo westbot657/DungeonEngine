@@ -34,16 +34,16 @@
                 "equipped": true
             },
             {
-                "type": "engine:armor",
-                "parent": "a banana",
-                "data": {
-                    "wa": false
-                }
+                "type": "engine:tool",
+                "parent": "engine:tools/fishing_rod",
+                "equipped": true
             },
             {
                 "type": "engine:tool",
                 "parent": "engine:tools/test_tool",
-                "durability": 7
+                "data": {
+                    "durability": 7
+                }
             }
         ],
         "status_effects": [

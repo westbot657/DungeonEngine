@@ -45,7 +45,7 @@ class Inventory:
         for key in self.equips.keys():
             if self.equips[key] is gameObject:
                 self.equips[key] = self.defaults.get(key, None)
-                return
+                
     
     def getOfType(self, objectType:type|tuple[type]):
         matches = []
@@ -56,6 +56,12 @@ class Inventory:
 
     def isEquipped(self, gameObject:GameObject):
         return gameObject in self.equips.values()
+
+    def getEquipped(self, objectType:type):
+        for e in self.equips.values():
+            if isinstance(e, objectType):
+                return e
+        return None
 
     def unequipType(self, objectType:str):
         if objectType in self.equips:

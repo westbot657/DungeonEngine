@@ -103,6 +103,8 @@ class DungeonLoader:
                 r = f._call(engine, args)
                 # if a #store operator was present with the function, the function's result is assigned to the name in #store
                 if var := data.get("#store", None):
+                    var: str
+                    if var.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{var}'")
                     engine.function_memory.store(var, r)
                 return r
         elif (var := data.get("#ref", None)) is not None:
@@ -110,6 +112,7 @@ class DungeonLoader:
         elif (store := data.get("#store", None)) is not None:
             if isinstance(store, dict):
                 for key, value in store.items():
+                    if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
                     engine.function_memory.store(key, value)
         elif isinstance(data, dict):
             dat = {}
@@ -217,13 +220,28 @@ class DungeonLoader:
         
         item_name: str = groupdict["item_name"]
 
+        amount: int = TextPattern.interpretAmount(groupdict["amount"])
+
+        found_item = False
         for item in player.inventory.getOfType(Item):
             item: Item
             if item.name.lower().strip() == item_name.lower().strip():
+                found_item = True
                 if item.checkKeyword(keyword):
-                    ...
+                    item.onUse(engine, amount)
 
-        amount: int = TextPattern.interpretAmount(groupdict["amount"])
+        if not found_item:
+            if tool := player.inventory.getEquipped(Tool):
+                tool: Tool
+                if tool.name.lower().strip() == item_name.lower().strip():
+                    found_item = True
+                    if tool.checkKeyword(keyword):
+                        tool.onUse(engine, amount)
+
+        if not found_item:
+            engine.sendOutput(player, f"You do not have '{item_name}'")
+
+        
 
 
     @TextPattern(r"\b(inventory|bag|items)\b", TextPattern.CheckType.SEARCH)

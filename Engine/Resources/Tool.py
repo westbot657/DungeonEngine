@@ -26,10 +26,19 @@ class Tool(GameObject):
         self.max_durability = max_durability
         self.events = events
 
-    def onUse(self, engine:Engine):
+    def checkKeyword(self, keyword):
+        return keyword in self.abstract.getKeywords()
+
+    def onUse(self, engine:Engine, amount_used):
         if on_use := self.events.get("on_use", None):
+
             engine.function_memory.addContextData({
-                "tool": self
+                "#tool": self
+            })
+            engine.function_memory.update({
+                ".name": self.name,
+                ".durability": self.durability,
+                ".max_durability": self.max_durability,
             })
             res = engine.evaluateFunction(on_use)
             engine.function_memory.clear()

@@ -9,6 +9,17 @@ except ImportError:
 
 import json
 
+"""
+Function Memory:
+
+Variable Types:
+'%' - constant, global utility variables
+'.' - local environment variables
+'#' - global environment variables
+'' - local, temporary variables
+
+"""
+
 class FunctionMemory:
     _instance = None
 
@@ -29,7 +40,7 @@ class FunctionMemory:
         self.symbol_table.clear()
         self.context_data.clear()
 
-    def addContextData(self, **data):
+    def addContextData(self, data:dict):
         self.context_data.update(data)
 
     def checkPredicate(self, engine:Engine, predicate:dict):

@@ -75,21 +75,7 @@ class AbstractAmmo(AbstractGameObject):
             return b
         raise InvalidObjectError(f"Ammo has no max-count! ({self.identifier})")
 
-    def is_parent_of(self, other):
-        p = other
-        while p is not None:
-            if self == p:
-                return True
-            p = p.parent
-        return False
     
-    def inherets_from(self, other):
-        p = self
-        while p is not None:
-            if p == other:
-                return True
-            p = p.parent
-        return False
 
     def createInstance(self, engine:Engine, **override_values) -> Ammo:
         if self.is_template:

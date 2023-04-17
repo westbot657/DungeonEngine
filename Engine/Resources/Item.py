@@ -4,10 +4,12 @@ try:
     from .GameObject import GameObject
     from .Identifier import Identifier
     from .Util import Util
+    from .EngineDummy import Engine
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
     from Util import Util
+    from EngineDummy import Engine
 
 class Item(GameObject):
     identifier = Identifier("engine", "object/", "item")
@@ -20,6 +22,14 @@ class Item(GameObject):
 
     def checkKeyword(self, keyword):
         return keyword in self.abstract.getKeywords()
+
+    def onUse(self, engine:Engine, amount_used:int):
+        if on_use := self.events.get("on_use", None):
+            engine.function_memory.addContextData({
+                "tool": self
+            })
+            res = engine.evaluateFunction(on_use)
+            engine.function_memory.clear()
 
     def __repr__(self):
         return f"Item {self.name}: max_count:{self.max_count} count:{self.count} data:{self.data}"

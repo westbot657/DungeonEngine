@@ -3,9 +3,12 @@
 try:
     from .Identifier import Identifier
     from .EngineDummy import Engine
+    from .Logger import Log
+
 except ImportError:
     from Identifier import Identifier
     from EngineDummy import Engine
+    from Logger import Log
 
 from typing import Any
 
@@ -133,6 +136,7 @@ class LoaderFunction:
     @classmethod
     def _call(cls, engine, data:dict):
         # check args
+        Log["debug"]["loader function"](f"calling '{cls.__name__}' with data: '{data}'")
         if call := cls.check(engine, data):
             return call(engine, **data)
         else:

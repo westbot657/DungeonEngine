@@ -5,10 +5,12 @@ try:
     from .Identifier import Identifier
     from .EngineDummy import Engine
     from .Util import Util
+    from .Logger import Log
 except ImportError:
     from Identifier import Identifier
     from EngineDummy import Engine
     from Util import Util
+    from Logger import Log
 
 import random
 
@@ -25,6 +27,7 @@ class LootEntry:
 
     def calcWeight(self, engine:Engine, curr_weight:float, num_entries_calculated:int, num_entries_total:int) -> float:
         if weight := self.data.get("weight", None): # all entries with specified weight should be calculated before ones with unspecified
+            Log["debug"]["fishing rod"](f"weight: {weight}")
             weight = engine.evaluateFunction(weight)
             if curr_weight + weight > 1.0:
                 raise Exception(f"Weighted LootTable has too much weight! ({curr_weight} + {weight} = {curr_weight+weight})")

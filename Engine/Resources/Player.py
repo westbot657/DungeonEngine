@@ -29,6 +29,12 @@ class Player(Entity):
         self.status_effects = StatusEffectManager()
         super().__init__(location)
 
+    def addHealth(self, health):
+        self.health = min(self.max_health, self.health + health)
+
+    def setHealth(self, health):
+        self.health = min(max(0, health), self.max_health)
+
     def _get_save(self, engine:Engine):
         data = {
             "id": self.discord_id,

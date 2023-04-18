@@ -9,9 +9,13 @@ except ImportError:
 
 class StatusEffect:
 
-    def __init__(self, abstract):
+    def __init__(self, abstract, name:str, level:int, duration:float|int, cause, events:dict):
         self.abstract = abstract
-        ...
+        self.name = name
+        self.level = level
+        self.duration = duration
+        self.cause = cause
+        self.events = events
 
     def _get_save(self, engine:Engine):
         ...

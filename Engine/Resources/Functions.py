@@ -367,8 +367,14 @@ class Engine_StatusEffect_GetLevel(LoaderFunction):
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
-            case {}: ...
+            case {
+                "status_effect": StatusEffect()|None,
+                "default": int()
+            }: ...
             case _: return None
+    @staticmethod
+    def get_level(function_memory:FunctionMemory, status_effect:StatusEffect|None, default:int):
+        ...
 class Engine_StatusEffect_SetLevel(LoaderFunction):
     id = Identifier("engine", "status_effect/", "set_level")
     @classmethod
@@ -510,7 +516,8 @@ class Engine_Player_Heal(LoaderFunction):
             case _: return None
     @staticmethod
     def heal(function_memory:FunctionMemory, amount:int|dict):
-        function_memory.engine
+        player = function_memory.ref("#player")
+        player.addHealth(amount)
 class Engine_Player_Damage(LoaderFunction):
     id = Identifier("engine", "player/", "damage")
     @classmethod
@@ -551,8 +558,14 @@ class Engine_Player_GetStatusEffect(LoaderFunction):
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
-            case {}: ...
+            case {
+                "status_effect": str()|None,
+                "default": dict()|None
+            }: return cls.get_status_effect
             case _: return None
+    @staticmethod
+    def get_status_effect(function_memory, status_effect, default) -> StatusEffect:
+        ...
 class Engine_Player_HasItem(LoaderFunction):
     id = Identifier("engine", "player/", "has_item")
     return_type = bool
@@ -649,7 +662,7 @@ class Engine_Random_Uniform(LoaderFunction):
             }: return cls.rand_choice
             case _: return None
     @staticmethod
-    def rand_range(engine, min, max):
+    def rand_range(function_memory:FunctionMemory, min, max):
         return random.randint(min, max)
     @staticmethod
     def rand_choice(function_memory:FunctionMemory, rolls:int, pools:list[dict]):

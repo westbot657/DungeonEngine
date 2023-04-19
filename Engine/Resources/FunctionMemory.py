@@ -58,7 +58,7 @@ class FunctionMemory:
                 return self.global_environment_variables[name]
             raise MemoryError(f"Global environment variable not defined: '{name}'")
 
-        elif name.startswith("."):
+        elif name.startswith("#"):
             if name in self.context_data:
                 return self.context_data[name]
             raise MemoryError(f"Local context variable not defined: '{name}'")

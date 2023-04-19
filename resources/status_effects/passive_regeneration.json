@@ -1,0 +1,74 @@
+{
+    "name": "Passive Regeneration",
+    "duration": -1,
+    "level": 1,
+    "data": {
+        "delay": {
+            "function": "engine:math/solve",
+            "multiply": [
+                {
+                    "divide": [
+                        1,
+                        {
+                            "#ref": ".level"
+                        }
+                    ]
+                },
+                20
+            ]
+        }
+    },
+    "events": {
+        "on_tick": {
+            "functions": [
+                {
+                    "function": "engine:math/solve",
+                    "subtract": [
+                        {
+                            "#ref": ".delay"
+                        },
+                        1
+                    ],
+                    "#store": ".delay"
+                },
+                {
+                    "@check": {
+                        "function": "engine:logic/compare",
+                        "<=": [
+                            {
+                                "#ref": ".delay"
+                            },
+                            0
+                        ]
+                    },
+                    "true": {
+                        "functions": [
+                            {
+                                "#store": {
+                                    "delay": {
+                                        "function": "engine:math/solve",
+                                        "multiply": [
+                                            {
+                                                "divide": [
+                                                    1,
+                                                    {
+                                                        "#ref": ".level"
+                                                    }
+                                                ]
+                                            },
+                                            20
+                                        ]
+                                    }
+                                }
+                            },
+                            {
+                                "function": "engine:player/heal",
+                                "amount": 1
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+}

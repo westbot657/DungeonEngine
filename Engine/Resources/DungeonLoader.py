@@ -119,6 +119,14 @@ class DungeonLoader:
                     for key, value in store.items():
                         if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
                         function_memory.store(key, value)
+            elif (check := data.get("@check", None)) is not None:
+                res = self._evaluateFunction(function_memory, check)
+                if res and ((true_branch := data.get("true", None)) is not None):
+                    return self._evaluateFunction(function_memory, true_branch)
+                elif (false_branch := data.get("false", None)) is not None:
+                    return self._evaluateFunction(function_memory, false_branch)
+                else:
+                    return None
             else:
                 dat = {}
                 for key, item in data.items():

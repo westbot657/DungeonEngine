@@ -12,25 +12,19 @@
             {
                 "type": "engine:armor",
                 "parent": "engine:armor/leather_armor",
-                "data": {
-                    "durability": 15
-                },
+                "durability": 15,
                 "equipped": true
             },
             {
                 "type": "engine:item",
                 "parent": "engine:items/stick",
-                "data": {
-                    "count": 35
-                }
+                "count": 35
             },
             {
                 "type": "engine:weapon",
                 "parent": "engine:weapons/sword",
-                "data": {
-                    "name": "Rusty Sword",
-                    "durability": 23
-                },
+                "name": "Rusty Sword",
+                "durability": 23,
                 "equipped": true
             },
             {
@@ -41,9 +35,7 @@
             {
                 "type": "engine:tool",
                 "parent": "engine:tools/test_tool",
-                "data": {
-                    "durability": 7
-                }
+                "durability": 7
             }
         ],
         "status_effects": [

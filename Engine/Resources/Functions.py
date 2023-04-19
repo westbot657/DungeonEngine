@@ -729,9 +729,55 @@ class Engine_Math_Solve(LoaderFunction):
     return_type = Tool
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case {}: ...
-            case _: return None
+        return cls.solve
+    
+    @classmethod
+    def solve(cls, function_memory:FunctionMemory, **args):
+        return cls._solve(args)
 
+    @classmethod
+    def _solve(cls, branch):
+        if isinstance(branch, dict):
+            match branch:
+                case {
+                    "add": list()
+                }:
+                    return sum([cls._solve(a) for a in branch["add"]])
+                
+                case {
+                    "subtract": list()
+                }:
+                    return sum([-cls._solve(s) for s in branch["subtract"]], cls._solve(branch["subtract"][0])*2)
+                
+                case {
+                    "multiply": list()
+                }:
+                    mx = branch["multiply"]
+                    m = cls._solve(mx.pop(0))
+                    while mx:
+                        m *= cls._solve(mx.pop(0))
+                    return m
+                
+                case {
+                    "divide": list()
+                }:
+                    dx = branch["divide"]
+                    d = cls._solve(dx.pop(0))
+                    while dx:
+                        d /= cls._solve(dx.pop(0))
+                    return d
+                
+                case {
+                    "max": list()
+                }:
+                    return max([cls._solve(m) for m in branch["max"]])
+                
+                case {
+                    "min": list()
+                }:
+                    return min([cls._solve(m) for m in branch["min"]])
 
+        else:
+            return branch
+            
 

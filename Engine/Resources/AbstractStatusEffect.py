@@ -2,10 +2,17 @@
 
 try:
     from .StatusEffect import StatusEffect
+    from .EngineErrors import InvalidObjectError
     from .Identifier import Identifier
+    from .StatusEffectCause import StatusEffectCause
+    from .Logger import Log
 except ImportError:
     from StatusEffect import StatusEffect
+    from EngineErrors import InvalidObjectError
     from Identifier import Identifier
+    from StatusEffectCause import StatusEffectCause
+    from Logger import Log
+
 
 import glob, json, re
 
@@ -22,7 +29,6 @@ class AbstractStatusEffect:
         if "parent" in data:
             AbstractStatusEffect._link_parents.append((self, data["parent"]))
 
-
         self.name: str|None = data.get("name", None)
         self.level: int|None = data.get("level", None)
         self.duration: int|None = data.get("duration", None)
@@ -32,8 +38,109 @@ class AbstractStatusEffect:
 
         self.is_template: bool = data.get("template", False)
 
+    def getName(self):
+        n = self.name or (self.parent.getName() if self.parent else None)
+        if n is not None: return n
+        raise InvalidObjectError(f"StatusEffect has no name! ({self.identifier})")
+
+    def getLevel(self):
+        if self.level is None:
+            l = self.parent.getLevel() if self.parent else None
+        else:
+            l = self.level
+        if l is not None:
+            return l
+        raise InvalidObjectError(f"StatusEffect has no level! ({self.identifier})")
+    
+    def getDuration(self):
+        if self.duration is None:
+            d = self.parent.getDuration() if self.parent else None
+        else:
+            d = self.duration
+        if d is not None:
+            return d
+        return 1
+        # raise InvalidObjectError(f"StatusEffect has no duration! ({self.identifier})")
+
+    def getCause(self):
+        if self.cause is None:
+            c = self.parent.getCause() if self.parent else None
+        else:
+            c = self.cause
+        if c is not None:
+            return c
+        return StatusEffectCause.getCauseType()
+        # raise InvalidObjectError(f"StatusEffect has no cause! ({self.identifier})") # *existential crisis*
+
+    def getEvents(self):
+        return self.events or {}
+
+    def createInstance(self, **override_values):
+        if self.is_template:
+            ...
+        else:
+            return StatusEffect(self,
+                override_values.get("name", self.getName()),
+                override_values.get("level", self.getLevel()),
+                override_values.get("duration", self.getDuration()),
+                self.getCause(),
+                self.getEvents()
+            )
 
     @classmethod
     def loadData(cls, engine) -> list:
-        ...
+        files: list[str] = glob.glob("**/status_effects/*.json", recursive=True)
+
+        Log["loadup"]["abstract"]["status effect"](f"found {len(files)} status effect files")
+        for file in files:
+            file: str
+            Log["loadup"]["abstract"]["status effect"](f"loading AbstractStatusEffect from '{file}'")
+            with open(file, "r+", encoding="utf-8") as f:
+                data = json.load(f)
+            
+            Id = Identifier.fromFile(file)
+            cls._loaded.update({Id.full(): cls(Id, data)})
+
+        Log["loadup"]["abstract"]["status effect"]("linking AbstractStatusEffect parents...")
+        for a, p in cls._link_parents:
+            a: AbstractStatusEffect
+            p: str
+            if parent := cls._loaded.get(p, None):
+                if parent is a:
+                    Log["ERROR"]["loadup"]["abstract"]["status effect"]("cannot set object as it's own parent")
+                    continue
+                elif parent in a.get_parent_chain():
+                    Log["ERROR"]["loadup"]["abstract"]["status effect"]("circular parent loop found")
+                    continue
+                a._set_parent(parent)
+            else:
+                Log["ERROR"]["loadup"]["abstract"]["status effect"](f"parent does not exist: '{p}'")
+        
+        Log["loadup"]["abstract"]["status effect"]("verifying AbstractStatusEffect completion...")
+        Log.track(len(cls._loaded), "loadup", "abstract", "status_effetcs")
+        for l, o in cls._loaded.copy().items():
+            l: str
+            o: AbstractStatusEffect
+            if o.is_template:
+                Log.success()
+                continue
+            try:
+                o.getName()
+                o.getLevel()
+                o.getDuration()
+                o.getCause()
+                Log.success()
+            except InvalidObjectError:
+                e: AbstractStatusEffect = cls._loaded.pop(l)
+                Log.ERROR("loadup", "abstract", "status effect", f"failed to load status effect: {e.identifier}")
+
+        Log.end_track()
+
+        Log["loadup"]["abstract"]["status effect"]("AbstractStatusEffect loading complete")
+        return cls._loaded
+
+
+if __name__ == "__main__":
+    print(AbstractStatusEffect.loadData(None))
+
 

@@ -91,8 +91,8 @@ class AbstractTool(AbstractGameObject):
         else:
             return Tool(self,
                 override_values.get("name", self.getName()),
-                override_values.get("max_durability", self.getMaxDurability()),
                 DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(engine),
+                override_values.get("max_durability", self.getMaxDurability()),
                 self.getEvents()
             )
     

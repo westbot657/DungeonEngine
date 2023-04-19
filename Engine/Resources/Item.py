@@ -35,7 +35,7 @@ class Item(GameObject):
         return f"Item {self.name}: max_count:{self.max_count} count:{self.count} data:{self.data}"
 
     def fullStats(self, engine, _):
-        return f"{self.name}  {Util.getDurabilityBar(self.count, self.max_count)}"
+        return f"{self.name}  {self.count}/{self.max_count}"
 
     def quickStats(self, engine):
         return f"{self.name}  {self.count}/{self.max_count}"

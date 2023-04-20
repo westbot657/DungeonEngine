@@ -40,7 +40,7 @@
         ],
         "status_effects": [
             {
-                "effect": "engine:passive_regeneration",
+                "effect": "engine:status_effects/passive_regeneration",
                 "tick": 232
             }
         ]

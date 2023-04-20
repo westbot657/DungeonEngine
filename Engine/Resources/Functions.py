@@ -541,7 +541,7 @@ class Engine_Player_GiveObject(LoaderFunction):
     @classmethod
     def giveObject(cls, function_memory:FunctionMemory, **kwargs):
         object_name = Identifier.fromString(kwargs.get("object"))
-        count = kwargs.get("count", 1)
+        count = int(kwargs.get("count", 1))
 
         game_object = function_memory.engine.loader.constructGameObject(
             function_memory,
@@ -747,9 +747,124 @@ class Engine_Logic_Compare(LoaderFunction):
     return_type = Tool
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case {}: ...
-            case _: return None
+        return cls.compare
+    @classmethod
+    def compare(cls, function_memory:FunctionMemory, **args):
+        return cls._compare(args)
+    
+    @classmethod
+    def _compare(cls, branch):
+        if isinstance(branch, dict):
+            match branch:
+                case {
+                    "==": list()
+                }:
+                    ls = branch["=="].copy()
+                    ls.append(None) # add a thing so that last 2 items before this get checked
+                    x = ls.pop(0)
+                    y = ls.pop(0)
+
+                    while ls:
+                        if not (cls._compare(x) == cls._compare(y)):
+                            return False
+                        x = y
+                        y = ls.pop(0)
+                    return True
+                
+                case {
+                    "!=": list()
+                }:
+                    ls = branch["!="].copy()
+                    ls.append(None) # add a thing so that last 2 items before this get checked
+                    x = ls.pop(0)
+                    y = ls.pop(0)
+
+                    while ls:
+                        if not (cls._compare(x) != cls._compare(y)):
+                            return False
+                        x = y
+                        y = ls.pop(0)
+                    return True
+                
+                case {
+                    "<": list()
+                }:
+                    ls = branch["<"].copy()
+                    ls.append(None) # add a thing so that last 2 items before this get checked
+                    x = ls.pop(0)
+                    y = ls.pop(0)
+
+                    while ls:
+                        if not (cls._compare(x) < cls._compare(y)):
+                            return False
+                        x = y
+                        y = ls.pop(0)
+                    return True
+                
+                case {
+                    "<=": list()
+                }:
+                    ls = branch["<="].copy()
+                    ls.append(None) # add a thing so that last 2 items before this get checked
+                    x = ls.pop(0)
+                    y = ls.pop(0)
+
+                    while ls:
+                        if not (cls._compare(x) <= cls._compare(y)):
+                            return False
+                        x = y
+                        y = ls.pop(0)
+                    return True
+                case {
+                    ">": list()
+                }:
+                    ls = branch[">"].copy()
+                    ls.append(None) # add a thing so that last 2 items before this get checked
+                    x = ls.pop(0)
+                    y = ls.pop(0)
+
+                    while ls:
+                        if not (cls._compare(x) > cls._compare(y)):
+                            return False
+                        x = y
+                        y = ls.pop(0)
+                    return True
+                case {
+                    ">=": list()
+                }:
+                    ls = branch[">="].copy()
+                    ls.append(None) # add a thing so that last 2 items before this get checked
+                    x = ls.pop(0)
+                    y = ls.pop(0)
+
+                    while ls:
+                        if not (cls._compare(x) >= cls._compare(y)):
+                            return False
+                        x = y
+                        y = ls.pop(0)
+                    return True
+                case {
+                    "and": list()
+                }:
+                    ls = branch["and"].copy()
+                    for l in ls:
+                        if not cls._compare(l):
+                            return False
+                    return True
+                case {
+                    "or": list()
+                }:
+                    ls = branch["or"].copy()
+                    for l in ls:
+                        if cls._compare(l):
+                            return True
+                    return False
+                case {
+                    "not": dict()|bool()
+                }:
+                    return not cls._compare(branch["not"])
+        else:
+            return branch
 
 ####XXX#############XXX####
 ### XXX Engine Math XXX ###

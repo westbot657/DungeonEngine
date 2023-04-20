@@ -64,7 +64,9 @@ class Tool(GameObject):
         if on_break := self.events.get("on_break", None):
             self.prepFunctionMemory(function_memory)
             res = function_memory.evaluateFunction(on_break)
-            # function_memory.clear()
+
+        if self.durability <= 0:
+            function_memory.ref("#player").inventory.removeObject(self)
 
     def onDamage(self, function_memory:FunctionMemory):
         if on_damage := self.events.get("on_damage", None):

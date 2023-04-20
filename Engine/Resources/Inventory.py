@@ -48,7 +48,27 @@ class Inventory:
             if self.equips[key] is gameObject:
                 self.equips[key] = self.defaults.get(key, None)
                 
+    def removeObject(self, game_object:GameObject):
+        if game_object in self.contents:
+            if self.isEquipped(game_object):
+                self.unequipObject(game_object)
+            self.contents.remove(game_object)
+
     def addObject(self, game_object:GameObject):
+
+        if hasattr(game_object, "count"):
+            for obj in self.contents:
+                if obj.abstract == game_object.abstract:
+                    if obj.count < obj.max_count == game_object.max_count:
+                        diff = obj.max_count - obj.count
+                        if diff < game_object.count:
+                            game_object.count -= diff
+                            obj.count = obj.max_count
+                            break
+                        else:
+                            obj.count += game_object.count
+                            return
+
         self.contents.append(game_object)
     
     def getOfType(self, objectType:type|tuple[type]):
@@ -74,6 +94,7 @@ class Inventory:
     def fullStats(self, engine):
         equip_stats = []
         for v in self.equips.values():
+            if v is None: continue
             if (b := v.bonuses(engine)) is not None: equip_stats.append(b)
         
         out = []

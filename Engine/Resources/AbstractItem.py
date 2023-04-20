@@ -100,8 +100,8 @@ class AbstractItem(AbstractGameObject):
         else:
             return Item(self,
                 override_values.get("name", self.getName()),
-                override_values.get("max_count", self.getMaxCount()),
-                DynamicValue(override_values.get("count", self.getCount())).getCachedOrNew(function_memory),
+                int(override_values.get("max_count", self.getMaxCount())),
+                int(DynamicValue(override_values.get("count", self.getCount())).getCachedOrNew(function_memory)),
                 DynamicValue(override_values.get("data", self.getData()))
             )
 

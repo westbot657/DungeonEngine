@@ -53,18 +53,19 @@ class Engine:
         self.io_hook = io_hook
         self.loader: DungeonLoader = DungeonLoader()
         #self.function_memory: FunctionMemory = FunctionMemory()
+        self._function_memory = FunctionMemory(self)
         self.default_input_handler = self._default_input_handler
         self.players = []
         #self.default_input_handler.send(None)
 
     def evaluateFunction(self, data:dict, function_memory:FunctionMemory=None, context_data:dict=None, local_variables:dict=None):
-        if not function_memory:
+        if function_memory is None:
             function_memory = FunctionMemory(self)
         if context_data:
             function_memory.addContextData(context_data)
         if local_variables:
             function_memory.update(local_variables)
-        return function_memory.evaluateFunction(data)
+        return self.loader.evaluateFunction(function_memory, data)
 
     def loadGame(self):
         self.loader.loadGame(self)
@@ -104,13 +105,15 @@ class Engine:
                 # TODO: checks for stuff like moving, inventory stuff, etc...
 
                 if player_id == 0: # id 0 means engine basically
-                    ConsoleCommand.handle_input(self, text)
+                    self._function_memory.clear()
+                    ConsoleCommand.handle_input(self._function_memory, text)
 
                 elif player := self.getPlayer(player_id, None):
                     #print(f"{player=}")
 
                     #try:
-                    TextPattern.handleInput(self, player, text)
+                    self._function_memory.clear()
+                    TextPattern.handleInput(self._function_memory, player, text)
                     #except Exception as e:
                     #    Log["ERROR"]["engine"]["input-handler"]("\n" + "\n".join(e.args))
                         

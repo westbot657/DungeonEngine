@@ -22,7 +22,7 @@ class StatusEffectManager:
     def fullStats(self):
         return ""
 
-    def _get_save(self, engine:Engine):
+    def _get_save(self, function_memory):
         ...
     
     

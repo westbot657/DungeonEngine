@@ -21,7 +21,7 @@ class ConsoleCommand:
         self.command_exec = command_exec
         ConsoleCommand._commands.update({self.identity.full(): self})
 
-    def call(self, engine, *args):
+    def call(self, function_memory, *args):
         raise FunctionCallError(f"Command: '{self.identity.full()}' is not properly defined")
 
     @classmethod
@@ -88,7 +88,8 @@ class ConsoleCommand:
 
 
     @classmethod
-    def _parse_args(cls, engine, arg_tree:dict|None, text:str) -> list|None:
+    def _parse_args(cls, function_memory, arg_tree:dict|None, text:str) -> list|None:
+        engine = function_memory.engine
         args = []
         for arg, con in arg_tree.items():
             arg: str
@@ -176,29 +177,29 @@ class ConsoleCommand:
                     pass
 
 
-    def _run(self, engine, text:str):
-        args = ConsoleCommand._parse_args(engine, self.args, text)
+    def _run(self, function_memory, text:str):
+        args = ConsoleCommand._parse_args(function_memory, self.args, text)
 
 
     @classmethod
-    def handle_input(cls, engine, text:str):
+    def handle_input(cls, function_memory, text:str):
         values = []
         cmd, text = text.split(" ", 1)
 
         if command := cls._commands.get(cmd, None):
             try:
-                command._run(engine, text)
+                command._run(function_memory, text)
             except Exception as e:
                 print(e, e.args)
                 return
         else:
-            engine.io_hook.sendOutput(0, f"There is no command by the name '{cmd}'")
+            function_memory.engine.io_hook.sendOutput(0, f"There is no command by the name '{cmd}'")
             return
 
 
     @classmethod
-    def call_command(cls, engine, command:str, args:list):
+    def call_command(cls, function_memory, command:str, args:list):
         if cmd := cls._commands.get(command, None):
-            return cmd.call(engine, *args)
+            return cmd.call(function_memory, *args)
         raise FunctionCallError(f"No command exists by the name '{command}'")
 

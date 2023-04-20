@@ -35,15 +35,15 @@ class Player(Entity):
     def setHealth(self, health):
         self.health = min(max(0, health), self.max_health)
 
-    def _get_save(self, engine:Engine):
+    def _get_save(self, function_memory):
         data = {
             "id": self.discord_id,
             "name": self.name,
             "max_health": self.max_health,
             "health": self.health,
-            "location": self.location._get_save(engine),
-            "inventory": self.inventory._get_save(engine),
-            "status_effects": self.status_effects._get_save(engine)
+            "location": self.location._get_save(function_memory),
+            "inventory": self.inventory._get_save(function_memory),
+            "status_effects": self.status_effects._get_save(function_memory)
         }
 
     def __repr__(self):
@@ -57,7 +57,7 @@ class Player(Entity):
         ]).strip()
 
     @classmethod
-    def loadData(cls, engine:Engine) -> list:
+    def loadData(cls, engine) -> list:
 
         Inventory._default_equips = {
             "engine:weapon": engine.loader.abstract_weapons["engine:weapons/unnarmed_strike"],
@@ -86,7 +86,7 @@ class Player(Entity):
         return cls._loaded
 
     @classmethod
-    def saveData(cls, engine:Engine):
+    def saveData(cls, engine):
         # TODO: implement this
         pass
 

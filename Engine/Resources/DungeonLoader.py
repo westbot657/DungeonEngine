@@ -181,7 +181,7 @@ class DungeonLoader:
     def constructWeapon(self, data:dict) -> Weapon:
         ...
     
-    def constructGameObject(self, engine, data:dict) -> GameObject:
+    def constructGameObject(self, function_memory:FunctionMemory, data:dict) -> GameObject:
         Log["loadup"]["loader"]("Constructing new GameObject...")
         if obj_type := data.get("type", None):
             identifier = Identifier.fromString(obj_type)
@@ -191,7 +191,7 @@ class DungeonLoader:
                 if parent := data.get("parent", None):
                     if abstract := tp._loaded.get(parent, None):
                         Log["loadup"]["loader"]("GameObject Construction complete")
-                        return abstract.createInstance(engine, **data)
+                        return abstract.createInstance(function_memory, **data)
                     raise InvalidObjectError(f"No parent GameObject with id: '{parent}'")
             raise InvalidObjectError(f"GameObject type: '{nm}' does not exist")
         elif parent := data.get("parent", None):
@@ -203,7 +203,7 @@ class DungeonLoader:
 
     @TextPattern(r"\b(?:equip) *(?P<item_name>.*)\b")
     @staticmethod
-    def checkTextEquip(engine:Engine, player:Player, raw_text:str, groupdict:dict):
+    def checkTextEquip(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         item_name: str = groupdict["item_name"].strip()
 
         for weapon in player.inventory.getOfType(Weapon):
@@ -224,11 +224,11 @@ class DungeonLoader:
                         player.inventory.equip("engine:tool", tool)
                         break
                 else:
-                    engine.sendOutput(player, f"You have no Weapon, Armor, or Tool called '{item_name}'")
+                    function_memory.engine.sendOutput(player, f"You have no Weapon, Armor, or Tool called '{item_name}'")
 
     @TextPattern(r"\b(?P<keyword>use|eat|throw|apply|drink)(?: *(?P<amount>[1-9][0-9]*|an?|the|(?:some|all) *(?:(?:of *)?(?:the|my)))?)? *(?P<item_name>.*)\b")
     @staticmethod
-    def checkTextUse(engine:Engine, player:Player, raw_text:str, groupdict:dict):
+    def checkTextUse(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         keyword: str = groupdict["keyword"]
         
         item_name: str = groupdict["item_name"]
@@ -242,12 +242,12 @@ class DungeonLoader:
                 found_item = True
                 if item.checkKeyword(keyword):
                     
-                    function_memory = FunctionMemory(engine)
-                    function_memory.addContextData({
+                    function_memory_1 = FunctionMemory(function_memory.engine)
+                    function_memory_1.addContextData({
                         "#player": player,
                         "#item": item
                     })
-                    item.onUse(function_memory, amount)
+                    item.onUse(function_memory_1, amount)
 
         if not found_item:
             if tool := player.inventory.getEquipped(Tool):
@@ -255,23 +255,23 @@ class DungeonLoader:
                 if tool.name.lower().strip() == item_name.lower().strip():
                     found_item = True
                     if tool.checkKeyword(keyword):
-                        function_memory = FunctionMemory(engine)
-                        function_memory.addContextData({
+                        function_memory_1 = FunctionMemory(function_memory.engine)
+                        function_memory_1.addContextData({
                             "#player": player,
                             "#tool": tool
                         })
-                        tool.onUse(function_memory, amount)
+                        tool.onUse(function_memory_1, amount)
 
         if not found_item:
-            engine.sendOutput(player, f"You do not have '{item_name}'")
+            function_memory.engine.sendOutput(player, f"You do not have '{item_name}'")
 
         
 
 
     @TextPattern(r"\b(inventory|bag|items)\b", TextPattern.CheckType.SEARCH)
     @staticmethod
-    def checkTextInventory(engine:Engine, player:Player, raw_text:str, groupdict:dict):
-        engine.sendOutput(player, player.inventory.fullStats(engine))
+    def checkTextInventory(function_memory, player:Player, raw_text:str, groupdict:dict):
+        function_memory.engine.sendOutput(player, player.inventory.fullStats(function_memory.engine))
 
     def getAmmo(self, identifier:Identifier|str) -> AbstractAmmo:
         identifier: Identifier = Identifier.fromString(identifier)

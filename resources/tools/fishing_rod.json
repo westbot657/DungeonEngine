@@ -60,7 +60,7 @@
                                 },
                                 "functions": [
                                     {
-                                        "function": "engine:player/give_item",
+                                        "function": "engine:player/give_object",
                                         "item-parent": "engine:items/fish",
                                         "count": 1
                                     },

@@ -85,13 +85,13 @@ class AbstractTool(AbstractGameObject):
             words += [word for word in self.parent.getKeywords() if word not in words]
         return words
 
-    def createInstance(self, engine:Engine, **override_values) -> Tool:
+    def createInstance(self, function_memory, **override_values) -> Tool:
         if self.is_template:
             ...
         else:
             return Tool(self,
                 override_values.get("name", self.getName()),
-                DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(engine),
+                DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(function_memory),
                 override_values.get("max_durability", self.getMaxDurability()),
                 self.getEvents()
             )

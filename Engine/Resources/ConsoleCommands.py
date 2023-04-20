@@ -18,7 +18,7 @@ except ImportError:
         }
     }
 )
-def engine_NewPlayer(engine, player_id, max_health, name):
+def engine_NewPlayer(function_memory, player_id, max_health, name):
     ...
 
 
@@ -28,8 +28,8 @@ def engine_NewPlayer(engine, player_id, max_health, name):
         "function:dict": None
     }
 )
-def engine_runFunction(engine, function):
-    engine.loader.evaluateFunction(engine, function)
+def engine_runFunction(function_memory, function):
+    function_memory.evaluateFunction(function)
 
 
 @ConsoleCommand(
@@ -42,7 +42,7 @@ def engine_runFunction(engine, function):
         }
     }
 )
-def engine_giveGameObject(engine, target, objectType, gameObject):
+def engine_giveGameObject(function_memory, target, objectType, gameObject):
     ...
 
 

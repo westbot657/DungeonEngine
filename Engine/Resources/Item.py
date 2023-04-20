@@ -23,12 +23,12 @@ class Item(GameObject):
     def checkKeyword(self, keyword):
         return keyword in self.abstract.getKeywords()
 
-    def onUse(self, engine:Engine, amount_used:int):
+    def onUse(self, function_memory, amount_used:int):
         if on_use := self.events.get("on_use", None):
-            engine.function_memory.addContextData({
+            function_memory.addContextData({
                 "#tool": self
             })
-            res = engine.evaluateFunction(on_use)
+            res = function_memory.evaluateFunction(on_use)
 
     def __repr__(self):
         return f"Item {self.name}: max_count:{self.max_count} count:{self.count} data:{self.data}"

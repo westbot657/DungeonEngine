@@ -118,7 +118,7 @@ class AbstractWeapon(AbstractGameObject):
             return abstract
         raise InvalidObjectError(f"AmmoType: '{tp}' does not exist")
 
-    def createInstance(self, engine:Engine, **value_overrides) -> Weapon:
+    def createInstance(self, function_memory, **value_overrides) -> Weapon:
         if self.is_template:
             # go through children (and sub children probably) and pick a random one?
             # or
@@ -130,7 +130,7 @@ class AbstractWeapon(AbstractGameObject):
                 DynamicValue(value_overrides.get("damage", self.getDamage())),
                 DynamicValue(value_overrides.get("range", self.getRange())),
                 value_overrides.get("max_durability", self.getMaxDurability()),
-                DynamicValue(value_overrides.get("durability", self.getDurability())).getCachedOrNew(engine),
+                DynamicValue(value_overrides.get("durability", self.getDurability())).getCachedOrNew(function_memory),
                 self._assertAmmoType(value_overrides.get("ammo_type", self.getAmmoType()))
             )
 

@@ -34,33 +34,33 @@ class TextPattern:
         self.eval_method = eval_method
     
     @classmethod
-    def handleInput(cls, engine:Engine, player, text:str):
+    def handleInput(cls, function_memory, player, text:str):
         for pattern in cls._patterns:
-            matched, ret = pattern.check(engine, player, text)
+            matched, ret = pattern.check(function_memory, player, text)
             if matched:
                 return ret
 
-    def check(self, engine:Engine, player, text:str) -> tuple[bool, Any]:
+    def check(self, function_memory, player, text:str) -> tuple[bool, Any]:
         if self.check_type == TextPattern.CheckType.MATCH:
             # Log["debug"]["text pattern"]("match-type")
             # Log["debug"]["text pattern"](f"regex: r'{self.regex}'")
             # Log["debug"]["text pattern"](f"text: '{text}'")
             if m := re.match(self.regex, text):
-                return True, self.eval_method(engine, player, text, m.groupdict())
+                return True, self.eval_method(function_memory, player, text, m.groupdict())
 
         elif self.check_type == TextPattern.CheckType.SEARCH:
             # Log["debug"]["text pattern"]("search-type")
             # Log["debug"]["text pattern"](f"regex: r'{self.regex}'")
             # Log["debug"]["text pattern"](f"text: '{text}'")
             if m := re.search(self.regex, text):
-                return True, self.eval_method(engine, player, text, m.groupdict())
+                return True, self.eval_method(function_memory, player, text, m.groupdict())
                 
         elif self.check_type == TextPattern.CheckType.FULLMATCH:
             # Log["debug"]["text pattern"]("fullmatch-type")
             # Log["debug"]["text pattern"](f"regex: r'{self.regex}'")
             # Log["debug"]["text pattern"](f"text: '{text}'")
             if m := re.fullmatch(self.regex, text):
-                return True, self.eval_method(engine, player, text, m.groupdict())
+                return True, self.eval_method(function_memory, player, text, m.groupdict())
             
         return False, None
 

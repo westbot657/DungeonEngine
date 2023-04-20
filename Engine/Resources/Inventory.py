@@ -12,6 +12,7 @@ try:
     from .EngineDummy import Engine
     from .EngineErrors import InvalidObjectError
     from .Logger import Log
+    from .FunctionMemory import FunctionMemory
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -24,17 +25,18 @@ except ImportError:
     from EngineDummy import Engine
     from EngineErrors import InvalidObjectError
     from Logger import Log
+    from FunctionMemory import FunctionMemory
 
 class Inventory:
     _default_equips = {}
 
-    def __init__(self, engine:Engine, contents:list[GameObject]):
+    def __init__(self, function_memory, contents:list[GameObject]):
         self.parent = None
         self.contents = contents
         self.equips = {}
         self.defaults = {}
         for key, abstract in Inventory._default_equips.items():
-            self.defaults.update({key: abstract.createInstance(engine)})
+            self.defaults.update({key: abstract.createInstance(function_memory)})
             self.equips.update({key: self.defaults[key]})
 
     def equip(self, objectType:str, gameObject:GameObject):
@@ -84,7 +86,7 @@ class Inventory:
         return f"{st}\n[no items in inventory]"
 
     @classmethod
-    def from_list(cls, engine:Engine, data:list):
+    def from_list(cls, engine, data:list):
         equips = {}
         contents = []
         Log["loadup"]["inventory"]("loading inventory from list...")
@@ -93,7 +95,7 @@ class Inventory:
             Log["loadup"]["inventory"]("Constructing new GameObject")
 
             try:
-                obj: GameObject = engine.loader.constructGameObject(engine, element)
+                obj: GameObject = engine.loader.constructGameObject(engine._function_memory, element)
             except InvalidObjectError as e:
                 Log["ERROR"]["loadup"]["inventory"](*e.args, sep=" ")
                 continue
@@ -102,7 +104,7 @@ class Inventory:
             Log["loadup"]["inventory"]("gameObject added to inventory")
             if element.get("equipped", False):
                 equips.update({obj.identifier.ID(): obj})
-        inv = cls(engine, contents)
+        inv = cls(engine._function_memory, contents)
         inv.equips = equips
         Log["loadup"]["inventory"]("Inventory Construction finished")
         return inv

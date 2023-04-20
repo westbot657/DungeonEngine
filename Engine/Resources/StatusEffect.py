@@ -17,5 +17,5 @@ class StatusEffect:
         self.cause = cause
         self.events = events
 
-    def _get_save(self, engine:Engine):
+    def _get_save(self, function_memory):
         ...

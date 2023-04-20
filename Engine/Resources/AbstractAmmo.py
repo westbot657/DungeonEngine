@@ -77,7 +77,7 @@ class AbstractAmmo(AbstractGameObject):
 
     
 
-    def createInstance(self, engine:Engine, **override_values) -> Ammo:
+    def createInstance(self, function_memory, **override_values) -> Ammo:
         if self.is_template:
             ...
         else:
@@ -85,7 +85,7 @@ class AbstractAmmo(AbstractGameObject):
                 override_values.get("name", self.getName()),
                 DynamicValue(override_values.get("bonus_damage", self.getBonusDamage())),
                 override_values.get("max_count", self.getMaxCount()),
-                DynamicValue(override_values.get("count", self.getCount())).getCachedOrNew(engine)
+                DynamicValue(override_values.get("count", self.getCount())).getCachedOrNew(function_memory)
             )
 
     @classmethod

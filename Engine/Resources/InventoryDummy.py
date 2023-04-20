@@ -11,6 +11,6 @@ class Inventory:
         self.equips: dict
 
     @classmethod
-    def from_list(cls, engine:Engine, data:list): ...
+    def from_list(cls, function_memory, data:list): ...
 
 

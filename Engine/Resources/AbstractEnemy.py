@@ -123,11 +123,11 @@ class AbstractEnemy:
 
         return out
 
-    def createInstance(self, engine:Engine, **override_values) -> Enemy:
+    def createInstance(self, function_memory, **override_values) -> Enemy:
         return Enemy(self,
             override_values.get("name", self.getName()),
             override_values.get("max_health", self.getMaxHealth()),
-            DynamicValue(override_values.get("health", self.getHealth())).getCachedOrNew(engine),
+            DynamicValue(override_values.get("health", self.getHealth())).getCachedOrNew(function_memory),
             self._assertListAttackType(override_values.get("attacks", self.getAttacks()))
         )
     

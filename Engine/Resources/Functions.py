@@ -374,7 +374,9 @@ class Engine_StatusEffect_GetLevel(LoaderFunction):
             case _: return None
     @staticmethod
     def get_level(function_memory:FunctionMemory, status_effect:StatusEffect|None, default:int):
-        ...
+        if status_effect is not None:
+            return status_effect.level
+        return default
 class Engine_StatusEffect_SetLevel(LoaderFunction):
     id = Identifier("engine", "status_effect/", "set_level")
     @classmethod
@@ -532,6 +534,7 @@ class Engine_Player_GiveObject(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_GiveStatusEffect(LoaderFunction):
     id = Identifier("engine", "player/", "give_status_effect")
     @classmethod
@@ -667,7 +670,7 @@ class Engine_Random_Uniform(LoaderFunction):
     @staticmethod
     def rand_choice(function_memory:FunctionMemory, rolls:int, pools:list[dict]):
         table = LootTable.fromDict({"rolls": rolls, "pools": pools})
-        return table.roll(function_memory.engine)
+        return table.roll(function_memory)
 
 class Engine_Random_Weighted(LoaderFunction):
     id = Identifier("engine", "random/", "weighted")
@@ -682,7 +685,7 @@ class Engine_Random_Weighted(LoaderFunction):
     @staticmethod
     def weighted_table(function_memory:FunctionMemory, rolls:int, pools:list[dict]):
         table = LootTable.fromDict({"rolls": rolls, "pools": pools})
-        return table.roll(function_memory.engine)
+        return table.roll(function_memory)
 
 
 ####XXX#############XXX####
@@ -752,7 +755,7 @@ class Engine_Math_Solve(LoaderFunction):
                 case {
                     "multiply": list()
                 }:
-                    mx = branch["multiply"]
+                    mx = branch["multiply"].copy()
                     m = cls._solve(mx.pop(0))
                     while mx:
                         m *= cls._solve(mx.pop(0))
@@ -761,7 +764,7 @@ class Engine_Math_Solve(LoaderFunction):
                 case {
                     "divide": list()
                 }:
-                    dx = branch["divide"]
+                    dx = branch["divide"].copy()
                     d = cls._solve(dx.pop(0))
                     while dx:
                         d /= cls._solve(dx.pop(0))

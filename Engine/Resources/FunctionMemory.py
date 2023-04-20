@@ -3,9 +3,11 @@
 try:
     from .EngineDummy import Engine
     from .EngineErrors import MemoryError
+    from .Logger import Log
 except ImportError:
     from EngineDummy import Engine
     from EngineErrors import MemoryError
+    from Logger import Log
 
 import json
 
@@ -42,9 +44,10 @@ class FunctionMemory:
     #     self.context_data.clear()
 
     def evaluateFunction(self, data:dict):
-        self.engine.evaluateFunction(data, self)
+        return self.engine.evaluateFunction(data, self)
 
     def addContextData(self, data:dict):
+        print(f"#store: {data}")
         self.context_data.update(data)
 
     def checkPredicate(self, predicate:dict):
@@ -55,6 +58,7 @@ class FunctionMemory:
         self.symbol_table.update({name: value})
         
     def ref(self, name:str):
+        print(f"#ref: {self.context_data}")
 
         if name.startswith("%"):
             if name in self.global_environment_variables:
@@ -72,8 +76,9 @@ class FunctionMemory:
             raise MemoryError(f"Variable referenced before assignment: '{name}'")
 
     def clear(self):
-        self.symbol_table.clear()
-        self.context_data.clear()
+        #self.symbol_table.clear()
+        #self.context_data.clear()
+        pass
 
     def update(self, data:dict):
         self.symbol_table.update(data)

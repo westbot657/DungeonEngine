@@ -45,8 +45,8 @@ class Tool(GameObject):
         if on_use := self.events.get("on_use", None):
 
             self.prepFunctionMemory(function_memory)
-            res = function_memory.engine.evaluateFunction(on_use, function_memory)
-            function_memory.clear()
+            res = function_memory.evaluateFunction(on_use)
+            # function_memory.clear()
 
             if res is Tool.Action.CANCEL_USE:
                 return
@@ -63,32 +63,32 @@ class Tool(GameObject):
     def onBreak(self, function_memory:FunctionMemory):
         if on_break := self.events.get("on_break", None):
             self.prepFunctionMemory(function_memory)
-            res = function_memory.engine.evaluateFunction(on_break)
-            function_memory.clear()
+            res = function_memory.evaluateFunction(on_break)
+            # function_memory.clear()
 
     def onDamage(self, function_memory:FunctionMemory):
         if on_damage := self.events.get("on_damage", None):
             self.prepFunctionMemory(function_memory)
-            res = function_memory.engine.evaluateFunction(on_damage)
-            function_memory.clear()
+            res = function_memory.evaluateFunction(on_damage)
+            # function_memory.clear()
 
     def onRepair(self, function_memory:FunctionMemory):
         if on_repair := self.events.get("on_repair", None):
             self.prepFunctionMemory(function_memory)
-            res = function_memory.engine.evaluateFunction(on_repair)
-            function_memory.clear()
+            res = function_memory.evaluateFunction(on_repair)
+            # function_memory.clear()
 
     def onEquip(self, function_memory:FunctionMemory):
         if on_equip := self.events.get("on_equip", None):
             self.prepFunctionMemory(function_memory)
-            res = function_memory.engine.evaluateFunction(on_equip)
-            function_memory.clear()
+            res = function_memory.evaluateFunction(on_equip)
+            # function_memory.clear()
 
     def onUnequip(self, function_memory:FunctionMemory):
         if on_unequip := self.events.get("on_unequip", None):
             self.prepFunctionMemory(function_memory)
-            res = function_memory.engine.evaluateFunction(on_unequip)
-            function_memory.clear()
+            res = function_memory.evaluateFunction(on_unequip)
+            # function_memory.clear()
 
     def __repr__(self):
         return f"Tool: {self.name} {self.durability}/{self.max_durability}"

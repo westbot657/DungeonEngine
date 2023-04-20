@@ -114,7 +114,7 @@ class LoaderFunction:
         pass # don't need to do anything in the dummy function
 
     @classmethod
-    def check(cls, engine:Engine, args:dict):
+    def check(cls, function_memory, args:dict):
         return cls._check_dummy_return
     
     def __init_subclass__(cls):
@@ -134,11 +134,11 @@ class LoaderFunction:
             cls.return_type = [cls.return_type]
 
     @classmethod
-    def _call(cls, engine, data:dict):
+    def _call(cls, function_memory, data:dict):
         # check args
         Log["debug"]["loader function"](f"calling '{cls.__name__}' with data: '{data}'")
-        if call := cls.check(engine, data):
-            return call(engine, **data)
+        if call := cls.check(function_memory, data):
+            return call(function_memory, **data)
         else:
             print(f"Invalid arguments given to function: {cls.id.full()}")
 

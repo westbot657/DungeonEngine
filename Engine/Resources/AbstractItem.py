@@ -93,14 +93,14 @@ class AbstractItem(AbstractGameObject):
         ...
         return {}
 
-    def createInstance(self, engine:Engine, **override_values) -> Item:
+    def createInstance(self, function_memory, **override_values) -> Item:
         if self.is_template:
             ...
         else:
             return Item(self,
                 override_values.get("name", self.getName()),
                 override_values.get("max_count", self.getMaxCount()),
-                DynamicValue(override_values.get("count", self.getCount())).getCachedOrNew(engine),
+                DynamicValue(override_values.get("count", self.getCount())).getCachedOrNew(function_memory),
                 DynamicValue(override_values.get("data", self.getData()))
             )
 

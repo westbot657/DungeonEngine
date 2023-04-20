@@ -16,7 +16,7 @@ except ImportError:
     from DynamicValue import DynamicValue
     from Logger import Log
 
-import glob, json, re
+import glob, json, re, random
 
 class AbstractAmmo(AbstractGameObject):
     _loaded: dict = {}
@@ -79,7 +79,8 @@ class AbstractAmmo(AbstractGameObject):
 
     def createInstance(self, function_memory, **override_values) -> Ammo:
         if self.is_template:
-            ...
+            return random.choice(self.get_children()).createInstance(function_memory, **override_values)
+            
         else:
             return Ammo(self,
                 override_values.get("name", self.getName()),

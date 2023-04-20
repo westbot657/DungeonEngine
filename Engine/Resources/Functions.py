@@ -18,6 +18,7 @@ try:
     from .AbstractTool import AbstractTool, Tool
     from .AbstractWeapon import AbstractWeapon, Weapon
     from .FunctionMemory import FunctionMemory
+    from .Player import Player
 
 except ImportError:
     from LoaderFunction import LoaderFunction
@@ -37,6 +38,7 @@ except ImportError:
     from AbstractTool import AbstractTool, Tool
     from AbstractWeapon import AbstractWeapon, Weapon
     from FunctionMemory import FunctionMemory
+    from Player import Player
 
 import random, math, re
 
@@ -532,8 +534,33 @@ class Engine_Player_GiveObject(LoaderFunction):
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
-            case {}: ...
+            case {
+                "object": str()
+            }: return cls.giveObject
             case _: return None
+    @classmethod
+    def giveObject(cls, function_memory:FunctionMemory, **kwargs):
+        object_name = Identifier.fromString(kwargs.get("object"))
+        count = kwargs.get("count", 1)
+
+        game_object = function_memory.engine.loader.constructGameObject(
+            function_memory,
+            {
+                "type": f"{object_name.namespace}:abstract/{object_name.path.strip('/').rstrip('s')}",
+                "parent": object_name.full()
+            }
+        )
+
+        print(f"fishing rod: game object: {game_object}")
+
+        if isinstance(game_object, (Ammo, Item)):
+            game_object: Ammo|Item
+            game_object.count = min(max(0, count), game_object.max_count)
+        
+        player: Player = function_memory.ref("#player")
+        player.inventory.addObject(game_object)
+
+        return game_object
 
 class Engine_Player_GiveStatusEffect(LoaderFunction):
     id = Identifier("engine", "player/", "give_status_effect")

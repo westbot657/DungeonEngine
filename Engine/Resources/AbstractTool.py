@@ -17,7 +17,7 @@ except ImportError:
     from DynamicValue import DynamicValue
     from Logger import Log
 
-import glob, json
+import glob, json, random
 
 class AbstractTool(AbstractGameObject):
     _loaded = {}
@@ -87,7 +87,8 @@ class AbstractTool(AbstractGameObject):
 
     def createInstance(self, function_memory, **override_values) -> Tool:
         if self.is_template:
-            ...
+            return random.choice(self.get_children()).createInstance(function_memory, **override_values)
+            
         else:
             return Tool(self,
                 override_values.get("name", self.getName()),

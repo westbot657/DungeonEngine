@@ -291,8 +291,10 @@ class DungeonLoader:
     def getWeapon(self, identifier:Identifier|str) -> AbstractWeapon:
         identifier: Identifier = Identifier.fromString(identifier)
 
-    def getGameObject(self, identifier:Identifier|str) -> AbstractGameObject:
+    def getGameObject(self, identifier) -> AbstractGameObject:
         identifier: Identifier = Identifier.fromString(identifier)
+
+        
 
         # TODO: actually search for object (however that needs to be done)
 

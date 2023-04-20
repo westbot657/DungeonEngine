@@ -61,7 +61,7 @@
                                 "functions": [
                                     {
                                         "function": "engine:player/give_object",
-                                        "item-parent": "engine:items/fish",
+                                        "object": "engine:items/fish",
                                         "count": 1
                                     },
                                     {

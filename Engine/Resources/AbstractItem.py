@@ -17,7 +17,8 @@ except ImportError:
     from AbstractGameObject import AbstractGameObject
     from Logger import Log
 
-import glob, json, re
+import glob, json, re, random
+
 
 class AbstractItem(AbstractGameObject):
     _loaded: dict = {}
@@ -95,7 +96,7 @@ class AbstractItem(AbstractGameObject):
 
     def createInstance(self, function_memory, **override_values) -> Item:
         if self.is_template:
-            ...
+            return random.choice(self.get_children()).createInstance(function_memory, **override_values)
         else:
             return Item(self,
                 override_values.get("name", self.getName()),

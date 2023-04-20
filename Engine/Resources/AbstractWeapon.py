@@ -19,7 +19,7 @@ except ImportError:
     from AbstractGameObject import AbstractGameObject
     from Logger import Log
 
-import glob, json
+import glob, json, random
 
 """ example_dungeon:weapon/longsword
 {
@@ -123,7 +123,8 @@ class AbstractWeapon(AbstractGameObject):
             # go through children (and sub children probably) and pick a random one?
             # or
             # create instance of first non-template child?
-            ...
+            return random.choice(self.get_children()).createInstance(function_memory, **override_values)
+            
         else:
             return Weapon(self,
                 value_overrides.get("name", self.getName()),

@@ -48,6 +48,8 @@ class Inventory:
             if self.equips[key] is gameObject:
                 self.equips[key] = self.defaults.get(key, None)
                 
+    def addObject(self, game_object:GameObject):
+        self.contents.append(game_object)
     
     def getOfType(self, objectType:type|tuple[type]):
         matches = []

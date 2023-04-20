@@ -75,7 +75,7 @@ class DungeonLoader:
 
     def evaluateFunction(self, function_memory:FunctionMemory, data:dict):
         # TODO: function memory stuff can happen here I guess? (not sure what that is right now though)
-        function_memory.clear()
+        #function_memory.clear()
         val = self._evaluateFunction(function_memory, data)
         return val
 

@@ -41,6 +41,9 @@ class FunctionMemory:
     #     self.symbol_table.clear()
     #     self.context_data.clear()
 
+    def evaluateFunction(self, data:dict):
+        self.engine.evaluateFunction(data, self)
+
     def addContextData(self, data:dict):
         self.context_data.update(data)
 

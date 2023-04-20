@@ -4,11 +4,13 @@
 try:
     from .Identifier import Identifier
     from .EngineDummy import Engine
+    from .FunctionMemory import FunctionMemory
     from .Util import Util
     from .Logger import Log
 except ImportError:
     from Identifier import Identifier
     from EngineDummy import Engine
+    from FunctionMemory import FunctionMemory
     from Util import Util
     from Logger import Log
 
@@ -25,10 +27,10 @@ class LootEntry:
             r.append(cls(d))
         return r
 
-    def calcWeight(self, engine:Engine, curr_weight:float, num_entries_calculated:int, num_entries_total:int) -> float:
+    def calcWeight(self, function_memory:FunctionMemory, curr_weight:float, num_entries_calculated:int, num_entries_total:int) -> float:
         if weight := self.data.get("weight", None): # all entries with specified weight should be calculated before ones with unspecified
             Log["debug"]["fishing rod"](f"weight: {weight}")
-            weight = engine.evaluateFunction(weight)
+            weight = function_memory.evaluateFunction(weight)
             if curr_weight + weight > 1.0:
                 raise Exception(f"Weighted LootTable has too much weight! ({curr_weight} + {weight} = {curr_weight+weight})")
                 
@@ -50,7 +52,7 @@ class LootPool:
             r.append(cls(d.get("bonus_rolls", 0), LootEntry.fromList(d.get("entries", []))))
         return r
 
-    def roll(self, engine:Engine) -> list:
+    def roll(self, function_memory:FunctionMemory) -> list:
         weighted_entries = [entry for entry in self.entries if "weight" in entry.data]
         unspecified_entries = [entry for entry in self.entries if entry not in weighted_entries]
 
@@ -63,7 +65,7 @@ class LootPool:
 
         for entry in entries:
             
-            w = entry.calcWeight(engine, weight, calculated, total_entries)
+            w = entry.calcWeight(function_memory, weight, calculated, total_entries)
             if w in weighted or w == 0:
                 continue # entry weight is 0, so it can't be picked anyways
             weighted.update({w: entry})
@@ -74,7 +76,7 @@ class LootPool:
         choice = Util.getRoundedUpKey(f, weighted)
 
         entry:LootEntry = weighted.get(choice)
-        return engine.evaluateFunction(entry.data), self.bonus_rolls
+        return function_memory.evaluateFunction(entry.data), self.bonus_rolls
 
 class LootTable:
 
@@ -88,13 +90,13 @@ class LootTable:
         pools:list[LootPool] = LootPool.fromList(data.get("pools", []))
         return cls(rolls, pools)
 
-    def roll(self, engine:Engine):
+    def roll(self, function_memory:FunctionMemory):
         result = []
         roll = 0
         while roll < self.rolls:
             for pool in self.pools:
                 pool: LootPool
-                r_b = pool.roll(engine)
+                r_b = pool.roll(function_memory)
                 r, b = r_b
                 if r:
                     result.append(r)

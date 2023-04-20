@@ -26,10 +26,9 @@ class Item(GameObject):
     def onUse(self, engine:Engine, amount_used:int):
         if on_use := self.events.get("on_use", None):
             engine.function_memory.addContextData({
-                "tool": self
+                "#tool": self
             })
             res = engine.evaluateFunction(on_use)
-            engine.function_memory.clear()
 
     def __repr__(self):
         return f"Item {self.name}: max_count:{self.max_count} count:{self.count} data:{self.data}"

@@ -31,18 +31,21 @@ class Tool(GameObject):
     def checkKeyword(self, keyword):
         return keyword in self.abstract.getKeywords()
 
+    def prepFunctionMemory(self, function_memory:FunctionMemory):
+        function_memory.addContextData({
+            "#tool": self
+        })
+        function_memory.update({
+            ".name": self.name,
+            ".durability": self.durability,
+            ".max_durability": self.max_durability,
+        })
+
     def onUse(self, function_memory:FunctionMemory, amount_used):
         if on_use := self.events.get("on_use", None):
 
-            function_memory.addContextData({
-                "#tool": self
-            })
-            function_memory.update({
-                ".name": self.name,
-                ".durability": self.durability,
-                ".max_durability": self.max_durability,
-            })
-            res = function_memory.engine.evaluateFunction(on_use)
+            self.prepFunctionMemory(function_memory)
+            res = function_memory.engine.evaluateFunction(on_use, function_memory)
             function_memory.clear()
 
             if res is Tool.Action.CANCEL_USE:
@@ -59,41 +62,31 @@ class Tool(GameObject):
 
     def onBreak(self, function_memory:FunctionMemory):
         if on_break := self.events.get("on_break", None):
-            function_memory.addContextData({
-                "#tool": self
-            })
+            self.prepFunctionMemory(function_memory)
             res = function_memory.engine.evaluateFunction(on_break)
             function_memory.clear()
 
     def onDamage(self, function_memory:FunctionMemory):
         if on_damage := self.events.get("on_damage", None):
-            function_memory.addContextData({
-                "#tool": self
-            })
+            self.prepFunctionMemory(function_memory)
             res = function_memory.engine.evaluateFunction(on_damage)
             function_memory.clear()
 
     def onRepair(self, function_memory:FunctionMemory):
         if on_repair := self.events.get("on_repair", None):
-            function_memory.addContextData({
-                "#tool": self
-            })
+            self.prepFunctionMemory(function_memory)
             res = function_memory.engine.evaluateFunction(on_repair)
             function_memory.clear()
 
     def onEquip(self, function_memory:FunctionMemory):
         if on_equip := self.events.get("on_equip", None):
-            function_memory.addContextData({
-                "#tool": self
-            })
+            self.prepFunctionMemory(function_memory)
             res = function_memory.engine.evaluateFunction(on_equip)
             function_memory.clear()
 
     def onUnequip(self, function_memory:FunctionMemory):
         if on_unequip := self.events.get("on_unequip", None):
-            function_memory.addContextData({
-                "#tool": self
-            })
+            self.prepFunctionMemory(function_memory)
             res = function_memory.engine.evaluateFunction(on_unequip)
             function_memory.clear()
 

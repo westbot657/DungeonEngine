@@ -57,8 +57,14 @@ class Engine:
         self.players = []
         #self.default_input_handler.send(None)
 
-    def evaluateFunction(self, data:dict):
-        return self.loader.evaluateFunction(FunctionMemory(self), data)
+    def evaluateFunction(self, data:dict, function_memory:FunctionMemory=None, context_data:dict=None, local_variables:dict=None):
+        if not function_memory:
+            function_memory = FunctionMemory(self)
+        if context_data:
+            function_memory.addContextData(context_data)
+        if local_variables:
+            function_memory.update(local_variables)
+        return function_memory.evaluateFunction(data)
 
     def loadGame(self):
         self.loader.loadGame(self)

@@ -247,7 +247,7 @@ class DungeonLoader:
                         "#player": player,
                         "#item": item
                     })
-                    item.onUse(function_memory_1, amount)
+                    return item.onUse(function_memory_1, amount)
 
         if not found_item:
             if tool := player.inventory.getEquipped(Tool):
@@ -260,7 +260,7 @@ class DungeonLoader:
                             "#player": player,
                             "#tool": tool
                         })
-                        tool.onUse(function_memory_1, amount)
+                        return tool.onUse(function_memory_1, amount)
 
         if not found_item:
             function_memory.engine.sendOutput(player, f"You do not have '{item_name}'")

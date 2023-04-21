@@ -113,7 +113,9 @@ class Engine:
 
                     #try:
                     self._function_memory.clear()
-                    TextPattern.handleInput(self._function_memory, player, text)
+                    res = TextPattern.handleInput(self._function_memory, player, text)
+                    player_id, text = yield res
+                    continue
                     #except Exception as e:
                     #    Log["ERROR"]["engine"]["input-handler"]("\n" + "\n".join(e.args))
                         

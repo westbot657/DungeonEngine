@@ -4,13 +4,17 @@ try:
     from .StatusEffect import StatusEffect
     from .EngineErrors import InvalidObjectError
     from .Identifier import Identifier
+    from .DynamicValue import DynamicValue
     from .StatusEffectCause import StatusEffectCause
+    from .FunctionMemory import FunctionMemory
     from .Logger import Log
 except ImportError:
     from StatusEffect import StatusEffect
     from EngineErrors import InvalidObjectError
     from Identifier import Identifier
+    from DynamicValue import DynamicValue
     from StatusEffectCause import StatusEffectCause
+    from FunctionMemory import FunctionMemory
     from Logger import Log
 
 
@@ -32,6 +36,7 @@ class AbstractStatusEffect:
         self.name: str|None = data.get("name", None)
         self.level: int|None = data.get("level", None)
         self.duration: int|None = data.get("duration", None)
+        self.tick_interval: int|dict|None = data.get("tick_interval", None)
         self.cause: int|None = data.get("cause", None)
         self.events: dict|None = data.get("events", None)
 
@@ -62,27 +67,36 @@ class AbstractStatusEffect:
         return 1
         # raise InvalidObjectError(f"StatusEffect has no duration! ({self.identifier})")
 
+    def getTickInterval(self):
+        if self.tick_interval is None:
+            if self.events.get("on_tick", None) is not None:
+                return 1
+            return -1
+        return self.tick_interval
+
     def getCause(self):
-        if self.cause is None:
+        if self.cause is None: # *existential crisis*
             c = self.parent.getCause() if self.parent else None
         else:
             c = self.cause
         if c is not None:
             return c
         return StatusEffectCause.getCauseType()
-        # raise InvalidObjectError(f"StatusEffect has no cause! ({self.identifier})") # *existential crisis*
+        # raise InvalidObjectError(f"StatusEffect has no cause! ({self.identifier})") # *more existential crisis*
 
     def getEvents(self):
         return self.events or {}
 
-    def createInstance(self, **override_values):
+    def createInstance(self, function_memory:FunctionMemory, **override_values):
         if self.is_template:
-            ...
+            pass
+            # I sure hope no one makes any status effect templates and tries to apply them as an effect...
         else:
             return StatusEffect(self,
                 override_values.get("name", self.getName()),
                 override_values.get("level", self.getLevel()),
                 override_values.get("duration", self.getDuration()),
+                DynamicValue(override_values.get("tick_interval", self.getTickInterval())).getCachedOrNew(function_memory),
                 self.getCause(),
                 self.getEvents()
             )

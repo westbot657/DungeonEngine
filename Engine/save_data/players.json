@@ -16,6 +16,12 @@
                 "equipped": true
             },
             {
+                "type": "engine:armor",
+                "parent": "engine:armor/leather_armor",
+                "durability": 20,
+                "name": "Batman T-shirt"
+            },
+            {
                 "type": "engine:item",
                 "parent": "engine:items/stick",
                 "count": 35

@@ -5,7 +5,7 @@ try:
     from .Identifier import Identifier
     from .LootTable import LootTable
     from .EngineDummy import Engine
-
+    from .EngineOperation import EngineOperation, _EngineOperation
     from .AbstractAmmo import AbstractAmmo, Ammo
     from .AbstractArmor import AbstractArmor, Armor
     from .AbstractAttack import AbstractAttack, Attack
@@ -25,7 +25,7 @@ except ImportError:
     from Identifier import Identifier
     from LootTable import LootTable
     from EngineDummy import Engine
-
+    from .EngineOperation import EngineOperation, _EngineOperation
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
     from AbstractAttack import AbstractAttack, Attack
@@ -649,9 +649,11 @@ class Engine_Player_GetInput(LoaderFunction): # NOTE: this function may (probabl
     return_type = Tool
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case {}: ...
-            case _: return None
+        return cls.getInput
+    
+    @classmethod
+    def getInput(cls, function_memory:FunctionMemory, **args):
+        ...
 
 class Engine_Player_SetLocation(LoaderFunction):
     id = Identifier("engine", "player/", "set_location")
@@ -737,7 +739,8 @@ class Engine_Text_Builder(LoaderFunction):
             if isinstance(element, str):
                 out_text.append(element)
             elif isinstance(element, dict):
-                ...
+                out_text.append(str(function_memory.evaluateFunction(element)))
+        return seperator.join(out_text)
 
 ####XXX##############XXX####
 ### XXX Engine Logic XXX ###
@@ -921,6 +924,10 @@ class Engine_Math_Solve(LoaderFunction):
                     "min": list()
                 }:
                     return min([cls._solve(m) for m in branch["min"]])
+                case {
+                    "round": dict()|float()|int()
+                }:
+                    return int(cls._solve(branch["round"]))
 
         else:
             return branch

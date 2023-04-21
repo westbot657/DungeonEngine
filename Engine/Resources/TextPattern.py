@@ -3,9 +3,12 @@
 try:
     from .EngineDummy import Engine
     from .Logger import Log
+    from .EngineOperation import EngineOperation, _EngineOperation
 except:
     from EngineDummy import Engine
     from Logger import Log
+    from EngineOperation import EngineOperation, _EngineOperation
+
 
 from enum import Enum, auto
 from typing import Any
@@ -37,8 +40,9 @@ class TextPattern:
     def handleInput(cls, function_memory, player, text:str):
         for pattern in cls._patterns:
             matched, ret = pattern.check(function_memory, player, text)
-            if matched:
+            if matched and isinstance(ret, (EngineOperation, _EngineOperation)):
                 return ret
+            return EngineOperation.Success()
 
     def check(self, function_memory, player, text:str) -> tuple[bool, Any]:
         if self.check_type == TextPattern.CheckType.MATCH:

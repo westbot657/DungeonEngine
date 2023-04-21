@@ -11,6 +11,23 @@
                     "max": 8
                 }
             }
-        ]
+        ],
+        "on_damage": {
+            "function": "engine:player/message",
+            "message": {
+                "function": "engine:text/builder",
+                "text": [
+                    "You used the First aid kit, you have",
+                    {
+                        "#ref": ".durability"
+                    },
+                    "left!"
+                ]
+            }
+        },
+        "on_break": {
+            "function": "engine:player/message",
+            "message": "uh oh! you ran out of First aid kits! :P"
+        }
     }
 }

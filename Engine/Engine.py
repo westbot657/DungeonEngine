@@ -67,6 +67,23 @@ class Engine:
             function_memory.update(local_variables)
         return self.loader.evaluateFunction(function_memory, data)
 
+    def generatorEvaluateFunction(self, data:dict, function_memory:FunctionMemory=None, context_data:dict=None, local_variables:dict=None):
+        if function_memory is None:
+            function_memory = FunctionMemory(self)
+        if context_data:
+            function_memory.addContextData(context_data)
+        if local_variables:
+            function_memory.update(local_variables)
+        ev = self.loader.generatorEvaluateFunction(function_memory, data)
+        try:
+            v = ev.send(None)
+            while isinstance(v, (EngineOperation, _EngineOperation)):
+                res = yield v
+                v = ev.send(res)
+        except StopIteration as e:
+            v = e.value or v
+        return v
+
     def loadGame(self):
         self.loader.loadGame(self)
         self.players = Player.loadData(self)

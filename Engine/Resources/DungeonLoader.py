@@ -94,7 +94,8 @@ class DungeonLoader:
                 res = yield v
                 v = ev.send(res)
         except StopIteration as e:
-            res = e.value or v
+            v = e.value or v
+        return v
 
     def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
         
@@ -111,8 +112,8 @@ class DungeonLoader:
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        res = e.value or v
-                        if res: result = res
+                        v = e.value or v
+                    if v: result = v
                 return result
             elif (func := data.get("function", None)) is not None:
                 if f := self.loader_function.getFunction(func):
@@ -130,8 +131,8 @@ class DungeonLoader:
                                     res = yield v
                                     v = ev.send(res)
                             except StopIteration as e:
-                                res = e.value or v
-                                args.update({key: res})
+                                v = e.value or v
+                            args.update({key: v})
                         else:
                             args.update({key: item})
                     r = f._call(function_memory, args)
@@ -143,7 +144,8 @@ class DungeonLoader:
                                 res = yield v
                                 v = ev.send(res)
                         except StopIteration as e:
-                            res = e.value or v
+                            v = e.value or v
+                        res = v
                     else:
                         res = r
                     
@@ -169,7 +171,8 @@ class DungeonLoader:
                         res = yield v
                         v = ev.send(res)
                 except StopIteration as e:
-                    res = e.value or v
+                    v = e.value or v
+                res = v
                 if res and ((true_branch := data.get("true", None)) is not None):
 
                     ev = self._generatorEvaluateFunction(function_memory, true_branch)
@@ -179,7 +182,8 @@ class DungeonLoader:
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        return e.value or v
+                        v = e.value or v
+                    return v
 
                 elif (false_branch := data.get("false", None)) is not None:
 
@@ -190,7 +194,8 @@ class DungeonLoader:
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        return e.value or v
+                        v = e.value or v
+                    return v
                 else:
                     return None
             else:
@@ -204,9 +209,8 @@ class DungeonLoader:
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        res = e.value or v
-
-                        dat.update({key: res})
+                        v = e.value or v
+                    dat.update({key: v})
                 return dat
             
         elif isinstance(data, list):
@@ -220,9 +224,8 @@ class DungeonLoader:
                         res = yield v
                         v = ev.send(res)
                 except StopIteration as e:
-                    res = e.value or v
-
-                dat.append(res)
+                    v = e.value or v
+                dat.append(v)
             return dat
         else:
             return data

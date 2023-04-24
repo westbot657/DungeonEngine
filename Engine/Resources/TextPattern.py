@@ -39,10 +39,11 @@ class TextPattern:
     @classmethod
     def handleInput(cls, function_memory, player, text:str):
         for pattern in cls._patterns:
+            pattern: TextPattern
             matched, ret = pattern.check(function_memory, player, text)
             if matched and isinstance(ret, (EngineOperation, _EngineOperation)):
                 return ret
-            return EngineOperation.Success()
+        return EngineOperation.Continue(ret)
 
     def check(self, function_memory, player, text:str) -> tuple[bool, Any]:
         if self.check_type == TextPattern.CheckType.MATCH:

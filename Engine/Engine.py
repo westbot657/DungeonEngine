@@ -113,6 +113,7 @@ class Engine:
 
                     #try:
                     self._function_memory.clear()
+                    
                     res = TextPattern.handleInput(self._function_memory, player, text)
                     player_id, text = yield res
                     continue
@@ -154,12 +155,15 @@ class Engine:
             case EngineOperation.Cancel():
                 ...
             case EngineOperation.Success():
-                ...
+                #if result.value:
+                #self.io_hook.sendOutput(player_id, result.value)
+                self.input_queue.pop(player_id)
             case EngineOperation.Failure():
                 ...
             case EngineOperation.Error():
                 ...
             case EngineOperation.Continue():
+                #self.io_hook.sendOutput(player_id, result.value)
                 self.input_queue.pop(player_id)
             case _:
                 raise EngineError("Unknown Operation")

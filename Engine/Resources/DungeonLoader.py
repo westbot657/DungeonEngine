@@ -190,8 +190,6 @@ class DungeonLoader:
         elif isinstance(data, list):
             dat = []
             for item in data:
-                # v = self._evaluateFunction(function_memory, item)
-                # if isinstance(v, (EngineOperation, _EngineOperation))
                 dat.append(self._evaluateFunction(function_memory, item))
             return dat
         else:

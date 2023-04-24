@@ -47,15 +47,17 @@ class EngineOperation:
         """
         yield/return if interaction passes and stuff happens
         """
-        def __init__(self):
+        def __init__(self, value=None):
             super().__init__(OpType.SUCCESS)
+            self.value = value
     
     class Continue(_EngineOperation):
         """
         yield this to tell engine to continue with the interaction (this actually sounds pointless now, but whatever)
         """
-        def __init__(self):
+        def __init__(self, value=None):
             super().__init__(OpType.CONTINUE)
+            self.value = value
     
     class Failure(_EngineOperation):
         """

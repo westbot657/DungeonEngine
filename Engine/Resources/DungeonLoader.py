@@ -23,6 +23,7 @@ try:
     from .Util import Util
     from .Logger import Log
     from .FunctionMemory import FunctionMemory
+    from .EngineOperation import EngineOperation, _EngineOperation
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -46,8 +47,9 @@ except ImportError:
     from Util import Util
     from Logger import Log
     from FunctionMemory import FunctionMemory
+    from EngineOperation import EngineOperation, _EngineOperation
 
-from typing import Any
+from typing import Any, Generator
 import re
 
 class DungeonLoader:
@@ -78,6 +80,59 @@ class DungeonLoader:
         #function_memory.clear()
         val = self._evaluateFunction(function_memory, data)
         return val
+
+
+
+    def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
+        
+        if isinstance(data, dict):
+            if (funcs := data.get("functions", None)) is not None:
+                if (predicate := data.get("predicate", None)) is not None:
+                    if not function_memory.checkPredicate(predicate): return None
+                result = None
+                for func in funcs:
+                    ev = self._generatorEvaluateFunction(function_memory, func)
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, (EngineOperation, _EngineOperation)):
+                            res = yield v
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        res = e.value or v
+                        if res: result = res
+                return result
+            elif (func := data.get("function", None)) is not None:
+                if f := self.loader_function.getFunction(func):
+                    f: LoaderFunction
+                    if (predicate := data.get("function", None)) is not None:
+                        if not function_memory.checkPredicate(predicate): return None
+                    args = {}
+                    for key, item in data.items():
+                        if key in ["function", "#store", "predicate"]: continue
+                        if isinstance(item, dict):
+                            ev = self._generatorEvaluateFunction(function_memory, item)
+                            try:
+                                v = ev.send(None)
+                                while isinstance(v, (EngineOperation, _EngineOperation)):
+                                    res = yield v
+                                    v = ev.send(res)
+                            except StopIteration as e:
+                                res = e.value or v
+                                args.update({key: res})
+                        else:
+                            args.update({key: item})
+                    r = f._call(function_memory, args)
+
+                    if isinstance(r, Generator):
+                        try:
+                            v = r.send(None)
+                            while isinstance(v, (EngineOperation, _EngineOperation)):
+                                res = yield v
+                                v = ev.send(res)
+                        except StopIteration as e:
+                            res = e.value or v
+                    else:
+                        res = r
 
     def _evaluateFunction(self, function_memory:FunctionMemory, data:dict):
         engine = function_memory.engine
@@ -135,6 +190,8 @@ class DungeonLoader:
         elif isinstance(data, list):
             dat = []
             for item in data:
+                # v = self._evaluateFunction(function_memory, item)
+                # if isinstance(v, (EngineOperation, _EngineOperation))
                 dat.append(self._evaluateFunction(function_memory, item))
             return dat
         else:

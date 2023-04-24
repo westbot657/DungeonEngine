@@ -17,6 +17,13 @@ import re
 
 class TextPattern:
 
+    # TODO:
+    # convert to generators:
+    # handleInput()
+    # check()
+    #
+    # treat eval_method as generator or function
+
     class CheckType(Enum):
         MATCH = auto()
         SEARCH = auto()

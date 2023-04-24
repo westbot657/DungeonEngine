@@ -53,6 +53,11 @@ from typing import Any, Generator
 import re
 
 class DungeonLoader:
+
+    # TODO:
+    # convert to generators:
+    # checkTextUse()
+
     _loader = None
     def __new__(cls):
         if not cls._loader:
@@ -81,58 +86,146 @@ class DungeonLoader:
         val = self._evaluateFunction(function_memory, data)
         return val
 
+    def generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
+        ev = self._generatorEvaluateFunction(function_memory, data)
+        try:
+            v = ev.send(None)
+            while isinstance(v, (EngineOperation, _EngineOperation)):
+                res = yield v
+                v = ev.send(res)
+        except StopIteration as e:
+            res = e.value or v
 
-
-    # def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
+    def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
         
-    #     if isinstance(data, dict):
-    #         if (funcs := data.get("functions", None)) is not None:
-    #             if (predicate := data.get("predicate", None)) is not None:
-    #                 if not function_memory.checkPredicate(predicate): return None
-    #             result = None
-    #             for func in funcs:
-    #                 ev = self._generatorEvaluateFunction(function_memory, func)
-    #                 try:
-    #                     v = ev.send(None)
-    #                     while isinstance(v, (EngineOperation, _EngineOperation)):
-    #                         res = yield v
-    #                         v = ev.send(res)
-    #                 except StopIteration as e:
-    #                     res = e.value or v
-    #                     if res: result = res
-    #             return result
-    #         elif (func := data.get("function", None)) is not None:
-    #             if f := self.loader_function.getFunction(func):
-    #                 f: LoaderFunction
-    #                 if (predicate := data.get("function", None)) is not None:
-    #                     if not function_memory.checkPredicate(predicate): return None
-    #                 args = {}
-    #                 for key, item in data.items():
-    #                     if key in ["function", "#store", "predicate"]: continue
-    #                     if isinstance(item, dict):
-    #                         ev = self._generatorEvaluateFunction(function_memory, item)
-    #                         try:
-    #                             v = ev.send(None)
-    #                             while isinstance(v, (EngineOperation, _EngineOperation)):
-    #                                 res = yield v
-    #                                 v = ev.send(res)
-    #                         except StopIteration as e:
-    #                             res = e.value or v
-    #                             args.update({key: res})
-    #                     else:
-    #                         args.update({key: item})
-    #                 r = f._call(function_memory, args)
+        if isinstance(data, dict):
+            if (funcs := data.get("functions", None)) is not None:
+                if (predicate := data.get("predicate", None)) is not None:
+                    if not function_memory.checkPredicate(predicate): return None
+                result = None
+                for func in funcs:
+                    ev = self._generatorEvaluateFunction(function_memory, func)
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, (EngineOperation, _EngineOperation)):
+                            res = yield v
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        res = e.value or v
+                        if res: result = res
+                return result
+            elif (func := data.get("function", None)) is not None:
+                if f := self.loader_function.getFunction(func):
+                    f: LoaderFunction
+                    if (predicate := data.get("function", None)) is not None:
+                        if not function_memory.checkPredicate(predicate): return None
+                    args = {}
+                    for key, item in data.items():
+                        if key in ["function", "#store", "predicate"]: continue
+                        if isinstance(item, dict):
+                            ev = self._generatorEvaluateFunction(function_memory, item)
+                            try:
+                                v = ev.send(None)
+                                while isinstance(v, (EngineOperation, _EngineOperation)):
+                                    res = yield v
+                                    v = ev.send(res)
+                            except StopIteration as e:
+                                res = e.value or v
+                                args.update({key: res})
+                        else:
+                            args.update({key: item})
+                    r = f._call(function_memory, args)
 
-    #                 if isinstance(r, Generator):
-    #                     try:
-    #                         v = r.send(None)
-    #                         while isinstance(v, (EngineOperation, _EngineOperation)):
-    #                             res = yield v
-    #                             v = ev.send(res)
-    #                     except StopIteration as e:
-    #                         res = e.value or v
-    #                 else:
-    #                     res = r
+                    if isinstance(r, Generator):
+                        try:
+                            v = r.send(None)
+                            while isinstance(v, (EngineOperation, _EngineOperation)):
+                                res = yield v
+                                v = ev.send(res)
+                        except StopIteration as e:
+                            res = e.value or v
+                    else:
+                        res = r
+                    
+                    if var := data.get("#store", None):
+                        var: str
+                        if var.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{var}'")
+                        function_memory.store(var, res)
+                    return res
+        
+            elif (var := data.get("#ref", None)) is not None:
+                return function_memory.ref(var)
+            elif (store := data.get("#store", None)) is not None:
+                if isinstance(store, dict):
+                    for key, value in store.items():
+                        if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
+                        function_memory.store(key, value)
+
+            elif (check := data.get("@check", None)) is not None:
+                ev = self._generatorEvaluateFunction(function_memory, check)
+                try:
+                    v = ev.send(None)
+                    while isinstance(v, (EngineOperation, _EngineOperation)):
+                        res = yield v
+                        v = ev.send(res)
+                except StopIteration as e:
+                    res = e.value or v
+                if res and ((true_branch := data.get("true", None)) is not None):
+
+                    ev = self._generatorEvaluateFunction(function_memory, true_branch)
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, (EngineOperation, _EngineOperation)):
+                            res = yield v
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        return e.value or v
+
+                elif (false_branch := data.get("false", None)) is not None:
+
+                    ev = self._generatorEvaluateFunction(function_memory, false_branch)
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, (EngineOperation, _EngineOperation)):
+                            res = yield v
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        return e.value or v
+                else:
+                    return None
+            else:
+                dat = {}
+                for key, item in data.items():
+
+                    ev = self._generatorEvaluateFunction(function_memory, item)
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, (EngineOperation, _EngineOperation)):
+                            res = yield v
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        res = e.value or v
+
+                        dat.update({key: res})
+                return dat
+            
+        elif isinstance(data, list):
+            dat = []
+            for item in data:
+
+                ev = self._generatorEvaluateFunction(function_memory, item)
+                try:
+                    v = ev.send(None)
+                    while isinstance(v, (EngineOperation, _EngineOperation)):
+                        res = yield v
+                        v = ev.send(res)
+                except StopIteration as e:
+                    res = e.value or v
+
+                dat.append(res)
+            return dat
+        else:
+            return data
 
     def _evaluateFunction(self, function_memory:FunctionMemory, data:dict):
         engine = function_memory.engine

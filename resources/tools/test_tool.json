@@ -13,17 +13,35 @@
             }
         ],
         "on_damage": {
-            "function": "engine:player/message",
-            "message": {
-                "function": "engine:text/builder",
-                "text": [
-                    "You used the First aid kit, you have",
-                    {
-                        "#ref": ".durability"
-                    },
-                    "left!"
-                ]
-            }
+            "functions": [
+                {
+                    "function": "engine:player/message",
+                    "message": {
+                        "function": "engine:text/builder",
+                        "text": [
+                            "You used the First aid kit, you have",
+                            {
+                                "#ref": ".durability"
+                            },
+                            "left!"
+                        ]
+                    }
+                },
+                {
+                    "function": "engine:player/message",
+                    "message": {
+                        "function": "engine:text/builder",
+                        "text": [
+                            "You said: '",
+                            {
+                                "function": "engine:player/get_input",
+                                "prompt": "say something."
+                            },
+                            "' !!"
+                        ]
+                    }
+                }
+            ]
         },
         "on_break": {
             "function": "engine:player/message",

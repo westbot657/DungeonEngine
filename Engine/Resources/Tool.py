@@ -145,6 +145,7 @@ class Tool(GameObject):
                     res = yield v
                     v = ev.send(res)
             except StopIteration as e:
+                if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
                 v = e.value or v
             res = v
             self.postEvaluate(function_memory)

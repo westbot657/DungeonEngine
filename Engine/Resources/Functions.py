@@ -749,6 +749,7 @@ class Engine_Text_Builder(LoaderFunction):
                         res = yield v
                         v = ev.send(res)
                 except StopIteration as e:
+                    #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
                     v = e.value or v
                 out_text.append(str(v))
 

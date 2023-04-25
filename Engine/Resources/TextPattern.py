@@ -57,6 +57,7 @@ class TextPattern:
                     res = yield matched, v
                     matched, v = ev.send(res)
             except StopIteration as e:
+                #if isinstance(e.value, _EngineOperation): print("\n\n\n1: Engine Operation\n\n\n")
                 if isinstance(e.value, (tuple, list)):
                     v = tuple(e.value)[1]
             ret = v
@@ -76,6 +77,7 @@ class TextPattern:
                             res = yield v
                             v = ret.send(res)
                     except StopIteration as e:
+                        #if isinstance(e.value, _EngineOperation): print("\n\n\n2: Engine Operation\n\n\n")
                         v = e.value or v
                     return v
             
@@ -144,6 +146,7 @@ class TextPattern:
                             res = yield True, v
                             v = ev.send(res)
                     except StopIteration as e:
+                        #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
                         v = e.value or v
                     return True, v
                 else:

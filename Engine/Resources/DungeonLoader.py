@@ -95,6 +95,7 @@ class DungeonLoader:
                 res = yield v
                 v = ev.send(res)
         except StopIteration as e:
+            #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
             v = e.value or v
         return v
 
@@ -134,6 +135,7 @@ class DungeonLoader:
                                     res = yield v
                                     v = ev.send(res)
                             except StopIteration as e:
+                                #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
                                 v = e.value or v
                             args.update({key: v})
                         else:
@@ -148,6 +150,7 @@ class DungeonLoader:
                                 res = yield v
                                 v = ev.send(res)
                         except StopIteration as e:
+                            #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
                             v = e.value or v
                         res = v
                     else:
@@ -176,6 +179,7 @@ class DungeonLoader:
                         res = yield v
                         v = ev.send(res)
                 except StopIteration as e:
+                    
                     v = e.value or v
                 res = v
                 if res and ((true_branch := data.get("true", None)) is not None):

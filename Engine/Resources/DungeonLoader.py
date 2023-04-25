@@ -126,7 +126,7 @@ class DungeonLoader:
                     args = {}
                     for key, item in data.items():
                         if key in ["function", "#store", "predicate"]: continue
-                        if isinstance(item, dict):
+                        if isinstance(item, (dict, list)):
                             ev = self._generatorEvaluateFunction(function_memory, item)
                             v = None
                             try:

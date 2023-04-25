@@ -9,7 +9,8 @@ Log._tag_colors = {
     "abstract": "\033[38;2;100;100;100m",
     "object": "\033[38;2;200;200;200m",
     "inventory": "\033[38;2;0;100;100m",
-    "dungeon": "\033[38;2;0;180;30m"
+    "dungeon": "\033[38;2;0;180;30m",
+    "evaluate-result": "\033[48;2;255;0;0m"
 }
 
 from Resources.AbstractAmmo         import AbstractAmmo, Ammo
@@ -143,6 +144,9 @@ class Engine:
                                 #v = res.send(ret)
                         except StopIteration as e:
                             v = e.value or v
+                            if isinstance(v, _EngineOperation):
+                                player_id, text = yield v
+                                continue
                         player_id, text = yield EngineOperation.Continue()
                     else:
                         player_id, text = yield res
@@ -191,7 +195,7 @@ class Engine:
                 target:int = result.target
                 prompt:str = result.prompt
                 self.io_hook.sendOutput(target, prompt)
-                self.input_queue.pop(player_id)
+                #self.input_queue.pop(player_id)
                 self.input_queue.update({player_id: [handler_getter, self.inputGetterWrapper(handler), ""]})
 
             case EngineOperation.Restart():
@@ -212,7 +216,7 @@ class Engine:
                 #self.io_hook.sendOutput(player_id, result.value)
                 if result.value: Log["debug"]["engine"]["evaluate-result"](f"EngineOperation.Continue ({result.value})")
                 #if self.input_queue[player_id][1] == self._default_input_handler:
-                self.input_queue.pop(player_id)
+                self.input_queue[player_id][2] = ""
             case _:
                 raise EngineError("Unknown Operation")
 

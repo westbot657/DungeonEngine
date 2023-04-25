@@ -143,9 +143,9 @@ class Engine:
                                 self.evaluateResult(self._default_input_handler, res, v, player_id, text)
                                 #v = res.send(ret)
                         except StopIteration as e:
-                            v = e.value or v
-                            if isinstance(v, _EngineOperation):
-                                player_id, text = yield v
+                            
+                            if isinstance(e.value, _EngineOperation):
+                                player_id, text = yield e.value
                                 continue
                         player_id, text = yield EngineOperation.Continue()
                     else:

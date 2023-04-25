@@ -33,3 +33,7 @@ class Weapon(GameObject):
 
     def quickStats(self, engine):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
+
+
+
+

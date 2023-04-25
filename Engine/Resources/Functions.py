@@ -653,7 +653,9 @@ class Engine_Player_GetInput(LoaderFunction): # NOTE: this function may (probabl
     
     @classmethod
     def getInput(cls, function_memory:FunctionMemory, **args):
-        ...
+        prompt = args.get("prompt", "")
+        x = yield EngineOperation.GetInput(function_memory.ref("#player"), prompt)
+        return x
 
 class Engine_Player_SetLocation(LoaderFunction):
     id = Identifier("engine", "player/", "set_location")
@@ -739,7 +741,17 @@ class Engine_Text_Builder(LoaderFunction):
             if isinstance(element, str):
                 out_text.append(element)
             elif isinstance(element, dict):
-                out_text.append(str(function_memory.evaluateFunction(element)))
+                ev = function_memory.generatorEvaluateFunction(element)
+                v = None
+                try:
+                    v = ev.send(None)
+                    while isinstance(v, _EngineOperation):
+                        res = yield v
+                        v = ev.send(res)
+                except StopIteration as e:
+                    v = e.value or v
+                out_text.append(str(v))
+
         return seperator.join(out_text)
 
 ####XXX##############XXX####

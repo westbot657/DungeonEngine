@@ -88,9 +88,10 @@ class DungeonLoader:
 
     def generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
         ev = self._generatorEvaluateFunction(function_memory, data)
+        v = None
         try:
             v = ev.send(None)
-            while isinstance(v, (EngineOperation, _EngineOperation)):
+            while isinstance(v, _EngineOperation):
                 res = yield v
                 v = ev.send(res)
         except StopIteration as e:
@@ -98,7 +99,7 @@ class DungeonLoader:
         return v
 
     def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
-        
+        v = None
         if isinstance(data, dict):
             if (funcs := data.get("functions", None)) is not None:
                 if (predicate := data.get("predicate", None)) is not None:
@@ -106,9 +107,10 @@ class DungeonLoader:
                 result = None
                 for func in funcs:
                     ev = self._generatorEvaluateFunction(function_memory, func)
+                    v = None
                     try:
                         v = ev.send(None)
-                        while isinstance(v, (EngineOperation, _EngineOperation)):
+                        while isinstance(v, _EngineOperation):
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
@@ -125,9 +127,10 @@ class DungeonLoader:
                         if key in ["function", "#store", "predicate"]: continue
                         if isinstance(item, dict):
                             ev = self._generatorEvaluateFunction(function_memory, item)
+                            v = None
                             try:
                                 v = ev.send(None)
-                                while isinstance(v, (EngineOperation, _EngineOperation)):
+                                while isinstance(v, _EngineOperation):
                                     res = yield v
                                     v = ev.send(res)
                             except StopIteration as e:
@@ -138,9 +141,10 @@ class DungeonLoader:
                     r = f._call(function_memory, args)
 
                     if isinstance(r, Generator):
+                        v = None
                         try:
                             v = r.send(None)
-                            while isinstance(v, (EngineOperation, _EngineOperation)):
+                            while isinstance(v, _EngineOperation):
                                 res = yield v
                                 v = ev.send(res)
                         except StopIteration as e:
@@ -165,9 +169,10 @@ class DungeonLoader:
 
             elif (check := data.get("@check", None)) is not None:
                 ev = self._generatorEvaluateFunction(function_memory, check)
+                v = None
                 try:
                     v = ev.send(None)
-                    while isinstance(v, (EngineOperation, _EngineOperation)):
+                    while isinstance(v, _EngineOperation):
                         res = yield v
                         v = ev.send(res)
                 except StopIteration as e:
@@ -176,9 +181,10 @@ class DungeonLoader:
                 if res and ((true_branch := data.get("true", None)) is not None):
 
                     ev = self._generatorEvaluateFunction(function_memory, true_branch)
+                    v = None
                     try:
                         v = ev.send(None)
-                        while isinstance(v, (EngineOperation, _EngineOperation)):
+                        while isinstance(v, _EngineOperation):
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
@@ -188,9 +194,10 @@ class DungeonLoader:
                 elif (false_branch := data.get("false", None)) is not None:
 
                     ev = self._generatorEvaluateFunction(function_memory, false_branch)
+                    v = None
                     try:
                         v = ev.send(None)
-                        while isinstance(v, (EngineOperation, _EngineOperation)):
+                        while isinstance(v, _EngineOperation):
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
@@ -203,9 +210,10 @@ class DungeonLoader:
                 for key, item in data.items():
 
                     ev = self._generatorEvaluateFunction(function_memory, item)
+                    v = None
                     try:
                         v = ev.send(None)
-                        while isinstance(v, (EngineOperation, _EngineOperation)):
+                        while isinstance(v, _EngineOperation):
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
@@ -218,9 +226,10 @@ class DungeonLoader:
             for item in data:
 
                 ev = self._generatorEvaluateFunction(function_memory, item)
+                v = None
                 try:
                     v = ev.send(None)
-                    while isinstance(v, (EngineOperation, _EngineOperation)):
+                    while isinstance(v, _EngineOperation):
                         res = yield v
                         v = ev.send(res)
                 except StopIteration as e:

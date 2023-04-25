@@ -11,7 +11,7 @@ except:
 
 
 from enum import Enum, auto
-from typing import Any
+from typing import Any, Generator
 
 import re
 
@@ -47,9 +47,38 @@ class TextPattern:
     def handleInput(cls, function_memory, player, text:str):
         for pattern in cls._patterns:
             pattern: TextPattern
-            matched, ret = pattern.check(function_memory, player, text)
-            if matched and isinstance(ret, (EngineOperation, _EngineOperation)):
-                return ret
+
+            ev = pattern.check(function_memory, player, text)
+            matched = False
+            v = None
+            try:
+                matched, v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield matched, v
+                    matched, v = ev.send(res)
+            except StopIteration as e:
+                if isinstance(e.value, (tuple, list)):
+                    v = tuple(e.value)[1]
+            ret = v
+            # if matched: return True, v
+            # return False, None
+
+
+            #matched, ret = pattern.check(function_memory, player, text)
+            if matched:
+                if isinstance(ret, (EngineOperation, _EngineOperation)):
+                    return ret
+                elif isinstance(ret, Generator):
+                    v = None
+                    try:
+                        v = ret.send(None)
+                        while isinstance(v, _EngineOperation):
+                            res = yield v
+                            v = ret.send(res)
+                    except StopIteration as e:
+                        v = e.value or v
+                    return v
+            
         return EngineOperation.Continue(ret)
 
     def check(self, function_memory, player, text:str) -> tuple[bool, Any]:
@@ -58,21 +87,69 @@ class TextPattern:
             # Log["debug"]["text pattern"](f"regex: r'{self.regex}'")
             # Log["debug"]["text pattern"](f"text: '{text}'")
             if m := re.match(self.regex, text):
-                return True, self.eval_method(function_memory, player, text, m.groupdict())
+
+                ev = self.eval_method(function_memory, player, text, m.groupdict())
+
+                if isinstance(ev, Generator):
+                    v = None
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, _EngineOperation):
+                            res = yield True, v
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        v = e.value or v
+                    return True, v
+                else:
+                    return True, ev
+
+                #return True, self.eval_method(function_memory, player, text, m.groupdict())
 
         elif self.check_type == TextPattern.CheckType.SEARCH:
             # Log["debug"]["text pattern"]("search-type")
             # Log["debug"]["text pattern"](f"regex: r'{self.regex}'")
             # Log["debug"]["text pattern"](f"text: '{text}'")
             if m := re.search(self.regex, text):
-                return True, self.eval_method(function_memory, player, text, m.groupdict())
+
+                ev = self.eval_method(function_memory, player, text, m.groupdict())
+
+                if isinstance(ev, Generator):
+                    v = None
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, _EngineOperation):
+                            res = yield True, v
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        v = e.value or v
+                    return True, v
+                else:
+                    return True, ev
+                
+                #return True, self.eval_method(function_memory, player, text, m.groupdict())
                 
         elif self.check_type == TextPattern.CheckType.FULLMATCH:
             # Log["debug"]["text pattern"]("fullmatch-type")
             # Log["debug"]["text pattern"](f"regex: r'{self.regex}'")
             # Log["debug"]["text pattern"](f"text: '{text}'")
             if m := re.fullmatch(self.regex, text):
-                return True, self.eval_method(function_memory, player, text, m.groupdict())
+
+                ev = self.eval_method(function_memory, player, text, m.groupdict())
+
+                if isinstance(ev, Generator):
+                    v = None
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, _EngineOperation):
+                            res = yield True, v
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        v = e.value or v
+                    return True, v
+                else:
+                    return True, ev
+
+                #return True, self.eval_method(function_memory, player, text, m.groupdict())
             
         return False, None
 

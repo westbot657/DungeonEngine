@@ -50,15 +50,16 @@ class Tool(GameObject):
             if isinstance(n, str) and n.strip() != self.name:
                 self.name = n.strip()
         
-        if m := x.get(".max_durability", None) is not None:
+        if (m := x.get(".max_durability", None)) is not None:
             if isinstance(m, int):
                 if m <= 0:
-                    self.durability = self.max_durability = -1
+                    self.durability = -1
+                    self.max_durability = -1
                 else:
                     self.max_durability = m
                     self.durability = min(self.durability, self.max_durability)
 
-        if d := x.get(".durability", None) is not None:
+        if (d := x.get(".durability", None)) is not None:
             if isinstance(d, int) and (0 < d <= self.max_durability):
                 self.durability = d
 
@@ -66,29 +67,66 @@ class Tool(GameObject):
         if on_use := self.events.get("on_use", None):
 
             self.prepFunctionMemory(function_memory)
-            res = function_memory.evaluateFunction(on_use)
+            #res = function_memory.evaluateFunction(on_use)
+
+            ev = function_memory.generatorEvaluateFunction(on_use)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or v
+            res = v
+
             self.postEvaluate(function_memory)
             # function_memory.clear()
 
             if res is Tool.Action.CANCEL_USE:
                 return
-            
-            elif isinstance(res, (EngineOperation, _EngineOperation)):
-                return res
 
             if self.max_durability > 0:
                 self.durability -= 1
 
                 if self.durability <= 0:
-                    self.onBreak(function_memory)
+                    v = None
+                    ev = self.onBreak(function_memory)
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, _EngineOperation):
+                            res = yield v
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        v = e.value or v
+                    return v
 
                 else:
-                    self.onDamage(function_memory)
+                    v = None
+                    ev = self.onDamage(function_memory)
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, _EngineOperation):
+                            res = yield v
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        v = e.value or v
+                    return v
 
     def onBreak(self, function_memory:FunctionMemory):
         if on_break := self.events.get("on_break", None):
             self.prepFunctionMemory(function_memory)
-            res = function_memory.evaluateFunction(on_break)
+            #res = function_memory.evaluateFunction(on_break)
+            ev = function_memory.generatorEvaluateFunction(on_break)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or v
+            res = v
             self.postEvaluate(function_memory)
 
 
@@ -98,7 +136,17 @@ class Tool(GameObject):
     def onDamage(self, function_memory:FunctionMemory):
         if on_damage := self.events.get("on_damage", None):
             self.prepFunctionMemory(function_memory)
-            res = function_memory.evaluateFunction(on_damage)
+            #res = function_memory.evaluateFunction(on_damage)
+            ev = function_memory.generatorEvaluateFunction(on_damage)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or v
+            res = v
             self.postEvaluate(function_memory)
 
             # function_memory.clear()
@@ -106,7 +154,17 @@ class Tool(GameObject):
     def onRepair(self, function_memory:FunctionMemory):
         if on_repair := self.events.get("on_repair", None):
             self.prepFunctionMemory(function_memory)
-            res = function_memory.evaluateFunction(on_repair)
+            #res = function_memory.evaluateFunction(on_repair)
+            ev = function_memory.generatorEvaluateFunction(on_repair)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or v
+            res = v
             self.postEvaluate(function_memory)
 
             # function_memory.clear()
@@ -114,7 +172,17 @@ class Tool(GameObject):
     def onEquip(self, function_memory:FunctionMemory):
         if on_equip := self.events.get("on_equip", None):
             self.prepFunctionMemory(function_memory)
-            res = function_memory.evaluateFunction(on_equip)
+            #res = function_memory.evaluateFunction(on_equip)
+            ev = function_memory.generatorEvaluateFunction(on_equip)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or v
+            res = v
             self.postEvaluate(function_memory)
 
             # function_memory.clear()
@@ -122,7 +190,17 @@ class Tool(GameObject):
     def onUnequip(self, function_memory:FunctionMemory):
         if on_unequip := self.events.get("on_unequip", None):
             self.prepFunctionMemory(function_memory)
-            res = function_memory.evaluateFunction(on_unequip)
+            #res = function_memory.evaluateFunction(on_unequip)
+            ev = function_memory.generatorEvaluateFunction(on_unequip)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or v
+            res = v
             self.postEvaluate(function_memory)
 
             # function_memory.clear()

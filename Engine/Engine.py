@@ -75,9 +75,10 @@ class Engine:
         if local_variables:
             function_memory.update(local_variables)
         ev = self.loader.generatorEvaluateFunction(function_memory, data)
+        v = None
         try:
             v = ev.send(None)
-            while isinstance(v, (EngineOperation, _EngineOperation)):
+            while isinstance(v, _EngineOperation):
                 res = yield v
                 v = ev.send(res)
         except StopIteration as e:
@@ -132,7 +133,20 @@ class Engine:
                     self._function_memory.clear()
                     
                     res = TextPattern.handleInput(self._function_memory, player, text)
-                    player_id, text = yield res
+                    if isinstance(res, Generator):
+                        v = None
+                        try:
+                            v = res.send(None)
+                            while isinstance(v, _EngineOperation):
+                                #ret = yield v
+                                self.evaluateResult(self._default_input_handler, res, v, player_id, text)
+                                #v = res.send(ret)
+                        except StopIteration as e:
+                            v = e.value or v
+                        player_id, text = yield EngineOperation.Continue()
+                    else:
+                        player_id, text = yield res
+
                     continue
                     #except Exception as e:
                     #    Log["ERROR"]["engine"]["input-handler"]("\n" + "\n".join(e.args))
@@ -158,6 +172,18 @@ class Engine:
         if default is ...: raise EngineError(f"Player does not exist with id: '{player_id}'")
         return default
 
+
+    def inputGetterWrapper(self, handler:Generator):
+
+        player_id, text = yield
+
+        v = handler.send(text)
+
+        if isinstance(v, (_EngineOperation)):
+            return v
+        else:
+            return EngineOperation.Success(v)
+
     def evaluateResult(self, handler_getter:Callable, handler:Generator, result:_EngineOperation, player_id:int, text:str):
         Log["debug"]["engine"]["evaluate-result"](f"result:{result}  id:{player_id} text:'{text}'")
         match result:
@@ -166,6 +192,8 @@ class Engine:
                 prompt:str = result.prompt
                 self.io_hook.sendOutput(target, prompt)
                 self.input_queue.pop(player_id)
+                self.input_queue.update({player_id: [handler_getter, self.inputGetterWrapper(handler), ""]})
+
             case EngineOperation.Restart():
                 gen = self.input_queue[player_id][0]
                 self.input_queue[player_id][1] = gen
@@ -174,6 +202,7 @@ class Engine:
             case EngineOperation.Success():
                 #if result.value:
                 #self.io_hook.sendOutput(player_id, result.value)
+                if result.value: Log["debug"]["engine"]["evaluate-result"](f"EngineOperation.Success ({result.value})")
                 self.input_queue.pop(player_id)
             case EngineOperation.Failure():
                 ...
@@ -181,6 +210,8 @@ class Engine:
                 ...
             case EngineOperation.Continue():
                 #self.io_hook.sendOutput(player_id, result.value)
+                if result.value: Log["debug"]["engine"]["evaluate-result"](f"EngineOperation.Continue ({result.value})")
+                #if self.input_queue[player_id][1] == self._default_input_handler:
                 self.input_queue.pop(player_id)
             case _:
                 raise EngineError("Unknown Operation")
@@ -212,7 +243,7 @@ class Engine:
                             if not Util.generator_started(response_handler):
                                 result = response_handler.send(None)
                                 if not isinstance(result, _EngineOperation):
-                                    raise EngineError("generator did not yield/return an EngineOperation")
+                                    raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
                                 #print(result)
                                 try:
                                     self.evaluateResult(handler_getter, response_handler, result, player_id, text)
@@ -222,7 +253,7 @@ class Engine:
                             try:
                                 result = response_handler.send((player_id, text))
                                 if not isinstance(result, _EngineOperation):
-                                    raise EngineError("generator did not yield/return an EngineOperation")
+                                    raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
                                 #print(result)
                                 try:
                                     self.evaluateResult(handler_getter, response_handler, result, player_id, text)
@@ -233,7 +264,7 @@ class Engine:
                             except StopIteration as e:
                                 result = e.value
                                 if not isinstance(result, _EngineOperation):
-                                    raise EngineError("generator did not yield/return an EngineOperation")
+                                    raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
                                 #print(result)
                                 try:
                                     self.evaluateResult(handler_getter, response_handler, result, player_id, text)
@@ -247,7 +278,7 @@ class Engine:
                                 self.input_queue[player_id][1] = response_handler = result
                                 result = response_handler.send(None)
                             if not isinstance(result, _EngineOperation):
-                                raise EngineError("function did not return an EngineOperation")
+                                raise EngineError(f"function did not return an EngineOperation! ({result})")
                             try:
                                 self.evaluateResult(handler_getter, response_handler, result, player_id, text)
                             except EngineError as e:

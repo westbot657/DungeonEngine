@@ -5,11 +5,13 @@ try:
     from .Identifier import Identifier
     from .Util import Util
     from .EngineDummy import Engine
+    from .EngineOperation import EngineOperation, _EngineOperation
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
     from Util import Util
     from EngineDummy import Engine
+    from EngineOperation import EngineOperation, _EngineOperation
 
 class Item(GameObject):
     identifier = Identifier("engine", "object/", "item")
@@ -28,7 +30,16 @@ class Item(GameObject):
             function_memory.addContextData({
                 "#tool": self
             })
-            res = function_memory.evaluateFunction(on_use)
+            ev = function_memory.generatorEvaluateFunction(on_use)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or v
+            res = v
 
     def __repr__(self):
         return f"Item {self.name}: max_count:{self.max_count} count:{self.count} data:{self.data}"

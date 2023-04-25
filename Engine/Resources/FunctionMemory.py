@@ -46,6 +46,9 @@ class FunctionMemory:
     def evaluateFunction(self, data:dict):
         return self.engine.evaluateFunction(data, self)
 
+    def generatorEvaluateFunction(self, data:dict):
+        return self.engine.generatorEvaluateFunction(data, self)
+
     def addContextData(self, data:dict):
         print(f"#store: {data}")
         self.context_data.update(data)

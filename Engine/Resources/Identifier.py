@@ -64,6 +64,7 @@ class Identifier:
             namespace = d.get("namespace", "")
             path = d.get("path", "")
             name = d.get("name", "")
+        
         else:
             raise IdentifierError(f"Unknown identifier format: '{file_name}'")
         return cls(namespace, path, name)

@@ -26,7 +26,7 @@ class LootEntry:
     def fromList(cls, data:list):
         r = []
         for d in data:
-            r.append(cls(d))
+            r.append(LootEntry(d))
         return r
 
     def calcWeight(self, function_memory:FunctionMemory, curr_weight:float, num_entries_calculated:int, num_entries_total:int) -> float:
@@ -63,7 +63,12 @@ class LootPool:
     def fromList(cls, data:list):
         r = []
         for d in data:
-            r.append(cls(d.get("bonus_rolls", 0), LootEntry.fromList(d.get("entries", []))))
+            r.append(
+                LootPool(
+                    d.get("bonus_rolls", 0),
+                    LootEntry.fromList(d.get("entries", []))
+                )
+            )
         return r
 
     def roll(self, function_memory:FunctionMemory) -> list:

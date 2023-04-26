@@ -99,9 +99,10 @@ class DungeonLoader:
             v = e.value or (v if not isinstance(v, _EngineOperation) else None)
         return v
 
-    def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
+    def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict, prepEval:bool=False):
         v = None
         if isinstance(data, dict):
+            
             if (funcs := data.get("functions", None)) is not None:
                 if (predicate := data.get("predicate", None)) is not None:
                     if not function_memory.checkPredicate(predicate): return None
@@ -121,12 +122,12 @@ class DungeonLoader:
             elif (func := data.get("function", None)) is not None:
                 if f := self.loader_function.getFunction(func):
                     f: LoaderFunction
-                    if (predicate := data.get("function", None)) is not None:
+                    if (predicate := data.get("predicate", None)) is not None:
                         if not function_memory.checkPredicate(predicate): return None
                     args = {}
                     for key, item in data.items():
                         if key in ["function", "#store", "predicate"]: continue
-                        if isinstance(item, (dict, list)):
+                        if isinstance(item, dict) or (isinstance(item, list) and (not prepEval)):
                             ev = self._generatorEvaluateFunction(function_memory, item)
                             v = None
                             try:
@@ -138,6 +139,7 @@ class DungeonLoader:
                                 #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
                                 v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                             args.update({key: v})
+                        
                         else:
                             args.update({key: item})
                     r = f._call(function_memory, args)
@@ -162,6 +164,10 @@ class DungeonLoader:
                         function_memory.store(var, res)
                     return res
         
+                else:
+                    ...
+                    # TODO: function doesn't exist, do something (raise error)
+
             elif (var := data.get("#ref", None)) is not None:
                 return function_memory.ref(var)
             elif (store := data.get("#store", None)) is not None:
@@ -211,7 +217,6 @@ class DungeonLoader:
             else:
                 dat = {}
                 for key, item in data.items():
-
                     ev = self._generatorEvaluateFunction(function_memory, item)
                     v = None
                     try:
@@ -225,10 +230,15 @@ class DungeonLoader:
                 return dat
             
         elif isinstance(data, list):
+            #print(f"\n\n\ndoes this even ever get called??\n{data}\n\n\n")
             dat = []
             for item in data:
-
-                ev = self._generatorEvaluateFunction(function_memory, item)
+                # if isinstance(item, dict):
+                #     if item.get("call-on-load", True) is False:
+                        
+                #         dat.append(item)
+                #         continue
+                ev = self._generatorEvaluateFunction(function_memory, item, True)
                 v = None
                 try:
                     v = ev.send(None)

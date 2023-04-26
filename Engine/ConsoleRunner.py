@@ -3,19 +3,20 @@
 from threading import Thread
 import re
 
+
 class ConsoleIOHook:
     def __init__(self):
         self.print_queue = []
         self.engine = None
         self.running = False
-    
+
     def init(self, engine):
         self.engine = engine
 
     def stop(self):
         self.running = False
-        
-    def sendOutput(self, target:int|str, prompt:str):
+
+    def sendOutput(self, target: int | str, prompt: str):
         self.print_queue.append((target, prompt))
 
     def start(self):
@@ -24,7 +25,7 @@ class ConsoleIOHook:
         o.start()
         i = Thread(target=self._input_loop)
         i.start()
-    
+
     def _output_loop(self):
         while self.running:
             while self.print_queue:
@@ -44,10 +45,5 @@ class ConsoleIOHook:
 if __name__ == "__main__":
     from Engine import Engine
     console_hook = ConsoleIOHook()
-    game_engine = Engine(console_hook) # pylint: disable=[not-callable]
+    game_engine = Engine(console_hook)  # pylint: disable=[not-callable]
     game_engine.start()
-    
-
-
-
-

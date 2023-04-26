@@ -14,8 +14,15 @@ from typing import Any
 
 class LoaderFunction:
     _functions = {}
+    _pre_evaluators = [] # a list of identifiers
     id: Identifier|None = None
     return_type: list|tuple|tuple = None
+    pre_evaluator: bool = False
+
+    @classmethod
+    def isPreEvaluator(cls, func:str|Identifier):
+        if isinstance(func, Identifier): func = func.full()
+        return func in cls._pre_evaluators
 
     @classmethod
     def getFunction(cls, identifier:Identifier|str):
@@ -127,6 +134,8 @@ class LoaderFunction:
                 return
 
             LoaderFunction._functions.update({id.full(): cls})
+            if cls.pre_evaluator:
+                LoaderFunction._pre_evaluators.append(id.full())
         else:
             print(f"Failed to load function without id: {cls}")
         

@@ -682,6 +682,7 @@ class Engine_Player_GetLocation(LoaderFunction):
 class Engine_Random_Uniform(LoaderFunction):
     id = Identifier("engine", "random/", "uniform")
     return_type = int
+    pre_evaluator = True
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -704,6 +705,7 @@ class Engine_Random_Uniform(LoaderFunction):
 
 class Engine_Random_Weighted(LoaderFunction):
     id = Identifier("engine", "random/", "weighted")
+    pre_evaluator = True
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -724,6 +726,7 @@ class Engine_Random_Weighted(LoaderFunction):
 class Engine_Text_Builder(LoaderFunction):
     id = Identifier("engine", "text/", "builder")
     return_type = str
+    pre_evaluator = True
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -760,6 +763,7 @@ class Engine_Text_Builder(LoaderFunction):
 class Engine_Logic_Compare(LoaderFunction):
     id = Identifier("engine", "logic/", "compare")
     return_type = Tool
+    pre_evaluator = True
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         return cls.compare
@@ -886,7 +890,8 @@ class Engine_Logic_Compare(LoaderFunction):
 ####XXX#############XXX####
 class Engine_Math_Solve(LoaderFunction):
     id = Identifier("engine", "math/", "solve")
-    return_type = Tool
+    return_type = [int, float]
+    pre_evaluator = True
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         return cls.solve

@@ -446,6 +446,11 @@ class DungeonLoader:
     def checkTextInventory(function_memory, player:Player, raw_text:str, groupdict:dict):
         function_memory.engine.sendOutput(player, player.inventory.fullStats(function_memory.engine))
 
+    @TextPattern(r"", TextPattern.CheckType.SEARCH)
+    def checkTravelTo(self, function_memory, player:Player, raw_text:str, groupdict:dict):
+        ...
+
+
     def getAmmo(self, identifier:Identifier|str) -> AbstractAmmo:
         identifier: Identifier = Identifier.fromString(identifier)
         
@@ -473,37 +478,37 @@ class DungeonLoader:
 
     def loadGame(self, engine:Engine):
         Log["loadup"]["loader"]("Loading Abstract Status Effects...")
-        self.abstract_status_effects = AbstractStatusEffect.loadData(self)
+        self.abstract_status_effects = AbstractStatusEffect.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Abstract Ammo...")
-        self.abstract_ammo = AbstractAmmo.loadData(self)
+        self.abstract_ammo = AbstractAmmo.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Abstract Armors...")
-        self.abstract_armor = AbstractArmor.loadData(self)
+        self.abstract_armor = AbstractArmor.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Abstract Tools...")
-        self.abstract_tools = AbstractTool.loadData(self)
+        self.abstract_tools = AbstractTool.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Abstract Weapons...")
-        self.abstract_weapons = AbstractWeapon.loadData(self)
+        self.abstract_weapons = AbstractWeapon.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Abstract Items...")
-        self.abstract_items = AbstractItem.loadData(self)
+        self.abstract_items = AbstractItem.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Abstract Attacks...")
-        self.abstract_attacks = AbstractAttack.loadData(self)
+        self.abstract_attacks = AbstractAttack.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Abstract Enemies...")
-        self.abstract_enemies = AbstractEnemy.loadData(self)
+        self.abstract_enemies = AbstractEnemy.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Abstract Combats...")
-        self.abstract_combats = AbstractCombat.loadData(self)
-        #self.abstract_loot_tables = AbstractLootTable.loadData(self)
+        self.abstract_combats = AbstractCombat.loadData(engine)
         
-        # self.abstract_rooms = AbstractRoom.loadData(self)
+        Log["loadup"]["loader"]("Loading Abstract Rooms...")
+        self.abstract_rooms = AbstractRoom.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Abstract Dungeons...")
-        self.abstract_dungeons = AbstractDungeon.loadData(self)
+        self.abstract_dungeons = AbstractDungeon.loadData(engine)
 
         Log["loadup"]["loader"]("Engine resource loading completed")
 

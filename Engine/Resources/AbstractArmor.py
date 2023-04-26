@@ -93,7 +93,7 @@ class AbstractArmor(AbstractGameObject):
             )
 
     @classmethod
-    def loadData(cls, inline_handler) -> list:
+    def loadData(cls, engine) -> list:
         files: list[str] = glob.glob("**/armor/*.json", recursive=True)
         for file in files:
             file: str

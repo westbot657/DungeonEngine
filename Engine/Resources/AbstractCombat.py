@@ -18,7 +18,7 @@ class AbstractCombat:
         self._raw_data = data
         
     @classmethod
-    def loadData(cls, inline_handler) -> list:
+    def loadData(cls, engine) -> list:
         files: list[str] = glob.glob("**/combats/*.json", recursive=True)
 
         for file in files:

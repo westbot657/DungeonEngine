@@ -5,11 +5,13 @@ try:
     from .Identifier import Identifier
     from .EngineErrors import InvalidObjectError
     from .Logger import Log
+    from .AbstractRoom import AbstractRoom
 except ImportError:
     from Dungeon import Dungeon
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
     from Logger import Log
+    from AbstractRoom import AbstractRoom
 
 
 import glob, json, re
@@ -19,54 +21,6 @@ import glob, json, re
 ####XXX######################XXX####
 
 # │┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌
-""" files
-my_dungeon
-├ resources
-│ ├ armor
-│ ├ attacks
-│ ├ enemies
-│ │ └ some_enemy.json
-│ └ weapons
-│   └ some_weapon.json
-├ rooms
-│ ├ room1.json
-│ └ room2.json
-├ my_dungeon.json
-└ my_dungeon.py   ?
-"""
-
-
-""" 
-> meh_dungeon.json
-{
-    "name": "Meh Dungeon",
-    "version": 0.1,
-    "entry_point": "meh_dungeon.rooms.entrance",
-    "rooms": {
-        "entrance": {
-            "name": "Entrance",
-            "environment_data": [
-                "fish-habitable"
-            ],
-            "interactions": [
-                { # targeted with: (room assumption) meh_dungeon:#door_entrance_left
-                    "type": "door",
-                    "id": "door_entrance_left",
-                    "target": "meh_dungeon"
-                },
-                {
-                    "type": "loot-item",
-                    "id": "entrance_loot",
-                    "item": "meh_dungeon:weapons/some_weapon"
-                }
-            ]
-        }
-    }
-}
-
-
-
-"""
 
 
 class AbstractDungeon:
@@ -83,10 +37,14 @@ class AbstractDungeon:
         self.exit_message: str|dict = data.get("exit_message")
         self.data: dict = data.get("data", {})
 
-        room_files: list[str] = glob.glob(f"Dungeons/{self.identifier.name}/rooms/*.json")
+
+        #room_files: list[str] = glob.glob(f"Dungeons/{self.identifier.name}/rooms/*.json")
+
+        self.abstract_rooms: list[AbstractRoom]
+
 
     @classmethod
-    def loadData(cls, inline_handler) -> list:
+    def loadData(cls, engine) -> list:
         files: list[str] = glob.glob("Dungeons/**/*.json")#, recursive=True)
 
         Log["loadup"]["dungeon"](f"Loading {len(files)} dungeons...")

@@ -131,7 +131,7 @@ class AbstractStatusEffect:
                 Log["ERROR"]["loadup"]["abstract"]["status effect"](f"parent does not exist: '{p}'")
         
         Log["loadup"]["abstract"]["status effect"]("verifying AbstractStatusEffect completion...")
-        Log.track(len(cls._loaded), "loadup", "abstract", "status_effetcs")
+        Log.track(len(cls._loaded), "loadup", "abstract", "status effect")
         for l, o in cls._loaded.copy().items():
             l: str
             o: AbstractStatusEffect

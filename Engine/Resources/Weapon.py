@@ -13,7 +13,7 @@ except ImportError:
 
 class Weapon(GameObject):
     identifier = Identifier("engine", "object/", "weapon")
-    def __init__(self, abstract, name:str, damage:DynamicValue, range:DynamicValue, max_durability:int, durability:int, ammo_type):
+    def __init__(self, abstract, name:str, damage:DynamicValue, range:DynamicValue, max_durability:int, durability:int, ammo_type, events:dict):
         self.abstract = abstract
         self.name = name
         self.damage = damage
@@ -21,6 +21,7 @@ class Weapon(GameObject):
         self.durability = durability
         self.max_durability = max_durability
         self.ammo_type = ammo_type
+        self.events = events
 
     def __repr__(self):
         return f"Weapon {self.name}: damage:{self.damage} range:{self.range}  durability:{self.durability}"
@@ -34,6 +35,13 @@ class Weapon(GameObject):
     def quickStats(self, engine):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
 
+    # onUse
+    # onDamage
+    # onBreak
+    # onAttack
+    # onEquip
+    # onUnequip
+    # onRepair
 
 
 

@@ -132,8 +132,19 @@ class LootTable:
         while roll < self.rolls:
             for pool in self.pools:
                 pool: LootPool
-                r_b = pool.roll(function_memory)
-                r, b = r_b
+
+                ev = pool.roll(function_memory)
+                v = None
+                try:
+                    v = ev.send(None)
+                    while isinstance(v, _EngineOperation):
+                        res = yield v
+                        v = ev.send(res)
+                except StopIteration as e:
+                    v = e.value
+
+                #r_b = pool.roll(function_memory)
+                r, b = v
                 if r:
                     result.append(r)
                     roll -= b

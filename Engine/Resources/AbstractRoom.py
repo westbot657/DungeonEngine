@@ -5,11 +5,13 @@ try:
     from .Identifier import Identifier
     from .Logger import Log
     from .EngineErrors import InvalidObjectError
+    from .EngineDummy import Engine
 except ImportError:
     from Room import Room
     from Identifier import Identifier
     from Logger import Log
     from EngineErrors import InvalidObjectError
+    from EngineDummy import Engine
 
 import glob, json, re
 
@@ -27,9 +29,12 @@ class AbstractRoom:
             AbstractRoom._link_parents.append((self, data["parent"]))
 
         self.name: str = data.get("name", None)
-        self.enter_message: str|dict = data.get("enter_message", None)
-        self.exit_message: str|dict = data.get("exit_message", None)
+        if self.name is None: self.name = identifier.name
+        self.enter_message: str|dict|None = data.get("enter_message", None)
+        self.exit_message: str|dict|None = data.get("exit_message", None)
         self.interactions: list = data.get("interactions", [])
+
+        self.is_template: bool = data.get("template", False)
 
     def _set_parent(self, parent):
         self.parent = parent
@@ -67,7 +72,7 @@ class AbstractRoom:
             return [self.parent] + self.parent.get_parent_chain()
 
     @classmethod
-    def loadData(cls, engine):
+    def loadData(cls, engine:Engine):
         files: list[str] = glob.glob("**/rooms/**/*.json", recursive=True)
         Log["loadup"]["abstract"]["room"](f"found {len(files)} item files")
 
@@ -81,7 +86,7 @@ class AbstractRoom:
             cls._loaded.update({Id.full(): cls(Id, data)})
         
             
-            Log["loadup"]["abstract"]["room"]("linking AbstractRoom parents...")
+        Log["loadup"]["abstract"]["room"]("linking AbstractRoom parents...")
         for w, p in cls._link_parents:
             w: AbstractRoom
             p: str
@@ -130,3 +135,5 @@ class AbstractRoom:
     #             cls._loaded.pop(room.identifier.ID())
     #             continue
 
+if __name__ == "__main__":
+    print(AbstractRoom.loadData(None))

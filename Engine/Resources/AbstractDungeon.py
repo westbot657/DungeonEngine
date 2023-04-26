@@ -32,7 +32,7 @@ class AbstractDungeon:
 
         self.name: str = data.get("name", None)
         self.version: float|str|int = data.get("version", None)
-        self.entry_point: str = data.get("entry_point", None)
+        self.entry_point: Identifier = Identifier.fromString(data.get("entry_point", None))
         self.enter_message: str|dict = data.get("enter_message")
         self.exit_message: str|dict = data.get("exit_message")
         self.data: dict = data.get("data", {})
@@ -40,7 +40,7 @@ class AbstractDungeon:
 
         #room_files: list[str] = glob.glob(f"Dungeons/{self.identifier.name}/rooms/*.json")
 
-        self.abstract_rooms: list[AbstractRoom]
+        self.abstract_rooms: list[AbstractRoom] = []
 
 
     @classmethod

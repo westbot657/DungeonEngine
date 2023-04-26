@@ -7,12 +7,14 @@ try:
     from .FunctionMemory import FunctionMemory
     from .Util import Util
     from .Logger import Log
+    from .EngineOperation import _EngineOperation
 except ImportError:
     from Identifier import Identifier
     from EngineDummy import Engine
     from FunctionMemory import FunctionMemory
     from Util import Util
     from Logger import Log
+    from EngineOperation import _EngineOperation
 
 import random
 
@@ -30,7 +32,19 @@ class LootEntry:
     def calcWeight(self, function_memory:FunctionMemory, curr_weight:float, num_entries_calculated:int, num_entries_total:int) -> float:
         if weight := self.data.get("weight", None): # all entries with specified weight should be calculated before ones with unspecified
             Log["debug"]["fishing rod"](f"weight: {weight}")
-            weight = function_memory.evaluateFunction(weight)
+
+            ev = function_memory.generatorEvaluateFunction(weight)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            weight = v
+
+            #weight = function_memory.evaluateFunction(weight)
             if curr_weight + weight > 1.0:
                 raise Exception(f"Weighted LootTable has too much weight! ({curr_weight} + {weight} = {curr_weight+weight})")
                 
@@ -65,7 +79,18 @@ class LootPool:
 
         for entry in entries:
             
-            w = entry.calcWeight(function_memory, weight, calculated, total_entries)
+            #w = entry.calcWeight(function_memory, weight, calculated, total_entries)
+            
+            ev = entry.calcWeight(function_memory, weight, calculated, total_entries)
+            w = None
+            try:
+                w = ev.send(None)
+                while isinstance(w, _EngineOperation):
+                    res = yield w
+                    w = ev.send(res)
+            except StopIteration as e:
+                w = e.value or (w if not isinstance(w, _EngineOperation) else None)
+            
             if w in weighted or w == 0:
                 continue # entry weight is 0, so it can't be picked anyways
             weighted.update({w: entry})
@@ -76,7 +101,18 @@ class LootPool:
         choice = Util.getRoundedUpKey(f, weighted)
 
         entry:LootEntry = weighted.get(choice)
-        return function_memory.evaluateFunction(entry.data), self.bonus_rolls
+
+        ev = function_memory.generatorEvaluateFunction(entry.data)
+        d = None
+        try:
+            d = ev.send(None)
+            while isinstance(d, _EngineOperation):
+                res = yield d
+                d = ev.send(res)
+        except StopIteration as e:
+            d = e.value or (d if not isinstance(d, _EngineOperation) else None)
+
+        return d, self.bonus_rolls
 
 class LootTable:
 

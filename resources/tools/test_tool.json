@@ -37,7 +37,8 @@
                             "prompt": "say something."
                         },
                         "' !!"
-                    ]
+                    ],
+                    "seperator": ""
                 }
             }
         ],

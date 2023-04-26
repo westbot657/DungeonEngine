@@ -77,7 +77,7 @@ class Tool(GameObject):
                     res = yield v
                     v = ev.send(res)
             except StopIteration as e:
-                v = e.value or v
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
             res = v
 
             self.postEvaluate(function_memory)
@@ -98,7 +98,7 @@ class Tool(GameObject):
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or v
+                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                     return v
 
                 else:
@@ -110,7 +110,7 @@ class Tool(GameObject):
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or v
+                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                     return v
 
     def onBreak(self, function_memory:FunctionMemory):
@@ -125,7 +125,7 @@ class Tool(GameObject):
                     res = yield v
                     v = ev.send(res)
             except StopIteration as e:
-                v = e.value or v
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
             res = v
             self.postEvaluate(function_memory)
 
@@ -146,7 +146,7 @@ class Tool(GameObject):
                     v = ev.send(res)
             except StopIteration as e:
                 if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
-                v = e.value or v
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
             res = v
             self.postEvaluate(function_memory)
 
@@ -164,7 +164,7 @@ class Tool(GameObject):
                     res = yield v
                     v = ev.send(res)
             except StopIteration as e:
-                v = e.value or v
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
             res = v
             self.postEvaluate(function_memory)
 
@@ -182,7 +182,7 @@ class Tool(GameObject):
                     res = yield v
                     v = ev.send(res)
             except StopIteration as e:
-                v = e.value or v
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
             res = v
             self.postEvaluate(function_memory)
 
@@ -200,7 +200,7 @@ class Tool(GameObject):
                     res = yield v
                     v = ev.send(res)
             except StopIteration as e:
-                v = e.value or v
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
             res = v
             self.postEvaluate(function_memory)
 

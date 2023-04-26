@@ -551,7 +551,6 @@ class Engine_Player_GiveObject(LoaderFunction):
             }
         )
 
-        print(f"fishing rod: game object: {game_object}")
 
         if isinstance(game_object, (Ammo, Item)):
             game_object: Ammo|Item
@@ -735,23 +734,23 @@ class Engine_Text_Builder(LoaderFunction):
 
     @staticmethod
     def builder(function_memory:FunctionMemory, text:list, seperator:str|dict=" "):
-        out_text = []
+        out_text = [str(t) for t in text]
 
-        for element in text:
-            if isinstance(element, str):
-                out_text.append(element)
-            elif isinstance(element, dict):
-                ev = function_memory.generatorEvaluateFunction(element)
-                v = None
-                try:
-                    v = ev.send(None)
-                    while isinstance(v, _EngineOperation):
-                        res = yield v
-                        v = ev.send(res)
-                except StopIteration as e:
-                    #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
-                    v = e.value or v
-                out_text.append(str(v))
+        # for element in text:
+        #     if isinstance(element, str):
+        #         out_text.append(element)
+        #     elif isinstance(element, dict):
+        #         ev = function_memory.generatorEvaluateFunction(element)
+        #         v = None
+        #         try:
+        #             v = ev.send(None)
+        #             while isinstance(v, _EngineOperation):
+        #                 res = yield v
+        #                 v = ev.send(res)
+        #         except StopIteration as e:
+        #             #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
+        #             v = e.value or v
+        #         out_text.append(str(v))
 
         return seperator.join(out_text)
 

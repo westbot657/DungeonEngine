@@ -54,7 +54,7 @@ class TextPattern:
             try:
                 matched, v = ev.send(None)
                 while isinstance(v, _EngineOperation):
-                    res = yield matched, v
+                    res = yield v
                     matched, v = ev.send(res)
             except StopIteration as e:
                 #if isinstance(e.value, _EngineOperation): print("\n\n\n1: Engine Operation\n\n\n")
@@ -78,7 +78,7 @@ class TextPattern:
                             v = ret.send(res)
                     except StopIteration as e:
                         #if isinstance(e.value, _EngineOperation): print("\n\n\n2: Engine Operation\n\n\n")
-                        v = e.value or v
+                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                     return v
             
         return EngineOperation.Continue(ret)
@@ -100,7 +100,7 @@ class TextPattern:
                             res = yield True, v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or v
+                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                     return True, v
                 else:
                     return True, ev
@@ -123,7 +123,7 @@ class TextPattern:
                             res = yield True, v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or v
+                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                     return True, v
                 else:
                     return True, ev
@@ -147,7 +147,7 @@ class TextPattern:
                             v = ev.send(res)
                     except StopIteration as e:
                         #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
-                        v = e.value or v
+                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                     return True, v
                 else:
                     return True, ev

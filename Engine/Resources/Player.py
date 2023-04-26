@@ -45,6 +45,7 @@ class Player(Entity):
             "inventory": self.inventory._get_save(function_memory),
             "status_effects": self.status_effects._get_save(function_memory)
         }
+        return data
 
     def __repr__(self):
         return self.name

@@ -3,10 +3,13 @@
 try:
     from .ConsoleCommand import ConsoleCommand
     from .Identifier import Identifier
+    from .Player import Player
+    from .Inventory import Inventory
 except ImportError:
     from ConsoleCommand import ConsoleCommand
     from Identifier import Identifier
-
+    from Player import Player
+    from Inventory import Inventory
 
 @ConsoleCommand(
     Identifier("engine", "", "new-player"),

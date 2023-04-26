@@ -96,7 +96,7 @@ class DungeonLoader:
                 v = ev.send(res)
         except StopIteration as e:
             #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
-            v = e.value or v
+            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
         return v
 
     def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
@@ -115,7 +115,7 @@ class DungeonLoader:
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or v
+                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                     if v: result = v
                 return result
             elif (func := data.get("function", None)) is not None:
@@ -136,7 +136,7 @@ class DungeonLoader:
                                     v = ev.send(res)
                             except StopIteration as e:
                                 #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
-                                v = e.value or v
+                                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                             args.update({key: v})
                         else:
                             args.update({key: item})
@@ -148,10 +148,10 @@ class DungeonLoader:
                             v = r.send(None)
                             while isinstance(v, _EngineOperation):
                                 res = yield v
-                                v = ev.send(res)
+                                v = r.send(res)
                         except StopIteration as e:
                             #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
-                            v = e.value or v
+                            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                         res = v
                     else:
                         res = r
@@ -179,8 +179,7 @@ class DungeonLoader:
                         res = yield v
                         v = ev.send(res)
                 except StopIteration as e:
-                    
-                    v = e.value or v
+                    v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                 res = v
                 if res and ((true_branch := data.get("true", None)) is not None):
 
@@ -192,7 +191,7 @@ class DungeonLoader:
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or v
+                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                     return v
 
                 elif (false_branch := data.get("false", None)) is not None:
@@ -205,7 +204,7 @@ class DungeonLoader:
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or v
+                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                     return v
                 else:
                     return None
@@ -221,7 +220,7 @@ class DungeonLoader:
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or v
+                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                     dat.update({key: v})
                 return dat
             
@@ -237,7 +236,7 @@ class DungeonLoader:
                         res = yield v
                         v = ev.send(res)
                 except StopIteration as e:
-                    v = e.value or v
+                    v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                 dat.append(v)
             return dat
         else:

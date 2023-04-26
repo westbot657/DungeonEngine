@@ -38,7 +38,7 @@ class Item(GameObject):
                     res = yield v
                     v = ev.send(res)
             except StopIteration as e:
-                v = e.value or v
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
             res = v
 
     def __repr__(self):

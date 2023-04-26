@@ -83,7 +83,7 @@ class Engine:
                 res = yield v
                 v = ev.send(res)
         except StopIteration as e:
-            v = e.value or v
+            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
         return v
 
     def loadGame(self):
@@ -138,7 +138,7 @@ class Engine:
                         v = None
                         try:
                             v = res.send(None)
-                            while isinstance(v, _EngineOperation):
+                            if isinstance(v, _EngineOperation):
                                 #ret = yield v
                                 self.evaluateResult(self._default_input_handler, res, v, player_id, text)
                                 #v = res.send(ret)
@@ -178,10 +178,13 @@ class Engine:
 
 
     def inputGetterWrapper(self, handler:Generator):
-
         player_id, text = yield
 
-        v = handler.send(text)
+        v = None
+        try:
+            v = handler.send(text)
+        except StopIteration as e:
+            v = e.value
 
         if isinstance(v, (_EngineOperation)):
             return v
@@ -196,7 +199,9 @@ class Engine:
                 prompt:str = result.prompt
                 self.io_hook.sendOutput(target, prompt)
                 #self.input_queue.pop(player_id)
-                self.input_queue.update({player_id: [handler_getter, self.inputGetterWrapper(handler), ""]})
+                wrapper = self.inputGetterWrapper(handler)
+                wrapper.send(None)
+                self.input_queue.update({player_id: [handler_getter, wrapper, ""]})
 
             case EngineOperation.Restart():
                 gen = self.input_queue[player_id][0]

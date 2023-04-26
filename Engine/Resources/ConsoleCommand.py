@@ -94,7 +94,7 @@ class ConsoleCommand:
         for arg, con in arg_tree.items():
             arg: str
             con: dict|None
-            arg_name, arg_types = arg.split("=")
+            arg_name, arg_types = arg.split(":")
             arg_types = arg_types.split("|")
             for tp in arg_types:
                 try:
@@ -169,7 +169,7 @@ class ConsoleCommand:
                     if con is None:
                         return args
                     if isinstance(con, dict):
-                        a = cls._parse_args(engine, con, text)
+                        a = cls._parse_args(function_memory, con, text)
                         if a is None: continue
                         if isinstance(a, list):
                             return args + a
@@ -184,14 +184,17 @@ class ConsoleCommand:
     @classmethod
     def handle_input(cls, function_memory, text:str):
         values = []
-        cmd, text = text.split(" ", 1)
+        if " " not in text:
+            cmd, text = text, ""
+        else:
+            cmd, text = text.split(" ", 1)
 
         if command := cls._commands.get(cmd, None):
-            try:
-                command._run(function_memory, text)
-            except Exception as e:
-                print(e, e.args)
-                return
+            #try:
+            command._run(function_memory, text)
+            #except Exception as e:
+            #    print(e, e.args)
+            #    return
         else:
             function_memory.engine.io_hook.sendOutput(0, f"There is no command by the name '{cmd}'")
             return

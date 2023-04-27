@@ -9,7 +9,7 @@ try:
     from .AbstractEnemy import AbstractEnemy, Enemy
     from .AbstractItem import AbstractItem, Item
     from .AbstractRoom import AbstractRoom, Room
-    from .AbstractStatusEffect import AbstractStatusEffect, StatusEffect
+    from .AbstractStatusEffect import AbstractStatusEffect, StatusEffect, StatusEffectCause
     from .AbstractTool import AbstractTool, Tool
     from .AbstractWeapon import AbstractWeapon, Weapon
     from .Functions import LoaderFunction
@@ -26,6 +26,9 @@ try:
     from .EngineOperation import EngineOperation, _EngineOperation
     from .Location import Location
     from .Position import Position
+    from .Environment import Environment
+    from .AbstractInteractable import AbstractInteractable, Interactable
+    from .Entity import Entity
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -35,7 +38,7 @@ except ImportError:
     from AbstractDungeon import AbstractDungeon, Dungeon
     from AbstractItem import AbstractItem, Item
     from AbstractRoom import AbstractRoom, Room
-    from AbstractStatusEffect import AbstractStatusEffect, StatusEffect
+    from AbstractStatusEffect import AbstractStatusEffect, StatusEffect, StatusEffectCause
     from AbstractTool import AbstractTool, Tool
     from AbstractWeapon import AbstractWeapon, Weapon
     from Functions import LoaderFunction
@@ -50,8 +53,10 @@ except ImportError:
     from Logger import Log
     from FunctionMemory import FunctionMemory
     from EngineOperation import EngineOperation, _EngineOperation
-    from .Location import Location
-    from .Position import Position
+    from Location import Location
+    from Position import Position
+    from Environment import Environment
+    from AbstractInteractable import AbstractInteractable, Interactable
 
 from typing import Any, Generator
 import re

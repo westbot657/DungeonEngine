@@ -4,10 +4,8 @@
         "name": "Weston",
         "max_health": 20,
         "health": 11,
-        "location": {
-            "world_pos": "energia_city:rooms/west_main_street",
-            "position": [0, 0]
-        },
+        "location": "energia_city:rooms/west_main_street",
+        "position": [0, 0],
         "inventory": [
             {
                 "type": "engine:armor",

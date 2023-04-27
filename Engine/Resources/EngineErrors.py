@@ -28,6 +28,10 @@ class IdentifierError(EngineError):
     def __init__(self, *args):
         super().__init__("IdentifierError:", *args)
 
+class LocationError(EngineError):
+    def __init__(self, *args):
+        super().__init__("LocationError:", *args)
+
 class ParseError(EngineError):
     def __init__(self, *args):
         super().__init__("ParseError:", *args)

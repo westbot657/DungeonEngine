@@ -7,6 +7,7 @@ try:
     from .StatusEffectManager import StatusEffectManager
     from .EngineDummy import Engine
     from .Logger import Log
+    from .Position import Position
 except ImportError:
     from Inventory import Inventory
     from Entity import Entity
@@ -14,20 +15,21 @@ except ImportError:
     from StatusEffectManager import StatusEffectManager
     from EngineDummy import Engine
     from Logger import Log
+    from Position import Position
 
 import json
 
 class Player(Entity):
     _loaded = {}
 
-    def __init__(self, discord_id:int, name:str, max_health:int, health:int, inventory:Inventory, location:Location):
+    def __init__(self, discord_id:int, name:str, max_health:int, health:int, inventory:Inventory, location:Location, position:Position):
         self.discord_id = discord_id
         self.name = name
         self.max_health = max_health
         self.health = health
         self.inventory = inventory
         self.status_effects = StatusEffectManager()
-        super().__init__(location)
+        super().__init__(location, position)
 
     def addHealth(self, health):
         self.health = min(self.max_health, self.health + health)
@@ -42,6 +44,7 @@ class Player(Entity):
             "max_health": self.max_health,
             "health": self.health,
             "location": self.location._get_save(function_memory),
+            "position": self.position._get_save(function_memory),
             "inventory": self.inventory._get_save(function_memory),
             "status_effects": self.status_effects._get_save(function_memory)
         }
@@ -74,13 +77,15 @@ class Player(Entity):
             name: str = data.get("name")
             max_health: int = data.get("max_health")
             health: int = data.get("health")
-            location_dict: dict = data.get("location")
+            location_str: str = data.get("location")
+            position_list: list = data.get("position")
             inv_list: list = data.get("inventory")
 
             Log["loadup"]["player"]("creating player instance...")
-            location: Location = Location.from_dict(engine, location_dict)
+            location: Location = Location.fromString(location_str)
+            position: Position = Position(*position_list)
             inventory: Inventory = Inventory.from_list(engine, inv_list)
-            p = cls(Id, name, max_health, health, inventory, location)
+            p = cls(Id, name, max_health, health, inventory, location, position)
             cls._loaded.update({Id: p})
             Log["loadup"]["player"]("player instance created")
         Log["loadup"]["player"](f"Loaded players: {cls._loaded}")

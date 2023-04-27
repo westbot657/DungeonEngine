@@ -1,6 +1,9 @@
 {
     "name": "Energia Island",
     "default_dungeon": "energia_city",
+    "environment": {
+        
+    },
     "dungeon_entrances": [
         {
             "dungeon": "energia_city",

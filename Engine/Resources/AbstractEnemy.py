@@ -8,6 +8,8 @@ try:
     from .DynamicValue import DynamicValue
     from .Enemy import Enemy
     from .Logger import Log
+    from .Position import Position
+    from .Location import Location
 except ImportError:
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
@@ -16,6 +18,8 @@ except ImportError:
     from DynamicValue import DynamicValue
     from Enemy import Enemy
     from Logger import Log
+    from .Position import Position
+    from .Location import Location
 
 import glob, json, re
 
@@ -123,12 +127,14 @@ class AbstractEnemy:
 
         return out
 
-    def createInstance(self, function_memory, **override_values) -> Enemy:
+    def createInstance(self, function_memory, location:Location, position:Position, **override_values) -> Enemy:
         return Enemy(self,
             override_values.get("name", self.getName()),
             override_values.get("max_health", self.getMaxHealth()),
             DynamicValue(override_values.get("health", self.getHealth())).getCachedOrNew(function_memory),
-            self._assertListAttackType(override_values.get("attacks", self.getAttacks()))
+            self._assertListAttackType(override_values.get("attacks", self.getAttacks())),
+            location,
+            position
         )
     
     @classmethod

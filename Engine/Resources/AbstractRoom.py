@@ -72,6 +72,24 @@ class AbstractRoom:
             return [self.parent] + self.parent.get_parent_chain()
 
     @classmethod
+    def getDungeonAbstractRooms(cls, dungeon_name:str):
+        rooms = []
+        for room in cls._loaded.values():
+            room: AbstractRoom
+            if room.identifier.namespace == dungeon_name:
+                rooms.append(room)
+        return rooms
+
+    @classmethod
+    def getDungeonRooms(cls, dungeon_name:str):
+        rooms = []
+        for room in cls._loaded.values():
+            room: AbstractRoom
+            if room.identifier.namespace == dungeon_name:
+                rooms.append(room)
+        return Room(rooms)
+
+    @classmethod
     def loadData(cls, engine:Engine):
         files: list[str] = glob.glob("**/rooms/**/*.json", recursive=True)
         Log["loadup"]["abstract"]["room"](f"found {len(files)} item files")
@@ -85,7 +103,6 @@ class AbstractRoom:
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})
         
-            
         Log["loadup"]["abstract"]["room"]("linking AbstractRoom parents...")
         for w, p in cls._link_parents:
             w: AbstractRoom

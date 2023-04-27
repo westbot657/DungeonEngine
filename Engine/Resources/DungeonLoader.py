@@ -24,6 +24,8 @@ try:
     from .Logger import Log
     from .FunctionMemory import FunctionMemory
     from .EngineOperation import EngineOperation, _EngineOperation
+    from .Location import Location
+    from .Position import Position
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -48,6 +50,8 @@ except ImportError:
     from Logger import Log
     from FunctionMemory import FunctionMemory
     from EngineOperation import EngineOperation, _EngineOperation
+    from .Location import Location
+    from .Position import Position
 
 from typing import Any, Generator
 import re
@@ -72,6 +76,7 @@ class DungeonLoader:
         self.abstract_attacks: dict[str, AbstractAttack] = {}
         self.abstract_combats: dict[str, AbstractCombat] = {}
         self.abstract_dungeons: dict[str, AbstractDungeon] = {}
+        self.dungeons: dict[str, Dungeon] = {}
         self.abstract_enemies: dict[str, AbstractEnemy] = {}
         self.abstract_items: dict[str, AbstractItem] = {}
         #self.abstract_loot_tables: dict[str, AbstractLootTable] = {}
@@ -438,18 +443,21 @@ class DungeonLoader:
         if not found_item:
             function_memory.engine.sendOutput(player, f"You do not have '{item_name}'")
 
-        
 
 
-    @TextPattern(r"\b(inventory|bag|items)\b", TextPattern.CheckType.SEARCH)
+
+    @TextPattern(r"\b(?:inventory|bag|items)\b", TextPattern.CheckType.SEARCH)
     @staticmethod
     def checkTextInventory(function_memory, player:Player, raw_text:str, groupdict:dict):
         function_memory.engine.sendOutput(player, player.inventory.fullStats(function_memory.engine))
 
-    @TextPattern(r"", TextPattern.CheckType.SEARCH)
+    @TextPattern(r"\b(?:go *to|travel *to) *(?P<location_name>[a-zA-Z0-9_][a-zA-Z0-9_ ]*)\b", TextPattern.CheckType.SEARCH)
     def checkTravelTo(self, function_memory, player:Player, raw_text:str, groupdict:dict):
-        ...
+        location_name = Location.fromString(groupdict["location_name"])
 
+        for dungeon_name, dungeon in self.dungeons.items():
+            if location_name.dungeon == dungeon_name:
+                ...
 
     def getAmmo(self, identifier:Identifier|str) -> AbstractAmmo:
         identifier: Identifier = Identifier.fromString(identifier)

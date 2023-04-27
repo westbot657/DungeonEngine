@@ -489,7 +489,26 @@ class DungeonLoader:
             {
                 "engine:text": str,
                 "engine:boolean": bool,
-                "engine:number": (int, float)
+                "engine:number": (int, float),
+                "engine:weapon": Weapon,
+                "engine:ammo": Ammo,
+                "engine:armor": Armor,
+                "engine:tool": Tool,
+                "engine:item": Item,
+                "engine:status_effect": StatusEffect,
+                "engine:status_effect_cause": StatusEffectCause,
+                "engine:room": Room,
+                "engine:dungeon": Dungeon,
+                "engine:loot_table": LootTable,
+                "engine:player": Player,
+                "engine:enemy": Enemy,
+                "engine:entity": Entity,
+                "engine:attack": Attack,
+                "engine:combat": Combat,
+                "engine:environment": Environment,
+                "engine:location": Location,
+                "engine:position": Position,
+                "engine:interactable": Interactable
             }.get(element_type, None)
         )
 

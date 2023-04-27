@@ -1,6 +1,12 @@
 # pylint: disable=[W,R,C,import-error]
 
-class StatusEffectCause:
+try:
+    from .FunctionalElement import FunctionalElement
+except ImportError:
+    from FunctionalElement import FunctionalElement
+
+
+class StatusEffectCause(FunctionalElement):
     _cause_types = {}
 
     def __init_subclass__(cls):

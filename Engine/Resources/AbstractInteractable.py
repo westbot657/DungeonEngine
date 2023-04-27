@@ -34,6 +34,10 @@ class AbstractInteractable:
         self.fields: dict[str, dict[str, Any]]|None = data.get("fields", None)
         self.interaction: dict = data.get("interaction", None)
 
+    def _set_parent(self, parent):
+        self.parent = parent
+        parent.children.append(self)
+
     def is_parent_of(self, other):
         p = other
         while p is not None:
@@ -145,6 +149,7 @@ class AbstractInteractable:
             l: str
             o: AbstractInteractable
             try:
+                #o.getFieldValues(engine._function_memory)
                 Log.success()
             except InvalidObjectError:
                 e: AbstractInteractable = cls._loaded.pop(l)

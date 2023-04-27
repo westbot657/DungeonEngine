@@ -13,6 +13,7 @@ try:
     from .EngineErrors import InvalidObjectError
     from .Logger import Log
     from .FunctionMemory import FunctionMemory
+    from .FunctionalElement import FunctionalElement
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -26,8 +27,9 @@ except ImportError:
     from EngineErrors import InvalidObjectError
     from Logger import Log
     from FunctionMemory import FunctionMemory
+    from FunctionalElement import FunctionalElement
 
-class Inventory:
+class Inventory(FunctionalElement):
     _default_equips = {}
 
     def __init__(self, function_memory, contents:list[GameObject]):

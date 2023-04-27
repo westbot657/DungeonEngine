@@ -3,13 +3,15 @@
 try:
     from .EngineDummy import Engine
     from .StatusEffectCause import StatusEffectCause
+    from .FunctionalElement import FunctionalElement
 except ImportError:
     from EngineDummy import Engine
     from StatusEffectCause import StatusEffectCause
+    from FunctionalElement import FunctionalElement
 
 
 
-class StatusEffect:
+class StatusEffect(FunctionalElement):
 
     def __init__(self, abstract, name:str, level:int, duration:float|int, tick_interval, cause:StatusEffectCause, events:dict):
         self.abstract = abstract

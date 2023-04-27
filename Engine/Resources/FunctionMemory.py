@@ -4,10 +4,12 @@ try:
     from .EngineDummy import Engine
     from .EngineErrors import MemoryError
     from .Logger import Log
+    from .FunctionalElement import FunctionalElement
 except ImportError:
     from EngineDummy import Engine
     from EngineErrors import MemoryError
     from Logger import Log
+    from FunctionalElement import FunctionalElement
 
 import json
 
@@ -75,11 +77,33 @@ class FunctionMemory:
                 return self.context_data[name]
             raise MemoryError(f"Local context variable not defined: '{name}'")
 
+        elif name.startswith("."):
+            props = [f".{prop}" for prop in name.split(".") if prop]
+            prop = props.pop(0)
+            if prop in self.symbol_table:
+                return self._getProperty(prop, props)
+
+            raise MemoryError(f"Variable referenced before assignment: '{name}'")
+
         else:
             if name in self.symbol_table:
                 return self.symbol_table[name]
             
             raise MemoryError(f"Variable referenced before assignment: '{name}'")
+
+    def _getProperty(self, obj, propertyTree:list):
+        while propertyTree:
+            if isinstance(obj, FunctionalElement):
+                obj_props = obj.getLocalVariables()
+                curr = propertyTree.pop(0)
+                if curr in obj_props:
+                    obj = obj_props[curr]
+                else:
+                    raise MemoryError(f"Variable '{obj}' has no property '{curr}'")
+            else:
+                break
+        return obj
+
 
     def clear(self):
         #self.symbol_table.clear()

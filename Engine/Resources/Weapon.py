@@ -5,11 +5,13 @@ try:
     from .Identifier import Identifier
     from .DynamicValue import DynamicValue
     from .Util import Util
+    from .FunctionMemory import FunctionMemory
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
     from DynamicValue import DynamicValue
     from Util import Util
+    from FunctionMemory import FunctionMemory
 
 class Weapon(GameObject):
     identifier = Identifier("engine", "object/", "weapon")
@@ -35,13 +37,20 @@ class Weapon(GameObject):
     def quickStats(self, engine):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
 
-    # onUse
-    # onDamage
-    # onBreak
-    # onAttack
-    # onEquip
-    # onUnequip
-    # onRepair
+    def onUse(self, function_memory:FunctionMemory):
+        ...
+    def onDamage(self, function_memory:FunctionMemory):
+        ...
+    def onBreak(self, function_memory:FunctionMemory):
+        ...
+    def onAttack(self, function_memory:FunctionMemory):
+        ...
+    def onEquip(self, function_memory:FunctionMemory):
+        ...
+    def onUnequip(self, function_memory:FunctionMemory):
+        ...
+    def onRepair(self, function_memory:FunctionMemory):
+        ...
 
 
 

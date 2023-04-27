@@ -10,7 +10,7 @@ Log._tag_colors = {
     "object": "\033[38;2;200;200;200m",
     "inventory": "\033[38;2;0;100;100m",
     "dungeon": "\033[38;2;0;180;30m",
-    "evaluate-result": "\033[48;2;255;0;0m"
+    "evaluate-result": "\033[38;2;255;0;0m"
 }
 
 from Resources.AbstractAmmo         import AbstractAmmo, Ammo

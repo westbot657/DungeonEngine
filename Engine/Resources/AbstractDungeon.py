@@ -57,7 +57,7 @@ class AbstractDungeon:
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
 
-            Id = Identifier.fromFile(file)
+            Id = Identifier("dungeon", "", file.replace("\\", "/").rsplit("/", 1)[1].rsplit(".", 1)[0])
             cls._loaded.update({Id.full(): cls(Id, data)})
 
         for l in cls._loaded.copy():

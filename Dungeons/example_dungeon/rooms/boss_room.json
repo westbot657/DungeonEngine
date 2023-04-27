@@ -1,6 +1,5 @@
 {
     "name": "Boss Room",
-    "version": 0.1,
     "entry-point": "example_dungeon:grove_entrance",
     "data": {
         "boss_defeated": false

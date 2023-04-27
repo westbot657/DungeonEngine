@@ -3,11 +3,13 @@
 try:
     from .Identifier import Identifier
     from .EngineErrors import EngineError, IdentifierError
+    from .FunctionalElement import FunctionalElement
 except ImportError:
     from Identifier import Identifier
     from EngineErrors import EngineError, IdentifierError
+    from FunctionalElement import FunctionalElement
 
-class GameObject:
+class GameObject(FunctionalElement):
     _game_object_types = {}
     
     identifier: Identifier = None

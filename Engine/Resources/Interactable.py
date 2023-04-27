@@ -4,14 +4,16 @@ try:
     from .GameObject import GameObject
     from .Identifier import Identifier
     from .DynamicValue import DynamicValue
+    from .FunctionalElement import FunctionalElement
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
     from DynamicValue import DynamicValue
+    from FunctionalElement import FunctionalElement
 
 from typing import Any
 
-class Interactable:
+class Interactable(FunctionalElement):
     
     def __init__(self, abstract, field_values:dict):
         self.abstract = abstract

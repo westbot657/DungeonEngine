@@ -84,6 +84,7 @@ class DungeonLoader:
         self.dungeons: dict[str, Dungeon] = {}
         self.abstract_enemies: dict[str, AbstractEnemy] = {}
         self.abstract_items: dict[str, AbstractItem] = {}
+        self.abstract_interactables: dict[str, AbstractInteractable] = {}
         #self.abstract_loot_tables: dict[str, AbstractLootTable] = {}
         self.abstract_rooms: dict[str, AbstractRoom] = {}
         self.abstract_status_effects: dict[str, AbstractStatusEffect] = {}
@@ -476,16 +477,17 @@ class DungeonLoader:
 
     @TextPattern(r"\b(?:inventory|bag|items)\b", TextPattern.CheckType.SEARCH, ["global"])
     @staticmethod
-    def checkTextInventory(function_memory, player:Player, raw_text:str, groupdict:dict):
+    def checkTextInventory(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         function_memory.engine.sendOutput(player, player.inventory.fullStats(function_memory.engine))
 
     @TextPattern(r"\b(?:go *to|travel *to) *(?P<location_name>[a-zA-Z0-9_][a-zA-Z0-9_ ]*)\b", TextPattern.CheckType.SEARCH, ["world"])
-    def checkTravelTo(self, function_memory, player:Player, raw_text:str, groupdict:dict):
+    @staticmethod
+    def checkTravelTo(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         location_name = Location.fromString(groupdict["location_name"])
 
-        for dungeon_name, dungeon in self.dungeons.items():
+        for dungeon_name, dungeon in function_memory.engine.loader.dungeons.items():
             if location_name.dungeon == dungeon_name:
-                ...
+                function_memory.engine.sendOutput(player, "dungeon exists")
 
 
     def isElementOfType(self, element:Any, element_type:str):
@@ -545,13 +547,20 @@ class DungeonLoader:
         Log["loadup"]["loader"]("Loading Abstract Combats...")
         self.abstract_combats = AbstractCombat.loadData(engine)
         
+        Log["loadup"]["loader"]("Loading Abstract Interactables...")
+        self.abstract_interactables = AbstractInteractable.loadData(engine)
+
         Log["loadup"]["loader"]("Loading Abstract Rooms...")
         self.abstract_rooms = AbstractRoom.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Abstract Dungeons...")
         self.abstract_dungeons = AbstractDungeon.loadData(engine)
 
+        Log["loadup"]["loader"]("Loading Dungeons...")
+
         Log["loadup"]["loader"]("Engine resource loading completed")
+        
+
 
     def saveGame(self, engine:Engine):
         # TODO: implement saving

@@ -60,6 +60,8 @@ class AbstractWeapon(AbstractGameObject):
         self.max_durability: int|None = data.get("max_durability", None)
         self.durability: int|None = data.get("durability", self.max_durability)
 
+        self.events: dict = data.get("events", {})
+
         self.ammo_type: str|None = data.get("ammo_type", None)
 
         self.is_template: bool = data.get("template", False)
@@ -112,6 +114,13 @@ class AbstractWeapon(AbstractGameObject):
             return AbstractAmmo._loaded["engine:ammo/none"]
         return AbstractAmmo._loaded["engine:ammo/none"]
 
+    def getEvents(self):
+        if self.events is None:
+            e = self.parent.getEvents() if self.parent else None
+        else:
+            e = self.events
+        return e or {}
+
     def _assertAmmoType(self, tp) -> AbstractAmmo:
         if isinstance(tp, AbstractAmmo): return tp
         if abstract := AbstractAmmo._loaded.get(tp, None):
@@ -132,7 +141,8 @@ class AbstractWeapon(AbstractGameObject):
                 DynamicValue(override_values.get("range", self.getRange())),
                 override_values.get("max_durability", self.getMaxDurability()),
                 DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(function_memory),
-                self._assertAmmoType(override_values.get("ammo_type", self.getAmmoType()))
+                self._assertAmmoType(override_values.get("ammo_type", self.getAmmoType())),
+                self.getEvents()
             )
 
     @classmethod

@@ -19,10 +19,12 @@ class Location:
         self.room = room
 
     def full(self):
+        if self.room_path == self.room == "":
+            return self.dungeon
         return f"{self.dungeon}:{self.room_path}{self.room}"
 
     def fullWith(self, **kwargs):
-        return f"{kwargs.get('dungeon', self.dungeon)}:{kwargs.get('room_path', self.room_path)}{kwargs.get('room', self.room)}"
+        return f"{kwargs.get('dungeon', self.dungeon)}:{kwargs.get('room_path', self.room_path)}{kwargs.get('room', self.room)}".strip(":")
 
     def __eq__(self, other):
         if isinstance(other, str):
@@ -35,7 +37,7 @@ class Location:
             return True
 
     def __repr__(self):
-        return f""
+        return self.full()
 
     @classmethod
     def fromString(cls, location:str):
@@ -46,6 +48,11 @@ class Location:
             room_path = d.get("room_path", "")
             room = d.get("room", "")
             return cls(dungeon, room_path, room)
+
+        elif m := re.match(r"(?P<dungeon>[a-z_][a-z0-9_])", location):
+            d = m.groupdict()
+            dungeon = d.get("dungeon")
+            return cls(dungeon, "", "")
 
         else:
             LocationError(f"Unknown Location format: '{location}'")

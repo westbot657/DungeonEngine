@@ -24,24 +24,29 @@ class TextPattern:
         FULLMATCH = auto()
 
     _patterns = []
-    def __init__(self, regex, check_type=CheckType.SEARCH, categories:list[str]=[]):
+    def __init__(self, regex, check_type=CheckType.SEARCH, categories:list[str]=None):
         """
         regex: the regular expression player input is checked against.
         if the pattern is matched, the decorated function is called,
         passing the engine, player, raw text, and the regex groupdict()
+
+        categories: a list of strings to sort which patterns to check with `handleInput()`
         """
         self.check_type = check_type
         self.regex = regex
+        self.categories = categories or ["default"]
         TextPattern._patterns.append(self)
     
     def __call__(self, eval_method):
         self.eval_method = eval_method
     
     @classmethod
-    def handleInput(cls, function_memory, player, text:str):
+    def handleInput(cls, function_memory, player, text:str, categories:list[str]=None):
+        if not categories: categories = ["default"]
         for pattern in cls._patterns:
             pattern: TextPattern
-
+            if not any(c in pattern.categories for c in categories):
+                continue
             ev = pattern.check(function_memory, player, text)
             matched = False
             v = None

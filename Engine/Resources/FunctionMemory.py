@@ -25,8 +25,10 @@ Variable Types:
 class FunctionMemory:
     #_instance = None
 
-    with open(f"./resources/environment_variables.json", "r+", encoding="utf-8") as f:
-        global_environment_variables = json.load(f)
+    with open(f"./resources/engine.json", "r+", encoding="utf-8") as f:
+        _config = json.load(f)
+        global_environment_variables = _config.get("environment_variables")
+        data_types = _config.get("data_types")
 
     # def __new__(cls):
     #     if not cls._instance:
@@ -76,6 +78,7 @@ class FunctionMemory:
         else:
             if name in self.symbol_table:
                 return self.symbol_table[name]
+            
             raise MemoryError(f"Variable referenced before assignment: '{name}'")
 
     def clear(self):

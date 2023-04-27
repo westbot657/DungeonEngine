@@ -57,10 +57,8 @@ class AbstractDungeon:
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
 
-            if m := re.match(r"Dungeons/(?P<dungeon_id>[^/]+)/\1.json", file):
-                d: dict = m.groupdict()
-                dungeon_id = d.get("dungeon_id")
-                cls._loaded.update({dungeon_id: cls(Identifier(dungeon_id, f"Dungeons/{dungeon_id}/"), data)})
+            Id = Identifier.fromFile(file)
+            cls._loaded.update({Id.full(): cls(Id, data)})
 
         for l in cls._loaded.copy():
             try:

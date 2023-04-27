@@ -91,6 +91,33 @@ class DungeonLoader:
         val = self._evaluateFunction(function_memory, data)
         return val
 
+    def scanFunction(self, function_memory:FunctionMemory, data:Any, allowed_functions:list, disallowed_functions:list):
+        return not self._scanFunction(function_memory, data, allowed_functions, disallowed_functions)
+    
+    def _scanFunction(self, function_memory:FunctionMemory, data:Any, allowed_functions:list, disallowed_functions:list):
+        if isinstance(data, dict):
+            if (func := data.get("function", None)) is not None:
+                func: str
+                if not any(func.startswith(a) for a in allowed_functions):
+                    return True
+                if any(func.startswith(d) for d in disallowed_functions):
+                    return True
+
+                for key, item in data.items():
+                    if key in ["function"]: continue
+                    if self._scanFunction(function_memory, item, allowed_functions, disallowed_functions):
+                        return True
+            else:
+                for key, item in data.items():
+                    if self._scanFunction(function_memory, item, allowed_functions, disallowed_functions):
+                        return True
+        elif isinstance(data, list):
+            for item in data:
+                if self._scanFunction(function_memory, item, allowed_functions, disallowed_functions):
+                    return True
+        return False
+                
+
     def generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
         ev = self._generatorEvaluateFunction(function_memory, data)
         v = None
@@ -378,8 +405,7 @@ class DungeonLoader:
         else:
             raise InvalidObjectError("No type or parent given for GameObject")
 
-
-    @TextPattern(r"\b(?:equip) *(?P<item_name>.*)\b")
+    @TextPattern(r"\b(?:equip) *(?P<item_name>.*)\b", TextPattern.CheckType.SEARCH, ["common"])
     @staticmethod
     def checkTextEquip(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         item_name: str = groupdict["item_name"].strip()
@@ -404,7 +430,7 @@ class DungeonLoader:
                 else:
                     function_memory.engine.sendOutput(player, f"You have no Weapon, Armor, or Tool called '{item_name}'")
 
-    @TextPattern(r"\b(?P<keyword>use|eat|throw|apply|drink)(?: *(?P<amount>[1-9][0-9]*|an?|the|(?:some|all) *(?:(?:of *)?(?:the|my)))?)? *(?P<item_name>.*)\b")
+    @TextPattern(r"\b(?P<keyword>use|eat|throw|apply|drink)(?: *(?P<amount>[1-9][0-9]*|an?|the|(?:some|all) *(?:(?:of *)?(?:the|my)))?)? *(?P<item_name>.*)\b", TextPattern.CheckType.SEARCH, ["common"])
     @staticmethod
     def checkTextUse(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         keyword: str = groupdict["keyword"]
@@ -443,15 +469,12 @@ class DungeonLoader:
         if not found_item:
             function_memory.engine.sendOutput(player, f"You do not have '{item_name}'")
 
-
-
-
-    @TextPattern(r"\b(?:inventory|bag|items)\b", TextPattern.CheckType.SEARCH)
+    @TextPattern(r"\b(?:inventory|bag|items)\b", TextPattern.CheckType.SEARCH, ["global"])
     @staticmethod
     def checkTextInventory(function_memory, player:Player, raw_text:str, groupdict:dict):
         function_memory.engine.sendOutput(player, player.inventory.fullStats(function_memory.engine))
 
-    @TextPattern(r"\b(?:go *to|travel *to) *(?P<location_name>[a-zA-Z0-9_][a-zA-Z0-9_ ]*)\b", TextPattern.CheckType.SEARCH)
+    @TextPattern(r"\b(?:go *to|travel *to) *(?P<location_name>[a-zA-Z0-9_][a-zA-Z0-9_ ]*)\b", TextPattern.CheckType.SEARCH, ["world"])
     def checkTravelTo(self, function_memory, player:Player, raw_text:str, groupdict:dict):
         location_name = Location.fromString(groupdict["location_name"])
 
@@ -459,30 +482,16 @@ class DungeonLoader:
             if location_name.dungeon == dungeon_name:
                 ...
 
-    def getAmmo(self, identifier:Identifier|str) -> AbstractAmmo:
-        identifier: Identifier = Identifier.fromString(identifier)
-        
-    def getArmor(self, identifier:Identifier|str) -> AbstractArmor:
-        identifier: Identifier = Identifier.fromString(identifier)
-    
-    def getItem(self, identifier:Identifier|str) -> AbstractItem:
-        identifier: Identifier = Identifier.fromString(identifier)
-    
-    def getStatusEffect(self, identifier:Identifier|str) -> AbstractStatusEffect:
-        identifier: Identifier = Identifier.fromString(identifier)
 
-    def getTool(self, identifier:Identifier|str) -> AbstractTool:
-        identifier: Identifier = Identifier.fromString(identifier)
-    
-    def getWeapon(self, identifier:Identifier|str) -> AbstractWeapon:
-        identifier: Identifier = Identifier.fromString(identifier)
-
-    def getGameObject(self, identifier) -> AbstractGameObject:
-        identifier: Identifier = Identifier.fromString(identifier)
-
-        
-
-        # TODO: actually search for object (however that needs to be done)
+    def isElementOfType(self, element:Any, element_type:str):
+        return isinstance(
+            element,
+            {
+                "engine:text": str,
+                "engine:boolean": bool,
+                "engine:number": (int, float)
+            }.get(element_type, None)
+        )
 
     def loadGame(self, engine:Engine):
         Log["loadup"]["loader"]("Loading Abstract Status Effects...")

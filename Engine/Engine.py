@@ -133,7 +133,7 @@ class Engine:
                     #try:
                     self._function_memory.clear()
                     
-                    res = TextPattern.handleInput(self._function_memory, player, text)
+                    res = TextPattern.handleInput(self._function_memory, player, text, ["common", "global", "world"])
                     if isinstance(res, Generator):
                         v = None
                         try:

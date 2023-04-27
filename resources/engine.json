@@ -1,0 +1,31 @@
+{
+    "environment_variables": {
+        "%text/pattern/affirmation": "\\b(ye+(s+|p|ah)|sure|m+h+m+|ok(i|a+y+)?|affirmative)\\b",
+        "%text/pattern/denial": "\\b(no+(pe)?|na+h|not *really)\\b"
+    },
+    "data_types": [
+        "engine:ammo",
+        "engine:armor",
+        "engine:attack",
+        "engine:combat",
+        "engine:dungeon",
+        "engine:enemy",
+        "engine:entity",
+        "engine:interactable",
+        "engine:inventory",
+        "engine:item",
+        "engine:location",
+        "engine:loot_table",
+        "engine:player",
+        "engine:position",
+        "engine:room",
+        "enigne:status_effect",
+        "engine:status_effect_cause",
+        "engine:tool",
+        "engine:weapon",
+
+        "engine:boolean",
+        "engine:text",
+        "engine:number"
+    ]
+}

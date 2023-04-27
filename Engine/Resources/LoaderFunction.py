@@ -20,6 +20,26 @@ class LoaderFunction:
     pre_evaluator: bool = False
 
     @classmethod
+    def getRelatedFunctions(cls, value_type:str|Identifier) -> list:
+        if isinstance(value_type, Identifier): value_type = value_type.full()
+        related = []
+        for name, value in cls._functions.items():
+            name: str
+            if name.startswith(value_type + "/"):
+                related.append(value)
+        return related
+    
+    @classmethod
+    def getRelatedFunctionNames(cls, value_type:str|Identifier) -> list:
+        if isinstance(value_type, Identifier): value_type = value_type.full()
+        related = []
+        for name in cls._functions:
+            name: str
+            if name.startswith(value_type + "/"):
+                related.append(name)
+        return related
+
+    @classmethod
     def isPreEvaluator(cls, func:str|Identifier):
         if isinstance(func, Identifier): func = func.full()
         return func in cls._pre_evaluators

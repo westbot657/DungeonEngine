@@ -33,24 +33,19 @@ class Tool(GameObject):
     def checkKeyword(self, keyword):
         return keyword in self.abstract.getKeywords()
 
-    def prepFunctionMemory(self, function_memory:FunctionMemory):
-        function_memory.addContextData({ # context data is immutable
-            "#tool": self
-        })
-        function_memory.update({ # local variables are mutable (as long as they remain valid)
+    def getLocalVariables(self):
+        return {
             ".name": self.name,
             ".durability": self.durability,
             ".max_durability": self.max_durability,
-        })
+        }
 
-    def postEvaluate(self, function_memory:FunctionMemory):
-        x = function_memory.symbol_table
-
-        if n := x.get(".name", None):
+    def updateLocalVariables(self, function_memory, locals:dict):
+        if n := locals.get(".name", None):
             if isinstance(n, str) and n.strip() != self.name:
                 self.name = n.strip()
         
-        if (m := x.get(".max_durability", None)) is not None:
+        if (m := locals.get(".max_durability", None)) is not None:
             if isinstance(m, int):
                 if m <= 0:
                     self.durability = -1
@@ -59,9 +54,19 @@ class Tool(GameObject):
                     self.max_durability = m
                     self.durability = min(self.durability, self.max_durability)
 
-        if (d := x.get(".durability", None)) is not None:
+        if (d := locals.get(".durability", None)) is not None:
             if isinstance(d, int) and (0 < d <= self.max_durability):
                 self.durability = d
+
+    def prepFunctionMemory(self, function_memory:FunctionMemory):
+        function_memory.addContextData({ # context data is immutable
+            "#tool": self
+        })
+        # local variables are mutable (as long as they remain valid)
+        function_memory.update(self.getLocalVariables())
+
+    def postEvaluate(self, function_memory:FunctionMemory):
+        self.updateLocalVariables(function_memory, function_memory.symbol_table)
 
     def onUse(self, function_memory:FunctionMemory, amount_used):
         if on_use := self.events.get("on_use", None):

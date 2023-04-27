@@ -19,6 +19,16 @@ Note: This is going to be a VERY long, detailed, guide to creating a dungeon and
 
 ## Dungeons
 
+Base JSON values:
+```json
+{
+  "name": "...",
+  "version": 1.0,
+  "entry_point": "dungeon:rooms/room",
+}
+```
+
+
 ## Rooms
 
 ## Weapons

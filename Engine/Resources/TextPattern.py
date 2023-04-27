@@ -17,12 +17,6 @@ import re
 
 class TextPattern:
 
-    # TODO:
-    # convert to generators:
-    # handleInput()
-    # check()
-    #
-    # treat eval_method as generator or function
 
     class CheckType(Enum):
         MATCH = auto()
@@ -30,7 +24,7 @@ class TextPattern:
         FULLMATCH = auto()
 
     _patterns = []
-    def __init__(self, regex, check_type=CheckType.SEARCH):
+    def __init__(self, regex, check_type=CheckType.SEARCH, categories:list[str]=[]):
         """
         regex: the regular expression player input is checked against.
         if the pattern is matched, the decorated function is called,

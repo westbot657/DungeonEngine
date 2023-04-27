@@ -25,6 +25,11 @@ Base JSON values:
   "name": "...",
   "version": 1.0,
   "entry_point": "dungeon:rooms/room",
+  "enter_message": "...",
+  "exit_message": "...",
+  "data": {
+    "some_variable": "some value"
+  }
 }
 ```
 

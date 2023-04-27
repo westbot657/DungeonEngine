@@ -6,12 +6,14 @@ try:
     from .EngineErrors import InvalidObjectError
     from .Logger import Log
     from .AbstractRoom import AbstractRoom
+    from .Environment import Environment
 except ImportError:
     from Dungeon import Dungeon
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
     from Logger import Log
     from AbstractRoom import AbstractRoom
+    from Environment import Environment
 
 
 import glob, json, re
@@ -31,6 +33,7 @@ class AbstractDungeon:
         self._raw_data = data
 
         self.name: str = data.get("name", None)
+        self.environment: Environment = Environment(data.get("environment", {}))
         self.version: float|str|int = data.get("version", None)
         self.entry_point: Identifier = Identifier.fromString(data.get("entry_point", None))
         self.enter_message: str|dict = data.get("enter_message")
@@ -40,8 +43,9 @@ class AbstractDungeon:
 
         #room_files: list[str] = glob.glob(f"Dungeons/{self.identifier.name}/rooms/*.json")
 
-        self.abstract_rooms: list[AbstractRoom] = []
 
+    def createInstance(self):
+        return Dungeon(self)
 
     @classmethod
     def loadData(cls, engine) -> list:

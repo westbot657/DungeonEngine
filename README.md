@@ -80,7 +80,7 @@ Door Interactable JSON:
 ## Entities
 
 ## Interactable Types
-see the [door](./resources/door.json) interactable type as an example  
+see the [door](./resources/interactable_types/door.json) interactable type as an example  
 
 ## Combats
 

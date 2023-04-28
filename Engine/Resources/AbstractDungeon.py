@@ -8,7 +8,8 @@ try:
     from .AbstractRoom import AbstractRoom
     from .Environment import Environment
     from .FunctionMemory import FunctionMemory
-
+    from .DynamicValue import DynamicValue
+    from .Util import Util
 except ImportError:
     from Dungeon import Dungeon
     from Identifier import Identifier
@@ -17,6 +18,8 @@ except ImportError:
     from AbstractRoom import AbstractRoom
     from Environment import Environment
     from FunctionMemory import FunctionMemory
+    from DynamicValue import DynamicValue
+    from Util import Util
 
 
 import glob, json, re
@@ -36,8 +39,8 @@ class AbstractDungeon:
         self._raw_data = data
 
         self.name: str = data.get("name", None)
-        self.environment: Environment = Environment(data.get("environment", {}))
         self.version: float|str|int = data.get("version", None)
+        self.environment: Environment = Environment(data.get("environment", {}))
         self.entry_point: Identifier = Identifier.fromString(data.get("entry_point", None))
         self.enter_message: str|dict = data.get("enter_message")
         self.exit_message: str|dict = data.get("exit_message")
@@ -47,10 +50,19 @@ class AbstractDungeon:
         #room_files: list[str] = glob.glob(f"Dungeons/{self.identifier.name}/rooms/*.json")
 
     def createRooms(self, function_memory:FunctionMemory):
-        rooms = AbstractRoom.getDungeonRooms(self.identifier.full())
+        return AbstractRoom.getDungeonRooms(self.identifier.full())
 
-    def createInstance(self, function_memory, **_):
-        return Dungeon(self)
+    def createInstance(self, function_memory, **override_values):
+        return Dungeon(self,
+            override_values.get("name", self.name),
+            self.version,
+            self.environment,
+            self.entry_point,
+            DynamicValue(self.enter_message),
+            DynamicValue(self.exit_message),
+            Util.deepCopy(self.data),
+            self.createRooms(function_memory)
+        )
 
     @classmethod
     def loadData(cls, engine) -> list:

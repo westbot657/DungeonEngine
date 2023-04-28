@@ -13,7 +13,15 @@ class Environment:
         self.stats = stats
         self.parent: Environment|None = None
 
+    def setParent(self, environment):
+        self.parent = environment
+
     def check(self, other_environment:dict):
+        """
+        This checks that this Environment contains every stat specified by `other_environment`.
+        If `other_environment` contains a stat that this environment does not, the check will fail.
+        this environment may have more stats than `other_environment` without affecting the check.
+        """
         for key, value in other_environment.items():
             if key in self.stats:
                 if value != self.stats[key]:
@@ -31,3 +39,4 @@ class Environment:
         elif self.parent:
             return self.parent._comp(key, value)
         return False
+

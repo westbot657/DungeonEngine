@@ -6,12 +6,18 @@ try:
     from .Logger import Log
     from .EngineErrors import InvalidObjectError
     from .EngineDummy import Engine
+    from .Interactable import Interactable
+    from .FunctionMemory import FunctionMemory
+    from .DynamicValue import DynamicValue
 except ImportError:
     from Room import Room
     from Identifier import Identifier
     from Logger import Log
     from EngineErrors import InvalidObjectError
     from EngineDummy import Engine
+    from Interactable import Interactable
+    from FunctionMemory import FunctionMemory
+    from DynamicValue import DynamicValue
 
 import glob, json, re
 
@@ -29,7 +35,6 @@ class AbstractRoom:
             AbstractRoom._link_parents.append((self, data["parent"]))
 
         self.name: str = data.get("name", None)
-        if self.name is None: self.name = identifier.name
         self.enter_message: str|dict|None = data.get("enter_message", None)
         self.exit_message: str|dict|None = data.get("exit_message", None)
         self.interactions: list = data.get("interactions", [])
@@ -70,6 +75,27 @@ class AbstractRoom:
             return []
         else:
             return [self.parent] + self.parent.get_parent_chain()
+
+
+    def getName(self):
+        ...
+
+    def getEnterMessage(self):
+        ...
+    
+    def getExitMessage(self):
+        ...
+    
+    def getInteractions(self, function_memory:FunctionMemory) -> list[Interactable]:
+        ...
+
+    def createInstance(self, function_memory:FunctionMemory, **override_values):
+        return Room(self,
+            override_values.get("name", self.getName()),
+            DynamicValue(override_values.get("enter_message", self.getEnterMessage())),
+            DynamicValue(override_values.get("exit_message", self.getExitMessage())),
+            self.getInteractions(function_memory)
+        )
 
     @classmethod
     def getDungeonAbstractRooms(cls, dungeon_name:str):

@@ -1,5 +1,5 @@
 # pylint: disable=[W,R,C,import-error]
-from typing import Generator
+from typing import Any, Generator
 
 class Util:
     ...
@@ -50,3 +50,17 @@ class Util:
 
         return f"[{'='*filled:-<{bar_width}}] {current_value}/{max_value}"
 
+    @staticmethod
+    def deepCopy(data:Any):
+        if isinstance(data, dict):
+            dat = {}
+            for key, value in data.items():
+                dat.update({key: Util.deepCopy(value)})
+            return dat
+        elif isinstance(data, list):
+            dat = []
+            for val in data:
+                dat.append(Util.deepCopy(val))
+            return dat
+        else:
+            return data

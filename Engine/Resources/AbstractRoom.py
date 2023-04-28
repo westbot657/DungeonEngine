@@ -86,8 +86,8 @@ class AbstractRoom:
         for room in cls._loaded.values():
             room: AbstractRoom
             if room.identifier.namespace == dungeon_name:
-                rooms.append(room)
-        return Room(rooms)
+                rooms.append(Room(room))
+        return rooms
 
     @classmethod
     def loadData(cls, engine:Engine):

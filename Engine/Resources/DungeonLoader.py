@@ -480,13 +480,13 @@ class DungeonLoader:
     def checkTextInventory(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         function_memory.engine.sendOutput(player, player.inventory.fullStats(function_memory.engine))
 
-    @TextPattern(r"\b(?:go *to|travel *to) *(?P<location_name>[a-zA-Z0-9_][a-zA-Z0-9_ ]*)\b", TextPattern.CheckType.SEARCH, ["world"])
+    @TextPattern(r"\b(?:go *to|travel *to) *(?P<location_name>.*)\b", TextPattern.CheckType.SEARCH, ["world"])
     @staticmethod
     def checkTravelTo(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
-        location_name = Location.fromString(groupdict["location_name"])
+        location_name = groupdict["location_name"]
 
         for dungeon_name, dungeon in function_memory.engine.loader.dungeons.items():
-            if location_name.dungeon == dungeon_name:
+            if location_name.lower() == dungeon_name or location_name.lower() == dungeon.name.lower():
                 function_memory.engine.sendOutput(player, "dungeon exists")
 
 
@@ -557,6 +557,7 @@ class DungeonLoader:
         self.abstract_dungeons = AbstractDungeon.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Dungeons...")
+        
 
         Log["loadup"]["loader"]("Engine resource loading completed")
         

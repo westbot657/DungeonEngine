@@ -7,6 +7,8 @@ try:
     from .Logger import Log
     from .AbstractRoom import AbstractRoom
     from .Environment import Environment
+    from .FunctionMemory import FunctionMemory
+
 except ImportError:
     from Dungeon import Dungeon
     from Identifier import Identifier
@@ -14,6 +16,7 @@ except ImportError:
     from Logger import Log
     from AbstractRoom import AbstractRoom
     from Environment import Environment
+    from FunctionMemory import FunctionMemory
 
 
 import glob, json, re
@@ -43,8 +46,10 @@ class AbstractDungeon:
 
         #room_files: list[str] = glob.glob(f"Dungeons/{self.identifier.name}/rooms/*.json")
 
+    def createRooms(self, function_memory:FunctionMemory):
+        rooms = AbstractRoom.getDungeonRooms(self.identifier.full())
 
-    def createInstance(self):
+    def createInstance(self, function_memory, **_):
         return Dungeon(self)
 
     @classmethod

@@ -72,6 +72,7 @@ class Tool(GameObject):
         if on_use := self.events.get("on_use", None):
 
             self.prepFunctionMemory(function_memory)
+            function_memory.addContextData({"#uses": amount_used})
             #res = function_memory.evaluateFunction(on_use)
 
             ev = function_memory.generatorEvaluateFunction(on_use)
@@ -86,6 +87,7 @@ class Tool(GameObject):
             res = v
 
             self.postEvaluate(function_memory)
+            
             # function_memory.clear()
 
             if res is Tool.Action.CANCEL_USE:

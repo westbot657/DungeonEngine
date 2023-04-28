@@ -4,17 +4,22 @@ try:
     from .FunctionalElement import FunctionalElement
     from .DynamicValue import DynamicValue
     from .Interactable import Interactable
+    from .FunctionMemory import FunctionMemory
+    from .Player import Player
+    from .EngineOperation import _EngineOperation
 except ImportError:
     from FunctionalElement import FunctionalElement
     from DynamicValue import DynamicValue
-    from .Interactable import Interactable
+    from Interactable import Interactable
+    from FunctionMemory import FunctionMemory
+    from Player import Player
+    from EngineOperation import _EngineOperation
 
 class Room(FunctionalElement):
-    def __init__(self, abstract, name:str, enter_message:DynamicValue, exit_message:DynamicValue, interactions:list[Interactable]):
+    def __init__(self, abstract, name:str, events:dict, interactions:list[Interactable]):
         self.abstract = abstract
         self.name = name
-        self.enter_message = enter_message
-        self.exit_message = exit_message
+        self.events = events
         self.interactions = interactions
 
     def getLocalVariables(self) -> dict:
@@ -25,3 +30,74 @@ class Room(FunctionalElement):
     
     def updateLocalVariables(self, locals: dict):
         ...
+
+
+    def prepFunctionMemory(self, function_memory:FunctionMemory):
+        function_memory.addContextData({
+            "#room": self
+        })
+        function_memory.update(self.getLocalVariables())
+    
+    def postEvaluate(self, function_memory:FunctionMemory):
+        self.updateLocalVariables(function_memory.symbol_table)
+
+    def onEnter(self, function_memory:FunctionMemory, player:Player):
+        if (on_enter := self.events.get("on_enter", None)) is not None:
+            self.prepFunctionMemory(function_memory)
+            function_memory.addContextData({
+                "#player": player
+            })
+
+            ev = function_memory.generatorEvaluateFunction(on_enter)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            res = v
+
+            self.postEvaluate(function_memory)
+
+    def onExit(self, function_memory:FunctionMemory, player:Player):
+        if (on_exit := self.events.get("on_exit", None)) is not None:
+            self.prepFunctionMemory(function_memory)
+            function_memory.addContextData({
+                "#player": player
+            })
+
+            ev = function_memory.generatorEvaluateFunction(on_exit)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            res = v
+
+            self.postEvaluate(function_memory)
+
+    def onInput(self, function_memory:FunctionMemory, player:Player, text:str):
+        if (on_input := self.events.get("on_input", None)) is not None:
+            self.prepFunctionMemory(function_memory)
+            function_memory.addContextData({
+                "#player": player,
+                "#text": text
+            })
+
+            ev = function_memory.generatorEvaluateFunction(on_input)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            res = v
+
+            self.postEvaluate(function_memory)

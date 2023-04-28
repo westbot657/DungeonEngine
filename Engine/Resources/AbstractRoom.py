@@ -35,8 +35,9 @@ class AbstractRoom:
             AbstractRoom._link_parents.append((self, data["parent"]))
 
         self.name: str = data.get("name", None)
-        self.enter_message: str|dict|None = data.get("enter_message", None)
-        self.exit_message: str|dict|None = data.get("exit_message", None)
+        #self.enter_message: str|dict|None = data.get("enter_message", None)
+        #self.exit_message: str|dict|None = data.get("exit_message", None)
+        self.events: dict|None = data.get("events", None)
         self.interactions: list = data.get("interactions", [])
 
         self.is_template: bool = data.get("template", False)
@@ -78,22 +79,24 @@ class AbstractRoom:
 
 
     def getName(self):
-        ...
+        n = self.name or (self.parent.getName() if self.parent else None)
+        if n is not None: return n
+        raise InvalidObjectError(f"Tool has no name! ({self.identifier})")
+    
+    def getEvents(self):
+        if self.events is None:
+            e = self.parent.getEvents() if self.parent else None
+        else:
+            e = self.events
+        return e or {}
 
-    def getEnterMessage(self):
-        ...
-    
-    def getExitMessage(self):
-        ...
-    
     def getInteractions(self, function_memory:FunctionMemory) -> list[Interactable]:
-        ...
+        return [] # <-- TODO
 
     def createInstance(self, function_memory:FunctionMemory, **override_values):
         return Room(self,
             override_values.get("name", self.getName()),
-            DynamicValue(override_values.get("enter_message", self.getEnterMessage())),
-            DynamicValue(override_values.get("exit_message", self.getExitMessage())),
+            self.getEvents(),
             self.getInteractions(function_memory)
         )
 

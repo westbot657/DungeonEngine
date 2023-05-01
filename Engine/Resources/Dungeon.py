@@ -7,6 +7,13 @@ try:
     from .Identifier import Identifier
     from .DynamicValue import DynamicValue
     from .Room import Room
+    from .Player import Player
+    from .EngineOperation import _EngineOperation
+    from .ConsoleCommand import ConsoleCommand
+    from .Logger import Log
+    from .TextPattern import TextPattern
+    from .EngineOperation import EngineOperation, _EngineOperation
+    from .EngineErrors import EngineError, EngineBreak
 except ImportError:
     from FunctionalElement import FunctionalElement
     from FunctionMemory import FunctionMemory
@@ -14,19 +21,27 @@ except ImportError:
     from Identifier import Identifier
     from DynamicValue import DynamicValue
     from Room import Room
+    from Player import Player
+    from EngineOperation import _EngineOperation
+    from ConsoleCommand import ConsoleCommand
+    from Logger import Log
+    from TextPattern import TextPattern
+    from EngineOperation import EngineOperation, _EngineOperation
+    from EngineErrors import EngineError, EngineBreak
+
+from typing import Generator
 
 import json
 
 class Dungeon(FunctionalElement):
 
-    def __init__(self, abstract, name:str, version:int|float|str, environment:Environment, entry_point:Identifier, enter_message:DynamicValue, exit_message:DynamicValue, data:dict|None, rooms:list[Room]):
+    def __init__(self, abstract, name:str, version:int|float|str, environment:Environment, entry_point:Identifier, events:list, data:dict|None, rooms:list[Room]):
         self.abstract = abstract
         self.name = name
         self.version = version
         self.environment = environment
         self.entry_point = entry_point
-        self.enter_message = enter_message
-        self.exit_message = exit_message
+        self.events = events
         self.data = data
         self.rooms = rooms
 
@@ -45,10 +60,74 @@ class Dungeon(FunctionalElement):
     def updateLocalVariables(self, locals: dict):
         ...
 
+    def prepFunctionMemory(self, function_memory:FunctionMemory):
+        function_memory.addContextData({
+            "#dungeon": self
+        })
+
+    def postEvaluate(self, function_memory:FunctionMemory):
+        self.updateLocalVariables(function_memory.symbol_table)
+
     def loadSaveData(self, function_memory:FunctionMemory):
         ...
 
-    def _input_handler(self, player_id, text:str):
-        ...
+    # def _input_handler(self, player_id, text:str):
+    #     ...
+
+    def onEnter(self, function_memory:FunctionMemory, player:Player):
+        if (on_enter := self.events.get("on_enter", None)) is not None:
+            self.prepFunctionMemory(function_memory)
+
+            ev = function_memory.generatorEvaluateFunction(on_enter)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            res = v
+
+            self.postEvaluate(function_memory)
+        player._text_pattern_categories = ["global", "dungeon", "common"]
+
+    def onInput(self, function_memory:FunctionMemory, player:Player, text:str):
+        if (on_input := self.events.get("on_input", None)) is not None:
+            self.prepFunctionMemory(function_memory)
+
+            ev = function_memory.generatorEvaluateFunction(on_input)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            res = v
+
+            self.postEvaluate(function_memory)
+
+    def onExit(self, function_memory:FunctionMemory, player:Player):
+        if (on_exit := self.events.get("on_exit", None)) is not None:
+            self.prepFunctionMemory(function_memory)
+
+            ev = function_memory.generatorEvaluateFunction(on_exit)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            res = v
+
+            self.postEvaluate(function_memory)
+
+    
+
+
 
 

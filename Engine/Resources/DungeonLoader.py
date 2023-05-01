@@ -486,8 +486,11 @@ class DungeonLoader:
         location_name = groupdict["location_name"]
 
         for dungeon_name, dungeon in function_memory.engine.loader.dungeons.items():
+            dungeon: Dungeon
             if location_name.lower() == dungeon_name or location_name.lower() == dungeon.name.lower():
-                function_memory.engine.sendOutput(player, "dungeon exists")
+                dungeon.onEnter(function_memory, player)
+                #function_memory.engine.sendOutput(player, "dungeon exists")
+
 
 
     def isElementOfType(self, element:Any, element_type:str):
@@ -554,10 +557,12 @@ class DungeonLoader:
         self.abstract_rooms = AbstractRoom.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Abstract Dungeons...")
-        self.abstract_dungeons = AbstractDungeon.loadData(engine)
+        self.abstract_dungeons: list[AbstractDungeon] = AbstractDungeon.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Dungeons...")
-        
+        self.dungeons = {}
+        for k, v in self.abstract_dungeons.items():
+            self.dungeons.update({k: v.createInstance(engine._function_memory)})
 
         Log["loadup"]["loader"]("Engine resource loading completed")
         

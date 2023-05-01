@@ -22,13 +22,14 @@ import json
 class Player(Entity):
     _loaded = {}
 
-    def __init__(self, discord_id:int, name:str, max_health:int, health:int, inventory:Inventory, location:Location, position:Position):
+    def __init__(self, discord_id:int, name:str, max_health:int, health:int, inventory:Inventory, location:Location, position:Position, _text_pattern_categories:list[str]):
         self.discord_id = discord_id
         self.name = name
         self.max_health = max_health
         self.health = health
         self.inventory = inventory
         self.status_effects = StatusEffectManager()
+        self._text_pattern_categories = _text_pattern_categories
         super().__init__(location, position)
 
     def addHealth(self, health):
@@ -81,11 +82,14 @@ class Player(Entity):
             position_list: list = data.get("position")
             inv_list: list = data.get("inventory")
 
+            _text_pattern_categories: list[str] = data.get("text_pattern_categories")
+
             Log["loadup"]["player"]("creating player instance...")
             location: Location = Location.fromString(location_str)
             position: Position = Position(*position_list)
             inventory: Inventory = Inventory.from_list(engine, inv_list)
-            p = cls(Id, name, max_health, health, inventory, location, position)
+            
+            p = cls(Id, name, max_health, health, inventory, location, position, _text_pattern_categories)
             cls._loaded.update({Id: p})
             Log["loadup"]["player"]("player instance created")
         Log["loadup"]["player"](f"Loaded players: {cls._loaded}")

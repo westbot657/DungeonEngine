@@ -2,6 +2,9 @@
     "name": "Energia City",
     "version": 0.1,
     "entry_point": "energia_city:center_street",
-    "enter_message": "",
-    "exit_message": ""
+    "events": {
+        "on_enter": {},
+        "on_input": {},
+        "on_exit": {}
+    }
 }

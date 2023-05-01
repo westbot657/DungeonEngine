@@ -2,8 +2,12 @@
     "name": "Devin's Dungeon",
     "version": 0.1,
     "entry_point": "example_dungeon:rooms/grove_entrance",
-    "enter_message": "You enter the dark and gloomy grove of the Shadow Ent",
-    "exit_message": "",
+    "events": {
+        "on_enter": {
+            "function": "engine:player/message",
+            "message": "You enter the dark and gloomy grove of the Shadow Ent"
+        }
+    },
     "data": {
         "boss_defeated": false
     }

@@ -121,19 +121,17 @@ class Engine:
         while self.running:
             try:
                 Log["debug"]["engine"]["input-handler"](f"handling: '{text}' from {player_id}")
-                # TODO: checks for stuff like moving, inventory stuff, etc...
 
                 if player_id == 0: # id 0 means engine basically
                     self._function_memory.clear()
                     ConsoleCommand.handle_input(self._function_memory, text)
 
                 elif player := self.getPlayer(player_id, None):
-                    #print(f"{player=}")
-
-                    #try:
+                    player: Player
+                    
                     self._function_memory.clear()
                     
-                    res = TextPattern.handleInput(self._function_memory, player, text, ["common", "global", "world"])
+                    res = TextPattern.handleInput(self._function_memory, player, text, player._text_pattern_categories)
                     if isinstance(res, Generator):
                         v = None
                         try:
@@ -152,21 +150,6 @@ class Engine:
                         player_id, text = yield res
 
                     continue
-                    #except Exception as e:
-                    #    Log["ERROR"]["engine"]["input-handler"]("\n" + "\n".join(e.args))
-                        
-                    # if re.search(r"\b(inventory|bag|items)\b", text):
-                    #     Log["debug"]["console"]("checking inventory")
-                    #     self.io_hook.sendOutput(player_id, player.fullInventoryStats())
-
-
-
-                    # else:
-                    #     ...
-
-                    # Simple command checks
-                
-                # else: do nothing
 
             except EngineBreak: pass
             player_id, text = yield EngineOperation.Continue()

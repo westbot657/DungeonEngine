@@ -47,6 +47,11 @@
                 "effect": "engine:status_effects/passive_regeneration",
                 "tick": 232
             }
+        ],
+        "text_pattern_categories": [
+            "common",
+            "global",
+            "world"
         ]
     }
 ]

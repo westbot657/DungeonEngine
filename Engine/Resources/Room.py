@@ -25,7 +25,7 @@ class Room(FunctionalElement):
     def getLocalVariables(self) -> dict:
         return {
             ".name": self.name,
-            ".interaction": self.interactions
+            ".interactions": self.interactions
         }
     
     def updateLocalVariables(self, locals: dict):

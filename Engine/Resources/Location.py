@@ -26,6 +26,12 @@ class Location:
     def fullWith(self, **kwargs):
         return f"{kwargs.get('dungeon', self.dungeon)}:{kwargs.get('room_path', self.room_path)}{kwargs.get('room', self.room)}".strip(":")
 
+    def setLocation(self, location):
+        location: Location
+        self.dungeon = location.dungeon
+        self.room_path = location.room_path
+        self.room = location.room
+
     def __eq__(self, other):
         if isinstance(other, str):
             try:
@@ -42,7 +48,7 @@ class Location:
     @classmethod
     def fromString(cls, location:str):
         if isinstance(location, Location): return location
-        if m := re.match(r"(?P<dungeon>[a-z_][a-z0-9_]*):(?P<room_path>rooms/(?:[a-z_][a-z0-9_]*/)*)(?P<room>[a-z_][a-z0-9_]*)", location):
+        if m := re.match(r"(?P<dungeon>[a-z_][a-z0-9_]*):(?:rooms/)?(?P<room_path>(?:[a-z_][a-z0-9_]*/)*)(?P<room>[a-z_][a-z0-9_]*)", location):
             d = m.groupdict()
             dungeon = d.get("dungeon", "")
             room_path = d.get("room_path", "")

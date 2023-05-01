@@ -9,6 +9,7 @@ try:
     from .Interactable import Interactable
     from .FunctionMemory import FunctionMemory
     from .DynamicValue import DynamicValue
+    from .Location import Location
 except ImportError:
     from Room import Room
     from Identifier import Identifier
@@ -18,6 +19,7 @@ except ImportError:
     from Interactable import Interactable
     from FunctionMemory import FunctionMemory
     from DynamicValue import DynamicValue
+    from Location import Location
 
 import glob, json, re
 
@@ -35,8 +37,6 @@ class AbstractRoom:
             AbstractRoom._link_parents.append((self, data["parent"]))
 
         self.name: str = data.get("name", None)
-        #self.enter_message: str|dict|None = data.get("enter_message", None)
-        #self.exit_message: str|dict|None = data.get("exit_message", None)
         self.events: dict|None = data.get("events", None)
         self.interactions: list = data.get("interactions", [])
 
@@ -91,10 +91,14 @@ class AbstractRoom:
         return e or {}
 
     def getInteractions(self, function_memory:FunctionMemory) -> list[Interactable]:
-        return [] # <-- TODO
+        interactables = []
+        for interaction in self.interactions:
+            ...
+        return interactables # <-- TODO
 
     def createInstance(self, function_memory:FunctionMemory, **override_values):
         return Room(self,
+            Location.fromString(self.identifier.full()),
             override_values.get("name", self.getName()),
             self.getEvents(),
             self.getInteractions(function_memory)

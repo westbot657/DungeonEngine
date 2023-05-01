@@ -14,6 +14,7 @@ try:
     from .TextPattern import TextPattern
     from .EngineOperation import EngineOperation, _EngineOperation
     from .EngineErrors import EngineError, EngineBreak
+    from .Location import Location
 except ImportError:
     from FunctionalElement import FunctionalElement
     from FunctionMemory import FunctionMemory
@@ -28,6 +29,7 @@ except ImportError:
     from TextPattern import TextPattern
     from EngineOperation import EngineOperation, _EngineOperation
     from EngineErrors import EngineError, EngineBreak
+    from Location import Location
 
 from typing import Generator
 
@@ -35,7 +37,7 @@ import json
 
 class Dungeon(FunctionalElement):
 
-    def __init__(self, abstract, name:str, version:int|float|str, environment:Environment, entry_point:Identifier, events:list, data:dict|None, rooms:list[Room]):
+    def __init__(self, abstract, name:str, version:int|float|str, environment:Environment, entry_point:Location, events:list, data:dict|None, rooms:list[Room]):
         self.abstract = abstract
         self.name = name
         self.version = version
@@ -54,7 +56,7 @@ class Dungeon(FunctionalElement):
         for key, value in self.data:
             d.update({f".{key}": value})
         for room in self.rooms:
-            ...
+            d.update({f".{room.location.room}": room})
         return d
     
     def updateLocalVariables(self, locals: dict):
@@ -64,6 +66,7 @@ class Dungeon(FunctionalElement):
         function_memory.addContextData({
             "#dungeon": self
         })
+        function_memory.update(self.getLocalVariables())
 
     def postEvaluate(self, function_memory:FunctionMemory):
         self.updateLocalVariables(function_memory.symbol_table)
@@ -71,10 +74,8 @@ class Dungeon(FunctionalElement):
     def loadSaveData(self, function_memory:FunctionMemory):
         ...
 
-    # def _input_handler(self, player_id, text:str):
-    #     ...
-
     def onEnter(self, function_memory:FunctionMemory, player:Player):
+        player._text_pattern_categories = ["global", "common", "dungeon"]
         if (on_enter := self.events.get("on_enter", None)) is not None:
             self.prepFunctionMemory(function_memory)
 
@@ -90,26 +91,27 @@ class Dungeon(FunctionalElement):
             res = v
 
             self.postEvaluate(function_memory)
-        player._text_pattern_categories = ["global", "dungeon", "common"]
+        
 
-    def onInput(self, function_memory:FunctionMemory, player:Player, text:str):
-        if (on_input := self.events.get("on_input", None)) is not None:
-            self.prepFunctionMemory(function_memory)
+    # def onInput(self, function_memory:FunctionMemory, player:Player, text:str):
+    #     if (on_input := self.events.get("on_input", None)) is not None:
+    #         self.prepFunctionMemory(function_memory)
 
-            ev = function_memory.generatorEvaluateFunction(on_input)
-            v = None
-            try:
-                v = ev.send(None)
-                while isinstance(v, _EngineOperation):
-                    res = yield v
-                    v = ev.send(res)
-            except StopIteration as e:
-                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
-            res = v
+    #         ev = function_memory.generatorEvaluateFunction(on_input)
+    #         v = None
+    #         try:
+    #             v = ev.send(None)
+    #             while isinstance(v, _EngineOperation):
+    #                 res = yield v
+    #                 v = ev.send(res)
+    #         except StopIteration as e:
+    #             v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+    #         res = v
 
-            self.postEvaluate(function_memory)
+    #         self.postEvaluate(function_memory)
 
     def onExit(self, function_memory:FunctionMemory, player:Player):
+        player._text_pattern_categoris = ["global", "common", "world"]
         if (on_exit := self.events.get("on_exit", None)) is not None:
             self.prepFunctionMemory(function_memory)
 

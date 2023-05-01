@@ -72,6 +72,7 @@ class AbstractInteractable:
     def getFieldValues(self, function_memory:FunctionMemory, values:dict):
         vals = {}
         for field_name, field_data in self.fields.items():
+
             field_data: dict
             val = {}
             if (_type := field_data.get("type", None)) is not None:
@@ -113,6 +114,26 @@ class AbstractInteractable:
 
     def createInstance(self, function_memory:FunctionMemory, **field_values):
         return Interactable(self, self.getFieldValues(function_memory, field_values))
+
+    @classmethod
+    def createInteractable(cls, function_memory:FunctionMemory, data:dict):
+        
+        interaction_type = data.get("type", None)
+        if interaction_type is None:
+            raise InvalidObjectError(f"Interaction has no specified type! (data: {data})")
+        
+
+        interaction_id = data.get("id", None)
+        if interaction_id is None:
+            raise InvalidObjectError(f"Interaction has no id! (data: {data})")
+        data.pop("type")
+        #data.pop("id")
+
+        if (abstract := cls._loaded.get(interaction_type, None)) is not None:
+            abstract: AbstractInteractable
+            return abstract.createInstance(function_memory, data)
+        else:
+            InvalidObjectError(f"Interaction type '{interaction_type}' does not exist! (id: {interaction_id})")
 
     @classmethod
     def loadData(cls, engine) -> dict:

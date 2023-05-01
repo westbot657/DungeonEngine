@@ -1,0 +1,5 @@
+{
+    "name": "World",
+    "version": 1,
+    "entry_point": "world:start"
+}

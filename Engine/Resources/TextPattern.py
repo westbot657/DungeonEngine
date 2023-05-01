@@ -17,7 +17,6 @@ import re
 
 class TextPattern:
 
-
     class CheckType(Enum):
         MATCH = auto()
         SEARCH = auto()

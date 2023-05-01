@@ -19,7 +19,7 @@ try:
     from .AbstractWeapon import AbstractWeapon, Weapon
     from .FunctionMemory import FunctionMemory
     from .Player import Player
-
+    from .Logger import Log
 except ImportError:
     from LoaderFunction import LoaderFunction
     from Identifier import Identifier
@@ -39,17 +39,24 @@ except ImportError:
     from AbstractWeapon import AbstractWeapon, Weapon
     from FunctionMemory import FunctionMemory
     from Player import Player
+    from Logger import Log
+
+from typing import Any
 
 import random, math, re
 
 """
 functions:
+
+# v Tool v #
 engine:tool/cancel_use
 engine:tool/get_durability
 engine:tool/set_durability
 engine:tool/set_max_durability
 engine:tool/get_max_durability
+# ^ Tool ^ #
 
+# v Player v #
 engine:player/message
 engine:player/give_item
 engine:player/get_status_effect
@@ -67,12 +74,16 @@ engine:player/get_item
 engine:player/get_input
 engine:player/set_location
 engine:player/get_location
+# ^ Player ^ #
 
+# v Status Effect v #
 engine:status_effect/get_level
 engine:status_effect/set_level
 engine:status_effect/get_duration
 engine:status_effect/set_duration
+# ^ Status Effect ^ #
 
+# v Weapon v #
 engine:weapon/get_durability
 engine:weapon/set_durability
 engine:weapon/get_max_durability
@@ -81,34 +92,57 @@ engine:weapon/get_damage
 engine:weapon/set_damage
 engine:weapon/get_parent_type
 engine:weapon/get_ammo_type
+# ^ Weapon ^ #
 
+# v Item v #
 engine:item/get_count
 engine:item/set_count
 engine:item/get_max_count
+# ^ Item ^ #
 
+# v Armor v #
 engine:armor/get_durability
 engine:armor/set_durability
 engine:armor/get_damage_reduction
 engine:armor/set_damage_reduction
 engine:armor/get_max_durability
 engine:armor/set_max_durability
+# ^ Armor ^ #
 
+# v Ammo v #
 engine:ammo/get_count
 engine:ammo/set_count
 engine:ammo/get_max_count
 engine:ammo/get_parent_type
 engine:ammo/get_bonus_damage
+# ^ Ammo ^ #
 
-
+# v Text v #
 engine:text/builder
+# ^ Text ^ #
 
-
+# v Random v #
 engine:random/uniform X
 engine:random/weighted
+# ^ Random ^ #
 
+# v Logic v #
 engine:logic/compare
+# ^ Logic ^ #
 
+# v Math v #
 engine:math/solve
+# ^ Math ^ #
+
+# v Interaction v #
+engine:interaction/interact
+# ^ Interaction ^ #
+
+# v  v #
+
+# ^  ^ #
+
+# v  v #
 
 
 """
@@ -194,7 +228,7 @@ class Engine_Tool_SetName(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
-
+# ^ Tool ^ #
 
 ####XXX###############XXX####
 ### XXX Engine Weapon XXX ###
@@ -261,7 +295,7 @@ class Engine_Weapon_GetParentType(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
-
+# ^ Weapon ^ #
 
 ####XXX##############XXX####
 ### XXX Engine Armor XXX ###
@@ -312,7 +346,7 @@ class Engine_Armor_SetDamageReduction(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
-
+# ^ Armor ^ #
 
 ####XXX#############XXX####
 ### XXX Engine Ammo XXX ###
@@ -357,7 +391,7 @@ class Engine_Ammo_GetBonusDamage(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
-
+# ^ Ammo ^ #
 
 ####XXX#####################XXX####
 ### XXX Engine StatusEffect XXX ###
@@ -416,7 +450,7 @@ class Engine_StatusEffect_GetCause(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
-
+# ^ Status Effect ^ #
 
 ####XXX#############XXX####
 ### XXX Engine Item XXX ###
@@ -445,7 +479,7 @@ class Engine_Item_GetMaxCount(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
-
+# ^ Item ^ #
 
 ####XXX###############XXX####
 ### XXX Engine Player XXX ###
@@ -661,10 +695,19 @@ class Engine_Player_SetLocation(LoaderFunction):
     return_type = Tool
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
+        Log["debug"]["loader function"]["set location"]["check"](f"args: {args}")
         match args:
-            case {}: ...
+            case {
+                "location": str()
+            }: ...
             case _: return None
-            
+
+    @staticmethod
+    def setLocation(function_memory:FunctionMemory, **kwargs):
+        Log["debug"]["loader function"]["set location"]["call"](f"kwargs: {kwargs}")
+        
+
+
 class Engine_Player_GetLocation(LoaderFunction):
     id = Identifier("engine", "player/", "get_location")
     return_type = Tool
@@ -673,7 +716,7 @@ class Engine_Player_GetLocation(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
-
+# ^ Player ^ #
 
 ####XXX###############XXX####
 ### XXX Engine Random XXX ###
@@ -718,7 +761,7 @@ class Engine_Random_Weighted(LoaderFunction):
     def weighted_table(function_memory:FunctionMemory, rolls:int, pools:list[dict]):
         table = LootTable.fromDict({"rolls": rolls, "pools": pools})
         return table.roll(function_memory)
-
+# ^ Random ^ #
 
 ####XXX#############XXX####
 ### XXX Engine Text XXX ###
@@ -756,6 +799,8 @@ class Engine_Text_Builder(LoaderFunction):
         #         out_text.append(str(v))
 
         return seperator.join(out_text)
+
+# ^ Text ^ #
 
 ####XXX##############XXX####
 ### XXX Engine Logic XXX ###
@@ -885,6 +930,8 @@ class Engine_Logic_Compare(LoaderFunction):
         else:
             return branch
 
+# ^ Logic ^ #
+
 ####XXX#############XXX####
 ### XXX Engine Math XXX ###
 ####XXX#############XXX####
@@ -948,5 +995,26 @@ class Engine_Math_Solve(LoaderFunction):
 
         else:
             return branch
-            
+
+# ^ Math ^ #
+
+####XXX####################XXX####
+### XXX Engine Interaction XXX ###
+####XXX####################XXX####
+
+class Engine_Interaction_Interact(LoaderFunction):
+    id = Identifier("engine", "interaction/", "interact")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "interactable": str()
+            }: return cls.interact
+            case _: return None
+
+    @staticmethod
+    def interact(function_memory:FunctionMemory, interactable):
+        ...
+
+
 

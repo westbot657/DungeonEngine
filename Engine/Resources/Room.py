@@ -7,6 +7,7 @@ try:
     from .FunctionMemory import FunctionMemory
     from .Player import Player
     from .EngineOperation import _EngineOperation
+    from .Location import Location
 except ImportError:
     from FunctionalElement import FunctionalElement
     from DynamicValue import DynamicValue
@@ -14,19 +15,24 @@ except ImportError:
     from FunctionMemory import FunctionMemory
     from Player import Player
     from EngineOperation import _EngineOperation
+    from Location import Location
 
 class Room(FunctionalElement):
-    def __init__(self, abstract, name:str, events:dict, interactions:list[Interactable]):
+    def __init__(self, abstract, location:Location, name:str, events:dict, interactions:list[Interactable]):
         self.abstract = abstract
+        self.location = location
         self.name = name
         self.events = events
         self.interactions = interactions
 
     def getLocalVariables(self) -> dict:
-        return {
-            ".name": self.name,
-            ".interactions": self.interactions
+        l = {
+            ".name": self.name
         }
+        for interaction in self.interactions:
+            l.update({
+                f".{interaction.}"
+            })
     
     def updateLocalVariables(self, locals: dict):
         ...

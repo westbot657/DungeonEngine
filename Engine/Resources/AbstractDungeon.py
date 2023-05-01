@@ -10,6 +10,7 @@ try:
     from .FunctionMemory import FunctionMemory
     from .DynamicValue import DynamicValue
     from .Util import Util
+    from .Location import Location
 except ImportError:
     from Dungeon import Dungeon
     from Identifier import Identifier
@@ -20,6 +21,7 @@ except ImportError:
     from FunctionMemory import FunctionMemory
     from DynamicValue import DynamicValue
     from Util import Util
+    from Location import Location
 
 
 import glob, json, re
@@ -41,9 +43,8 @@ class AbstractDungeon:
         self.name: str = data.get("name", None)
         self.version: float|str|int = data.get("version", None)
         self.environment: Environment = Environment(data.get("environment", {}))
-        self.entry_point: Identifier = Identifier.fromString(data.get("entry_point", None))
-        self.enter_message: str|dict = data.get("enter_message")
-        self.exit_message: str|dict = data.get("exit_message")
+        self.entry_point: Location = Location.fromString(data.get("entry_point", None))
+        self.events: dict|None = data.get("events", None)
         self.data: dict = data.get("data", {})
 
 
@@ -52,14 +53,14 @@ class AbstractDungeon:
     def createRooms(self, function_memory:FunctionMemory):
         return AbstractRoom.getDungeonRooms(self.identifier.full())
 
+
     def createInstance(self, function_memory, **override_values):
         return Dungeon(self,
             override_values.get("name", self.name),
             self.version,
             self.environment,
             self.entry_point,
-            DynamicValue(self.enter_message),
-            DynamicValue(self.exit_message),
+            self.events,
             Util.deepCopy(self.data),
             self.createRooms(function_memory)
         )

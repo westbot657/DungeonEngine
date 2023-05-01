@@ -488,38 +488,37 @@ class DungeonLoader:
         for dungeon_name, dungeon in function_memory.engine.loader.dungeons.items():
             dungeon: Dungeon
             if location_name.lower() == dungeon_name or location_name.lower() == dungeon.name.lower():
-                dungeon.onEnter(function_memory, player)
-                #function_memory.engine.sendOutput(player, "dungeon exists")
+                return dungeon.onEnter(function_memory, player)
 
 
-
+    _element_types = {
+        "engine:text": str,
+        "engine:boolean": bool,
+        "engine:number": (int, float),
+        "engine:weapon": Weapon,
+        "engine:ammo": Ammo,
+        "engine:armor": Armor,
+        "engine:tool": Tool,
+        "engine:item": Item,
+        "engine:status_effect": StatusEffect,
+        "engine:status_effect_cause": StatusEffectCause,
+        "engine:room": Room,
+        "engine:dungeon": Dungeon,
+        "engine:loot_table": LootTable,
+        "engine:player": Player,
+        "engine:enemy": Enemy,
+        "engine:entity": Entity,
+        "engine:attack": Attack,
+        "engine:combat": Combat,
+        "engine:environment": Environment,
+        "engine:location": Location,
+        "engine:position": Position,
+        "engine:interactable": Interactable
+    }
     def isElementOfType(self, element:Any, element_type:str):
         return isinstance(
             element,
-            {
-                "engine:text": str,
-                "engine:boolean": bool,
-                "engine:number": (int, float),
-                "engine:weapon": Weapon,
-                "engine:ammo": Ammo,
-                "engine:armor": Armor,
-                "engine:tool": Tool,
-                "engine:item": Item,
-                "engine:status_effect": StatusEffect,
-                "engine:status_effect_cause": StatusEffectCause,
-                "engine:room": Room,
-                "engine:dungeon": Dungeon,
-                "engine:loot_table": LootTable,
-                "engine:player": Player,
-                "engine:enemy": Enemy,
-                "engine:entity": Entity,
-                "engine:attack": Attack,
-                "engine:combat": Combat,
-                "engine:environment": Environment,
-                "engine:location": Location,
-                "engine:position": Position,
-                "engine:interactable": Interactable
-            }.get(element_type, None)
+            self._element_types.get(element_type, None)
         )
 
     def loadGame(self, engine:Engine):

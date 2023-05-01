@@ -113,7 +113,7 @@ class AbstractInteractable:
         return vals
 
     def createInstance(self, function_memory:FunctionMemory, **field_values):
-        return Interactable(self, self.getFieldValues(function_memory, field_values))
+        return Interactable(self, self.interaction, self.getFieldValues(function_memory, field_values))
 
     @classmethod
     def createInteractable(cls, function_memory:FunctionMemory, data:dict):

@@ -5,13 +5,14 @@ try:
     from .EngineErrors import MemoryError
     from .Logger import Log
     from .FunctionalElement import FunctionalElement
+    from .Environment import Environment
 except ImportError:
     from EngineDummy import Engine
     from EngineErrors import MemoryError
     from Logger import Log
     from FunctionalElement import FunctionalElement
+    from Environment import Environment
 
-from Engine.Resources.Environment import Environment
 
 import json
 

@@ -8,7 +8,7 @@
     },
     "interactions": [
         {
-            "type": "engine:passage",
+            "type": "engine:interactable/passage",
             "id": "west_passage",
             "target": "energia_city/rooms/west_main_street"
         }

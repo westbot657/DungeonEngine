@@ -38,6 +38,7 @@ class AbstractRoom:
 
         self.name: str = data.get("name", None)
         self.events: dict|None = data.get("events", None)
+        self.environment: dict = data.get("environment", {})
         self.interactions: list = data.get("interactions", [])
 
         self.is_template: bool = data.get("template", False)
@@ -96,12 +97,14 @@ class AbstractRoom:
             interactables.append(AbstractInteractable.createInteractable(function_memory, interaction))
         return interactables
 
+
     def createInstance(self, function_memory:FunctionMemory, **override_values):
         return Room(self,
             Location.fromString(self.identifier.full()),
             override_values.get("name", self.getName()),
             self.getEvents(),
-            self.getInteractions(function_memory)
+            self.getInteractions(function_memory),
+            self.environment
         )
 
     @classmethod

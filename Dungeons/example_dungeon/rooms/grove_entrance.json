@@ -25,7 +25,7 @@
     },
     "interactions": [
         {
-            "type": "engine:door",
+            "type": "engine:interactable/door",
             "id": "left_tunnel",
             "target": "example_dungeon:left_tunnel",
             "travel_message": "",
@@ -33,18 +33,18 @@
             "locked": false
         },
         {
-            "type": "engine:door",
+            "type": "engine:interactable/door",
             "id": "right_tunnel",
             "target": "example_dungeon:right_tunnel"
         },
         {
-            "type": "engine:door",
+            "type": "engine:interactable/door",
             "id": "boss_room_door",
             "target": "example_dungeon:boss_room",
             "locked": true
         },
         {
-            "type": "engine:loot",
+            "type": "engine:interactable/loot",
             "id": "ritual_staff",
             "item": "example_dungeon:weapons/ritual_staff"
         }

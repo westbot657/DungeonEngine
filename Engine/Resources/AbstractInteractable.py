@@ -110,9 +110,10 @@ class AbstractInteractable:
 
             else:
                 raise InvalidObjectError(f"Interactable field '{field_name}' has no 'type' specified")
+        vals.update({"id": values.get("id")})
         return vals
 
-    def createInstance(self, function_memory:FunctionMemory, **field_values):
+    def createInstance(self, function_memory:FunctionMemory, field_values):
         return Interactable(self, self.interaction, self.getFieldValues(function_memory, field_values))
 
     @classmethod
@@ -137,7 +138,7 @@ class AbstractInteractable:
 
     @classmethod
     def loadData(cls, engine) -> dict:
-        files: list[str] = glob.glob("**/interactable_types/*.json", recursive=True)
+        files: list[str] = glob.glob("**/interactable/*.json", recursive=True)
 
         Log["loadup"]["abstract"]["interactable"](f"found {len(files)} interactable file{'s' if len(files) != 1 else ''}")
         for file in files:

@@ -6,9 +6,11 @@
 # temperature
 # what can live where
 # other descriptors, made as needed
-
-from Engine.Resources.Util import Util
-
+try:
+    from .Util import Util
+except ImportError:
+    from Util import Util
+    
 class Environment:
 
     def __init__(self, stats:dict):

@@ -20,6 +20,7 @@ try:
     from .FunctionMemory import FunctionMemory
     from .Player import Player
     from .Logger import Log
+    from .Interactable import Interactable
 except ImportError:
     from LoaderFunction import LoaderFunction
     from Identifier import Identifier
@@ -40,6 +41,7 @@ except ImportError:
     from FunctionMemory import FunctionMemory
     from Player import Player
     from Logger import Log
+    from Interactable import Interactable
 
 from typing import Any
 
@@ -1013,8 +1015,12 @@ class Engine_Interaction_Interact(LoaderFunction):
             case _: return None
 
     @staticmethod
-    def interact(function_memory:FunctionMemory, interactable):
-        ...
+    def interact(function_memory:FunctionMemory, interactable_id):
+        interactable: Interactable = function_memory.ref(interactable_id)
+        player: Player = function_memory.ref("#player")
 
+        return interactable.onInteract(function_memory, player)
+
+# ^ Interaction ^ #
 
 

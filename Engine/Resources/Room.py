@@ -31,7 +31,7 @@ class Room(FunctionalElement):
         }
         for interaction in self.interactions:
             l.update({
-                f".{interaction.}"
+                f".{interaction.name}"
             })
     
     def updateLocalVariables(self, locals: dict):

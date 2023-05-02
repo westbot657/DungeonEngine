@@ -20,7 +20,7 @@ except ImportError:
 from typing import Any
 
 class Interactable(FunctionalElement):
-    
+
     def __init__(self, abstract, interaction_event, field_values:dict):
         self.abstract = abstract
         self.field_values = field_values
@@ -42,10 +42,9 @@ class Interactable(FunctionalElement):
 
     def prepFunctionMemory(self, function_memory:FunctionMemory):
         function_memory.update(self.getLocalVariables())
-    
+
     def postEvaluate(self, function_memory:FunctionMemory):
         self.updateLocalVariables(function_memory.symbol_table)
-    
 
     def onInteract(self, function_memory:FunctionMemory, player:Player):
         if self.interaction_event:

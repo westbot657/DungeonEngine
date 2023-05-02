@@ -8,6 +8,7 @@ try:
     from .Player import Player
     from .EngineOperation import _EngineOperation
     from .Location import Location
+    from .Environment import Environment
 except ImportError:
     from FunctionalElement import FunctionalElement
     from DynamicValue import DynamicValue
@@ -16,18 +17,21 @@ except ImportError:
     from Player import Player
     from EngineOperation import _EngineOperation
     from Location import Location
+    from Environment import Environment
 
 class Room(FunctionalElement):
-    def __init__(self, abstract, location:Location, name:str, events:dict, interactions:list[Interactable]):
+    def __init__(self, abstract, location:Location, name:str, events:dict, interactions:list[Interactable], environment:Environment):
         self.abstract = abstract
         self.location = location
         self.name = name
         self.events = events
         self.interactions = interactions
+        self.environment = environment
 
     def getLocalVariables(self) -> dict:
         l = {
-            ".name": self.name
+            ".name": self.name,
+            ".environment": self.environment
         }
         for interaction in self.interactions:
             l.update({

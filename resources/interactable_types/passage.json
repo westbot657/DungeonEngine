@@ -1,0 +1,24 @@
+{
+    "fields": {
+        "target": {
+            "type": "engine:location",
+            "required": true
+        },
+        "travel_message": {
+            "type": "engine:text",
+            "required": false,
+            "default": ""
+        },
+        "blocked": {
+            "type": "engine:boolean",
+            "required": false,
+            "default": false
+        },
+        "blocked_message": {
+            "type": "engine:text",
+            "required": false,
+            "default": ""
+        }
+    },
+    "interaction": []
+}

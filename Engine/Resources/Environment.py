@@ -7,6 +7,8 @@
 # what can live where
 # other descriptors, made as needed
 
+from Engine.Resources.Util import Util
+
 class Environment:
 
     def __init__(self, stats:dict):
@@ -40,3 +42,7 @@ class Environment:
             return self.parent._comp(key, value)
         return False
 
+    def __add__(self, other):
+        d = Util.deepCopy(self.stats)
+        d.update(Util.deepCopy(other.stats))
+        return Environment(d)

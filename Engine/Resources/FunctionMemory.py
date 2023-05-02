@@ -11,6 +11,8 @@ except ImportError:
     from Logger import Log
     from FunctionalElement import FunctionalElement
 
+from Engine.Resources.Environment import Environment
+
 import json
 
 """
@@ -58,8 +60,21 @@ class FunctionMemory:
         self.context_data.update(data)
 
     def checkPredicate(self, predicate:dict):
+        for key, value in predicate.items():
+            key: str
+            if key == "environment":
+                e = Environment({})
+                if (dungeon := self.context_data.get("#dungeon", None)) is not None:
+                    e = e + dungeon.environment
+                if (room := self.context_data.get("#room", None)) is not None:
+                    e = e + room.environment
+                if not e.check(value):
+                    return False
+
+            elif key.startswith("."):
+                ...
+
         return True
-        ...
 
     def store(self, name:str, value):
         self.symbol_table.update({name: value})

@@ -133,7 +133,7 @@ class AbstractInteractable:
             abstract: AbstractInteractable
             return abstract.createInstance(function_memory, data)
         else:
-            InvalidObjectError(f"Interaction type '{interaction_type}' does not exist! (id: {interaction_id})")
+            raise InvalidObjectError(f"Interaction type '{interaction_type}' does not exist! (id: {interaction_id})")
 
     @classmethod
     def loadData(cls, engine) -> dict:

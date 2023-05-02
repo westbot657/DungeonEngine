@@ -9,7 +9,8 @@
     "interactions": [
         {
             "type": "engine:passage",
-            "id": "west_passage"
+            "id": "west_passage",
+            "target": "energia_city/rooms/west_main_street"
         }
     ]
 }

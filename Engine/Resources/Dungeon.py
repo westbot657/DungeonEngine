@@ -37,7 +37,7 @@ import json
 
 class Dungeon(FunctionalElement):
 
-    def __init__(self, abstract, name:str, version:int|float|str, environment:Environment, entry_point:Location, events:list, data:dict|None, rooms:list[Room]):
+    def __init__(self, abstract, name:str, version:int|float|str, environment:Environment, entry_point:Location, events:list, data:dict|None, rooms:dict[str, Room]):
         self.abstract = abstract
         self.name = name
         self.version = version
@@ -55,7 +55,7 @@ class Dungeon(FunctionalElement):
         }
         for key, value in self.data:
             d.update({f".{key}": value})
-        for room in self.rooms:
+        for room in self.rooms.values():
             d.update({f".{room.location.room}": room})
         return d
     
@@ -78,6 +78,9 @@ class Dungeon(FunctionalElement):
         player._text_pattern_categories = ["global", "common", "dungeon"]
         if (on_enter := self.events.get("on_enter", None)) is not None:
             self.prepFunctionMemory(function_memory)
+            function_memory.addContextData({
+                "#player": player
+            })
 
             ev = function_memory.generatorEvaluateFunction(on_enter)
             v = None
@@ -91,7 +94,19 @@ class Dungeon(FunctionalElement):
             res = v
 
             self.postEvaluate(function_memory)
-        
+
+            entrance: Room = self.rooms.get(self.entry_point.full())
+
+            ev = entrance.onEnter(function_memory, player)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            return v
 
     # def onInput(self, function_memory:FunctionMemory, player:Player, text:str):
     #     if (on_input := self.events.get("on_input", None)) is not None:

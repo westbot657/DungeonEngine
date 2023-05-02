@@ -48,7 +48,7 @@ class Location:
     @classmethod
     def fromString(cls, location:str):
         if isinstance(location, Location): return location
-        if m := re.match(r"(?P<dungeon>[a-z_][a-z0-9_]*):(?:rooms/)?(?P<room_path>(?:[a-z_][a-z0-9_]*/)*)(?P<room>[a-z_][a-z0-9_]*)", location):
+        if m := re.match(r"(?P<dungeon>[a-z_][a-z0-9_]*):(?P<room_path>(?:rooms/)?(?:[a-z_][a-z0-9_]*/)*)(?P<room>[a-z_][a-z0-9_]*)", location):
             d = m.groupdict()
             dungeon = d.get("dungeon", "")
             room_path = d.get("room_path", "")

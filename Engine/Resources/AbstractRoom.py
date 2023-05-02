@@ -6,7 +6,7 @@ try:
     from .Logger import Log
     from .EngineErrors import InvalidObjectError
     from .EngineDummy import Engine
-    from .Interactable import Interactable
+    from .AbstractInteractable import Interactable, AbstractInteractable
     from .FunctionMemory import FunctionMemory
     from .DynamicValue import DynamicValue
     from .Location import Location
@@ -16,7 +16,7 @@ except ImportError:
     from Logger import Log
     from EngineErrors import InvalidObjectError
     from EngineDummy import Engine
-    from Interactable import Interactable
+    from AbstractInteractable import Interactable, AbstractInteractable
     from FunctionMemory import FunctionMemory
     from DynamicValue import DynamicValue
     from Location import Location
@@ -93,8 +93,8 @@ class AbstractRoom:
     def getInteractions(self, function_memory:FunctionMemory) -> list[Interactable]:
         interactables = []
         for interaction in self.interactions:
-            ...
-        return interactables # <-- TODO
+            interactables.append(AbstractInteractable.createInteractable(function_memory, interaction))
+        return interactables
 
     def createInstance(self, function_memory:FunctionMemory, **override_values):
         return Room(self,
@@ -105,21 +105,22 @@ class AbstractRoom:
         )
 
     @classmethod
-    def getDungeonAbstractRooms(cls, dungeon_name:str):
-        rooms = []
+    def getDungeonAbstractRooms(cls, function_memory:FunctionMemory, dungeon_name:str):
+        rooms = {}
         for room in cls._loaded.values():
             room: AbstractRoom
             if room.identifier.namespace == dungeon_name:
-                rooms.append(room)
+                rooms.update({room.identifier.full(): room})
         return rooms
 
     @classmethod
-    def getDungeonRooms(cls, dungeon_name:str):
-        rooms = []
+    def getDungeonRooms(cls, function_memory:FunctionMemory, dungeon_name:str):
+        rooms = {}
         for room in cls._loaded.values():
             room: AbstractRoom
-            if room.identifier.namespace == dungeon_name:
-                rooms.append(Room(room))
+            if room.identifier.namespace == dungeon_name.split(":")[1]:
+                rooms.update({room.identifier.full(): room.createInstance(function_memory)})
+        Log["debug"]["abstract"]["room"](f"getRooms: dungeon: {dungeon_name}, rooms:{rooms}")
         return rooms
 
     @classmethod

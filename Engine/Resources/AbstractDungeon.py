@@ -51,7 +51,7 @@ class AbstractDungeon:
         #room_files: list[str] = glob.glob(f"Dungeons/{self.identifier.name}/rooms/*.json")
 
     def createRooms(self, function_memory:FunctionMemory):
-        return AbstractRoom.getDungeonRooms(self.identifier.full())
+        return AbstractRoom.getDungeonRooms(function_memory, self.identifier.full())
 
 
     def createInstance(self, function_memory, **override_values):
@@ -76,6 +76,7 @@ class AbstractDungeon:
                 data = json.load(f)
 
             Id = Identifier("dungeon", "", file.replace("\\", "/").rsplit("/", 1)[1].rsplit(".", 1)[0])
+            Log["debug"]["abstract"]["dungeon"](f"dungeon id: {Id.full()}")
             cls._loaded.update({Id.full(): cls(Id, data)})
 
         for l in cls._loaded.copy():

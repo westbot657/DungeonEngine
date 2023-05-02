@@ -1,8 +1,15 @@
 {
     "name": "Center Street",
+    "events": {
+        "on_enter": {
+            "function": "engine:player/message",
+            "message": "You enter the first room"
+        }
+    },
     "interactions": [
         {
-            "type": "engine:passage"
+            "type": "engine:passage",
+            "id": "west_passage"
         }
     ]
 }

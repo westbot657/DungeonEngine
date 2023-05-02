@@ -1,9 +1,14 @@
 {
     "name": "Energia City",
     "version": 0.1,
-    "entry_point": "energia_city:center_street",
+    "entry_point": "energia_city:rooms/center_street",
     "events": {
-        "on_enter": {},
+        "on_enter": [
+            {
+                "function": "engine:player/message",
+                "message": "You have entered Energia City"
+            }
+        ],
         "on_input": {},
         "on_exit": {}
     }

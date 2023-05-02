@@ -49,6 +49,9 @@ class Interactable(FunctionalElement):
     def onInteract(self, function_memory:FunctionMemory, player:Player):
         if self.interaction_event:
             self.prepFunctionMemory(function_memory)
+            function_memory.addContextData({
+                "#player": player
+            })
 
             ev = function_memory.generatorEvaluateFunction(self.interaction_event)
             v = None

@@ -9,7 +9,15 @@
                         "fish-habitable": false
                     }
                 },
-                "function": "engine:tool/cancel_use"
+                "functions": [
+                    {
+                        "function": "engine:tool/cancel_use"
+                    },
+                    {
+                        "function": "engine:player/message",
+                        "message": "You can't fish here!"
+                    }
+                ]
             },
             {
                 "predicate": {

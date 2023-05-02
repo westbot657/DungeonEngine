@@ -24,7 +24,7 @@ class EngineOperation:
         leave target as None to accept input from any player (for internal engine use only)
         leave prompt as None to wait for target to give any input
         """
-        def __init__(self, target:int=None, prompt:str=None):
+        def __init__(self, target:int=None, prompt:str=None, handler=None):
             super().__init__(OpType.GET_INPUT)
             self.target = target
             self.prompt = prompt

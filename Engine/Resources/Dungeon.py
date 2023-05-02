@@ -95,18 +95,19 @@ class Dungeon(FunctionalElement):
 
             self.postEvaluate(function_memory)
 
-            entrance: Room = self.rooms.get(self.entry_point.full())
+        entrance: Room = self.rooms.get(self.entry_point.full())
 
-            ev = entrance.onEnter(function_memory, player)
-            v = None
-            try:
-                v = ev.send(None)
-                while isinstance(v, _EngineOperation):
-                    res = yield v
-                    v = ev.send(res)
-            except StopIteration as e:
-                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
-            return v
+        ev = entrance.onEnter(function_memory, player)
+        v = None
+        try:
+            v = ev.send(None)
+            while isinstance(v, _EngineOperation):
+                res = yield v
+                v = ev.send(res)
+        except StopIteration as e:
+            pass#v = e.value or v
+        
+        
 
     # def onInput(self, function_memory:FunctionMemory, player:Player, text:str):
     #     if (on_input := self.events.get("on_input", None)) is not None:

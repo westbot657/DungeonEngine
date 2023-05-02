@@ -57,10 +57,11 @@ class FunctionMemory:
         return self.engine.generatorEvaluateFunction(data, self)
 
     def addContextData(self, data:dict):
-        print(f"#store: {data}")
+        #print(f"#store: {data}")
         self.context_data.update(data)
 
     def checkPredicate(self, predicate:dict):
+        #Log["debug"]["function memory"]["check predicate"](f"predicate: {predicate}")
         for key, value in predicate.items():
             key: str
             if key == "environment":
@@ -69,11 +70,18 @@ class FunctionMemory:
                     e = e + dungeon.environment
                 if (room := self.context_data.get("#room", None)) is not None:
                     e = e + room.environment
-                if not e.check(value):
+                v = e.check(value)
+                #print(v)
+                if v is False:
                     return False
-
-            elif key.startswith("."):
-                ...
+                continue
+            
+            try:
+                v = self.ref(key)
+                if v != value:
+                    return False
+            except MemoryError:
+                return False
 
         return True
 
@@ -81,7 +89,7 @@ class FunctionMemory:
         self.symbol_table.update({name: value})
         
     def ref(self, name:str):
-        print(f"#ref: {self.context_data}")
+        #print(f"#ref: {self.context_data}")
 
         if name.startswith("%"):
             if name in self.global_environment_variables:

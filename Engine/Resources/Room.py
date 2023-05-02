@@ -6,7 +6,7 @@ try:
     from .Interactable import Interactable
     from .FunctionMemory import FunctionMemory
     from .Player import Player
-    from .EngineOperation import _EngineOperation
+    from .EngineOperation import EngineOperation, _EngineOperation
     from .Location import Location
     from .Environment import Environment
 except ImportError:
@@ -15,7 +15,7 @@ except ImportError:
     from Interactable import Interactable
     from FunctionMemory import FunctionMemory
     from Player import Player
-    from EngineOperation import _EngineOperation
+    from EngineOperation import EngineOperation, _EngineOperation
     from Location import Location
     from Environment import Environment
 
@@ -53,6 +53,7 @@ class Room(FunctionalElement):
         self.updateLocalVariables(function_memory.symbol_table)
 
     def onEnter(self, function_memory:FunctionMemory, player:Player):
+        player.location.setLocation(self.location)
         if (on_enter := self.events.get("on_enter", None)) is not None:
             self.prepFunctionMemory(function_memory)
             function_memory.addContextData({
@@ -71,6 +72,14 @@ class Room(FunctionalElement):
             res = v
 
             self.postEvaluate(function_memory)
+        
+        
+
+    # def _input_handler(self, engine, player_id, text):
+    #     while True:
+    #         ...
+
+    #         engine, player_id, text = yield EngineOperation.Continue()
 
     def onExit(self, function_memory:FunctionMemory, player:Player):
         if (on_exit := self.events.get("on_exit", None)) is not None:

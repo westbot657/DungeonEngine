@@ -26,6 +26,7 @@ class Environment:
         If `other_environment` contains a stat that this environment does not, the check will fail.
         this environment may have more stats than `other_environment` without affecting the check.
         """
+        #print(f"environment check:\nself: {self.stats}\nother: {other_environment}")
         for key, value in other_environment.items():
             if key in self.stats:
                 if value != self.stats[key]:
@@ -33,7 +34,7 @@ class Environment:
             elif self.parent and (key in self.parent.stats):
                 if not self.parent._comp(key, value):
                     return False
-            else:
+            elif value is True:
                 return False
         return True
 

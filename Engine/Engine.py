@@ -114,10 +114,13 @@ class Engine:
         else:
             self.input_queue[player_id][2] = text
 
+    def setInputHandler(self, player_id, handler, handler_getter):
+        self.input_queue.update({player_id: [handler_getter, handler, ""]})
+
     def sendOutput(self, target:str|int, text:str):
         self.io_hook.sendOutput(target, text)
 
-    def _default_input_handler(self, player_id, text) -> Generator:
+    def _default_input_handler(self, _, player_id, text) -> Generator:
         while self.running:
             try:
                 Log["debug"]["engine"]["input-handler"](f"handling: '{text}' from {player_id}")
@@ -143,16 +146,16 @@ class Engine:
                         except StopIteration as e:
                             
                             if isinstance(e.value, _EngineOperation):
-                                player_id, text = yield e.value
+                                _, player_id, text = yield e.value
                                 continue
-                        player_id, text = yield EngineOperation.Continue()
+                        _, player_id, text = yield EngineOperation.Continue()
                     else:
-                        player_id, text = yield res
+                        _, player_id, text = yield res
 
                     continue
 
             except EngineBreak: pass
-            player_id, text = yield EngineOperation.Continue()
+            _, player_id, text = yield EngineOperation.Continue()
 
     def getPlayer(self, player_id:int, default=...) -> Player:
         if p := Player._loaded.get(player_id, None): return p
@@ -161,7 +164,7 @@ class Engine:
 
 
     def inputGetterWrapper(self, handler:Generator):
-        player_id, text = yield
+        _, player_id, text = yield
 
         v = None
         try:
@@ -182,6 +185,7 @@ class Engine:
                 prompt:str = result.prompt
                 self.io_hook.sendOutput(target, prompt)
                 #self.input_queue.pop(player_id)
+
                 wrapper = self.inputGetterWrapper(handler)
                 wrapper.send(None)
                 self.input_queue.update({player_id: [handler_getter, wrapper, ""]})
@@ -243,7 +247,7 @@ class Engine:
                                     print(e)
                                 continue
                             try:
-                                result = response_handler.send((player_id, text))
+                                result = response_handler.send((self, player_id, text))
                                 if not isinstance(result, _EngineOperation):
                                     raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
                                 #print(result)

@@ -815,8 +815,21 @@ class Engine_Text_Match(LoaderFunction):
 
         for pattern, func in kwargs.items():
             if (m := re.match(pattern, text)):
-                function_memory.update(m.groupdict())
-                return function_memory.generatorEvaluateFunction(func)
+                print(f"'{text}' matches pattern '{pattern}'")
+                if m.groupdict():
+                    function_memory.update(m.groupdict())
+                ev = function_memory.generatorEvaluateFunction(func)
+                v = None
+                try:
+                    v = ev.send(None)
+                    while isinstance(v, _EngineOperation):
+                        res = yield v
+                        v = ev.send(res)
+                except StopIteration as e:
+                    if isinstance(e.value, _EngineOperation):
+                        yield e.value
+                    else:
+                        yield e.value or (v if not isinstance(v, _EngineOperation) else None)
 
 
 # ^ Text ^ #
@@ -1032,7 +1045,8 @@ class Engine_Interaction_Interact(LoaderFunction):
             case _: return None
 
     @staticmethod
-    def interact(function_memory:FunctionMemory, interactable_id):
+    def interact(function_memory:FunctionMemory, **kwargs):
+        interactable_id = kwargs.get("interactable")
         interactable: Interactable = function_memory.ref(interactable_id)
         player: Player = function_memory.ref("#player")
 

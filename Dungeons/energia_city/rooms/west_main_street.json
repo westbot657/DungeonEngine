@@ -1,6 +1,13 @@
 {
     "name": "West Main Street",
-    "events": {},
+    "events": {
+        "on_enter": [
+            {
+                "function": "engine:player/message",
+                "message": "you went to West Main Street!"
+            }
+        ]
+    },
     "interactions": [],
     "environment": {}
 }

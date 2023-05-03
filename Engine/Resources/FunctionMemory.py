@@ -98,7 +98,7 @@ class FunctionMemory:
             props = [f".{prop}" for prop in name.split(".") if prop]
             prop = props.pop(0)
             if prop in self.symbol_table:
-                return self._getProperty(prop, props)
+                return self._getProperty(self.symbol_table[prop], props)
 
             raise MemoryError(f"Variable referenced before assignment: '{name}'")
 

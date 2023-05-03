@@ -22,11 +22,11 @@
             "text": {
                 "#ref": "#text"
             },
-            "\\bleave\\b": {
+            "leave": {
                 "function": "engine:interaction/interact",
                 "interactable": ".exit_door"
             },
-            "\\bwest\\b": {
+            "west": {
                 "function": "engine:interaction/interact",
                 "interactable": ".west_passage"
             }

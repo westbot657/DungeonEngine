@@ -142,3 +142,5 @@ class Room(FunctionalElement):
             res = v
 
             self.postEvaluate(function_memory)
+            
+            yield res

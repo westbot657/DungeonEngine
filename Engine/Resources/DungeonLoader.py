@@ -422,6 +422,8 @@ class DungeonLoader:
             dungeon: Dungeon
             name = dungeon_name.split(":", 1)[1]
 
+            location = Location.fromString(location)
+
             if location.dungeon == name:
                 if (room := dungeon.rooms.get(location.full(), None)) is not None:
                     return room

@@ -101,13 +101,13 @@ class Dungeon(FunctionalElement):
         v = None
         try:
             v = ev.send(None)
-            while isinstance(v, _EngineOperation):
+            while isinstance(v, (_EngineOperation, Generator)):
                 res = yield v
                 v = ev.send(res)
         except StopIteration as e:
             pass#v = e.value or v
         
-        
+
 
     # def onInput(self, function_memory:FunctionMemory, player:Player, text:str):
     #     if (on_input := self.events.get("on_input", None)) is not None:

@@ -62,7 +62,7 @@ class Player(Entity):
         ]).strip()
 
     @classmethod
-    def loadData(cls, engine) -> list:
+    def loadData(cls, engine) -> dict:
 
         Inventory._default_equips = {
             "engine:weapon": engine.loader.abstract_weapons["engine:weapons/unnarmed_strike"],

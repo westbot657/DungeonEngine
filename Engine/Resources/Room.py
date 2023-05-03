@@ -27,6 +27,7 @@ class Room(FunctionalElement):
         self.events = events
         self.interactions = interactions
         self.environment = environment
+        self.players_in_room = []
 
     def getLocalVariables(self) -> dict:
         l = {
@@ -54,6 +55,7 @@ class Room(FunctionalElement):
 
     def onEnter(self, function_memory:FunctionMemory, player:Player):
         player.location.setLocation(self.location)
+        self.players_in_room.append(player.discord_id)
         if (on_enter := self.events.get("on_enter", None)) is not None:
             self.prepFunctionMemory(function_memory)
             function_memory.addContextData({
@@ -72,14 +74,28 @@ class Room(FunctionalElement):
             res = v
 
             self.postEvaluate(function_memory)
-        
-        
 
-    # def _input_handler(self, engine, player_id, text):
-    #     while True:
-    #         ...
+        
+        function_memory.engine.setInputHandler(player.discord_id, self._input_handler(function_memory), self._input_handler)
 
-    #         engine, player_id, text = yield EngineOperation.Continue()
+
+    def _input_handler(self, function_memory=None):
+        while True:
+            engine, player_id, text = yield EngineOperation.Continue()
+
+
+            if (player := engine.players.get(player_id, None)) is not None:
+                print("room received input!")
+                ev = self.onInput(function_memory, player, text)
+                v = None
+                try:
+                    v = ev.send(None)
+                    while isinstance(v, _EngineOperation):
+                        res = yield v
+                        v = ev.send(res)
+                except StopIteration as e:
+                    v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                
 
     def onExit(self, function_memory:FunctionMemory, player:Player):
         if (on_exit := self.events.get("on_exit", None)) is not None:

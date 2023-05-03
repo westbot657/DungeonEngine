@@ -51,7 +51,7 @@ class TextPattern:
             v = None
             try:
                 matched, v = ev.send(None)
-                while isinstance(v, _EngineOperation):
+                while isinstance(v, (_EngineOperation, Generator)):
                     res = yield v
                     matched, v = ev.send(res)
             except StopIteration as e:

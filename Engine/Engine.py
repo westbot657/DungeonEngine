@@ -56,7 +56,7 @@ class Engine:
         #self.function_memory: FunctionMemory = FunctionMemory()
         self._function_memory = FunctionMemory(self)
         self.default_input_handler = self._default_input_handler
-        self.players = []
+        self.players = {}
         #self.default_input_handler.send(None)
 
     def evaluateFunction(self, data:dict, function_memory:FunctionMemory=None, context_data:dict=None, local_variables:dict=None):
@@ -79,7 +79,7 @@ class Engine:
         v = None
         try:
             v = ev.send(None)
-            while isinstance(v, _EngineOperation):
+            if isinstance(v, _EngineOperation):
                 res = yield v
                 v = ev.send(res)
         except StopIteration as e:
@@ -100,7 +100,7 @@ class Engine:
             self.thread_running = True
             self.running = True
             t.start()
-    
+
     def stop(self):
         self.running = False
         self.thread_running = False
@@ -135,22 +135,22 @@ class Engine:
                     self._function_memory.clear()
                     
                     res = TextPattern.handleInput(self._function_memory, player, text, player._text_pattern_categories)
-                    if isinstance(res, Generator):
-                        v = None
-                        try:
-                            v = res.send(None)
-                            if isinstance(v, _EngineOperation):
-                                #ret = yield v
-                                self.evaluateResult(self._default_input_handler, res, v, player_id, text)
-                                #v = res.send(ret)
-                        except StopIteration as e:
-                            
-                            if isinstance(e.value, _EngineOperation):
-                                _, player_id, text = yield e.value
-                                continue
-                        _, player_id, text = yield EngineOperation.Continue()
-                    else:
-                        _, player_id, text = yield res
+                    #if isinstance(res, Generator):
+                    v = None
+                    try:
+                        v = res.send(None)
+                        if isinstance(v, _EngineOperation):
+                            #ret = yield v
+                            self.evaluateResult(self._default_input_handler, res, v, player_id, text)
+                            #v = res.send(ret)
+                    except StopIteration as e:
+                        
+                        if isinstance(e.value, _EngineOperation):
+                            _, player_id, text = yield e.value
+                            continue
+                    _, player_id, text = yield EngineOperation.Continue()
+                    #else:
+                    #    _, player_id, text = yield res
 
                     continue
 
@@ -170,7 +170,7 @@ class Engine:
         try:
             v = handler.send(text)
         except StopIteration as e:
-            v = e.value
+            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
 
         if isinstance(v, (_EngineOperation)):
             return v
@@ -183,7 +183,8 @@ class Engine:
             case EngineOperation.GetInput():
                 target:int = result.target
                 prompt:str = result.prompt
-                self.io_hook.sendOutput(target, prompt)
+                if prompt:
+                    self.io_hook.sendOutput(target, prompt)
                 #self.input_queue.pop(player_id)
 
                 wrapper = self.inputGetterWrapper(handler)
@@ -269,7 +270,7 @@ class Engine:
                                 continue
                                 
                         elif isinstance(response_handler, Callable):
-                            result = response_handler(player_id, text)
+                            result = response_handler(self, player_id, text)
                             if isinstance(result, Generator):
                                 self.input_queue[player_id][1] = response_handler = result
                                 result = response_handler.send(None)

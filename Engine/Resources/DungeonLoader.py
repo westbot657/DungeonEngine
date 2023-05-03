@@ -191,6 +191,10 @@ class DungeonLoader:
                                 res = yield v
                                 v = r.send(res)
                         except StopIteration as e:
+                            
+                            #if isinstance(e.value, Generator):
+                            
+                            
                             #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
                             v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                         res = v

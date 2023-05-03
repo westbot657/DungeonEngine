@@ -500,9 +500,9 @@ class DungeonLoader:
 
         for dungeon_name, dungeon in function_memory.engine.loader.dungeons.items():
             dungeon: Dungeon
-            if location_name.lower() == dungeon_name or location_name.lower() == dungeon.name.lower():
-                return dungeon.onEnter(function_memory, player)
-
+            if location_name.lower() == dungeon_name or location_name.lower() == dungeon.name.lower():                
+                yield EngineOperation.MovePlayer(player, dungeon.entry_point)
+                return
 
     _element_types = {
         "engine:text": str,

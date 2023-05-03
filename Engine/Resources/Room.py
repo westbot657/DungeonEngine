@@ -79,7 +79,7 @@ class Room(FunctionalElement):
         i.send(None)
         function_memory.engine.setInputHandler(player.discord_id, i, self._input_handler)
         
-        return EngineOperation.Success()
+        return EngineOperation.Continue()
 
     def _input_handler(self, function_memory=None):
         engine, player_id, text = yield
@@ -97,10 +97,11 @@ class Room(FunctionalElement):
                 except StopIteration as e:
                     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
 
-            engine, player_id, text = yield EngineOperation.Success()
+            engine, player_id, text = yield EngineOperation.Continue()
 
     def onExit(self, function_memory:FunctionMemory, player:Player):
-        self.players_in_room.remove(player.discord_id)
+        if player.discord_id in self.players_in_room:
+            self.players_in_room.remove(player.discord_id)
         
         if (on_exit := self.events.get("on_exit", None)) is not None:
             self.prepFunctionMemory(function_memory)

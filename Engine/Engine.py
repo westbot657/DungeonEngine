@@ -57,6 +57,8 @@ class Engine:
         self._function_memory = FunctionMemory(self)
         self.default_input_handler = self._default_input_handler
         self.players = {}
+        self.tasks: list[Generator] = []
+        self._player_input_categories = ["common", "global", "world"]
         #self.default_input_handler.send(None)
 
     def evaluateFunction(self, data:dict, function_memory:FunctionMemory=None, context_data:dict=None, local_variables:dict=None):
@@ -115,7 +117,14 @@ class Engine:
             self.input_queue[player_id][2] = text
 
     def setInputHandler(self, player_id, handler, handler_getter):
+        print(f"Setting input handler for player {player_id}: {handler}")
         self.input_queue.update({player_id: [handler_getter, handler, ""]})
+
+    def resetInputHandler(self, player_id):
+        if (player := self.players.get(player_id, None)) is not None:
+            player: Player
+            player._text_pattern_categories = self._player_input_categories.copy()
+            self.input_queue.update({player_id: [self._default_input_handler, self.default_input_handler, ""]})
 
     def sendOutput(self, target:str|int, text:str):
         self.io_hook.sendOutput(target, text)
@@ -177,6 +186,36 @@ class Engine:
         else:
             return EngineOperation.Success(v)
 
+    def _move_player(self, function_memory:FunctionMemory, player:Player, target_location:Location, handler_getter:Callable, handler:Generator):
+        old_room = self.loader.getLocation(self._function_memory, player.location)
+        new_room = self.loader.getLocation(self._function_memory, target_location)
+
+        yield
+
+        ev = old_room.onExit(function_memory, player)
+        v = None
+        try:
+            v = ev.send(None)
+            while isinstance(v, _EngineOperation):
+                res = yield (handler_getter, handler, v, player.discord_id, "")
+                v = ev.send(res)
+        except StopIteration as e:
+            if isinstance(e.value, _EngineOperation):
+                res = yield (handler_getter, handler, e.value, player.discord_id, "")
+
+        ev = new_room.onEnter(function_memory, player)
+        v = None
+        try:
+            v = ev.send(None)
+            while isinstance(v, _EngineOperation):
+                res = yield (handler_getter, handler, v, player.discord_id, "")
+                v = ev.send(res)
+        except StopIteration as e:
+            if isinstance(e.value, _EngineOperation):
+                res = yield (handler_getter, handler, e.value, player.discord_id, "")
+
+
+
     def evaluateResult(self, handler_getter:Callable, handler:Generator, result:_EngineOperation, player_id:int, text:str):
         Log["debug"]["engine"]["evaluate-result"](f"result:{result}  id:{player_id} text:'{text}'")
         match result:
@@ -190,6 +229,14 @@ class Engine:
                 wrapper = self.inputGetterWrapper(handler)
                 wrapper.send(None)
                 self.input_queue.update({player_id: [handler_getter, wrapper, ""]})
+
+            case EngineOperation.MovePlayer():
+                player = result.player
+                target_location = result.target_location
+
+                mover = self._move_player(self._function_memory, player, target_location, handler_getter, handler)
+                mover.send(None)
+                self.tasks.append(mover)
 
             case EngineOperation.Restart():
                 gen = self.input_queue[player_id][0]
@@ -226,61 +273,78 @@ class Engine:
                 # Pause Menu thingy?
                 continue
             # Main Loop
-            
+
             # check inputs
-            while self.input_queue:
-                for player_id in [k for k in self.input_queue.keys()]:
-                    handler_getter, response_handler, text = self.input_queue[player_id]
-                    handler_getter: Callable
-                    response_handler: Generator|Callable
-                    player_id: int
-                    text: str
-                    if text:
-                        if isinstance(response_handler, Generator):
-                            if not Util.generator_started(response_handler):
-                                result = response_handler.send(None)
-                                if not isinstance(result, _EngineOperation):
-                                    raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
-                                #print(result)
-                                try:
-                                    self.evaluateResult(handler_getter, response_handler, result, player_id, text)
-                                except EngineError as e:
-                                    print(e)
-                                continue
-                            try:
-                                result = response_handler.send((self, player_id, text))
-                                if not isinstance(result, _EngineOperation):
-                                    raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
-                                #print(result)
-                                try:
-                                    self.evaluateResult(handler_getter, response_handler, result, player_id, text)
-                                except EngineError as e:
-                                    print(e)
-                                continue
-                                
-                            except StopIteration as e:
-                                result = e.value
-                                if not isinstance(result, _EngineOperation):
-                                    raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
-                                #print(result)
-                                try:
-                                    self.evaluateResult(handler_getter, response_handler, result, player_id, text)
-                                except EngineError as e:
-                                    print(e)
-                                continue
-                                
-                        elif isinstance(response_handler, Callable):
-                            result = response_handler(self, player_id, text)
-                            if isinstance(result, Generator):
-                                self.input_queue[player_id][1] = response_handler = result
-                                result = response_handler.send(None)
+            #while self.input_queue:
+
+                # run scheduled tasks
+
+            while self.tasks:
+                task = self.tasks.pop(0)
+                v = None
+                try:
+                    while True:
+                        v = task.send(None)
+                        try:
+                            self.evaluateResult(*v)
+                        except EngineError as e:
+                            print(e)
+                except StopIteration as e:
+                    print(f"Task completed: {task}  {v=}  {e.value=}")
+
+            # check inputs
+            for player_id in [k for k in self.input_queue.copy().keys()]:
+                handler_getter, response_handler, text = self.input_queue[player_id]
+                handler_getter: Callable
+                response_handler: Generator|Callable
+                player_id: int
+                text: str
+                if text:
+                    if isinstance(response_handler, Generator):
+                        if not Util.generator_started(response_handler):
+                            result = response_handler.send(None)
                             if not isinstance(result, _EngineOperation):
-                                raise EngineError(f"function did not return an EngineOperation! ({result})")
+                                raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
+                            #print(result)
                             try:
                                 self.evaluateResult(handler_getter, response_handler, result, player_id, text)
                             except EngineError as e:
                                 print(e)
                             continue
+                        try:
+                            result = response_handler.send((self, player_id, text))
+                            if not isinstance(result, _EngineOperation):
+                                raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
+                            #print(result)
+                            try:
+                                self.evaluateResult(handler_getter, response_handler, result, player_id, text)
+                            except EngineError as e:
+                                print(e)
+                            continue
+                            
+                        except StopIteration as e:
+                            result = e.value
+                            if not isinstance(result, _EngineOperation):
+                                raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
+                            #print(result)
+                            try:
+                                self.evaluateResult(handler_getter, response_handler, result, player_id, text)
+                            except EngineError as e:
+                                print(e)
+                            continue
+                            
+                    elif isinstance(response_handler, Callable):
+                        result = response_handler(self, player_id, text)
+                        if isinstance(result, Generator):
+                            self.input_queue[player_id][1] = response_handler = result
+                            result = response_handler.send(None)
+                        if not isinstance(result, _EngineOperation):
+                            raise EngineError(f"function did not return an EngineOperation! ({result})")
+                        try:
+                            self.evaluateResult(handler_getter, response_handler, result, player_id, text)
+                        except EngineError as e:
+                            print(e)
+                        continue
 
             # do other engine stuff
 

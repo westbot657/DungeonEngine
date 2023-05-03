@@ -707,9 +707,9 @@ class Engine_Player_SetLocation(LoaderFunction):
     @staticmethod
     def setLocation(function_memory:FunctionMemory, location):
         player: Player = function_memory.ref("#player")
-        room: Room = function_memory.getLocation(player.location)
-        
-        
+
+        # NOTE: yield instead of return, otherwise the EngineOperation may be ignored
+        yield EngineOperation.MovePlayer(player, location)
 
 
 class Engine_Player_GetLocation(LoaderFunction):

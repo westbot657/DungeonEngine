@@ -800,10 +800,23 @@ class Engine_Text_Match(LoaderFunction):
     def pattern_match(function_memory:FunctionMemory, **kwargs):
         text = kwargs.pop("text")
 
+        if not isinstance(text, str):
+            ev = function_memory.generatorEvaluateFunction(text)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            text = str(v)
+
+
         for pattern, func in kwargs.items():
             if (m := re.match(pattern, text)):
                 function_memory.update(m.groupdict())
-                return function_memory.evaluateFunction(func)
+                return function_memory.generatorEvaluateFunction(func)
 
 
 # ^ Text ^ #

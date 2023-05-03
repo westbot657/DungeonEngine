@@ -20,5 +20,33 @@
             "default": ""
         }
     },
-    "interaction": []
+    "interaction": [
+        {
+            "@check": {
+                "#ref": ".blocked"
+            },
+            "true": {
+                "function": "engine:player/message",
+                "message": {
+                    "#ref": ".blocked_message"
+                }
+            },
+            "false": {
+                "functions": [
+                    {
+                        "function": "engine:player/message",
+                        "message": {
+                            "#ref": ".travel_message"
+                        }
+                    },
+                    {
+                        "function": "engine:player/set_location",
+                        "location": {
+                            "#ref": ".target"
+                        }
+                    }
+                ]
+            }
+        }
+    ]
 }

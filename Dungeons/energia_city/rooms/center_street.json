@@ -1,16 +1,35 @@
 {
     "name": "Center Street",
-    "events": {
-        "on_enter": {
-            "function": "engine:player/message",
-            "message": "You enter the first room"
-        }
-    },
     "interactions": [
+        {
+            "type": "engine:interactable/door",
+            "id": "exit_door",
+            "target": "world:rooms/start"
+        },
         {
             "type": "engine:interactable/passage",
             "id": "west_passage",
-            "target": "energia_city/rooms/west_main_street"
+            "target": "energia_city:rooms/west_main_street"
         }
-    ]
+    ],
+    "events": {
+        "on_enter": {
+            "function": "engine:player/message",
+            "message": "There is a "
+        },
+        "on_input": {
+            "function": "engine:text/match",
+            "text": {
+                "#ref": "#text"
+            },
+            "\\bleave\\b": {
+                "function": "engine:interaction/interact",
+                "interactable": ".exit_door"
+            },
+            "\\bwest\\b": {
+                "function": "engine:interaction/interact",
+                "interactable": ".west_passage"
+            }
+        }
+    }
 }

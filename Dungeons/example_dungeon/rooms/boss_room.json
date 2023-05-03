@@ -9,7 +9,7 @@
             "participants": [
                 {
                     "type": "enemy",
-                    "enemy": "example_dungeon:shadow_ent",
+                    "enemy": "example_dungeon:enemies/shadow_ent",
                     "id": "shadow_ent"
                 }
             ],

@@ -16,16 +16,6 @@ except ImportError:
 
 import json
 
-"""
-Function Memory:
-
-Variable Types:
-'%' - constant, global utility variables
-'.' - local environment variables
-'#' - global environment variables
-'' - local, temporary variables
-
-"""
 
 class FunctionMemory:
     #_instance = None
@@ -84,6 +74,9 @@ class FunctionMemory:
                 return False
 
         return True
+
+    def getLocation(self, location):
+        return self.engine.loader.getLocation(self, location)
 
     def store(self, name:str, value):
         self.symbol_table.update({name: value})

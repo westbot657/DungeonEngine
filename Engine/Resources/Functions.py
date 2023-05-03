@@ -701,12 +701,14 @@ class Engine_Player_SetLocation(LoaderFunction):
         match args:
             case {
                 "location": str()
-            }: ...
+            }: return cls.setLocation
             case _: return None
 
     @staticmethod
-    def setLocation(function_memory:FunctionMemory, **kwargs):
-        Log["debug"]["loader function"]["set location"]["call"](f"kwargs: {kwargs}")
+    def setLocation(function_memory:FunctionMemory, location):
+        player: Player = function_memory.ref("#player")
+        room: Room = function_memory.getLocation(player.location)
+        
         
 
 
@@ -715,9 +717,11 @@ class Engine_Player_GetLocation(LoaderFunction):
     return_type = Tool
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case {}: ...
-            case _: return None
+        return cls.getLocation
+
+    @staticmethod
+    def getLocation(function_memory:FunctionMemory):
+        return function_memory.ref("#player").location.full()
 # ^ Player ^ #
 
 ####XXX###############XXX####
@@ -782,25 +786,25 @@ class Engine_Text_Builder(LoaderFunction):
 
     @staticmethod
     def builder(function_memory:FunctionMemory, text:list, seperator:str|dict=" "):
-        out_text = [str(t) for t in text]
+        return seperator.join(str(t) for t in text)
 
-        # for element in text:
-        #     if isinstance(element, str):
-        #         out_text.append(element)
-        #     elif isinstance(element, dict):
-        #         ev = function_memory.generatorEvaluateFunction(element)
-        #         v = None
-        #         try:
-        #             v = ev.send(None)
-        #             while isinstance(v, _EngineOperation):
-        #                 res = yield v
-        #                 v = ev.send(res)
-        #         except StopIteration as e:
-        #             #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
-        #             v = e.value or v
-        #         out_text.append(str(v))
+class Engine_Text_Match(LoaderFunction):
+    id = Identifier("engine", "text/", "match")
+    pre_evaluate_args = False
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if "text" in args:
+            return cls.pattern_match
+        return None
+    @staticmethod
+    def pattern_match(function_memory:FunctionMemory, **kwargs):
+        text = kwargs.pop("text")
 
-        return seperator.join(out_text)
+        for pattern, func in kwargs.items():
+            if (m := re.match(pattern, text)):
+                function_memory.update(m.groupdict())
+                return function_memory.evaluateFunction(func)
+
 
 # ^ Text ^ #
 

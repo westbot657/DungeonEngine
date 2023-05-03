@@ -18,6 +18,7 @@ class LoaderFunction:
     id: Identifier|None = None
     return_type: list|tuple|tuple = None
     pre_evaluator: bool = False
+    pre_evaluate_args: bool = True
 
     @classmethod
     def getRelatedFunctions(cls, value_type:str|Identifier) -> list:
@@ -156,6 +157,7 @@ class LoaderFunction:
             LoaderFunction._functions.update({id.full(): cls})
             if cls.pre_evaluator:
                 LoaderFunction._pre_evaluators.append(id.full())
+
         else:
             print(f"Failed to load function without id: {cls}")
         

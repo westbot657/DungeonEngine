@@ -15,7 +15,7 @@ try:
     from .Functions import LoaderFunction
     from .Identifier import Identifier
     from .EngineDummy import Engine
-    from .EngineErrors import InvalidObjectError, FunctionLoadError
+    from .EngineErrors import InvalidObjectError, FunctionLoadError, LocationError
     from .LootTable import LootTable
     from .TextPattern import TextPattern
     from .Player import Player
@@ -44,7 +44,7 @@ except ImportError:
     from Functions import LoaderFunction
     from Identifier import Identifier
     from EngineDummy import Engine
-    from EngineErrors import InvalidObjectError, FunctionLoadError
+    from EngineErrors import InvalidObjectError, FunctionLoadError, LocationError
     from LootTable import LootTable
     from TextPattern import TextPattern
     from Player import Player
@@ -165,7 +165,7 @@ class DungeonLoader:
                     args = {}
                     for key, item in data.items():
                         if key in ["function", "#store", "predicate"]: continue
-                        if isinstance(item, dict) or (isinstance(item, list) and (not prepEval)):
+                        if (isinstance(item, dict) or (isinstance(item, list) and (not prepEval))) and f.pre_evaluate_args:
                             ev = self._generatorEvaluateFunction(function_memory, item)
                             v = None
                             try:
@@ -180,6 +180,7 @@ class DungeonLoader:
                         
                         else:
                             args.update({key: item})
+
                     r = f._call(function_memory, args)
 
                     if isinstance(r, Generator):
@@ -410,6 +411,18 @@ class DungeonLoader:
             # determine parent type
         else:
             raise InvalidObjectError("No type or parent given for GameObject")
+
+    def getLocation(self, function_memory:FunctionMemory, location:Location):
+        for dungeon_name, dungeon in function_memory.engine.loader.dungeons.items():
+            dungeon_name: str
+            dungeon: Dungeon
+            name = dungeon_name.split(":", 1)[1]
+
+            if location.dungeon == name:
+                if (room := dungeon.rooms.get(location.full(), None)) is not None:
+                    return room
+        raise LocationError(f"Could not find location: '{location.full()}'")
+
 
     @TextPattern(r"\b(?:equip) *(?P<item_name>.*)\b", TextPattern.CheckType.SEARCH, ["common"])
     @staticmethod

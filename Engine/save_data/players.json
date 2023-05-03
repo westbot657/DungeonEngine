@@ -4,7 +4,7 @@
         "name": "Weston",
         "max_health": 20,
         "health": 11,
-        "location": "world:start",
+        "location": "world:rooms/start",
         "position": [0, 0],
         "inventory": [
             {
@@ -33,7 +33,11 @@
             },
             {
                 "type": "engine:tool",
-                "parent": "engine:tools/fishing_rod",
+                "parent": "engine:tools/fishing_rod"
+            },
+            {
+                "type": "engine:tool",
+                "parent": "engine:tools/test_tool",
                 "equipped": true
             }
         ],

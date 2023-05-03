@@ -75,14 +75,15 @@ class Room(FunctionalElement):
 
             self.postEvaluate(function_memory)
 
+        i = self._input_handler(function_memory)
+        i.send(None)
+        function_memory.engine.setInputHandler(player.discord_id, i, self._input_handler)
         
-        function_memory.engine.setInputHandler(player.discord_id, self._input_handler(function_memory), self._input_handler)
-
+        return EngineOperation.Success()
 
     def _input_handler(self, function_memory=None):
-        while True:
-            engine, player_id, text = yield EngineOperation.Continue()
-
+        engine, player_id, text = yield
+        while player_id in self.players_in_room:
 
             if (player := engine.players.get(player_id, None)) is not None:
                 print("room received input!")
@@ -95,9 +96,12 @@ class Room(FunctionalElement):
                         v = ev.send(res)
                 except StopIteration as e:
                     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
-                
+
+            engine, player_id, text = yield EngineOperation.Success()
 
     def onExit(self, function_memory:FunctionMemory, player:Player):
+        self.players_in_room.remove(player.discord_id)
+        
         if (on_exit := self.events.get("on_exit", None)) is not None:
             self.prepFunctionMemory(function_memory)
             function_memory.addContextData({

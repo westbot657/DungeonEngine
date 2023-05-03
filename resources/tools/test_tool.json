@@ -1,0 +1,12 @@
+{
+    "name": "Debug Tool",
+    "max_durability": -1,
+    "events": {
+        "on_use": [
+            {
+                "function": "engine:player/set_location",
+                "location": "world:rooms/start"
+            }
+        ]
+    }
+}

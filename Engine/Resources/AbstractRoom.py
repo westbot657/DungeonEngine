@@ -10,6 +10,7 @@ try:
     from .FunctionMemory import FunctionMemory
     from .DynamicValue import DynamicValue
     from .Location import Location
+    from .Environment import Environment
 except ImportError:
     from Room import Room
     from Identifier import Identifier
@@ -20,6 +21,7 @@ except ImportError:
     from FunctionMemory import FunctionMemory
     from DynamicValue import DynamicValue
     from Location import Location
+    from Environment import Environment
 
 import glob, json, re
 
@@ -104,7 +106,7 @@ class AbstractRoom:
             override_values.get("name", self.getName()),
             self.getEvents(),
             self.getInteractions(function_memory),
-            self.environment
+            Environment(self.environment)
         )
 
     @classmethod
@@ -179,15 +181,16 @@ class AbstractRoom:
         Log["loadup"]["abstract"]["room"]("AbstractRoom loading complete")
         return cls._loaded
 
-    # @classmethod
-    # def finishRoomLoading(cls):
-    #     for room, parent_name in cls._link_parents:
-    #         if parent_room := cls._loaded.get(parent_name, None):
-    #             room._set_parent(parent_room)
-    #         else:
-    #             print(f"Failed to load parent room of '{room.identifier.ID()}': '{parent_name}'")
-    #             cls._loaded.pop(room.identifier.ID())
-    #             continue
+    def _get_save(self, function_memory:FunctionMemory):
+        s = {
+            "name": self.name,
+            "events": self.events,
+            "environment": self.environment,
+            "interactions": self.interactions
+        }
+        if self.is_template:
+            s.update({"template": True})
+        return s
 
 if __name__ == "__main__":
     print(AbstractRoom.loadData(None))

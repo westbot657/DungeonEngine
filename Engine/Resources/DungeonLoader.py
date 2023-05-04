@@ -430,6 +430,22 @@ class DungeonLoader:
         raise LocationError(f"Could not find location: '{location.full()}'")
 
 
+    def getSaveData(self, function_memory:FunctionMemory, obj:Any):
+        match obj:
+            case str()|int()|float()|bool():
+                return obj
+            case list():
+                return [self.getSaveData(function_memory, o) for o in obj]
+            case dict():
+                d = {}
+                for key, value in obj:
+                    d.update({key: self.getSaveData(function_memory, value)})
+                return d
+            
+
+            case _:
+                raise Exception(f"Unrecognized object type for: {obj}")
+
     @TextPattern(r"\b(?:equip) *(?P<item_name>.*)\b", TextPattern.CheckType.SEARCH, ["common"])
     @staticmethod
     def checkTextEquip(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
@@ -547,7 +563,7 @@ class DungeonLoader:
         Log["loadup"]["loader"]("Loading Abstract Ammo...")
         self.abstract_ammo = AbstractAmmo.loadData(engine)
 
-        Log["loadup"]["loader"]("Loading Abstract Armors...")
+        Log["loadup"]["loader"]("Loading Abstract Armor...")
         self.abstract_armor = AbstractArmor.loadData(engine)
 
         Log["loadup"]["loader"]("Loading Abstract Tools...")
@@ -588,4 +604,11 @@ class DungeonLoader:
 
     def saveGame(self, engine:Engine):
         # TODO: implement saving
-        pass
+
+        Log["loadup"]["loader"]("Saving Dungeons...")
+        AbstractDungeon.saveData(engine._function_memory)
+
+        Log["loadup"]["loader"]("Saving Players...")
+        Player.saveData(engine._function_memory)
+
+        Log["loadup"]["loader"]("Finished saving")

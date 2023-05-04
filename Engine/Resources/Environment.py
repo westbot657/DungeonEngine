@@ -49,3 +49,13 @@ class Environment:
         d = Util.deepCopy(self.stats)
         d.update(Util.deepCopy(other.stats))
         return Environment(d)
+
+    def __eq__(self, other):
+        if isinstance(other, Environment):
+            return self.stats == other.stats
+        elif isinstance(other, dict):
+            return self.stats == other
+
+    def _get_save(self, function_memory):
+        return self.stats
+

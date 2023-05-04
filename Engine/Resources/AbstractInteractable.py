@@ -8,6 +8,7 @@ try:
     from .FunctionMemory import FunctionMemory
     from .EngineOperation import _EngineOperation
     from .Logger import Log
+    from .Util import Util
 except ImportError:
     from Location import Location
     from Identifier import Identifier
@@ -16,6 +17,7 @@ except ImportError:
     from FunctionMemory import FunctionMemory
     from EngineOperation import _EngineOperation
     from Logger import Log
+    from Util import Util
 
 from typing import Any
 
@@ -31,8 +33,9 @@ class AbstractInteractable:
         self.children: list[AbstractInteractable] = []
         self.parent: AbstractInteractable|None = None
 
-        self.fields: dict[str, dict[str, Any]]|None = data.get("fields", None)
-        self.interaction: dict = data.get("interaction", None)
+        self.fields: dict[str, dict[str, Any]] = data.get("fields", {})
+        self.data: dict[str, Any] = data.get("data", {})
+        self.interaction: dict = data.get("interaction", {})
 
     def _set_parent(self, parent):
         self.parent = parent
@@ -114,7 +117,11 @@ class AbstractInteractable:
         return vals
 
     def createInstance(self, function_memory:FunctionMemory, field_values):
-        return Interactable(self, self.interaction, self.getFieldValues(function_memory, field_values))
+        return Interactable(self,
+            self.interaction,
+            self.getFieldValues(function_memory, field_values),
+            Util.deepCopy(self.data)
+        )
 
     @classmethod
     def createInteractable(cls, function_memory:FunctionMemory, data:dict):

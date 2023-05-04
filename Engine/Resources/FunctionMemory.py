@@ -13,6 +13,7 @@ except ImportError:
     from FunctionalElement import FunctionalElement
     from Environment import Environment
 
+from typing import Any
 
 import json
 
@@ -77,6 +78,9 @@ class FunctionMemory:
 
     def getLocation(self, location):
         return self.engine.loader.getLocation(self, location)
+
+    def getSaveData(self, obj:Any):
+        return self.engine.loader.getSaveData(self, obj)
 
     def store(self, name:str, value):
         self.symbol_table.update({name: value})

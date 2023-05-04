@@ -144,3 +144,26 @@ class Room(FunctionalElement):
             self.postEvaluate(function_memory)
             
             yield res
+
+    def _get_save(self, function_memory:FunctionMemory):
+        dat = {}
+        if self.name != self.abstract.name:
+            dat.update({"name": self.name})
+        
+        if self.environment != self.abstract.environment:
+            dat.update({"environment": self.environment._get_save(function_memory)})
+        
+        interactions = {}
+
+        for interaction in self.interactions:
+            interaction: Interactable
+            interaction._save_to(interactions)
+        
+        if interactions:
+            dat.update({"interactions": interactions})
+
+        return dat
+
+    def _save_to(self, function_memory:FunctionMemory, save_dict:dict):
+        if save := self._get_save(function_memory):
+            save_dict.update({self.location.full(): save})

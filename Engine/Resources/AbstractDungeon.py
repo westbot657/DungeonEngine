@@ -42,7 +42,7 @@ class AbstractDungeon:
 
         self.name: str = data.get("name", None)
         self.version: float|str|int = data.get("version", None)
-        self.environment: Environment = Environment(data.get("environment", {}))
+        self.environment: dict = data.get("environment", {})
         self.entry_point: Location = Location.fromString(data.get("entry_point", None))
         self.events: dict|None = data.get("events", None)
         self.data: dict = data.get("data", {})
@@ -58,7 +58,7 @@ class AbstractDungeon:
         return Dungeon(self,
             override_values.get("name", self.name),
             self.version,
-            self.environment,
+            Environment(self.environment),
             self.entry_point,
             self.events,
             Util.deepCopy(self.data),
@@ -86,6 +86,21 @@ class AbstractDungeon:
                 e = cls._loaded.pop(l)
 
         return cls._loaded
+
+    def _get_save(self, function_memory:FunctionMemory):
+        return {
+            "name": self.name,
+            "version": self.version,
+            "environment": self.environment,
+            "entry_point": self.entry_point._get_save(function_memory),
+            #"events": self.events,
+            "data": self.data
+        }
+
+    @classmethod
+    def saveData(cls, function_memory:FunctionMemory):
+        ...
+
 
 if __name__ == "__main__":
     pass #print(AbstractDungeon.loadData())

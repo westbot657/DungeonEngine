@@ -33,7 +33,7 @@ except ImportError:
 
 from typing import Generator
 
-import json
+import json, os
 
 class Dungeon(FunctionalElement):
 
@@ -71,8 +71,73 @@ class Dungeon(FunctionalElement):
     def postEvaluate(self, function_memory:FunctionMemory):
         self.updateLocalVariables(function_memory.symbol_table)
 
-    def loadSaveData(self, function_memory:FunctionMemory):
-        ...
+    def loadData(self, function_memory:FunctionMemory):
+        filename = f"./Engine/save_data/{self.abstract.identifier.name}.json"
+
+        if os.path.exists(filename):
+            with open(filename, "r+", encoding="utf-8") as f:
+                data = json.load(f)
+            
+            if (dungeon := data.get("dungeon", None)) is not None:
+                if (name := dungeon.get("name", None)) is not None:
+                    self.name = name
+                if (version := dungeon.get("verison", None)) is not None:
+                    self.version = version
+                if (environemt := dungeon.get("environment", None)) is not None:
+                    self.environment = Environment(environemt)
+                if (entry_point := dungeon.get("entry_point", None)) is not None:
+                    self.entry_point = Location.fromString(entry_point)
+                if (data := dungeon.get("data", None)) is not None:
+                    ...
+
+
+    def saveData(self, function_memory:FunctionMemory):
+        filename = f"./Engine/save_data/{self.abstract.identifier.name}.json"
+        data = {}
+        _dat = self.abstract._get_save(function_memory)
+        dat = {}
+        # for val_name, abstract_val in _dat.items():
+        #     current_val = getattr(self, val_name)
+        #     if current_val != abstract_val:
+        #         dat.update({val_name: current_val})
+        
+        if (name := _dat.get("name", None)) is not None:
+            if name != self.name:
+                dat.update({"name": self.name})
+
+        if (version := _dat.get("version", None)) is not None:
+            if version != self.version:
+                dat.update({"version": self.version})
+
+        if (environment := _dat.get("environment", None)) is not None:
+            if self.environment != environment:
+                dat.update({"environment": self.environment._get_save(function_memory)})
+            
+        if (entry_point := _dat.get("entry_point", None)) is not None:
+            if self.entry_point.full() != entry_point:
+                dat.update({"entry_point": self.entry_point})
+        
+        if (_data := _dat.get("data", None)) is not None:
+            for data_name, abstract_val in _data.items():
+                current_val = self.data[data_name]
+                
+
+        if dat:
+            data.update({"dungeon": dat})
+
+        rooms = {}
+
+        for room in self.rooms:
+            room: Room
+            room._save_to(function_memory, rooms)
+
+        if rooms:
+            data.update({"rooms": rooms})
+
+        if data:
+            with open(filename, "w+", encoding="utf-8") as f:
+                json.dump(data, f)
+        
 
     def onEnter(self, function_memory:FunctionMemory, player:Player):
         player._text_pattern_categories = ["global", "common", "dungeon"]

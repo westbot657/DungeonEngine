@@ -119,10 +119,14 @@ class Dungeon(FunctionalElement):
         
         if (_data := _dat.get("data", None)) is not None:
             _data_save = {}
-            for data_name, abstract_val in _data.items():
-                current_val = self.data[data_name]
-                
-
+            for data_name, current_val in self.data.items():
+                if (abstract_val := _data.get(data_name, None)) is not None:
+                    if abstract_val != current_val:
+                        _data_save.update({data_name: function_memory.getSaveData(current_val)})
+                else:
+                    _data_save.update({data_name: function_memory.getSaveData(current_val)})
+            if _data_save:
+                dat.update({"data": _data_save})
 
         if dat:
             data.update({"dungeon": dat})

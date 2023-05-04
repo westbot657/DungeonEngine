@@ -118,9 +118,11 @@ class Dungeon(FunctionalElement):
                 dat.update({"entry_point": self.entry_point})
         
         if (_data := _dat.get("data", None)) is not None:
+            _data_save = {}
             for data_name, abstract_val in _data.items():
                 current_val = self.data[data_name]
                 
+
 
         if dat:
             data.update({"dungeon": dat})

@@ -1,7 +1,7 @@
 {
     "name": "Example Dungeon",
     "version": 0.1,
-    "entry_point": "example_dungeon:grove_entrance",
+    "entry_point": "example_dungeon:rooms/grove_entrance",
     "events": {
         "on_enter": {
             "function": "engine:player/message",

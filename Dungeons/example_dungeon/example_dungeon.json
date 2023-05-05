@@ -1,5 +1,5 @@
 {
-    "name": "Devin's Dungeon",
+    "name": "Example Dungeon",
     "version": 0.1,
     "entry_point": "example_dungeon:grove_entrance",
     "events": {

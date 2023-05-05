@@ -86,14 +86,20 @@ see the [door](./resources/interactable_types/door.json) interactable type as an
 
 ## Functions
 
-Function List:  
+Function and Parameter List:  
 - player:
   - engine:player/message
+    * message
   - engine:player/get_input
   - engine:player/give_item
+    * item
   - engine:player/heal
+    * amount
   - engine:player/damage
+    * amount
 
+the following functions have more complex parameters.  
+more in-depth explanation can be found [here](#complex-parameters)
 - math:
   - engine:math/solve
 
@@ -107,9 +113,26 @@ Function List:
 - text:
   - engine:text/builder
 
+Usage:
+```json
+...
+  {
+    "function": "<function-id>",
+    "<parameter>": "<value>",
+    ...
+  }
+...
+```
+
+
 ### Function Examples
 WIP
 
+
+
+
+#### complex parameters
+WIP
 
 
 

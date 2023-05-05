@@ -22,6 +22,8 @@ class Item(GameObject):
         self.count = count
         self.data = data or {}
 
+        self.owner = None
+
     def checkKeyword(self, keyword):
         return keyword in self.abstract.getKeywords()
 

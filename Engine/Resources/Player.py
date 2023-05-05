@@ -28,6 +28,7 @@ class Player(Entity):
         self.max_health = max_health
         self.health = health
         self.inventory = inventory
+        self.inventory.setParent(self)
         self.status_effects = StatusEffectManager()
         self._text_pattern_categories = _text_pattern_categories
         super().__init__(location, position)

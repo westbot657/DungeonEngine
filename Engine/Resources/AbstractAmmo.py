@@ -33,7 +33,7 @@ class AbstractAmmo(AbstractGameObject):
             AbstractAmmo._link_parents.append((self, data["parent"]))
     
         self.name: str|None = data.get("name", None)
-        self.bonus_damage: int|None = data.get("bonus_damage", "None")
+        self.bonus_damage: int|None = data.get("bonus_damage", None)
         self.max_count: int|None = data.get("max_count", None)
         self.count: int|None = data.get("count", self.max_count)
 
@@ -74,8 +74,6 @@ class AbstractAmmo(AbstractGameObject):
         if b is not None:
             return b
         raise InvalidObjectError(f"Ammo has no max-count! ({self.identifier})")
-
-    
 
     def createInstance(self, function_memory, **override_values) -> Ammo:
         if self.is_template:

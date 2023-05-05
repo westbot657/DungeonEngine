@@ -19,6 +19,8 @@ class Ammo(GameObject):
         self.max_count = max_count
         self.count = count or max_count # this will make None and 0 set the amount to max (0 is included so that you can't have a stack of no ammo)
 
+        self.owner = None
+
     def __repr__(self):
         return f"Ammo {self.name}: bonus-damage:{self.bonus_damage} max-count:{self.max_count}"
 
@@ -27,3 +29,20 @@ class Ammo(GameObject):
 
     def quickStats(self, engine):
         return f"{self.name} {self.count}/{self.max_count}"
+
+    def _get_save(self, function_memory):
+        d = {
+            "type": "engine:ammo",
+            "parent": self.abstract.identifier.full()
+        }
+
+        if self.name != self.abstract.getName():
+            d.update({"name": self.name})
+        if self.bonus_damage != self.abstract.getBonusDamage():
+            d.update({"bonus_damage": self.bonus_damage})
+        if self.max_count != self.abstract.getMaxCount():
+            d.update({"max_count": self.max_count})
+        if self.count != self.abstract.getCount():
+            d.update({"count": self.count})
+        return d
+

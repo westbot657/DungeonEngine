@@ -30,6 +30,8 @@ class Tool(GameObject):
         self.max_durability = max_durability
         self.events = events
 
+        self.owner = None
+
     def checkKeyword(self, keyword):
         return keyword in self.abstract.getKeywords()
 

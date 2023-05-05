@@ -55,6 +55,7 @@ class Inventory(FunctionalElement):
             if self.isEquipped(game_object):
                 self.unequipObject(game_object)
             self.contents.remove(game_object)
+            game_object.owner = None
 
     def addObject(self, game_object:GameObject):
 
@@ -71,8 +72,14 @@ class Inventory(FunctionalElement):
                             obj.count += game_object.count
                             return
 
+        game_object.owner = self.parent
         self.contents.append(game_object)
     
+    def setParent(self, parent):
+        self.parent = parent
+        for game_object in self.contents:
+            game_object.owner = parent
+
     def getOfType(self, objectType:type|tuple[type]):
         matches = []
         for c in self.contents:

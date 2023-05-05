@@ -19,6 +19,9 @@ class GameObject(FunctionalElement):
 
         GameObject._game_object_types.update({cls.identifier.full(): cls})
 
+    def __init__(self):
+        self.owner = None
+
     def bonuses(self, engine):
         return None
 

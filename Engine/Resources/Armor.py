@@ -20,6 +20,8 @@ class Armor(GameObject):
         self.max_durability = max_durability
         self.durability = durability
 
+        self.owner = None
+
     def bonuses(self, engine):
         return f"+{self.damage_reduction.quickDisplay(engine)}def"
 

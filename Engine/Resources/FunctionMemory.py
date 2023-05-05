@@ -82,6 +82,9 @@ class FunctionMemory:
     def getSaveData(self, obj:Any):
         return self.engine.loader.getSaveData(self, obj)
 
+    def rebuildData(self, data:Any):
+        return self.engine.loader.rebuildData(self, data)
+
     def store(self, name:str, value):
         self.symbol_table.update({name: value})
         

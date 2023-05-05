@@ -25,6 +25,8 @@ class Weapon(GameObject):
         self.ammo_type = ammo_type
         self.events = events
 
+        self.owner = None
+
     def __repr__(self):
         return f"Weapon {self.name}: damage:{self.damage} range:{self.range}  durability:{self.durability}"
 

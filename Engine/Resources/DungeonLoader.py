@@ -29,6 +29,7 @@ try:
     from .Environment import Environment
     from .AbstractInteractable import AbstractInteractable, Interactable
     from .Entity import Entity
+    from .DynamicValue import DynamicValue
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -57,6 +58,9 @@ except ImportError:
     from Position import Position
     from Environment import Environment
     from AbstractInteractable import AbstractInteractable, Interactable
+    from Entity import Entity
+    from DynamicValue import DynamicValue
+
 
 from typing import Any, Generator
 import re
@@ -437,14 +441,50 @@ class DungeonLoader:
             case list():
                 return [self.getSaveData(function_memory, o) for o in obj]
             case dict():
-                d = {}
+                d = {"%ENGINE:DATA-TYPE%": "dict"}
                 for key, value in obj:
                     d.update({key: self.getSaveData(function_memory, value)})
                 return d
-            
+            case Ammo(): ...
+            case Armor(): ...
+            case Attack(): ...
+            case Combat(): ...
+            case DynamicValue(): ...
+            case Enemy(): ...
+            case Environment(): ...
+            case Identifier():
+                return {
+                    "%ENGINE:DATA-TYPE%": "identifier",
+                    "value": obj.full()
+                }
+            case Interactable(): ...
+            case Item(): ...
+            case Location():
+                return {
+                    "%ENGINE:DATA-TYPE%": "location",
+                    "value": obj.full()
+                }
+            case LootTable(): ...
+            case Player():
+                return {
+                    "%ENGINE:DATA-TYPE%": "player",
+                    "id": obj.discord_id
+                }
+            case Position():
+                return {
+                    "%ENGINE:DATA-TYPE%": "position",
+                    "x": obj.x,
+                    "y": obj.y
+                }
+            case StatusEffect(): ...
+            case Tool(): ...
+            case Weapon(): ...
 
             case _:
                 raise Exception(f"Unrecognized object type for: {obj}")
+
+    def rebuildData(self, function_memory:FunctionMemory, data:Any):
+        ...
 
     @TextPattern(r"\b(?:equip) *(?P<item_name>.*)\b", TextPattern.CheckType.SEARCH, ["common"])
     @staticmethod

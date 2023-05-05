@@ -88,7 +88,10 @@ class Dungeon(FunctionalElement):
                 if (entry_point := dungeon.get("entry_point", None)) is not None:
                     self.entry_point = Location.fromString(entry_point)
                 if (data := dungeon.get("data", None)) is not None:
-                    ...
+                    _data = {}
+                    for key, value in data:
+                        _data.update({key: function_memory.rebuildData(value)})
+                    self.data = _data
 
 
     def saveData(self, function_memory:FunctionMemory):

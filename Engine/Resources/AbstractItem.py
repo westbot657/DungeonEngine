@@ -90,9 +90,6 @@ class AbstractItem(AbstractGameObject):
             words += [word for word in self.parent.getKeywords() if word not in words]
         return words
 
-    def getEvents(self) -> dict:
-        ...
-        return {}
 
     def createInstance(self, function_memory, **override_values) -> Item:
         if self.is_template:
@@ -102,7 +99,8 @@ class AbstractItem(AbstractGameObject):
                 override_values.get("name", self.getName()),
                 int(override_values.get("max_count", self.getMaxCount())),
                 int(DynamicValue(override_values.get("count", self.getCount())).getCachedOrNew(function_memory)),
-                DynamicValue(override_values.get("data", self.getData()))
+                override_values.get("data", self.getData()),
+                self.events
             )
 
     @classmethod

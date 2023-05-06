@@ -4,10 +4,12 @@ try:
     from .GameObject import GameObject
     from .Identifier import Identifier
     from .DynamicValue import DynamicValue
+    from .FunctionMemory import FunctionMemory
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
     from DynamicValue import DynamicValue
+    from FunctionMemory import FunctionMemory
 
 
 class Ammo(GameObject):
@@ -30,7 +32,38 @@ class Ammo(GameObject):
     def quickStats(self, engine):
         return f"{self.name} {self.count}/{self.max_count}"
 
-    def _get_save(self, function_memory):
+    def getLocalVariables(self) -> dict:
+        return {}
+
+    def updateLocalVariables(self, locals: dict):
+        ...
+
+    def prepFunctionMemory(self, function_memory:FunctionMemory):
+        function_memory.addContextData({
+            "#ammo": self
+        })
+        function_memory.update(self.getLocalVariables())
+
+    def postEvaluate(self, function_memory:FunctionMemory):
+        self.updateLocalVariables(function_memory.symbol_table)
+
+
+    def onLoad(self, function_memory:FunctionMemory):
+        ...
+
+    def onUnload(self, function_memory:FunctionMemory):
+        ...
+    
+    def onFire(self, function_memory:FunctionMemory):
+        ...
+
+    def onHit(self, function_memory:FunctionMemory):
+        ...
+    
+    def onMiss(self, function_memory:FunctionMemory):
+        ...
+
+    def _get_save(self, function_memory:FunctionMemory):
         d = {
             "type": "engine:ammo",
             "parent": self.abstract.identifier.full()

@@ -61,14 +61,14 @@ class Engine:
         self._player_input_categories = ["common", "global", "world"]
         #self.default_input_handler.send(None)
 
-    def evaluateFunction(self, data:dict, function_memory:FunctionMemory=None, context_data:dict=None, local_variables:dict=None):
-        if function_memory is None:
-            function_memory = FunctionMemory(self)
-        if context_data:
-            function_memory.addContextData(context_data)
-        if local_variables:
-            function_memory.update(local_variables)
-        return self.loader.evaluateFunction(function_memory, data)
+    # def evaluateFunction(self, data:dict, function_memory:FunctionMemory=None, context_data:dict=None, local_variables:dict=None):
+    #     if function_memory is None:
+    #         function_memory = FunctionMemory(self)
+    #     if context_data:
+    #         function_memory.addContextData(context_data)
+    #     if local_variables:
+    #         function_memory.update(local_variables)
+    #     return self.loader.evaluateFunction(function_memory, data)
 
     def generatorEvaluateFunction(self, data:dict, function_memory:FunctionMemory=None, context_data:dict=None, local_variables:dict=None):
         if function_memory is None:

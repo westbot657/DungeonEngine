@@ -48,12 +48,15 @@ class Ammo(GameObject):
         self.updateLocalVariables(function_memory.symbol_table)
 
 
+    # on_load: when ammo is loaded into a weapon
     def onLoad(self, function_memory:FunctionMemory):
         ...
 
+    # on_unload: when ammo is unloaded from a weapon
     def onUnload(self, function_memory:FunctionMemory):
         ...
     
+    # when weapon is used to fire ammo
     def onFire(self, function_memory:FunctionMemory):
         ...
 

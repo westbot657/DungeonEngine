@@ -6,12 +6,14 @@ try:
     from .Util import Util
     from .EngineDummy import Engine
     from .EngineOperation import EngineOperation, _EngineOperation
+    from .FunctionMemory import FunctionMemory
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
     from Util import Util
     from EngineDummy import Engine
     from EngineOperation import EngineOperation, _EngineOperation
+    from FunctionMemory import FunctionMemory
 
 class Item(GameObject):
     identifier = Identifier("engine", "object/", "item")
@@ -37,11 +39,26 @@ class Item(GameObject):
     def quickStats(self, engine):
         return f"{self.name}  {self.count}/{self.max_count}"
     
-    def onUse(self, function_memory, amount_used:int):
+    def getLocalVariables(self) -> dict:
+        d = {}
+
+        return d
+
+    def updateLocalVariables(self, locals: dict):
+        ...
+
+    def prepFunctionMemory(self, function_memory:FunctionMemory):
+        function_memory.addContextData({
+            "#item": self
+        })
+        function_memory.update(self.getLocalVariables())
+    
+    def postEvaluate(self, function_memory:FunctionMemory):
+        self.updateLocalVariables(function_memory.symbol_table)
+
+    def onUse(self, function_memory:FunctionMemory, amount_used:int):
         if on_use := self.events.get("on_use", None):
-            function_memory.addContextData({
-                "#tool": self
-            })
+            self.prepFunctionMemory(function_memory)
             ev = function_memory.generatorEvaluateFunction(on_use)
             v = None
             try:
@@ -52,4 +69,19 @@ class Item(GameObject):
             except StopIteration as e:
                 v = e.value or (v if not isinstance(v, _EngineOperation) else None)
             res = v
+            self.postEvaluate(function_memory)
 
+    def onExpended(self, function_memory:FunctionMemory):
+        if on_expended := self.events.get("on_expended", None):
+            self.prepFunctionMemory(function_memory)
+            ev = function_memory.generatorEvaluateFunction(on_expended)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            res = v
+            self.postEvaluate(function_memory)

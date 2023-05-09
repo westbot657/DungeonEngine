@@ -41,8 +41,8 @@ class FunctionMemory:
     #     self.symbol_table.clear()
     #     self.context_data.clear()
 
-    def evaluateFunction(self, data:dict):
-        return self.engine.evaluateFunction(data, self)
+    # def evaluateFunction(self, data:dict):
+    #     return self.engine.evaluateFunction(data, self)
 
     def generatorEvaluateFunction(self, data:dict):
         return self.engine.generatorEvaluateFunction(data, self)

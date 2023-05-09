@@ -95,11 +95,11 @@ class DungeonLoader:
         self.abstract_tools: dict[str, AbstractTool] = {}
         self.abstract_weapons: dict[str, AbstractWeapon] = {}
 
-    def evaluateFunction(self, function_memory:FunctionMemory, data:dict):
-        # TODO: function memory stuff can happen here I guess? (not sure what that is right now though)
-        #function_memory.clear()
-        val = self._evaluateFunction(function_memory, data)
-        return val
+    # def evaluateFunction(self, function_memory:FunctionMemory, data:dict):
+    #     # TODO: function memory stuff can happen here I guess? (not sure what that is right now though)
+    #     #function_memory.clear()
+    #     val = self._evaluateFunction(function_memory, data)
+    #     return val
 
     def scanFunction(self, function_memory:FunctionMemory, data:Any, allowed_functions:list, disallowed_functions:list):
         return not self._scanFunction(function_memory, data, allowed_functions, disallowed_functions)
@@ -299,66 +299,66 @@ class DungeonLoader:
         else:
             return data
 
-    def _evaluateFunction(self, function_memory:FunctionMemory, data:dict):
-        engine = function_memory.engine
+    # def _evaluateFunction(self, function_memory:FunctionMemory, data:dict):
+    #     engine = function_memory.engine
         
-        if isinstance(data, dict):
-            if (funcs := data.get("functions", None)) is not None:
-                if (predicate := data.get("predicate", None)) is not None:
-                    if not function_memory.checkPredicate(predicate): return None
-                result = None
-                for func in funcs:
-                    res = self._evaluateFunction(function_memory, func)
-                    if res: result = res
-                return result
-            elif (func := data.get("function", None)) is not None:
-                if f := self.loader_function.getFunction(func):
-                    f: LoaderFunction
-                    # Check predicate
-                    if (predicate := data.get("predicate", None)) is not None:
-                        if not function_memory.checkPredicate(predicate): return None
-                    # Run function
-                    args = {}
-                    for key, item in data.items(): # gather the arguments for the function
-                        if key in ["function", "#store", "predicate"]: continue # skip the function's id, predicate, and the special #store operator
-                        if isinstance(item, dict):
-                            args.update({key: self._evaluateFunction(function_memory, item)})
-                        else:
-                            args.update({key: item})
-                    r = f._call(function_memory, args)
-                    # if a #store operator was present with the function, the function's result is assigned to the name in #store
-                    if var := data.get("#store", None):
-                        var: str
-                        if var.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{var}'")
-                        function_memory.store(var, r)
-                    return r
-            elif (var := data.get("#ref", None)) is not None:
-                return function_memory.ref(var)
-            elif (store := data.get("#store", None)) is not None:
-                if isinstance(store, dict):
-                    for key, value in store.items():
-                        if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
-                        function_memory.store(key, value)
-            elif (check := data.get("@check", None)) is not None:
-                res = self._evaluateFunction(function_memory, check)
-                if res and ((true_branch := data.get("true", None)) is not None):
-                    return self._evaluateFunction(function_memory, true_branch)
-                elif (false_branch := data.get("false", None)) is not None:
-                    return self._evaluateFunction(function_memory, false_branch)
-                else:
-                    return None
-            else:
-                dat = {}
-                for key, item in data.items():
-                    dat.update({key: self._evaluateFunction(function_memory, item)})
-                return dat
-        elif isinstance(data, list):
-            dat = []
-            for item in data:
-                dat.append(self._evaluateFunction(function_memory, item))
-            return dat
-        else:
-            return data
+    #     if isinstance(data, dict):
+    #         if (funcs := data.get("functions", None)) is not None:
+    #             if (predicate := data.get("predicate", None)) is not None:
+    #                 if not function_memory.checkPredicate(predicate): return None
+    #             result = None
+    #             for func in funcs:
+    #                 res = self._evaluateFunction(function_memory, func)
+    #                 if res: result = res
+    #             return result
+    #         elif (func := data.get("function", None)) is not None:
+    #             if f := self.loader_function.getFunction(func):
+    #                 f: LoaderFunction
+    #                 # Check predicate
+    #                 if (predicate := data.get("predicate", None)) is not None:
+    #                     if not function_memory.checkPredicate(predicate): return None
+    #                 # Run function
+    #                 args = {}
+    #                 for key, item in data.items(): # gather the arguments for the function
+    #                     if key in ["function", "#store", "predicate"]: continue # skip the function's id, predicate, and the special #store operator
+    #                     if isinstance(item, dict):
+    #                         args.update({key: self._evaluateFunction(function_memory, item)})
+    #                     else:
+    #                         args.update({key: item})
+    #                 r = f._call(function_memory, args)
+    #                 # if a #store operator was present with the function, the function's result is assigned to the name in #store
+    #                 if var := data.get("#store", None):
+    #                     var: str
+    #                     if var.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{var}'")
+    #                     function_memory.store(var, r)
+    #                 return r
+    #         elif (var := data.get("#ref", None)) is not None:
+    #             return function_memory.ref(var)
+    #         elif (store := data.get("#store", None)) is not None:
+    #             if isinstance(store, dict):
+    #                 for key, value in store.items():
+    #                     if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
+    #                     function_memory.store(key, value)
+    #         elif (check := data.get("@check", None)) is not None:
+    #             res = self._evaluateFunction(function_memory, check)
+    #             if res and ((true_branch := data.get("true", None)) is not None):
+    #                 return self._evaluateFunction(function_memory, true_branch)
+    #             elif (false_branch := data.get("false", None)) is not None:
+    #                 return self._evaluateFunction(function_memory, false_branch)
+    #             else:
+    #                 return None
+    #         else:
+    #             dat = {}
+    #             for key, item in data.items():
+    #                 dat.update({key: self._evaluateFunction(function_memory, item)})
+    #             return dat
+    #     elif isinstance(data, list):
+    #         dat = []
+    #         for item in data:
+    #             dat.append(self._evaluateFunction(function_memory, item))
+    #         return dat
+    #     else:
+    #         return data
 
     def searchFor(self, identifier:Identifier) -> AbstractGameObject|type[AbstractGameObject]|LoaderFunction|None:
         if identifier.path:

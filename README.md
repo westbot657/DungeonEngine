@@ -2,7 +2,7 @@
 # Dungeon Building
 
 Note: This is going to be a VERY long, detailed, guide to creating a dungeon and all it's components.  
-[Dungeons](#dungeons) | [Rooms](#rooms)  
+[Dungeons](#dungeons) | [Rooms](#rooms) | [Interactions](#interactions)    
 [Weapons](#weapons) | [Ammo](#ammo) | [Armor](#armor)  
 [Items](#items) | [Tools](#tools)  
 [StatusEffects](#status-effects)  
@@ -10,16 +10,19 @@ Note: This is going to be a VERY long, detailed, guide to creating a dungeon and
 [Interactable Types](#interactable-types)  
 [Functions](#functions)  
 
+
 ## Dungeons
 
-### Base JSON values:
+Base JSON values:
 ```json
 {
   "name": "...",
   "version": 1.0,
   "entry_point": "dungeon:rooms/room",
-  "enter_message": "...",
-  "exit_message": "...",
+  "events": {
+    "on_enter": {...},
+    "on_exit": {...}
+  }
   "data": {
     "some_variable": "some value"
   }
@@ -31,15 +34,18 @@ More comming soon!
 
 ## Rooms
 
-### Base JSON values:
+Base JSON values:
 ```json
 {
   "name": "<string>",
-  "enter_message": "<function|string>",
-  "exit_message": "<function|string>",
   "interactions": [
-    "// interactions will be explained below"
-  ]
+    // interactions will be explained below
+  ],
+  "events": {
+    "on_enter": {...},
+    "on_exit": {...},
+    "on_input": {...}
+  }
 }
 ```
 
@@ -47,12 +53,12 @@ More comming soon!
 for interactable types, go [here](#interactable-types).  
 
 
-Door Interactable JSON:  
+Door Interaction JSON:  
 ```json
 {
   "type": "engine:door",
   "id": "<string>",
-  "target": "<room_identifier>",
+  "target": "<room identifier>",
   "travel_message": "<function|string>",
   "lock_message": "<function|string>",
   "locked": "<bool>",
@@ -62,27 +68,67 @@ Door Interactable JSON:
 ```
 
 ## Weapons
+WIP
 
 ## Ammo
+WIP
 
 ## Armor
+WIP
 
 ## Items
+```json
+{
+  "parent": "<item identifier>",
+  "name": "...",
+  "max_count": "<int>",
+  "count": "<int>",
+  "data": {...},
+  "events": {
+    "on_use": {...},
+    "on_expended": {...}
+  }
+}
+```
+
 
 ## Tools
+```json
+{
+  "parent": "<tool identifier>",
+  "name": "...",
+  "max_durability": "<int>",
+  "durability": "<int>",
+  "data": {...},
+  "events": {
+    "on_use": {...},
+    "on_equip": {...},
+    "on_unequip": {...},
+    "on_damaged": {...},
+    "on_break": {...}
+  }
+}
+```
+
 
 ## Status Effects
+WIP
 
 ## Enemies
+WIP
 
 ## Attacks
+WIP
 
 ## Entities
+WIP
 
 ## Interactable Types
+WIP
 see the [door](./resources/interactable_types/door.json) interactable type as an example  
 
 ## Combats
+WIP
 
 ## Functions
 

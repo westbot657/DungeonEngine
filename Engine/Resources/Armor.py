@@ -99,10 +99,10 @@ class Armor(GameObject):
 
     def onDamageReduction(self, function_memory:FunctionMemory, damage:int):
 
+        self.prepFunctionMemory(function_memory)
         function_memory.update({
             "damage": damage
         })
-
         ev = self.damage_reduction.getNew(function_memory)
         v = None
         if isinstance(ev, Generator):
@@ -118,13 +118,54 @@ class Armor(GameObject):
             v = ev
         else:
             Log["error"]["armor"]["event"]["on damage reduction"](f"invalid return from damage_reduction DynamicValue.getNew(): '{ev}'")
-            
+        
+        reduced_damage = v
 
         if on_damage_reduction := self.events.get("on_damage_reduction", None):
-            self.prepFunctionMemory(function_memory)
+            #self.prepFunctionMemory(function_memory)
+            function_memory.update({
+                "damage": reduced_damage
+            })
             ev = function_memory.generatorEvaluateFunction(on_damage_reduction)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            res = v
+            self.postEvaluate(function_memory)
 
-            # function_memory.clear()
+        if self.max_durability > 0:
+            self.durability -= 1
+
+            if self.durability <= 0:
+                v = None
+                ev = self.onBreak(function_memory)
+                try:
+                    v = ev.send(None)
+                    while isinstance(v, _EngineOperation):
+                        res = yield v
+                        v = ev.send(res)
+                except StopIteration as e:
+                    v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                return v
+
+            else:
+                v = None
+                ev = self.onDamaged(function_memory)
+                try:
+                    v = ev.send(None)
+                    while isinstance(v, _EngineOperation):
+                        res = yield v
+                        v = ev.send(res)
+                except StopIteration as e:
+                    v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                return v
+
+
     def onDamaged(self, function_memory:FunctionMemory):
         if on_damaged := self.events.get("on_damaged", None):
             self.prepFunctionMemory(function_memory)
@@ -154,6 +195,9 @@ class Armor(GameObject):
                 v = e.value or (v if not isinstance(v, _EngineOperation) else None)
             res = v
             self.postEvaluate(function_memory)
+
+        if self.durability <= 0:
+            function_memory.ref("#player").inventory.removeObject(self)
 
     def _get_save(self, function_memory:FunctionMemory):
         d = {

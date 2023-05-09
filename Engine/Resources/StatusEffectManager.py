@@ -14,13 +14,14 @@ except ImportError:
 class StatusEffectManager:
     
     def __init__(self):
-        self.effects = []
+        self.effects: list[StatusEffect] = []
         
     def addEffect(self, effect:StatusEffect):
-        ...
+        effect.effect_manager = self
+        self.effects.append(effect)
 
     def fullStats(self):
-        return ""
+        return "\n".join([effect.fullStats() for effect in self.effects]).strip()
 
     def _get_save(self, function_memory):
         ...

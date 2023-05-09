@@ -4,16 +4,18 @@ try:
     from .EngineDummy import Engine
     from .StatusEffectCause import StatusEffectCause
     from .FunctionalElement import FunctionalElement
+    from .FunctionMemory import FunctionMemory
 except ImportError:
     from EngineDummy import Engine
     from StatusEffectCause import StatusEffectCause
     from FunctionalElement import FunctionalElement
+    from FunctionMemory import FunctionMemory
 
 
 
 class StatusEffect(FunctionalElement):
 
-    def __init__(self, abstract, name:str, level:int, duration:float|int, tick_interval, cause:StatusEffectCause, events:dict):
+    def __init__(self, abstract, name:str, level:int, duration:float|int, tick_interval:int, cause:StatusEffectCause, events:dict, getters:dict):
         self.abstract = abstract
         self.name = name
         self.level = level
@@ -21,6 +23,42 @@ class StatusEffect(FunctionalElement):
         self.tick_interval = tick_interval
         self.cause = cause
         self.events = events
+        self.getters = getters
 
-    def _get_save(self, function_memory):
-        ...
+        self.effect_manager = None
+
+
+    def getLocalVariables(self) -> dict:
+        d = {
+            ".name": self.name,
+            ".level": self.level,
+            ".duration": self.duration,
+            ".cause": self.cause.getDisplay(),
+            ".tick_interval": self.tick_interval
+        }
+        return d
+
+    def bonuses(self, engine:Engine):
+        if (get_bonuses := self.getters.get("bonuses", None)) is not None:
+            return engine.evaluateFunction(get_bonuses, FunctionMemory(engine), None, self.getLocalVariables())
+
+        return None
+
+    def quickStats(self, engine:Engine):
+
+        if (get_quick_stats := self.getters.get("quick_stats", None)) is not None:
+            return engine.evaluateFunction(get_quick_stats, FunctionMemory(engine), None, self.getLocalVariables())
+
+        return f"{self.name} {self.level}"
+
+    def fullStats(self, engine:Engine):
+
+        if (get_full_stats := self.getters.get("full_stats", None)) is not None:
+            return engine.evaluateFunction(get_full_stats, FunctionMemory(engine), None, self.getLocalVariables())
+
+        return f"{self.name} {self.level} {self.duration}s {self.cause.getDisplay()}"
+
+    def _get_save(self, function_memory:FunctionMemory):
+        d = {}
+
+        return d

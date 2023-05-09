@@ -34,6 +34,7 @@ class AbstractTool(AbstractGameObject):
         self.max_durability: int|None = data.get("max_durability", None)
         self.durability: int|None = data.get("durability", self.max_durability)
         self.events: dict|None = data.get("events", None)
+        self.data: dict = data.get("data", {})
 
         self.keywords: list = data.get("keywords", None)
 
@@ -73,6 +74,13 @@ class AbstractTool(AbstractGameObject):
             e = self.events
         return e or {}
 
+    def getData(self) -> dict:
+        _data = {}
+        if self.parent:
+            _data.update(self.parent.getData())
+        _data.update(self.data.copy())
+        return _data
+
     def getKeywords(self) -> list:
         if self.keywords is None:
             if self.parent:
@@ -94,7 +102,8 @@ class AbstractTool(AbstractGameObject):
                 override_values.get("name", self.getName()),
                 DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(function_memory),
                 override_values.get("max_durability", self.getMaxDurability()),
-                self.getEvents()
+                self.getEvents(),
+                self.getData()
             )
     
     @classmethod

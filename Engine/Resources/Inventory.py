@@ -103,6 +103,7 @@ class Inventory(FunctionalElement):
     def fullStats(self, engine):
         equip_stats = []
         for v in self.equips.values():
+            v: GameObject|None
             if v is None: continue
             if (b := v.bonuses(engine)) is not None: equip_stats.append(b)
         
@@ -140,3 +141,8 @@ class Inventory(FunctionalElement):
         inv.equips = equips
         Log["loadup"]["inventory"]("Inventory Construction finished")
         return inv
+
+    def _get_save(self, function_memory:FunctionMemory):
+        d = {}
+
+        return d

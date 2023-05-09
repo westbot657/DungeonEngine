@@ -2,7 +2,6 @@
 from typing import Any, Generator
 
 class Util:
-    ...
 
     @staticmethod
     def getRoundedUpKey(key:float, data:dict[float]):
@@ -50,18 +49,19 @@ class Util:
 
         return f"[{'='*filled:-<{bar_width}}] {current_value}/{max_value}"
 
-    @staticmethod
-    def deepCopy(data:Any):
+    @classmethod
+    def deepCopy(cls, data:Any):
         if isinstance(data, dict):
             dat = {}
             for key, value in data.items():
-                dat.update({key: Util.deepCopy(value)})
+                dat.update({key: cls.deepCopy(value)})
             return dat
         elif isinstance(data, list):
             dat = []
             for val in data:
-                dat.append(Util.deepCopy(val))
+                dat.append(cls.deepCopy(val))
             return dat
         else:
             return data
+
 

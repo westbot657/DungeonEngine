@@ -46,7 +46,7 @@
         {
             "type": "engine:interactable/loot",
             "id": "ritual_staff",
-            "item": "example_dungeon:weapons/ritual_staff"
+            "loot": "example_dungeon:weapons/ritual_staff"
         }
     ]
 }

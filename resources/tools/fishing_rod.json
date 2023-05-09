@@ -90,7 +90,7 @@
         "on_equip": [],
         "on_unequip": [],
         "on_break": [],
-        "on_damage": [],
+        "on_damaged": [],
         "on_repair": []
     }
 }

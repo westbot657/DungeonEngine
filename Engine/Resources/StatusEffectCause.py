@@ -23,7 +23,7 @@ class StatusEffectCause(FunctionalElement):
         self.name = name
 
     def getDisplay(self):
-        return ""
+        return f"[{self.name}]"
 
     def __repr__(self):
         extra = self.getDisplay()

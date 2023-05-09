@@ -23,12 +23,13 @@ class Tool(GameObject):
         CANCEL_USE = auto()
 
     identifier = Identifier("engine", "object/", "tool")
-    def __init__(self, abstract, name:str, durability:int, max_durability:int, events:dict):
+    def __init__(self, abstract, name:str, durability:int, max_durability:int, events:dict, data:dict):
         self.abstract = abstract
         self.name = name
         self.durability = durability
         self.max_durability = max_durability
         self.events = events
+        self.data = data
 
         self.owner = None
 
@@ -36,11 +37,16 @@ class Tool(GameObject):
         return keyword in self.abstract.getKeywords()
 
     def getLocalVariables(self):
-        return {
+        d = {
             ".name": self.name,
             ".durability": self.durability,
             ".max_durability": self.max_durability,
         }
+
+        for key, val in self.data.items():
+            d.update({f".{key}": val})
+
+        return d
 
     def updateLocalVariables(self, function_memory, locals:dict):
         if n := locals.get(".name", None):
@@ -70,11 +76,10 @@ class Tool(GameObject):
     def postEvaluate(self, function_memory:FunctionMemory):
         self.updateLocalVariables(function_memory, function_memory.symbol_table)
 
-    def onUse(self, function_memory:FunctionMemory, amount_used):
+    def onUse(self, function_memory:FunctionMemory):
         if on_use := self.events.get("on_use", None):
 
             self.prepFunctionMemory(function_memory)
-            function_memory.addContextData({"#uses": amount_used})
             #res = function_memory.evaluateFunction(on_use)
 
             ev = function_memory.generatorEvaluateFunction(on_use)
@@ -112,7 +117,7 @@ class Tool(GameObject):
 
                 else:
                     v = None
-                    ev = self.onDamage(function_memory)
+                    ev = self.onDamaged(function_memory)
                     try:
                         v = ev.send(None)
                         while isinstance(v, _EngineOperation):
@@ -142,11 +147,11 @@ class Tool(GameObject):
         if self.durability <= 0:
             function_memory.ref("#player").inventory.removeObject(self)
 
-    def onDamage(self, function_memory:FunctionMemory):
-        if on_damage := self.events.get("on_damage", None):
+    def onDamaged(self, function_memory:FunctionMemory):
+        if on_damaged := self.events.get("on_damaged", None):
             self.prepFunctionMemory(function_memory)
             #res = function_memory.evaluateFunction(on_damage)
-            ev = function_memory.generatorEvaluateFunction(on_damage)
+            ev = function_memory.generatorEvaluateFunction(on_damaged)
             v = None
             try:
                 v = ev.send(None)

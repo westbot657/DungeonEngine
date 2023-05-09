@@ -38,7 +38,7 @@ class AbstractItem(AbstractGameObject):
         self.name: str = data.get("name", None)
         self.max_count: int = data.get("max_count", None)
         self.count: int = data.get("count", self.max_count)
-        self.data: dict = data.get("data", None)
+        self.data: dict = data.get("data", {})
         self.events: dict = data.get("events", None)
         self.keywords: list = data.get("keywords", None)
 
@@ -74,9 +74,11 @@ class AbstractItem(AbstractGameObject):
         raise InvalidObjectError(f"Item has no count! ({self.identifier})")
     
     def getData(self) -> dict:
-        if self.data is None:
-            return self.parent.getData() or {} if self.parent else {}
-        return self.data
+        _data = {}
+        if self.parent:
+            _data.update(self.parent.getData())
+        _data.update(self.data.copy())
+        return _data
 
     def getKeywords(self) -> list:
         if self.keywords is None:

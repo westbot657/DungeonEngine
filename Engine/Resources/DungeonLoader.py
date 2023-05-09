@@ -512,14 +512,11 @@ class DungeonLoader:
                 else:
                     function_memory.engine.sendOutput(player, f"You have no Weapon, Armor, or Tool called '{item_name}'")
 
-    @TextPattern(r"\b(?P<keyword>use|eat|throw|apply|drink)(?: *(?P<amount>[1-9][0-9]*|an?|the|(?:some|all) *(?:(?:of *)?(?:the|my)))?)? *(?P<item_name>.*)\b", TextPattern.CheckType.SEARCH, ["common"])
+    @TextPattern(r"\b(?P<keyword>use|eat|throw|apply|drink) *(?P<item_name>.*)\b", TextPattern.CheckType.SEARCH, ["common"])
     @staticmethod
     def checkTextUse(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         keyword: str = groupdict["keyword"]
-        
         item_name: str = groupdict["item_name"]
-
-        amount: int = TextPattern.interpretAmount(groupdict["amount"])
 
         found_item = False
         for item in player.inventory.getOfType(Item):
@@ -533,7 +530,7 @@ class DungeonLoader:
                         "#player": player,
                         "#item": item
                     })
-                    return item.onUse(function_memory_1, amount)
+                    return item.onUse(function_memory_1)
 
         if not found_item:
             if tool := player.inventory.getEquipped(Tool):
@@ -546,7 +543,7 @@ class DungeonLoader:
                             "#player": player,
                             "#tool": tool
                         })
-                        return tool.onUse(function_memory_1, amount)
+                        return tool.onUse(function_memory_1)
 
         if not found_item:
             function_memory.engine.sendOutput(player, f"You do not have '{item_name}'")

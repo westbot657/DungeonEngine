@@ -1,6 +1,8 @@
 {
     "fields": {
-        
+        "loot": {
+            "type": "engine:identifier"
+        }
     },
     "interaction": [
         {

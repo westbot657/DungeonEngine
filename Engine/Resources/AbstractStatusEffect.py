@@ -38,8 +38,8 @@ class AbstractStatusEffect:
         self.duration: int|None = data.get("duration", None)
         self.tick_interval: int|dict|None = data.get("tick_interval", None)
         self.cause: int|None = data.get("cause", None)
-        self.events: dict|None = data.get("events", None)
-
+        self.events: dict = data.get("events", {})
+        self.getters: dict = data.get("display", {})
 
         self.is_template: bool = data.get("template", False)
 
@@ -84,8 +84,6 @@ class AbstractStatusEffect:
         return StatusEffectCause.getCauseType()
         # raise InvalidObjectError(f"StatusEffect has no cause! ({self.identifier})") # *more existential crisis*
 
-    def getEvents(self):
-        return self.events or {}
 
     def createInstance(self, function_memory:FunctionMemory, **override_values):
         if self.is_template:
@@ -98,7 +96,8 @@ class AbstractStatusEffect:
                 override_values.get("duration", self.getDuration()),
                 DynamicValue(override_values.get("tick_interval", self.getTickInterval())).getCachedOrNew(function_memory),
                 self.getCause(),
-                self.getEvents()
+                self.events,
+                self.getters
             )
 
     @classmethod

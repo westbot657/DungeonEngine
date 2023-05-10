@@ -1,6 +1,6 @@
 {
     "name": "none",
-    "damage_bonus": 0,
+    "bonus_damage": 0,
     "max_count": -1,
     "hidden": true
 }

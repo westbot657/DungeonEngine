@@ -37,6 +37,7 @@ class AbstractArmor(AbstractGameObject):
         self.max_durability: int = data.get("max_durability", None)
         self.durability: int = data.get("durability", self.max_durability)
         self.damage_reduction: int = data.get("damage_reduction", None)
+        self.events: dict = data.get("events", {})
 
         self.is_template: bool = data.get("template", False)
 
@@ -89,7 +90,8 @@ class AbstractArmor(AbstractGameObject):
                 override_values.get("name", self.getName()),
                 DynamicValue(override_values.get("damage_reduction", self.getDamageReduction())),
                 override_values.get("max_durability", self.getMaxDurability()),
-                DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(function_memory)
+                DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(function_memory),
+                self.events
             )
 
     @classmethod

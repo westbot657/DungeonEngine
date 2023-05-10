@@ -129,9 +129,9 @@ class AbstractAmmo(AbstractGameObject):
                 o.getBonusDamage()
                 o.getMaxCount()
                 Log.success()
-            except InvalidObjectError:
+            except InvalidObjectError as err:
                 e: AbstractAmmo = cls._loaded.pop(l)
-                Log.ERROR("loadup", "abstract", "ammo", f"failed to load ammo: {e.identifier}")
+                Log.ERROR("loadup", "abstract", "ammo", f"failed to load ammo: {e.identifier}. {err}")
 
         Log.end_track()
 

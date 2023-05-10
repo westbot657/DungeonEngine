@@ -586,7 +586,8 @@ class DungeonLoader:
         "engine:environment": Environment,
         "engine:location": Location,
         "engine:position": Position,
-        "engine:interactable": Interactable
+        "engine:interactable": Interactable,
+        "engine:identifier": Identifier
     }
     def isElementOfType(self, element:Any, element_type:str):
         return isinstance(

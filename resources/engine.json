@@ -23,6 +23,7 @@
         "engine:status_effect_cause",
         "engine:tool",
         "engine:weapon",
+        "engine:identifier",
 
         "engine:boolean",
         "engine:text",

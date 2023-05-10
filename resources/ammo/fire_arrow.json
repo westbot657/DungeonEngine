@@ -1,6 +1,6 @@
 {
     "parent": "engine:ammo/arrow",
     "name": "Fire Arrow",
-    "damage_bonus": 3,
+    "bonus_damage": 3,
     "max_count": 18
 }

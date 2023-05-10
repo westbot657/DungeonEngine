@@ -1,5 +1,5 @@
 {
     "name": "Crossbow Bolt",
-    "damage_bonus": 1,
+    "bonus_damage": 1,
     "max_count": 40
 }

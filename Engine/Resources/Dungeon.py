@@ -148,7 +148,7 @@ class Dungeon(FunctionalElement):
                 json.dump(data, f)
         
 
-    def onEnter(self, function_memory:FunctionMemory, player:Player):
+    def onEnter(self, function_memory:FunctionMemory, player:Player, enter_first_room=True):
         player._text_pattern_categories = ["global", "common", "dungeon"]
         if (on_enter := self.events.get("on_enter", None)) is not None:
             self.prepFunctionMemory(function_memory)
@@ -168,6 +168,8 @@ class Dungeon(FunctionalElement):
             res = v
 
             self.postEvaluate(function_memory)
+
+        if not enter_first_room: return
 
         entrance: Room = self.rooms.get(self.entry_point.full())
 

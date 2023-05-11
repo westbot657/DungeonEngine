@@ -71,6 +71,12 @@ class Identifier:
             path = d.get("path", "")
             name = d.get("name", "")
 
+        elif m := re.match(r"Dungeons/(?P<dungeon_name>[a-z_][a-z0-9_]*)/(?P<path>combats/([a-z_][a-z0-9_]*/)*)(?P<name>[a-z_][a-z0-9_]*).json", file_name.replace("\\", "/")):
+            d = m.groupdict()
+            namespace = d.get("dungeon_name", "")
+            path = d.get("path", "")
+            name = d.get("name", "")
+
         else:
             raise IdentifierError(f"Unknown identifier format: '{file_name}'")
         return cls(namespace, path, name)

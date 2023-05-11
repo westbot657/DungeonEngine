@@ -14,22 +14,30 @@
     ],
     "events": {
         "on_enter": {
-            "function": "engine:player/message",
-            "message": ""
+            "functions": [
+                {
+                    "function": "engine:player/message",
+                    "message": "You are on Center Street.\nAvailable locations:\nWest Main Street"
+                }
+            ]
         },
         "on_input": {
             "function": "engine:text/match",
             "text": {
                 "#ref": "#text"
             },
-            "leave": {
-                "function": "engine:interaction/interact",
-                "interactable": ".exit_door"
-            },
-            "west": {
-                "function": "engine:interaction/interact",
-                "interactable": ".west_passage"
-            }
+            "matches": [
+                {
+                    "pattern": "(leave|exit)",
+                    "function": "engine:interaction/interact",
+                    "interactable": ".exit_door"
+                },
+                {
+                    "pattern": "west",
+                    "function": "engine:interaction/interact",
+                    "interactable": ".west_passage"
+                }
+            ]
         }
     }
 }

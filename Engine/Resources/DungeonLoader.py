@@ -90,6 +90,7 @@ class DungeonLoader:
         self.abstract_status_effects: dict[str, AbstractStatusEffect] = {}
         self.abstract_tools: dict[str, AbstractTool] = {}
         self.abstract_weapons: dict[str, AbstractWeapon] = {}
+        self.players = {}
 
     def evaluateFunction(self, function_memory:FunctionMemory, data:dict):
         val = self._evaluateFunction(function_memory, data)
@@ -415,12 +416,17 @@ class DungeonLoader:
         else:
             raise InvalidObjectError("No type or parent given for GameObject")
 
-    def getLocation(self, function_memory:FunctionMemory, location:Location):
+    def getLocation(self, function_memory:FunctionMemory, location:Location) -> Room|Dungeon:
         for dungeon_name, dungeon in function_memory.engine.loader.dungeons.items():
             dungeon_name: str
             dungeon: Dungeon
-            name = dungeon_name.split(":", 1)[1]
             location = Location.fromString(location)
+
+            if location.full() == dungeon_name:
+                return dungeon
+
+            name = dungeon_name.split(":", 1)[1]
+            
             if location.dungeon == name:
                 if (room := dungeon.rooms.get(location.full(), None)) is not None:
                     return room
@@ -545,16 +551,16 @@ class DungeonLoader:
     def checkTextInventory(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         function_memory.engine.sendOutput(player, player.inventory.fullStats(function_memory.engine))
 
-    @TextPattern(r"\b(?:go *to|travel *to) *(?P<location_name>.*)\b", TextPattern.CheckType.SEARCH, ["world"])
-    @staticmethod
-    def checkTravelTo(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
-        location_name = groupdict["location_name"]
+    # @TextPattern(r"\b(?:go *to|travel *to) *(?P<location_name>.*)\b", TextPattern.CheckType.SEARCH, ["world"])
+    # @staticmethod
+    # def checkTravelTo(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
+    #     location_name = groupdict["location_name"]
 
-        for dungeon_name, dungeon in function_memory.engine.loader.dungeons.items():
-            dungeon: Dungeon
-            if location_name.lower() == dungeon_name or location_name.lower() == dungeon.name.lower():                
-                yield EngineOperation.MovePlayer(player, dungeon.entry_point)
-                return
+    #     for dungeon_name, dungeon in function_memory.engine.loader.dungeons.items():
+    #         dungeon: Dungeon
+    #         if location_name.lower() == dungeon_name or location_name.lower() == dungeon.name.lower():                
+    #             yield EngineOperation.MovePlayer(player, dungeon.entry_point)
+    #             return
 
     _element_types = {
         "engine:text": str,
@@ -628,6 +634,9 @@ class DungeonLoader:
         self.dungeons = {}
         for k, v in self.abstract_dungeons.items():
             self.dungeons.update({k: v.createInstance(engine._function_memory)})
+
+        Log["loadup"]["loader"]("Loading Players...")
+        self.players = Player.loadData(engine)
 
         Log["loadup"]["loader"]("Engine resource loading completed")
         

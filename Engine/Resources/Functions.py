@@ -6,6 +6,7 @@ try:
     from .LootTable import LootTable
     from .EngineDummy import Engine
     from .EngineOperation import EngineOperation, _EngineOperation
+    from .EngineErrors import LocationError
     from .AbstractAmmo import AbstractAmmo, Ammo
     from .AbstractArmor import AbstractArmor, Armor
     from .AbstractAttack import AbstractAttack, Attack
@@ -21,12 +22,15 @@ try:
     from .Player import Player
     from .Logger import Log
     from .Interactable import Interactable
+    from .Util import Util
+    from .Location import Location
 except ImportError:
     from LoaderFunction import LoaderFunction
     from Identifier import Identifier
     from LootTable import LootTable
     from EngineDummy import Engine
-    from .EngineOperation import EngineOperation, _EngineOperation
+    from EngineOperation import EngineOperation, _EngineOperation
+    from EngineErrors import LocationError
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
     from AbstractAttack import AbstractAttack, Attack
@@ -42,6 +46,8 @@ except ImportError:
     from Player import Player
     from Logger import Log
     from Interactable import Interactable
+    from Util import Util
+    from Location import Location
 
 from typing import Any
 
@@ -711,7 +717,6 @@ class Engine_Player_SetLocation(LoaderFunction):
         # NOTE: yield instead of return, otherwise the EngineOperation may be ignored
         yield EngineOperation.MovePlayer(player, location)
 
-
 class Engine_Player_GetLocation(LoaderFunction):
     id = Identifier("engine", "player/", "get_location")
     return_type = Tool
@@ -723,6 +728,30 @@ class Engine_Player_GetLocation(LoaderFunction):
     def getLocation(function_memory:FunctionMemory):
         return function_memory.ref("#player").location.full()
 # ^ Player ^ #
+
+####XXX#################XXX####
+### XXX Engine Location XXX ###
+####XXX#################XXX####
+class Engine_Location_Exists(LoaderFunction):
+    id = Identifier("engine", "location/", "exists")
+    return_type = bool
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "location": str()
+            }: return cls.exists
+            case _: return None
+
+    @staticmethod
+    def exists(function_memory:FunctionMemory, location):
+        try:
+            function_memory.getLocation(location)
+            return True
+        except LocationError:
+            return False
+
+# ^ Location ^ #
 
 ####XXX###############XXX####
 ### XXX Engine Random XXX ###
@@ -812,13 +841,27 @@ class Engine_Text_Match(LoaderFunction):
                 v = e.value or (v if not isinstance(v, _EngineOperation) else None)
             text = str(v)
 
+        patterns: list[dict] = Util.deepCopy(kwargs.pop("matches"))
 
-        for pattern, func in kwargs.items():
-            if (m := re.match(pattern, text)):
-                print(f"'{text}' matches pattern '{pattern}'")
-                if m.groupdict():
-                    function_memory.update(m.groupdict())
-                ev = function_memory.generatorEvaluateFunction(func)
+        for option in patterns:
+            pattern = option.pop("pattern")
+            if not isinstance(pattern, str):
+                ev = function_memory.generatorEvaluateFunction(pattern)
+                v = None
+                try:
+                    v = ev.send(None)
+                    while isinstance(v, _EngineOperation):
+                        res = yield v
+                        v = ev.send(res)
+                except StopIteration as e:
+                    v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                pattern = str(v)
+            
+            if m := re.match(pattern, text):
+                d = m.groupdict()
+                if d:
+                    function_memory.update(d)
+                ev = function_memory.generatorEvaluateFunction(option)
                 v = None
                 try:
                     v = ev.send(None)
@@ -830,7 +873,7 @@ class Engine_Text_Match(LoaderFunction):
                         yield e.value
                     else:
                         yield e.value or (v if not isinstance(v, _EngineOperation) else None)
-
+                
 
 # ^ Text ^ #
 
@@ -961,6 +1004,7 @@ class Engine_Logic_Compare(LoaderFunction):
                     return not cls._compare(branch["not"])
         else:
             return branch
+
 
 # ^ Logic ^ #
 

@@ -1,0 +1,36 @@
+{
+    "data": {},
+    "enemies": {
+        "zombie1-1": {
+            "parent": "engine:enemies/zombie",
+            "name": "Zombie 1"
+        },
+        "zombie1-2": {
+            "parent": "engine:enemies/zombie",
+            "name": "Zombie 2"
+        }
+    },
+    "sequence": {
+        "@start": {
+            "functions": [],
+            "spawn": [
+                "zombie1-1",
+                "zombie1-2"
+            ],
+            "events": {
+                "zombie1-1": {
+                    "on_death": {
+                        
+                        "function": "engine:combat/trigger",
+                        "trigger": "zombie1-1-death"
+                    }
+                }
+            }
+        },
+        "zombie1-1-death": {
+            "trigger": {
+                "": ""
+            }
+        }
+    }
+}

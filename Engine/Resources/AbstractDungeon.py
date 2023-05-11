@@ -44,7 +44,7 @@ class AbstractDungeon:
         self.version: float|str|int = data.get("version", None)
         self.environment: dict = data.get("environment", {})
         self.entry_point: Location = Location.fromString(data.get("entry_point", None))
-        self.events: dict|None = data.get("events", None)
+        self.events: dict|None = data.get("events", {})
         self.data: dict = data.get("data", {})
 
 

@@ -56,7 +56,7 @@ class Engine:
         #self.function_memory: FunctionMemory = FunctionMemory()
         self._function_memory = FunctionMemory(self)
         self.default_input_handler = self._default_input_handler
-        self.players = {}
+        self.players: dict[str, Player] = {}
         self.tasks: list[Generator] = []
         self._player_input_categories = ["common", "global", "world"]
         #self.default_input_handler.send(None)
@@ -90,11 +90,11 @@ class Engine:
 
     def loadGame(self):
         self.loader.loadGame(self)
-        self.players = Player.loadData(self)
+        self.players = self.loader.players
 
     def saveGame(self):
         self.loader.saveGame(self)
-        Player.saveData(self)
+        #Player.saveData(self)
 
     def start(self):
         if not self.thread_running:
@@ -138,30 +138,30 @@ class Engine:
                     self._function_memory.clear()
                     ConsoleCommand.handle_input(self._function_memory, text)
 
-                elif player := self.getPlayer(player_id, None):
-                    player: Player
+                # elif player := self.getPlayer(player_id, None):
+                #     player: Player
                     
-                    self._function_memory.clear()
+                #     self._function_memory.clear()
                     
-                    res = TextPattern.handleInput(self._function_memory, player, text, player._text_pattern_categories)
-                    #if isinstance(res, Generator):
-                    v = None
-                    try:
-                        v = res.send(None)
-                        if isinstance(v, _EngineOperation):
-                            #ret = yield v
-                            self.evaluateResult(self._default_input_handler, res, v, player_id, text)
-                            #v = res.send(ret)
-                    except StopIteration as e:
+                #     res = TextPattern.handleInput(self._function_memory, player, text, player._text_pattern_categories)
+                #     #if isinstance(res, Generator):
+                #     v = None
+                #     try:
+                #         v = res.send(None)
+                #         if isinstance(v, _EngineOperation):
+                #             #ret = yield v
+                #             self.evaluateResult(self._default_input_handler, res, v, player_id, text)
+                #             #v = res.send(ret)
+                #     except StopIteration as e:
                         
-                        if isinstance(e.value, _EngineOperation):
-                            _, player_id, text = yield e.value
-                            continue
-                    _, player_id, text = yield EngineOperation.Continue()
-                    #else:
-                    #    _, player_id, text = yield res
+                #         if isinstance(e.value, _EngineOperation):
+                #             _, player_id, text = yield e.value
+                #             continue
+                #     _, player_id, text = yield EngineOperation.Continue()
+                #     #else:
+                #     #    _, player_id, text = yield res
 
-                    continue
+                #     continue
 
             except EngineBreak: pass
             _, player_id, text = yield EngineOperation.Continue()
@@ -203,6 +203,32 @@ class Engine:
             if isinstance(e.value, _EngineOperation):
                 res = yield (handler_getter, handler, e.value, player.discord_id, "")
 
+        if old_room.location.dungeon != new_room.location.dungeon:
+            old_dungeon = self.loader.getLocation(self._function_memory, f"dungeon:{old_room.location.dungeon}")
+            new_dungeon = self.loader.getLocation(self._function_memory, f"dungeon:{new_room.location.dungeon}")
+
+            ev = old_dungeon.onExit(function_memory, player)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield (handler_getter, handler, v, player.discord_id, "")
+                    v = ev.send(res)
+            except StopIteration as e:
+                if isinstance(e.value, _EngineOperation):
+                    res = yield (handler_getter, handler, e.value, player.discord_id, "")
+
+            ev = new_dungeon.onEnter(function_memory, player, False)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield (handler_getter, handler, v, player.discord_id, "")
+                    v = ev.send(res)
+            except StopIteration as e:
+                if isinstance(e.value, _EngineOperation):
+                    res = yield (handler_getter, handler, e.value, player.discord_id, "")
+        
         ev = new_room.onEnter(function_memory, player)
         v = None
         try:
@@ -213,8 +239,6 @@ class Engine:
         except StopIteration as e:
             if isinstance(e.value, _EngineOperation):
                 res = yield (handler_getter, handler, e.value, player.discord_id, "")
-
-
 
     def evaluateResult(self, handler_getter:Callable, handler:Generator, result:_EngineOperation, player_id:int, text:str):
         Log["debug"]["engine"]["evaluate-result"](f"result:{result}  id:{player_id} text:'{text}'")
@@ -268,6 +292,10 @@ class Engine:
         self.io_hook.init(self)
         self.io_hook.start()
         self.loadGame()
+
+        for player in self.players.values():
+            self.evaluateResult(self._default_input_handler, self.default_input_handler, EngineOperation.MovePlayer(player, player.location), player.discord_id, "")
+
         while self.thread_running:
             if not self.running:
                 # Pause Menu thingy?
@@ -300,6 +328,21 @@ class Engine:
                 player_id: int
                 text: str
                 if text:
+
+                    res = TextPattern.handleInput(self._function_memory, player, text, player._text_pattern_categories)
+                    #if isinstance(res, Generator):
+                    v = None
+                    try:
+                        v = res.send(None)
+                        if isinstance(v, _EngineOperation):
+                            #ret = yield v
+                            self.evaluateResult(self._default_input_handler, res, v, player_id, text)
+                            #v = res.send(ret)
+                    except StopIteration as e:
+                        if isinstance(e.value, _EngineOperation):
+                            self.evaluateResult(self._default_input_handler, self.default_input_handler, e.value, player_id, text)
+
+
                     if isinstance(response_handler, Generator):
                         if not Util.generator_started(response_handler):
                             result = response_handler.send(None)

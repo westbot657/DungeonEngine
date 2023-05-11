@@ -3,5 +3,19 @@
     "environment": {},
     "interactions": [
         
-    ]
+    ],
+    "events": {
+        "on_input": {
+            "function": "engine:text/match",
+            "text": {
+                "#ref": "#text"
+            },
+            "matches": [
+                {
+                    "pattern": "go to (?P<dungeon_name>.*)",
+                    "function": ""
+                }
+            ]
+        }
+    }
 }

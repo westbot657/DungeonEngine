@@ -1,0 +1,9 @@
+{
+    "name": "Entrance",
+    "interactions": [],
+    "events": {
+        "on_enter": {},
+        "on_input": {},
+        "on_exit": {}
+    }
+}

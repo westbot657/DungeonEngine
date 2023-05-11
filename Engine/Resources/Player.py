@@ -8,6 +8,8 @@ try:
     from .EngineDummy import Engine
     from .Logger import Log
     from .Position import Position
+    from .EngineErrors import MemoryError
+    from .FunctionalElement import FunctionalElement
 except ImportError:
     from Inventory import Inventory
     from Entity import Entity
@@ -16,6 +18,10 @@ except ImportError:
     from EngineDummy import Engine
     from Logger import Log
     from Position import Position
+    from EngineErrors import MemoryError
+    from FunctionalElement import FunctionalElement
+
+from typing import Any
 
 import json
 
@@ -30,8 +36,46 @@ class Player(Entity):
         self.inventory = inventory
         self.inventory.setParent(self)
         self.status_effects = StatusEffectManager()
+
+        self.dungeon_data = {}
         self._text_pattern_categories = _text_pattern_categories
         super().__init__(location, position)
+
+    def _getProperty(self, obj, propertyTree:list):
+        while propertyTree:
+            if isinstance(obj, FunctionalElement):
+                obj_props = obj.getLocalVariables()
+                curr = propertyTree.pop(0)
+                if curr in obj_props:
+                    obj = obj_props[curr]
+                else:
+                    raise MemoryError(f"Variable '{obj}' has no property '{curr}'")
+            else:
+                break
+        return obj
+
+    def ref(self, dungeon_name:str, value_name:str):
+        if dungeon_dat := self.dungeon_data.get(dungeon_name, None):
+            dungeon_dat: dict
+            try:
+                
+                props = [f".{prop}" if prop else "." for prop in value_name.split(".")]
+                prop = props.pop(0)[1:]
+                if prop in dungeon_dat:
+                    return self._getProperty(dungeon_dat[prop], props)
+
+                raise MemoryError(f"Variable referenced before assignment: '{value_name}'")
+            
+            except KeyError:
+                pass
+
+        raise MemoryError(f"Variable referenced before assignment: '{value_name}'")
+
+    def store(self, dungeon_name:str, value_name:str, value:Any):
+        if dungeon_name not in self.dungeon_data:
+            self.dungeon_data.update({dungeon_name: {}})
+        
+        self.dungeon_data[dungeon_name].update({value_name: value})
 
     def addHealth(self, health):
         self.health = min(self.max_health, self.health + health)

@@ -67,10 +67,6 @@ import re
 
 class DungeonLoader:
 
-    # TODO:
-    # convert to generators:
-    # checkTextUse()
-
     _loader = None
     def __new__(cls):
         if not cls._loader:
@@ -96,8 +92,6 @@ class DungeonLoader:
         self.abstract_weapons: dict[str, AbstractWeapon] = {}
 
     def evaluateFunction(self, function_memory:FunctionMemory, data:dict):
-        # TODO: function memory stuff can happen here I guess? (not sure what that is right now though)
-        #function_memory.clear()
         val = self._evaluateFunction(function_memory, data)
         return val
 
@@ -112,7 +106,6 @@ class DungeonLoader:
                     return True
                 if any(func.startswith(d) for d in disallowed_functions):
                     return True
-
                 for key, item in data.items():
                     if key in ["function"]: continue
                     if self._scanFunction(function_memory, item, allowed_functions, disallowed_functions):
@@ -126,7 +119,6 @@ class DungeonLoader:
                 if self._scanFunction(function_memory, item, allowed_functions, disallowed_functions):
                     return True
         return False
-                
 
     def generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
         ev = self._generatorEvaluateFunction(function_memory, data)
@@ -137,14 +129,12 @@ class DungeonLoader:
                 res = yield v
                 v = ev.send(res)
         except StopIteration as e:
-            #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
             v = e.value or (v if not isinstance(v, _EngineOperation) else None)
         return v
 
     def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict, prepEval:bool=False):
         v = None
         if isinstance(data, dict):
-            
             if (funcs := data.get("functions", None)) is not None:
                 if (predicate := data.get("predicate", None)) is not None:
                     if not function_memory.checkPredicate(predicate): return None
@@ -181,12 +171,9 @@ class DungeonLoader:
                                 #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
                                 v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                             args.update({key: v})
-                        
                         else:
                             args.update({key: item})
-
                     r = f._call(function_memory, args)
-
                     if isinstance(r, Generator):
                         v = None
                         try:
@@ -195,34 +182,39 @@ class DungeonLoader:
                                 res = yield v
                                 v = r.send(res)
                         except StopIteration as e:
-                            
-                            #if isinstance(e.value, Generator):
-                            
-                            
-                            #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
                             v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                         res = v
                     else:
                         res = r
-                    
                     if var := data.get("#store", None):
                         var: str
                         if var.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{var}'")
                         function_memory.store(var, res)
+                    if var := data.get("#store-player", None):
+                        var: str
+                        if var.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{var}'")
+                        dungeon_name = function_memory.context_data.get("#dungeon", "global")
+                        function_memory.ref("#player").store(dungeon_name, var, res)
                     return res
-        
                 else:
                     ...
                     # TODO: function doesn't exist, do something (raise error)
-
             elif (var := data.get("#ref", None)) is not None:
                 return function_memory.ref(var)
+            elif (var := data.get("#ref-player", None)) is not None:
+                dungeon_name = function_memory.context_data.get("#dungeon", "global")
+                return function_memory.ref("#player").ref(dungeon_name, var)
             elif (store := data.get("#store", None)) is not None:
                 if isinstance(store, dict):
                     for key, value in store.items():
                         if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
                         function_memory.store(key, value)
-
+            elif (store := data.get("#store-player", None)) is not None:
+                if isinstance(store, dict):
+                    dungeon_name = function_memory.context_data.get("#dungeon", "global")
+                    for key, value in store.items():
+                        if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
+                        function_memory.ref("#player").store(dungeon_name, key, value)
             elif (check := data.get("@check", None)) is not None:
                 ev = self._generatorEvaluateFunction(function_memory, check)
                 v = None
@@ -235,7 +227,6 @@ class DungeonLoader:
                     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                 res = v
                 if res and ((true_branch := data.get("true", None)) is not None):
-
                     ev = self._generatorEvaluateFunction(function_memory, true_branch)
                     v = None
                     try:
@@ -246,9 +237,7 @@ class DungeonLoader:
                     except StopIteration as e:
                         v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                     return v
-
                 elif (false_branch := data.get("false", None)) is not None:
-
                     ev = self._generatorEvaluateFunction(function_memory, false_branch)
                     v = None
                     try:
@@ -275,16 +264,9 @@ class DungeonLoader:
                         v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                     dat.update({key: v})
                 return dat
-            
         elif isinstance(data, list):
-            #print(f"\n\n\ndoes this even ever get called??\n{data}\n\n\n")
             dat = []
             for item in data:
-                # if isinstance(item, dict):
-                #     if item.get("call-on-load", True) is False:
-                        
-                #         dat.append(item)
-                #         continue
                 ev = self._generatorEvaluateFunction(function_memory, item, True)
                 v = None
                 try:
@@ -301,8 +283,6 @@ class DungeonLoader:
 
     # TODO: Validate that this runs in parity to _generatorEvaluateFunction
     def _evaluateFunction(self, function_memory:FunctionMemory, data:dict):
-        engine = function_memory.engine
-        
         if isinstance(data, dict):
             if (funcs := data.get("functions", None)) is not None:
                 if (predicate := data.get("predicate", None)) is not None:
@@ -332,14 +312,28 @@ class DungeonLoader:
                         var: str
                         if var.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{var}'")
                         function_memory.store(var, r)
+                    if var := data.get("#store-player", None):
+                        var: str
+                        if var.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{var}'")
+                        dungeon_name = function_memory.context_data.get("#dungeon", "global")
+                        function_memory.ref("#player").store(dungeon_name, var, res)
                     return r
             elif (var := data.get("#ref", None)) is not None:
                 return function_memory.ref(var)
+            elif (var := data.get("#ref-player", None)) is not None:
+                dungeon_name = function_memory.context_data.get("#dungeon", "global")
+                return function_memory.ref("#player").ref(dungeon_name, var)
             elif (store := data.get("#store", None)) is not None:
                 if isinstance(store, dict):
                     for key, value in store.items():
                         if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
                         function_memory.store(key, value)
+            elif (store := data.get("#store-player", None)) is not None:
+                if isinstance(store, dict):
+                    dungeon_name = function_memory.context_data.get("#dungeon", "global")
+                    for key, value in store.items():
+                        if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
+                        function_memory.ref("#player").store(dungeon_name, key, value)
             elif (check := data.get("@check", None)) is not None:
                 res = self._evaluateFunction(function_memory, check)
                 if res and ((true_branch := data.get("true", None)) is not None):
@@ -426,15 +420,13 @@ class DungeonLoader:
             dungeon_name: str
             dungeon: Dungeon
             name = dungeon_name.split(":", 1)[1]
-
             location = Location.fromString(location)
-
             if location.dungeon == name:
                 if (room := dungeon.rooms.get(location.full(), None)) is not None:
                     return room
         raise LocationError(f"Could not find location: '{location.full()}'")
 
-
+    # TODO: 
     def getSaveData(self, function_memory:FunctionMemory, obj:Any):
         match obj:
             case str()|int()|float()|bool():

@@ -1,7 +1,7 @@
 {
     "name": "The Most Difficult Dungeon Ever",
     "version": 1,
-    "entry_point": "nonsense_dungeon:rooms/",
+    "entry_point": "nonsense_dungeon:rooms/entrance",
     "data": {},
     "events": {}
 }

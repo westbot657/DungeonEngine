@@ -15,7 +15,7 @@
     "events": {
         "on_enter": {
             "function": "engine:player/message",
-            "message": "There is a "
+            "message": ""
         },
         "on_input": {
             "function": "engine:text/match",

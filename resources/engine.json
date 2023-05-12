@@ -81,7 +81,7 @@
                                             "function": "engine:player/set_location",
                                             "location": {"#ref": "value.entry_point.location"}
                                         },
-                                        {"function": "engine:dict/break"}
+                                        {"function": "engine:control/break"}
                                     ]
                                 }
                             }

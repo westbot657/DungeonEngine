@@ -54,7 +54,7 @@
                 "matches": [
                     {
                         "pattern": {
-                            "#ref": "%text/pattern/affirmation"
+                            "#ref": "%text/pattern/yes"
                         },
                         "functions": [
                             {
@@ -73,7 +73,7 @@
                     },
                     {
                         "pattern": {
-                            "#ref": "%text/pattern/denial"
+                            "#ref": "%text/pattern/no"
                         },
                         "function": "engine:player/message",
                         "message": {

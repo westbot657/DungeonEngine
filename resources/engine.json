@@ -1,7 +1,7 @@
 {
     "environment_variables": {
-        "%text/pattern/affirmation": "\\b(ye+(s+|p|ah)|sure|m+h+m+|ok(i|a+y+)?|affirmative)\\b",
-        "%text/pattern/denial": "\\b(no+(pe)?|na+h|not *really)\\b"
+        "%text/pattern/yes": "\\b(ye+(s+|p|ah)|sure|m+h+m+|ok(i|a+y+)?|affirmative)\\b",
+        "%text/pattern/no": "\\b(no+(pe)?|na+h|not *really)\\b"
     },
     "data_types": [
         "engine:ammo",

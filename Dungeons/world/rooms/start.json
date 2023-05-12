@@ -13,7 +13,16 @@
             "matches": [
                 {
                     "pattern": "go to (?P<dungeon_name>.*)",
-                    "function": ""
+                    "functions": [
+                        {
+                            "function": "engine:text/lower",
+                            "text": {"#ref": "dungeon_name"},
+                            "@store": "dungeon_name"
+                        },
+                        {
+                            
+                        }
+                    ]
                 }
             ]
         }

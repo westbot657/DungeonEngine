@@ -801,6 +801,7 @@ class Engine_Random_Weighted(LoaderFunction):
 ####XXX#############XXX####
 ### XXX Engine Text XXX ###
 ####XXX#############XXX####
+
 class Engine_Text_Builder(LoaderFunction):
     id = Identifier("engine", "text/", "builder")
     return_type = str
@@ -873,9 +874,146 @@ class Engine_Text_Match(LoaderFunction):
                         yield e.value
                     else:
                         yield e.value or (v if not isinstance(v, _EngineOperation) else None)
-                
+
+class Engine_Text_Replace(LoaderFunction):
+    id = Identifier("engine", "text/", "replace")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "text": str(),
+                "sequence": str(),
+                "replacement": str()
+            }: return cls.replace
+            case _: return None
+
+    @staticmethod
+    def replace(function_memory:FunctionMemory, text:str, sequence:str, replacement:str):
+        return text.replace(sequence, replacement)
+
+class Engine_Text_ReplacePattern(LoaderFunction):
+    id = Identifier("engine", "text/", "replace_pattern")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "text": str(),
+                "pattern": str(),
+                "replacement": str()
+            }: return cls.replace
+            case _: return None
+
+    @staticmethod
+    def replace(function_memory:FunctionMemory, text:str, pattern:str, replacement:str):
+        return re.sub(pattern, replacement, text)
+
+class Engine_Text_Substring(LoaderFunction):
+    id = Identifier("engine", "text/", "substring")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "text": str()
+            } if any([n in args for n in ["start", "end"]]):
+                return cls.substring
+            case _: return None
+
+    @staticmethod
+    def substring(function_memory:FunctionMemory, text:str, start:int=0, end:int=None):
+        return text[start:end]
+
+class Engine_Text_Length(LoaderFunction):
+    id = Identifier("engine", "text/", "length")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "text": str()
+            }: return cls.length
+            case _: return None
+    @staticmethod
+    def length(function_memory:FunctionMemory, text:str):
+        return len(text)
+
+class Engine_Text_SetCase(LoaderFunction):
+    id = Identifier("engine", "text/", "set_case")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "text": str(),
+                "case": str()
+            } if args["case"] in ["upper", "lower", "title"]:
+                return cls.setcase
+            case _: return None
+    @staticmethod
+    def setcase(function_memory:FunctionMemory, text:str, case:str):
+        if case == "upper":
+            return text.upper()
+        if case == "lower":
+            return text.lower()
+        if case == "title":
+            return text.title()
+        return text
+
 
 # ^ Text ^ #
+
+
+####XXX###############XXX####
+### XXX Engine Number XXX ###
+####XXX###############XXX####
+
+
+
+# ^ Number ^ #
+
+####XXX#############XXX####
+### XXX Engine List XXX ###
+####XXX#############XXX####
+
+class Engine_List_ForEach(LoaderFunction):
+    id = Identifier("engine", "list/", "for_each")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case _: return None
+    @staticmethod
+    def _(function_memory:FunctionMemory, ):
+        return
+    
+class Engine_List_Subset(LoaderFunction):
+    id = Identifier("engine", "list/", "subset")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case _: return None
+    @staticmethod
+    def _(function_memory:FunctionMemory, ):
+        return
+    
+class Engine_List_Pop(LoaderFunction):
+    id = Identifier("engine", "list/", "pop")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case _: return None
+    @staticmethod
+    def _(function_memory:FunctionMemory, ):
+        return
+    
+class Engine_List_Append(LoaderFunction):
+    id = Identifier("engine", "list/", "append")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case _: return None
+    @staticmethod
+    def _(function_memory:FunctionMemory, ):
+        return
+
+# ^ List ^ #
+
 
 ####XXX##############XXX####
 ### XXX Engine Logic XXX ###

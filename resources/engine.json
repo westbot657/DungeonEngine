@@ -33,7 +33,7 @@
     ],
     "functions": {
 
-        "$goto": {
+        "$goto_check": {
             "function": "engine:text/match",
             "text": {"#ref": "text"},
             "matches": [
@@ -91,7 +91,7 @@
             ]
         }
 
-        
+
 
     }
 }

@@ -6,7 +6,7 @@
     ],
     "events": {
         "on_input": {
-            "#call": "$goto",
+            "#call": "$goto_check",
             "parameters": {
                 "text": {"#ref": "#text"}
             }

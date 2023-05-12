@@ -11,6 +11,7 @@ class OpType(Enum):
     ERROR = auto()
     FAILURE = auto()
     CANCEL = auto()
+    STOP_LOOP = auto()
 
 class _EngineOperation:
     def __init__(self, operation_type):
@@ -78,4 +79,12 @@ class EngineOperation:
         def __init__(self, details):
             super().__init__(OpType.ERROR)
             self.details = details
+
+    class StopLoop(_EngineOperation):
+        """
+        return this to break out of a for-each loop
+        """
+        def __init__(self):
+            super().__init__(OpType.STOP_LOOP)
+
 

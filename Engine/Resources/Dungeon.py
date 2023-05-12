@@ -53,7 +53,7 @@ class Dungeon(FunctionalElement):
             ".enviornment": self.environment,
             ".entry_point": self.entry_point,
         }
-        for key, value in self.data:
+        for key, value in self.data.items():
             d.update({f".{key}": value})
         for room in self.rooms.values():
             d.update({f".{room.location.room}": room})

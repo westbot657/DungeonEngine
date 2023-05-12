@@ -27,6 +27,8 @@
 
         "engine:boolean",
         "engine:text",
-        "engine:number"
+        "engine:number",
+        "engine:list",
+        "engine:dict"
     ]
 }

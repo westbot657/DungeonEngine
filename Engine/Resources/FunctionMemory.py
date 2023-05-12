@@ -6,12 +6,14 @@ try:
     from .Logger import Log
     from .FunctionalElement import FunctionalElement
     from .Environment import Environment
+    from .EngineOperation import _EngineOperation
 except ImportError:
     from EngineDummy import Engine
     from EngineErrors import MemoryError
     from Logger import Log
     from FunctionalElement import FunctionalElement
     from Environment import Environment
+    from EngineOperation import _EngineOperation
 
 from typing import Any
 
@@ -22,15 +24,19 @@ class FunctionMemory:
     #_instance = None
 
     with open(f"./resources/engine.json", "r+", encoding="utf-8") as f:
-        _config = json.load(f)
-        global_environment_variables = _config.get("environment_variables")
-        data_types = _config.get("data_types")
+        _config: dict = json.load(f)
+        global_environment_variables: dict = _config.get("environment_variables")
+        data_types: dict = _config.get("data_types")
+
+        stored_functions: dict = _config.get("functions", {})
 
     # def __new__(cls):
     #     if not cls._instance:
     #         cls._instance = super().__new__(cls)
     #         cls._instance.init()
     #     return cls._instance
+
+    
 
     def __init__(self, engine:Engine):
         self.symbol_table = {}
@@ -86,8 +92,49 @@ class FunctionMemory:
         return self.engine.loader.rebuildData(self, data)
 
     def store(self, name:str, value):
-        self.symbol_table.update({name: value})
+        if name.startswith("$"):
+            FunctionMemory.stored_functions.update({name: value})
+        else:
+            self.symbol_table.update({name: value})
+    
+    def call(self, name:str):
+        if name.startswith("$"):
+            func = FunctionMemory.stored_functions.get(name, None)
+        else:
+            func = self.symbol_table.get(name, None)
         
+        if func is None:
+            raise MemoryError(f"Function is not defined: '{name}'")
+    
+        if not isinstance(func, dict):
+            raise MemoryError(f"Cannot call non-function variable: '{name}' ({func})")
+        
+        ev = self.generatorEvaluateFunction(func)
+        v = None
+        try:
+            v = ev.send(None)
+            while isinstance(v, _EngineOperation):
+                res = yield v
+                v = ev.send(res)
+        except StopIteration as e:
+            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+        return v
+
+    def call2(self, name:str):
+        if name.startswith("$"):
+            func = FunctionMemory.stored_functions.get(name, None)
+        else:
+            func = self.symbol_table.get(name, None)
+        
+        if func is None:
+            raise MemoryError(f"Function is not defined: '{name}'")
+    
+        if not isinstance(func, dict):
+            raise MemoryError(f"Cannot call non-function variable: '{name}' ({func})")
+        
+        v = self.evaluateFunction(func)
+        return v
+
     def ref(self, name:str):
         #print(f"#ref: {self.context_data}")
 

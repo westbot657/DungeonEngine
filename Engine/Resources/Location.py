@@ -61,7 +61,7 @@ class Location:
             return cls(dungeon, "", "")
 
         else:
-            LocationError(f"Unknown Location format: '{location}'")
+            raise LocationError(f"Unknown Location format: '{location}'")
 
     def _get_save(self, function_memory):
         return self.full()

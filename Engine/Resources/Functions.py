@@ -706,7 +706,7 @@ class Engine_Player_SetLocation(LoaderFunction):
         Log["debug"]["loader function"]["set location"]["check"](f"args: {args}")
         match args:
             case {
-                "location": str()
+                "location": str()|Location()
             }: return cls.setLocation
             case _: return None
 
@@ -969,19 +969,136 @@ class Engine_Text_SetCase(LoaderFunction):
 # ^ Number ^ #
 
 ####XXX#############XXX####
+### XXX Engine Dict XXX ###
+####XXX#############XXX####
+
+class Engine_Dict_ForEach(LoaderFunction):
+    id = Identifier("engine", "dict/", "for_each")
+    pre_evaluate_args = False
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "dict": dict(),
+                "run": dict()
+            }:
+                return cls.for_each
+            case _: return None
+
+    @staticmethod
+    def for_each(function_memory:FunctionMemory, **args):
+
+        _dct: dict = args.get("dict")
+
+        ev = function_memory.generatorEvaluateFunction(_dct)
+        v = None
+        try:
+            v = ev.send(None)
+            while isinstance(v, _EngineOperation):
+                res = yield v
+                v = ev.send(res)
+        except StopIteration as e:
+            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+        dct = v
+
+        func: dict = args.get("run")
+        for key, val in dct.items():
+
+            ev = function_memory.generatorEvaluateFunction(val)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            element = v
+
+            function_memory.update({
+                "key": key,
+                "value": element
+            })
+
+            ev = function_memory.generatorEvaluateFunction(Util.deepCopy(func))
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    if isinstance(v, EngineOperation.StopLoop):
+                        return
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                if isinstance(e.value, EngineOperation.StopLoop):
+                    return
+
+class Engine_Dict_Break(LoaderFunction):
+    id = Identifier("engine", "dict/", "break")
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        return cls._break
+    @staticmethod
+    def _break(function_memory:FunctionMemory):
+        return EngineOperation.StopLoop()
+
+# ^ Dict ^ #
+
+
+####XXX#############XXX####
 ### XXX Engine List XXX ###
 ####XXX#############XXX####
 
 class Engine_List_ForEach(LoaderFunction):
     id = Identifier("engine", "list/", "for_each")
+    pre_evaluate_args = False
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
+            case {
+                "list": list(),
+                "run": list()
+            }:
+                return cls.for_each
             case _: return None
+
     @staticmethod
-    def _(function_memory:FunctionMemory, ):
-        return
-    
+    def for_each(function_memory:FunctionMemory, **args):
+
+        lst: list = args.get("list")
+        func: dict = args.get("run")
+        for l in lst:
+
+            ev = function_memory.generatorEvaluateFunction(l)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            element = v
+
+            function_memory.update({
+                "element": element
+            })
+
+            ev = function_memory.generatorEvaluateFunction(Util.deepCopy(func))
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    if isinstance(v, EngineOperation.StopLoop):
+                        return
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                if isinstance(e.value, EngineOperation.StopLoop):
+                    break
+            
+
 class Engine_List_Subset(LoaderFunction):
     id = Identifier("engine", "list/", "subset")
     @classmethod
@@ -1012,6 +1129,16 @@ class Engine_List_Append(LoaderFunction):
     def _(function_memory:FunctionMemory, ):
         return
 
+class Engine_List_Break(LoaderFunction):
+    id = Identifier("engine", "list/", "break")
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        return cls._break
+    @staticmethod
+    def _break(function_memory:FunctionMemory):
+        return EngineOperation.StopLoop()
+
 # ^ List ^ #
 
 
@@ -1027,10 +1154,10 @@ class Engine_Logic_Compare(LoaderFunction):
         return cls.compare
     @classmethod
     def compare(cls, function_memory:FunctionMemory, **args):
-        return cls._compare(args)
+        return cls._compare(function_memory, args)
     
     @classmethod
-    def _compare(cls, branch):
+    def _compare(cls, function_memory:FunctionMemory, branch):
         if isinstance(branch, dict):
             match branch:
                 case {
@@ -1042,7 +1169,28 @@ class Engine_Logic_Compare(LoaderFunction):
                     y = ls.pop(0)
 
                     while ls:
-                        if not (cls._compare(x) == cls._compare(y)):
+                        ev = cls._compare(function_memory, x)
+                        a = None
+                        try:
+                            a = ev.send(None)
+                            while isinstance(a, _EngineOperation):
+                                res = yield a
+                                a = ev.send(res)
+                        except StopIteration as e:
+                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                        
+                        ev = cls._compare(function_memory, y)
+                        b = None
+                        try:
+                            b = ev.send(None)
+                            while isinstance(b, _EngineOperation):
+                                res = yield b
+                                b = ev.send(res)
+                        except StopIteration as e:
+                            b = e.value or (b if not isinstance(b, _EngineOperation) else None)
+                        
+
+                        if not (a == b):
                             return False
                         x = y
                         y = ls.pop(0)
@@ -1057,7 +1205,29 @@ class Engine_Logic_Compare(LoaderFunction):
                     y = ls.pop(0)
 
                     while ls:
-                        if not (cls._compare(x) != cls._compare(y)):
+
+                        ev = cls._compare(function_memory, x)
+                        a = None
+                        try:
+                            a = ev.send(None)
+                            while isinstance(a, _EngineOperation):
+                                res = yield a
+                                a = ev.send(res)
+                        except StopIteration as e:
+                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                        
+                        ev = cls._compare(function_memory, y)
+                        b = None
+                        try:
+                            b = ev.send(None)
+                            while isinstance(b, _EngineOperation):
+                                res = yield b
+                                b = ev.send(res)
+                        except StopIteration as e:
+                            b = e.value or (b if not isinstance(b, _EngineOperation) else None)
+                        
+
+                        if not (a != b):
                             return False
                         x = y
                         y = ls.pop(0)
@@ -1072,7 +1242,29 @@ class Engine_Logic_Compare(LoaderFunction):
                     y = ls.pop(0)
 
                     while ls:
-                        if not (cls._compare(x) < cls._compare(y)):
+
+                        ev = cls._compare(function_memory, x)
+                        a = None
+                        try:
+                            a = ev.send(None)
+                            while isinstance(a, _EngineOperation):
+                                res = yield a
+                                a = ev.send(res)
+                        except StopIteration as e:
+                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                        
+                        ev = cls._compare(function_memory, y)
+                        b = None
+                        try:
+                            b = ev.send(None)
+                            while isinstance(b, _EngineOperation):
+                                res = yield b
+                                b = ev.send(res)
+                        except StopIteration as e:
+                            b = e.value or (b if not isinstance(b, _EngineOperation) else None)
+                        
+
+                        if not (a < b):
                             return False
                         x = y
                         y = ls.pop(0)
@@ -1087,7 +1279,29 @@ class Engine_Logic_Compare(LoaderFunction):
                     y = ls.pop(0)
 
                     while ls:
-                        if not (cls._compare(x) <= cls._compare(y)):
+
+                        ev = cls._compare(function_memory, x)
+                        a = None
+                        try:
+                            a = ev.send(None)
+                            while isinstance(a, _EngineOperation):
+                                res = yield a
+                                a = ev.send(res)
+                        except StopIteration as e:
+                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                        
+                        ev = cls._compare(function_memory, y)
+                        b = None
+                        try:
+                            b = ev.send(None)
+                            while isinstance(b, _EngineOperation):
+                                res = yield b
+                                b = ev.send(res)
+                        except StopIteration as e:
+                            b = e.value or (b if not isinstance(b, _EngineOperation) else None)
+                        
+
+                        if not (a <= b):
                             return False
                         x = y
                         y = ls.pop(0)
@@ -1101,7 +1315,29 @@ class Engine_Logic_Compare(LoaderFunction):
                     y = ls.pop(0)
 
                     while ls:
-                        if not (cls._compare(x) > cls._compare(y)):
+
+                        ev = cls._compare(function_memory, x)
+                        a = None
+                        try:
+                            a = ev.send(None)
+                            while isinstance(a, _EngineOperation):
+                                res = yield a
+                                a = ev.send(res)
+                        except StopIteration as e:
+                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                        
+                        ev = cls._compare(function_memory, y)
+                        b = None
+                        try:
+                            b = ev.send(None)
+                            while isinstance(b, _EngineOperation):
+                                res = yield b
+                                b = ev.send(res)
+                        except StopIteration as e:
+                            b = e.value or (b if not isinstance(b, _EngineOperation) else None)
+                        
+
+                        if not (a > b):
                             return False
                         x = y
                         y = ls.pop(0)
@@ -1115,7 +1351,29 @@ class Engine_Logic_Compare(LoaderFunction):
                     y = ls.pop(0)
 
                     while ls:
-                        if not (cls._compare(x) >= cls._compare(y)):
+
+                        ev = cls._compare(function_memory, x)
+                        a = None
+                        try:
+                            a = ev.send(None)
+                            while isinstance(a, _EngineOperation):
+                                res = yield a
+                                a = ev.send(res)
+                        except StopIteration as e:
+                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                        
+                        ev = cls._compare(function_memory, y)
+                        b = None
+                        try:
+                            b = ev.send(None)
+                            while isinstance(b, _EngineOperation):
+                                res = yield b
+                                b = ev.send(res)
+                        except StopIteration as e:
+                            b = e.value or (b if not isinstance(b, _EngineOperation) else None)
+                        
+
+                        if not (a >= b):
                             return False
                         x = y
                         y = ls.pop(0)
@@ -1125,7 +1383,19 @@ class Engine_Logic_Compare(LoaderFunction):
                 }:
                     ls = branch["and"].copy()
                     for l in ls:
-                        if not cls._compare(l):
+
+                        ev = cls._compare(function_memory, l)
+                        a = None
+                        try:
+                            a = ev.send(None)
+                            while isinstance(a, _EngineOperation):
+                                res = yield a
+                                a = ev.send(res)
+                        except StopIteration as e:
+                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                        
+
+                        if not a:
                             return False
                     return True
                 case {
@@ -1133,13 +1403,48 @@ class Engine_Logic_Compare(LoaderFunction):
                 }:
                     ls = branch["or"].copy()
                     for l in ls:
-                        if cls._compare(l):
+
+                        ev = cls._compare(function_memory, l)
+                        a = None
+                        try:
+                            a = ev.send(None)
+                            while isinstance(a, _EngineOperation):
+                                res = yield a
+                                a = ev.send(res)
+                        except StopIteration as e:
+                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                        
+
+                        if a:
                             return True
                     return False
                 case {
                     "not": dict()|bool()
                 }:
-                    return not cls._compare(branch["not"])
+
+                    ev = cls._compare(function_memory, branch["not"])
+                    a = None
+                    try:
+                        a = ev.send(None)
+                        while isinstance(a, _EngineOperation):
+                            res = yield a
+                            a = ev.send(res)
+                    except StopIteration as e:
+                        a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                        
+
+                    return not a
+                case _:
+                    ev = function_memory.generatorEvaluateFunction(branch)
+                    v = None
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, _EngineOperation):
+                            res = yield v
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                    return v
         else:
             return branch
 

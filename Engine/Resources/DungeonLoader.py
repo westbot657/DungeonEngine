@@ -205,11 +205,55 @@ class DungeonLoader:
             elif (var := data.get("#ref-player", None)) is not None:
                 dungeon_name = function_memory.context_data.get("#dungeon", "global")
                 return function_memory.ref("#player").ref(dungeon_name, var)
+            
+            elif (func_name := data.get("#call", None)) is not None:
+                _func_mem = FunctionMemory(function_memory.engine)
+                if (args := data.get("arguments", None)) is not None:
+                    args: dict
+                    for key, val in args.items():
+                        ev = self._generatorEvaluateFunction(function_memory, val)
+                        v = None
+                        try:
+                            v = ev.send(None)
+                            while isinstance(v, _EngineOperation):
+                                res = yield v
+                                v = ev.send(res)
+                        except StopIteration as e:
+                            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                        _func_mem.update({key: v})
+                ev = _func_mem.call(func_name)
+                v = None
+                try:
+                    v = ev.send(None)
+                    while isinstance(v, _EngineOperation):
+                        res = yield v
+                        v = ev.send(res)
+                except StopIteration as e:
+                    v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                if (store := data.get("#store", None)) is not None:
+                    function_memory.update({
+                        store: v
+                    })
+                return v
+            
             elif (store := data.get("#store", None)) is not None:
                 if isinstance(store, dict):
                     for key, value in store.items():
+                        key: str
                         if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
-                        function_memory.store(key, value)
+                        elif key.startswith("$"):
+                            function_memory.store(key, value)
+                        else:
+                            ev = self._generatorEvaluateFunction(function_memory, value)
+                            v = None
+                            try:
+                                v = ev.send(None)
+                                while isinstance(v, _EngineOperation):
+                                    res = yield v
+                                    v = ev.send(res)
+                            except StopIteration as e:
+                                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                            function_memory.store(key, v)
             elif (store := data.get("#store-player", None)) is not None:
                 if isinstance(store, dict):
                     dungeon_name = function_memory.context_data.get("#dungeon", "global")
@@ -324,11 +368,32 @@ class DungeonLoader:
             elif (var := data.get("#ref-player", None)) is not None:
                 dungeon_name = function_memory.context_data.get("#dungeon", "global")
                 return function_memory.ref("#player").ref(dungeon_name, var)
+            
+            elif (func_name := data.get("#call", None)) is not None:
+                _func_mem = FunctionMemory(function_memory.engine)
+                if (args := data.get("arguments", None)) is not None:
+                    args: dict
+                    for key, val in args.items():
+                        v = self._evaluateFunction(function_memory, val)
+                        _func_mem.update({key: v})
+                v = _func_mem.call2(func_name)
+                
+                if (store := data.get("#store", None)) is not None:
+                    function_memory.update({
+                        store: v
+                    })
+                return v
+            
             elif (store := data.get("#store", None)) is not None:
                 if isinstance(store, dict):
                     for key, value in store.items():
+                        key: str
                         if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
-                        function_memory.store(key, value)
+                        elif key.startswith("$"):
+                            function_memory.store(key, value)
+                        else:
+                            v = self._evaluateFunction(function_memory, value)
+                            function_memory.store(key, v)
             elif (store := data.get("#store-player", None)) is not None:
                 if isinstance(store, dict):
                     dungeon_name = function_memory.context_data.get("#dungeon", "global")
@@ -565,6 +630,7 @@ class DungeonLoader:
     _element_types = {
         "engine:text": str,
         "engine:boolean": bool,
+        "engine:list": list,
         "engine:number": (int, float),
         "engine:weapon": Weapon,
         "engine:ammo": Ammo,
@@ -585,7 +651,8 @@ class DungeonLoader:
         "engine:location": Location,
         "engine:position": Position,
         "engine:interactable": Interactable,
-        "engine:identifier": Identifier
+        "engine:identifier": Identifier,
+        "engine:dict": dict
     }
     def isElementOfType(self, element:Any, element_type:str):
         return isinstance(
@@ -638,8 +705,12 @@ class DungeonLoader:
         Log["loadup"]["loader"]("Loading Players...")
         self.players = Player.loadData(engine)
 
+        FunctionMemory.global_environment_variables.update({
+            "%dungeons": self.dungeons,
+            "%players": self.players
+        })
+
         Log["loadup"]["loader"]("Engine resource loading completed")
-        
 
 
     def saveGame(self, engine:Engine):

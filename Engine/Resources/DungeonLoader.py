@@ -208,7 +208,8 @@ class DungeonLoader:
             
             elif (func_name := data.get("#call", None)) is not None:
                 _func_mem = FunctionMemory(function_memory.engine)
-                if (args := data.get("arguments", None)) is not None:
+                _func_mem.context_data = function_memory.context_data
+                if (args := data.get("parameters", None)) is not None:
                     args: dict
                     for key, val in args.items():
                         ev = self._generatorEvaluateFunction(function_memory, val)
@@ -371,7 +372,8 @@ class DungeonLoader:
             
             elif (func_name := data.get("#call", None)) is not None:
                 _func_mem = FunctionMemory(function_memory.engine)
-                if (args := data.get("arguments", None)) is not None:
+                _func_mem.context_data = function_memory.context_data
+                if (args := data.get("parameters", None)) is not None:
                     args: dict
                     for key, val in args.items():
                         v = self._evaluateFunction(function_memory, val)

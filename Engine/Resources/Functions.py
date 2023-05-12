@@ -1033,16 +1033,6 @@ class Engine_Dict_ForEach(LoaderFunction):
                 if isinstance(e.value, EngineOperation.StopLoop):
                     return
 
-class Engine_Dict_Break(LoaderFunction):
-    id = Identifier("engine", "dict/", "break")
-
-    @classmethod
-    def check(cls, function_memory:FunctionMemory, args:dict):
-        return cls._break
-    @staticmethod
-    def _break(function_memory:FunctionMemory):
-        return EngineOperation.StopLoop()
-
 # ^ Dict ^ #
 
 
@@ -1097,7 +1087,6 @@ class Engine_List_ForEach(LoaderFunction):
             except StopIteration as e:
                 if isinstance(e.value, EngineOperation.StopLoop):
                     break
-            
 
 class Engine_List_Subset(LoaderFunction):
     id = Identifier("engine", "list/", "subset")
@@ -1129,8 +1118,15 @@ class Engine_List_Append(LoaderFunction):
     def _(function_memory:FunctionMemory, ):
         return
 
-class Engine_List_Break(LoaderFunction):
-    id = Identifier("engine", "list/", "break")
+
+# ^ List ^ #
+
+####XXX################XXX####
+### XXX Engine Control XXX ###
+####XXX################XXX####
+
+class Engine_Control_Break(LoaderFunction):
+    id = Identifier("engine", "control/", "break")
 
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
@@ -1139,7 +1135,34 @@ class Engine_List_Break(LoaderFunction):
     def _break(function_memory:FunctionMemory):
         return EngineOperation.StopLoop()
 
-# ^ List ^ #
+
+class Engine_Control_Call(LoaderFunction):
+    id = Identifier("engine", "control/", "call")
+    pre_evaluate_args = False
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if "method" in args:
+            return cls._call
+        return None
+    @staticmethod
+    def _call(function_memory:FunctionMemory, method:str, parameters:dict={}):
+        func = {
+            "#call": method,
+            "parameters": parameters
+        }
+        ev = function_memory.generatorEvaluateFunction(func)
+        v = None
+        try:
+            v = ev.send(None)
+            while isinstance(v, _EngineOperation):
+                res = yield v
+                v = ev.send(res)
+        except StopIteration as e:
+            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+        return v
+
+
+# ^ Control ^ #
 
 
 ####XXX##############XXX####

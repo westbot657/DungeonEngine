@@ -178,6 +178,8 @@ class AbstractRoom:
 
         Log.end_track()
 
+        cls._link_parents.clear()
+
         Log["loadup"]["abstract"]["room"]("AbstractRoom loading complete")
         return cls._loaded
 

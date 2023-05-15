@@ -7,6 +7,7 @@ try:
     from .EngineErrors import InvalidObjectError
     from .DynamicValue import DynamicValue
     from .Logger import Log
+    from .FunctionMemory import FunctionMemory
 except ImportError:
     from Identifier import Identifier
     from AbstractGameObject import AbstractGameObject
@@ -14,8 +15,9 @@ except ImportError:
     from EngineErrors import InvalidObjectError
     from DynamicValue import DynamicValue
     from Logger import Log
+    from FunctionMemory import FunctionMemory
 
-import glob, json
+import glob, json, random
 
 class AbstractAttack(AbstractGameObject):
     _loaded = {}
@@ -33,6 +35,10 @@ class AbstractAttack(AbstractGameObject):
         self.name: str|None = data.get("name", None)
         self.range: int|None = data.get("range", None)
         self.damage: int|dict|None = data.get("damage", None)
+        self.accuracy: int|None = data.get("accuracy", None)
+
+        self.data: dict = data.get("data", {})
+        self.events: dict = data.get("events", {})
 
         self.is_template = data.get("is_template", False)
 
@@ -41,7 +47,7 @@ class AbstractAttack(AbstractGameObject):
         if n is not None: return n
         raise InvalidObjectError(f"Attack has no name! ({self.identifier})")
     
-    def getDamage(self) -> int:
+    def getDamage(self) -> int|dict:
         if self.damage is None:
             d = self.parent.getDamage() if self.parent else None
         else:
@@ -57,6 +63,14 @@ class AbstractAttack(AbstractGameObject):
         if r is not None: return r
         raise InvalidObjectError(f"Attack has no range! ({self.identifier})")
 
+    def getAccuracy(self) -> int:
+        if self.accuracy is None:
+            a = self.parent.getAccuracy() if self.parent else None
+        else:
+            a = self.accuracy
+        if a is not None: return a
+        raise InvalidObjectError(f"Attack has no accuracy! ({self.identifier})")
+
     def _set_parent(self, parent):
         self.parent = parent
         parent.children.append(self)
@@ -64,17 +78,25 @@ class AbstractAttack(AbstractGameObject):
     @classmethod
     def fromDict(cls, identifier:Identifier, data:dict):
         atk = cls(identifier, data)
-        # TODO: link parent if needed (and whatever else needs to be done)
+        if cls._link_parents:
+            for w, p in cls._link_parents:
+                w: AbstractAttack
+                p: str
+                w._set_parent(cls._loaded.get(p))
         return atk
 
-    def createInstance(self, **override_values) -> Attack:
+    def createInstance(self, function_memory:FunctionMemory, **override_values) -> Attack:
         if self.is_template:
-            ...
+            return random.choice(self.get_children()).createInstance(function_memory, **override_values)
+        
         else:
             return Attack(self,
                 override_values.get("name", self.getName()),
                 DynamicValue(override_values.get("damage", self.getDamage())),
-                DynamicValue(override_values.get("range", self.getRange()))
+                override_values.get("range", self.getRange()),
+                DynamicValue(self.getAccuracy()).getCachedOrNew(function_memory),
+                self.data,
+                self.events
             )
 
     @classmethod
@@ -83,26 +105,50 @@ class AbstractAttack(AbstractGameObject):
         # TODO: load attacks
         files: list[str] = glob.glob("**/attacks/*.json", recursive=True)
 
+        Log["loadup"]["abstract"]["attack"](f"found {len(files)} attack file{'s' if len(files) != 1 else ''}")
         for file in files:
+
+            Log["loadup"]["abstract"]["attack"](f"loading AbstractAttack from '{file}'")
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
 
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})
 
-        for w, p in cls._link_parents:
-            w: AbstractAttack
+        Log["loadup"]["abstract"]["attack"]("linking AbstractAttack parents...")
+        for a, p in cls._link_parents:
+            a: AbstractAttack
             p: str
-            w._set_parent(cls._loaded.get(p))
+            if parent := cls._loaded.get(p, None):
+                if parent is a:
+                    Log["ERROR"]["loadup"]["abstract"]["attack"]("cannot set object as it's own parent")
+                    continue
+                elif parent in a.get_parent_chain():
+                    Log["ERROR"]["loadup"]["abstract"]["attack"]("circular parent loop found")
+                    continue
+                a._set_parent(parent)
+            else:
+                Log["ERROR"]["loadup"]["abstract"]["attack"](f"parent does not exist: '{p}'")
 
+        Log["loadup"]["abstract"]["attack"]("verifying AbstractAttack completion...")
+        Log.track(len(cls._loaded), "loadup", "abtract", "attack")
         for l, o in cls._loaded.copy().items():
             l: str
             o: AbstractAttack
+            if o.is_template:
+                Log.success()
+                continue
             try:
-                ...
+                o.getName()
+                o.getDamage()
+                o.getRange()
+                Log.success()
             except InvalidObjectError as err:
                 e: AbstractAttack = cls._loaded.pop(l)
-                print(f"Failed to load attack: {e.identifier}  {err}")
+                Log.ERROR("loadup", "abstract", "attack", f"failed to load attack: {e.identifier}  {err}")
 
+        Log.end_track()
+
+        cls._link_parents.clear()
         return cls._loaded
 

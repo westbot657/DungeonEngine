@@ -149,6 +149,8 @@ class AbstractStatusEffect:
 
         Log.end_track()
 
+        cls._link_parents.clear()
+
         Log["loadup"]["abstract"]["status effect"]("AbstractStatusEffect loading complete")
         return cls._loaded
 

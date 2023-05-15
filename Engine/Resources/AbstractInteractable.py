@@ -186,6 +186,8 @@ class AbstractInteractable:
 
         Log.end_track()
 
+        cls._link_parents.clear()
+
         Log["loadup"]["abstract"]["interactable"]("AbstractInteractable loading complete")
         return cls._loaded
 

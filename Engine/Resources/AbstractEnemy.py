@@ -175,6 +175,8 @@ class AbstractEnemy:
                 e: AbstractEnemy = cls._loaded.pop(l)
                 print(f"Failed to load enemy: {e.identifier}  {err}")
 
+        cls._link_parents.clear()
+
         return cls._loaded
 
 

@@ -135,6 +135,8 @@ class AbstractAmmo(AbstractGameObject):
 
         Log.end_track()
 
+        cls._link_parents.clear()
+
         Log["loadup"]["abstract"]["ammo"]("AbstractAmmo loading complete")
         return cls._loaded
 

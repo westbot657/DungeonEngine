@@ -154,6 +154,8 @@ class AbstractTool(AbstractGameObject):
 
         Log.end_track()
 
+        cls._link_parents.clear()
+
         return cls._loaded
 
 if __name__ == "__main__":

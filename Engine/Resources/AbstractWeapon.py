@@ -186,7 +186,9 @@ class AbstractWeapon(AbstractGameObject):
                 e: AbstractWeapon = cls._loaded.pop(l)
                 print(f"Failed to load weapon: {e.identifier}  {err}")
                 continue
-            
+
+
+        cls._link_parents.clear()
 
         return cls._loaded
 

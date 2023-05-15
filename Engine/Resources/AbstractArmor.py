@@ -149,6 +149,8 @@ class AbstractArmor(AbstractGameObject):
 
         Log.end_track()
 
+        cls._link_parents.clear()
+
         Log["loadup"]["abstract"]["armor"]("AbstractArmor loading complete")
         return cls._loaded
 

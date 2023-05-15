@@ -10,6 +10,7 @@ try:
     from .Position import Position
     from .EngineErrors import MemoryError
     from .FunctionalElement import FunctionalElement
+    from .FunctionMemory import FunctionMemory
 except ImportError:
     from Inventory import Inventory
     from Entity import Entity
@@ -20,6 +21,7 @@ except ImportError:
     from Position import Position
     from EngineErrors import MemoryError
     from FunctionalElement import FunctionalElement
+    from FunctionMemory import FunctionMemory
 
 from typing import Any
 
@@ -108,6 +110,14 @@ class Player(Entity):
 
 
         return text
+
+    ####XXX########XXX####
+    ### XXX Events XXX ###
+    ####XXX########XXX####
+    def onAttacked(self, function_memory:FunctionMemory, attacker, damage:int):
+        ...
+
+
 
     @classmethod
     def loadData(cls, engine) -> dict:

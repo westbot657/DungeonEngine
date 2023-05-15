@@ -3,9 +3,17 @@
 try:
     from .Combat import Combat
     from .Identifier import Identifier
+    from .FunctionMemory import FunctionMemory
+    from .EngineErrors import CombatError
+    from .Util import Util
+    from .AbstractEnemy import AbstractEnemy, Enemy
 except ImportError:
     from Combat import Combat
     from Identifier import Identifier
+    from FunctionMemory import FunctionMemory
+    from EngineErrors import CombatError
+    from Util import Util
+    from AbstractEnemy import AbstractEnemy, Enemy
 
 import glob, json, re
 
@@ -16,7 +24,36 @@ class AbstractCombat:
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
         self._raw_data = data
-        
+
+        self.enemies: list = data.get("enemies", [])
+        self.sequence: dict = data.get("sequence", {})
+        self.data: dict = data.get("data", {})
+
+
+    def getEnemies(self, function_memory:FunctionMemory) -> list:
+        _unknown = []
+        abstracts = {}
+        for enemy in self.enemies:
+            if isinstance(enemy, str):
+                abstract:AbstractEnemy = AbstractEnemy.getFromIdentifier(enemy)
+                _unknown.append(abstract)
+            elif isinstance(enemy, dict):
+                if any(k in enemy for k in ["function", "functions", "@check", "#ref", "#call"]):
+                    res = function_memory.evaluateFunction(enemy)
+                    if isinstance(res, Enemy):
+                        pass
+
+
+    def createInstance(self, function_memory:FunctionMemory, **override_values):
+        return Combat(self,
+            self.getEnemies(function_memory),
+            Util.deepCopy(self.sequence),
+            Util.deepCopy(self.data)
+        )
+
+
+
+
     @classmethod
     def loadData(cls, engine) -> list:
         files: list[str] = glob.glob("**/combats/*.json", recursive=True)
@@ -28,19 +65,6 @@ class AbstractCombat:
             
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})
-
-            # if m := re.match(r"Dungeons/(?P<namespace>[^/]+)/resources/(?P<path>(?:[^/]+/)+)(?P<name>[a-z0-9_]+)\.json", file):
-            #     d: dict = m.groupdict()
-            #     namespace:str = d["namespace"]
-            #     path: str = f"Dungeons/{namespace}/resources/{d['path']}"
-            #     name: str = d["name"]
-            #     cls._loaded.update({f"{namespace}:combats/{name}": cls(Identifier(namespace, path, name), data)})
-
-            # elif m := re.match(r"resources/combats/(?P<name>[a-z0-9_]+)\.json", file):
-            #     d: dict = m.groupdict()
-            #     name: str = d["name"]
-            #     cls._loaded.update({f"engine:combats/{name}": cls(Identifier("engine", "resources/combats/", name), data)})
-
 
         return cls._loaded
 

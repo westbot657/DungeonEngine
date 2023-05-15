@@ -1,36 +1,37 @@
 {
     "data": {},
-    "enemies": {
-        "zombie1-1": {
+    "enemies": [
+        {
             "parent": "engine:enemies/zombie",
-            "name": "Zombie 1"
-        },
-        "zombie1-2": {
-            "parent": "engine:enemies/zombie",
-            "name": "Zombie 2"
-        }
-    },
-    "sequence": {
-        "@start": {
-            "functions": [],
-            "spawn": [
-                "zombie1-1",
-                "zombie1-2"
-            ],
+            "id": "zombie1-1",
+            "name": "Zombie 1",
             "events": {
-                "zombie1-1": {
-                    "on_death": {
-                        
-                        "function": "engine:combat/trigger",
-                        "trigger": "zombie1-1-death"
+                "@start": {
+                    "on_damaged": {
+                        "@check": {
+                            "function": "engine:logic/compare",
+                            "<=": [
+                                {
+                                    "#ref": ".health"
+                                },
+                                3
+                            ]
+                        },
+                        "true": {
+                            "function": "engine:combat/trigger",
+                            "trigger": "zombie1-1-death"
+                        }
                     }
                 }
             }
         },
-        "zombie1-1-death": {
-            "trigger": {
-                "": ""
-            }
+        {
+            "parent": "engine:enemies/zombie",
+            "id": "zombie1-2",
+            "name": "Zombie 2"
         }
+    ],
+    "sequence": {
+        "@start": {}
     }
 }

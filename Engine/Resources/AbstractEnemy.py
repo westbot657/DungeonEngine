@@ -138,6 +138,15 @@ class AbstractEnemy:
         )
     
     @classmethod
+    def getFromIdentifier(cls, identifier:Identifier|str):
+        identifier = Identifier.fromString(identifier)
+
+        if (abstract := cls._loaded.get(identifier, None)) is not None:
+            return abstract
+    
+        raise InvalidObjectError(f"No Abstract Enemy exists with id: '{identifier}'")
+
+    @classmethod
     def loadData(cls, engine:Engine) -> list:
         files: list[str] = glob.glob("**/enemies/*.json", recursive=True)
         #print(files)

@@ -36,3 +36,11 @@ class ParseError(EngineError):
     def __init__(self, *args):
         super().__init__("ParseError:", *args)
 
+class CombatError(EngineError):
+    def __init__(self, *args):
+        super().__init__("CombatError:", *args)
+
+class FunctionError(EngineError):
+    def __init__(self, *args):
+        super().__init__("FunctionError:", *args)
+

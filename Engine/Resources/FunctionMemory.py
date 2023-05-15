@@ -17,7 +17,7 @@ except ImportError:
 
 from typing import Any
 
-import json
+import glob, json
 
 
 class FunctionMemory:
@@ -29,6 +29,11 @@ class FunctionMemory:
         data_types: dict = _config.get("data_types")
 
         stored_functions: dict = _config.get("functions", {})
+
+    function_files = glob.glob("**/ec_functions.json", recursive=True)
+    for file in function_files:
+        with open(file, "r+", encoding="utf-8") as f:
+            stored_functions.update(json.load(f))
 
     # def __new__(cls):
     #     if not cls._instance:

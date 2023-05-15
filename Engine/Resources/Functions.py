@@ -6,7 +6,7 @@ try:
     from .LootTable import LootTable
     from .EngineDummy import Engine
     from .EngineOperation import EngineOperation, _EngineOperation
-    from .EngineErrors import LocationError
+    from .EngineErrors import LocationError, FunctionError
     from .AbstractAmmo import AbstractAmmo, Ammo
     from .AbstractArmor import AbstractArmor, Armor
     from .AbstractAttack import AbstractAttack, Attack
@@ -30,7 +30,7 @@ except ImportError:
     from LootTable import LootTable
     from EngineDummy import Engine
     from EngineOperation import EngineOperation, _EngineOperation
-    from EngineErrors import LocationError
+    from EngineErrors import LocationError, FunctionError
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
     from AbstractAttack import AbstractAttack, Attack
@@ -759,8 +759,7 @@ class Engine_Location_Exists(LoaderFunction):
 
 class Engine_Random_Uniform(LoaderFunction):
     id = Identifier("engine", "random/", "uniform")
-    return_type = int
-    pre_evaluator = True
+    pre_evaluate_args = False
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -770,32 +769,62 @@ class Engine_Random_Uniform(LoaderFunction):
             }: return cls.rand_range
             case {
                 "rolls": int(),
-                "pools": list()
-            }: return cls.rand_choice
+                "pool": list()
+            }: return cls.uniform_list
             case _: return None
     @staticmethod
-    def rand_range(function_memory:FunctionMemory, min, max):
+    def rand_range(function_memory:FunctionMemory, min:int, max:int):
         return random.randint(min, max)
     @staticmethod
-    def rand_choice(function_memory:FunctionMemory, rolls:int, pools:list[dict]):
-        table = LootTable.fromDict({"rolls": rolls, "pools": pools})
-        return table.roll(function_memory)
+    def uniform_list(function_memory:FunctionMemory, rolls:int, pool:list, roll_size:int=1):
+        if roll_size > len(pool): raise FunctionError(f"Cannot pull more elements from list than are available")
+        result = []
+        for roll in range(rolls):
+            _pool = pool.copy()
+            for r in range(roll_size):
+                p = random.choice(_pool)
+                _pool.remove(p)
+                result.append(p)
+        return result
 
 class Engine_Random_Weighted(LoaderFunction):
     id = Identifier("engine", "random/", "weighted")
-    pre_evaluator = True
+    pre_evaluate_args = False
+    @classmethod
+    def chek(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "rolls": int(),
+                "pool": dict()
+            }: ...
+            case _: return None
+    @staticmethod
+    def random_weighted(function_memory:FunctionMemory, rolls:int, pool:dict):
+        weighted_list = []
+        for weight, value in pool.items():
+            for w in range(weight):
+                weighted_list.append(value)
+        result = []
+        for roll in rolls:
+            result.append(random.choice(weighted_list))
+
+
+class Engine_Random_LootTable(LoaderFunction):
+    id = Identifier("engine", "random/", "loot_table")
+    pre_evaluate_args = False
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
             case {
                 "rolls": int(),
                 "pools": list()
-            }: return cls.weighted_table
+            }: return cls.loot_table
             case _: return None
     @staticmethod
-    def weighted_table(function_memory:FunctionMemory, rolls:int, pools:list[dict]):
+    def loot_table(function_memory:FunctionMemory, rolls:int, pools:list[dict]):
         table = LootTable.fromDict({"rolls": rolls, "pools": pools})
         return table.roll(function_memory)
+
 # ^ Random ^ #
 
 ####XXX#############XXX####
@@ -1118,6 +1147,22 @@ class Engine_List_Append(LoaderFunction):
     def _(function_memory:FunctionMemory, ):
         return
 
+class Engine_List_Builder(LoaderFunction):
+    id = Identifier("engine", "list/", "builder")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "list": list()
+            }: return cls.list_builder
+            case _: return None
+
+    @staticmethod
+    def list_builder(function_memory:FunctionMemory, **kwargs):
+        _list = kwargs.get("list")
+        return _list # idk if this will work the way I think it will...
+
+
 
 # ^ List ^ #
 
@@ -1134,7 +1179,6 @@ class Engine_Control_Break(LoaderFunction):
     @staticmethod
     def _break(function_memory:FunctionMemory):
         return EngineOperation.StopLoop()
-
 
 class Engine_Control_Call(LoaderFunction):
     id = Identifier("engine", "control/", "call")

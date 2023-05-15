@@ -14,15 +14,19 @@ Note: This is going to be a VERY long, detailed, guide to creating a dungeon and
 ## File Structure
 ```
 Dungeons/
-|- resources/
-|  |- ammo/
-|  |- armor/
+|- <dungeon_id>
+|  |- resources/
+|  |  |- ammo/
+|  |  |- armor/
+|  |  |- enemies/
+|  |  |- items/
+|  |  |- tools/
+|  |  \- weapons/
 |  |- combats/
-|  |- enemies/
-|  |- items/
-|  |- tools/
-|  |- weapons/
-
+|  |- rooms/
+|  |- <dungeon_id>.json
+|  \- ec_functions.json
+:
 ```
 
 ## Dungeons

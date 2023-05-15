@@ -64,14 +64,14 @@ class DynamicValue(FunctionalElement):
             
         return self.cached_value
 
-    def quickDisplay(self, engine:Engine):
+    def quickDisplay(self, function_memory:FunctionMemory):
         if not isinstance(self.raw_data, dict):
             return str(self.raw_data)
-        return engine.loader.loader_function.quickDisplay(engine, self.raw_data)
+        return function_memory.engine.loader.loader_function.quickDisplay(function_memory, self.raw_data)
         
 
-    def fullDisplay(self, engine:Engine):
+    def fullDisplay(self, function_memory:FunctionMemory):
         if not isinstance(self.raw_data, dict):
             return str(self.raw_data)
-        return engine.loader.loader_function.fullDisplay(engine, self.raw_data)
+        return function_memory.engine.loader.loader_function.fullDisplay(function_memory, self.raw_data)
 

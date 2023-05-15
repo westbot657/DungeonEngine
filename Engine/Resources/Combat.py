@@ -2,8 +2,10 @@
 
 try:
     from .AbstractEnemy import AbstractEnemy, Enemy
+    from .FunctionMemory import FunctionMemory
 except ImportError:
     from AbstractEnemy import AbstractEnemy, Enemy
+    from FunctionMemory import FunctionMemory
 
 
 
@@ -21,4 +23,7 @@ class Combat:
         self.enemies = enemies
         self.sequence = sequence
         self.data = data
+
+    
+
 

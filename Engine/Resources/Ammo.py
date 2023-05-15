@@ -26,10 +26,10 @@ class Ammo(GameObject):
     def __repr__(self):
         return f"Ammo {self.name}: bonus-damage:{self.bonus_damage} max-count:{self.max_count}"
 
-    def fullStats(self, engine, is_equipped=False):
-        return f"{self.name} +{self.bonus_damage.fullDisplay(engine)}dmg {self.count}/{self.max_count}"
+    def fullStats(self, function_memory:FunctionMemory, is_equipped=False):
+        return f"{self.name} +{self.bonus_damage.fullDisplay(function_memory)}dmg {self.count}/{self.max_count}"
 
-    def quickStats(self, engine):
+    def quickStats(self, function_memory:FunctionMemory):
         return f"{self.name} {self.count}/{self.max_count}"
 
     def getLocalVariables(self) -> dict:

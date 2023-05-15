@@ -44,17 +44,17 @@ class StatusEffect(FunctionalElement):
 
         return None
 
-    def quickStats(self, engine:Engine):
+    def quickStats(self, function_memory:FunctionMemory):
 
         if (get_quick_stats := self.getters.get("quick_stats", None)) is not None:
-            return engine.evaluateFunction(get_quick_stats, FunctionMemory(engine), None, self.getLocalVariables())
+            return function_memory.engine.evaluateFunction(get_quick_stats, FunctionMemory(function_memory.engine), None, self.getLocalVariables())
 
         return f"{self.name} {self.level}"
 
-    def fullStats(self, engine:Engine):
+    def fullStats(self, function_memory:FunctionMemory):
 
         if (get_full_stats := self.getters.get("full_stats", None)) is not None:
-            return engine.evaluateFunction(get_full_stats, FunctionMemory(engine), None, self.getLocalVariables())
+            return function_memory.engine.evaluateFunction(get_full_stats, FunctionMemory(function_memory.engine), None, self.getLocalVariables())
 
         return f"{self.name} {self.level} {self.duration}s {self.cause.getDisplay()}"
 

@@ -22,13 +22,13 @@ class GameObject(FunctionalElement):
     def __init__(self):
         self.owner = None
 
-    def bonuses(self, engine):
+    def bonuses(self, function_memory):
         return None
 
-    def quickStats(self, engine):
+    def quickStats(self, function_memory):
         raise EngineError(f"game object has not defined quickStats() method!")
 
-    def fullStats(self, engine, is_equipped=False):
+    def fullStats(self, function_memory, is_equipped=False):
         raise EngineError(f"game object has not defined fullStats() method!")
 
 

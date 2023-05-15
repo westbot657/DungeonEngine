@@ -36,10 +36,10 @@ class Item(GameObject):
     def __repr__(self):
         return f"Item {self.name}: max_count:{self.max_count} count:{self.count} data:{self.data}"
 
-    def fullStats(self, engine, _):
+    def fullStats(self, function_memory:FunctionMemory, _):
         return f"{self.name}  {self.count}/{self.max_count}"
 
-    def quickStats(self, engine):
+    def quickStats(self, function_memory:FunctionMemory):
         return f"{self.name}  {self.count}/{self.max_count}"
     
     def getLocalVariables(self) -> dict:

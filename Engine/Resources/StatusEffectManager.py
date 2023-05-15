@@ -4,11 +4,12 @@ try:
     from .Identifier import Identifier
     from .StatusEffect import StatusEffect
     from .EngineDummy import Engine
+    from .FunctionMemory import FunctionMemory
 except ImportError:
     from Identifier import Identifier
     from StatusEffect import StatusEffect
     from EngineDummy import Engine
-
+    from FunctionMemory import FunctionMemory
 
 
 class StatusEffectManager:
@@ -20,10 +21,10 @@ class StatusEffectManager:
         effect.effect_manager = self
         self.effects.append(effect)
 
-    def fullStats(self):
+    def fullStats(self, function_memory:FunctionMemory):
         return "\n".join([effect.fullStats() for effect in self.effects]).strip()
 
-    def _get_save(self, function_memory):
+    def _get_save(self, function_memory:FunctionMemory):
         ...
     
     

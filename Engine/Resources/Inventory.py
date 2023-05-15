@@ -100,12 +100,12 @@ class Inventory(FunctionalElement):
         if objectType in self.equips:
             self.equips[objectType] = self.defaults.get(objectType, None)
 
-    def fullStats(self, engine):
+    def fullStats(self, function_memory:FunctionMemory):
         equip_stats = []
         for v in self.equips.values():
             v: GameObject|None
             if v is None: continue
-            if (b := v.bonuses(engine)) is not None: equip_stats.append(b)
+            if (b := v.bonuses(function_memory)) is not None: equip_stats.append(b)
         
         out = []
         st = ""
@@ -114,7 +114,7 @@ class Inventory(FunctionalElement):
         
         
         for obj in self.contents:
-            out.append(obj.fullStats(engine, obj in self.equips.values()))
+            out.append(obj.fullStats(function_memory, obj in self.equips.values()))
         if out: return "\n".join([st, *out])
         return f"{st}\n[no items in inventory]"
 

@@ -616,7 +616,7 @@ class DungeonLoader:
     @TextPattern(r"\b(?:inventory|bag|items)\b", TextPattern.CheckType.SEARCH, ["global"])
     @staticmethod
     def checkTextInventory(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
-        function_memory.engine.sendOutput(player, player.inventory.fullStats(function_memory.engine))
+        function_memory.engine.sendOutput(player, player.inventory.fullStats(function_memory))
 
     # @TextPattern(r"\b(?:go *to|travel *to) *(?P<location_name>.*)\b", TextPattern.CheckType.SEARCH, ["world"])
     # @staticmethod

@@ -4,11 +4,12 @@ try:
     from .Identifier import Identifier
     from .EngineDummy import Engine
     from .Logger import Log
-
+    from .FunctionMemory import FunctionMemory
 except ImportError:
     from Identifier import Identifier
     from EngineDummy import Engine
     from Logger import Log
+    from FunctionMemory import FunctionMemory
 
 from typing import Any
 
@@ -55,26 +56,26 @@ class LoaderFunction:
         return None
 
     @classmethod
-    def fullDisplay(cls, engine:Engine, data:dict|Any):
+    def fullDisplay(cls, function_memory:FunctionMemory, data:dict|Any):
         if not isinstance(data, dict):
             return str(data)
-        out = cls._fullDisplay(engine, data)
+        out = cls._fullDisplay(function_memory, data)
         return out
 
     @classmethod
-    def quickDisplay(cls, engine:Engine, data:dict|Any):
+    def quickDisplay(cls, function_memory:FunctionMemory, data:dict|Any):
         if not isinstance(data, dict):
             return str(data)
-        out = cls._quickDisplay(engine, data)
+        out = cls._quickDisplay(function_memory, data)
         return out
 
     @classmethod
-    def _fullDisplay(cls, engine:Engine, data:dict) -> str:
+    def _fullDisplay(cls, function_memory:FunctionMemory, data:dict) -> str:
         if isinstance(data, dict):
             if (funcs := data.get("functions", None)) is not None:
                 out = []
                 for func in funcs:
-                    out.append(cls._fullDisplay(engine, func))
+                    out.append(cls._fullDisplay(function_memory, func))
                 return "\n".join(out)
             if (func_name := data.get("function", None)) is not None:
                 if func := cls.getFunction(func_name):
@@ -82,29 +83,29 @@ class LoaderFunction:
                     args = {}
                     for key, item in data.items():
                         if key in ["function", "predicate", "#store"]: continue
-                        args.update({key: cls._fullDisplay(engine, item)})
-                    return func.getFullDisplay(engine, args)
+                        args.update({key: cls._fullDisplay(function_memory, item)})
+                    return func.getFullDisplay(function_memory, args)
             out = {}
             for key, item in data:
                 if isinstance(item, dict):
-                    out.update({key: cls._fullDisplay(engine, item)})
+                    out.update({key: cls._fullDisplay(function_memory, item)})
                 elif isinstance(item, list):
-                    out.update({key: str([cls._fullDisplay(engine, i) for i in item])})
+                    out.update({key: str([cls._fullDisplay(function_memory, i) for i in item])})
                 else:
                     out.update({key: str(item)})
             return str(out)
         if isinstance(data, list):
-            return str([cls._fullDisplay(engine, i) for i in data])
+            return str([cls._fullDisplay(function_memory, i) for i in data])
 
         return str(data)
 
     @classmethod
-    def _quickDisplay(cls, engine:Engine, data:dict) -> str:
+    def _quickDisplay(cls, function_memory:FunctionMemory, data:dict) -> str:
         if isinstance(data, dict):
             if (funcs := data.get("functions", None)) is not None:
                 out = []
                 for func in funcs:
-                    out.append(cls._quickDisplay(engine, func))
+                    out.append(cls._quickDisplay(function_memory, func))
                 return "\n".join(out)
             if (func_name := data.get("function", None)) is not None:
                 if func := cls.getFunction(func_name):
@@ -112,28 +113,28 @@ class LoaderFunction:
                     args = {}
                     for key, item in data.items():
                         if key in ["function", "predicate", "#store"]: continue
-                        args.update({key: cls._quickDisplay(engine, item)})
-                    return func.getQuickDisplay(engine, args)
+                        args.update({key: cls._quickDisplay(function_memory, item)})
+                    return func.getQuickDisplay(function_memory, args)
             out = {}
             for key, item in data:
                 if isinstance(item, dict):
-                    out.update({key: cls._quickDisplay(engine, item)})
+                    out.update({key: cls._quickDisplay(function_memory, item)})
                 elif isinstance(item, list):
-                    out.update({key: str([cls._quickDisplay(engine, i) for i in item])})
+                    out.update({key: str([cls._quickDisplay(function_memory, i) for i in item])})
                 else:
                     out.update({key: str(item)})
             return str(out)
         if isinstance(data, list):
-            return str([cls._quickDisplay(engine, i) for i in data])
+            return str([cls._quickDisplay(function_memory, i) for i in data])
 
         return str(data)
 
 
-    def getFullDisplay(self, engine:Engine, data:dict) -> str:
+    def getFullDisplay(self, function_memory:FunctionMemory, data:dict) -> str:
         # overridden by functions
         return f"{self.id.full()} {data}"
     
-    def getQuickDisplay(self, engine:Engine, data:dict) -> str:
+    def getQuickDisplay(self, function_memory:FunctionMemory, data:dict) -> str:
         # overridden by functions
         return f"{self.id.full()} ..."
 

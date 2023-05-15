@@ -34,11 +34,11 @@ class Armor(GameObject):
     def bonuses(self, engine):
         return f"+{self.damage_reduction.quickDisplay(engine)}def"
 
-    def quickStats(self, engine):
+    def quickStats(self, function_memory:FunctionMemory):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
 
-    def fullStats(self, engine, is_equipped=False):
-        return f"{self.name} +{self.damage_reduction.fullDisplay(engine)}def {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [WEARING]" if is_equipped else "")
+    def fullStats(self, function_memory:FunctionMemory, is_equipped=False):
+        return f"{self.name} +{self.damage_reduction.fullDisplay(function_memory)}def {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [WEARING]" if is_equipped else "")
 
     def getLocalVariables(self) -> dict:
         d = {

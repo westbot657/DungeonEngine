@@ -32,13 +32,13 @@ class Weapon(GameObject):
     def __repr__(self):
         return f"Weapon {self.name}: damage:{self.damage} range:{self.range}  durability:{self.durability}"
 
-    def bonuses(self, engine):
-        return f"+{self.damage.quickDisplay(engine)}dmg {self.range.quickDisplay(engine)}ft"
+    def bonuses(self, function_memory:FunctionMemory):
+        return f"+{self.damage.quickDisplay(function_memory)}dmg {self.range.quickDisplay(function_memory)}ft"
 
-    def fullStats(self, engine, is_equipped=False):
-        return f"{self.name} +{self.damage.fullDisplay(engine)}dmg {self.range.fullDisplay(engine)}ft {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [EQUIPPED]" if is_equipped else "")
+    def fullStats(self, function_memory:FunctionMemory, is_equipped=False):
+        return f"{self.name} +{self.damage.fullDisplay(function_memory)}dmg {self.range.fullDisplay(function_memory)}ft {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [EQUIPPED]" if is_equipped else "")
 
-    def quickStats(self, engine):
+    def quickStats(self, function_memory:FunctionMemory):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
 
     def getLocalVariables(self) -> dict:

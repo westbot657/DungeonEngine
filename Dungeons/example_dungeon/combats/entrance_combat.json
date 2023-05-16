@@ -8,18 +8,9 @@
             "events": {
                 "@start": {
                     "on_damaged": {
-                        "@check": {
-                            "function": "engine:logic/compare",
-                            "<=": [
-                                {
-                                    "#ref": ".health"
-                                },
-                                3
-                            ]
-                        },
-                        "true": {
-                            "function": "engine:combat/trigger",
-                            "trigger": "zombie1-1-death"
+                        "#call": "$enemy_health_check",
+                        "parameters": {
+                            "target_health": 3
                         }
                     }
                 }
@@ -32,6 +23,21 @@
         }
     ],
     "sequence": {
-        "@start": {}
+        "@start": {
+            "functions": [
+                {
+                    "function": "engine:combat/message",
+                    "message": "You walk in to a room. There are 2 zombies! they see you and slowly walk over to you..."
+                },
+                {
+                    "function": "engine:combat/spawn",
+                    "spawn": [
+                        "zombie1-1",
+                        "zombie1-2"
+                    ]
+                }
+            ]
+        },
+        "zombie1-1-health-check-3": {}
     }
 }

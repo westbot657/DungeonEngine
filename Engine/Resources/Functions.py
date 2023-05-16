@@ -153,7 +153,25 @@ engine:interaction/interact
 # v  v #
 
 
+# quick replace regex stuff:
+
+## ([a-zA-Z_]+) ([a-z_]+/)([a-z_]+)
+
+class Engine_$1(LoaderFunction):
+    id = Identifier("engine", "$2", "$3")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {}: return cls.$3
+            case _: return None
+    @staticmethod
+    def $3(function_memory:FunctionMemory, **kwargs):
+        ...
+
 """
+
+
+
 
 ####XXX#############XXX####
 ### XXX Engine Tool XXX####
@@ -1607,5 +1625,86 @@ class Engine_Interaction_Interact(LoaderFunction):
         return interactable.onInteract(function_memory, player)
 
 # ^ Interaction ^ #
+
+####XXX###############XXX####
+### XXX Engine Combat XXX ###
+####XXX###############XXX####
+
+class Engine_Combat_Trigger(LoaderFunction):
+    id = Identifier("engine", "combat/", "trigger")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "trigger": str()|dict()
+            }: return cls.trigger
+            case _: return None
+    @staticmethod
+    def trigger(function_memory:FunctionMemory, **kwargs):
+        trig_f = kwargs.get("trigger")
+
+        ev = function_memory.generatorEvaluateFunction(trig_f)
+        trig = None
+        try:
+            trig = ev.send(None)
+            while isinstance(trig, _EngineOperation):
+                res = yield trig
+                trig = ev.send(res)
+        except StopIteration as e:
+            trig = e.value or (trig if not isinstance(trig, _EngineOperation) else None)
+
+        return Combat.Operation.Trigger(trig)
+
+class Engine_Combat_UniqueName(LoaderFunction):
+    id = Identifier("engine", "combat/", "unique_name")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {}: return cls.unique_name
+            case _: return None
+    @staticmethod
+    def unique_name(function_memory:FunctionMemory, **kwargs):
+        
+        return Combat.Operation.UniqueName(function_memory.ref("#enemy"))
+
+class Engine_Combat_NumberedName(LoaderFunction):
+    id = Identifier("engine", "combat/", "numbered_name")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {}: return cls.numbered_name
+            case _: return None
+    @staticmethod
+    def numbered_name(function_memory:FunctionMemory, **kwargs):
+        
+
+class Engine_Combat_Spawn(LoaderFunction):
+    id = Identifier("engine", "combat/", "spawn")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {}: return cls.spawn
+            case _: return None
+    @staticmethod
+    def spawn(function_memory:FunctionMemory, **kwargs):
+        ...
+
+class Engine_Combat_Message(LoaderFunction):
+    id = Identifier("engine", "combat/", "message")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {}: return cls.message
+            case _: return None
+    @staticmethod
+    def message(function_memory:FunctionMemory, **kwargs):
+        ...
+
+
+# ^ Combat ^ #
+
+
+
+
 
 

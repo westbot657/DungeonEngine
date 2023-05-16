@@ -5,7 +5,9 @@
             {
                 "parent": "engine:enemies/goblin",
                 "id": "goblin 1",
-                "name": "Goblin 1"
+                "name": {
+                    "function": "engine:combat/unique_name"
+                }
             },
             {
                 "function": "engine:random/loot_table",
@@ -20,7 +22,10 @@
                         },
                         "entries": [
                             {
-                                "parent": "engine:enemies/goblin"
+                                "parent": "engine:enemies/goblin",
+                                "name": {
+                                    "function": "engine:combat/unique_name"
+                                }
                             }
                         ]
                     },
@@ -33,7 +38,10 @@
                         },
                         "entries": [
                             {
-                                "parent": "engine:enemies/zombie"
+                                "parent": "engine:enemies/zombie",
+                                "name": {
+                                    "function": "engine:combat/unique_name"
+                                }
                             }
                         ]
                     },
@@ -46,7 +54,10 @@
                         },
                         "entries": [
                             {
-                                "parent": "engine:enemies/bandit"
+                                "parent": "engine:enemies/bandit",
+                                "name": {
+                                    "function": "engine:combat/unique_name"
+                                }
                             }
                         ]
                     }

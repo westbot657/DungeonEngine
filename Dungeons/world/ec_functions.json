@@ -55,8 +55,29 @@
                 ]
             }
         ]
+    },
+
+
+    "$combat:enemy_health_check": {
+        "@check": {
+            "function": "engine:logic/compare",
+            "<=": [
+                {"#ref": "#enemy.health"},
+                {"#ref": "target_health"}
+            ]
+        },
+        "true": {
+            "function": "engine:combat/trigger",
+            "trigger": {
+                "function": "engine:text/builder",
+                "text": [
+                    {"#ref": "#enemy.id"},
+                    "health-check",
+                    {"#ref": "target_health"}
+                ],
+                "seperator": "-"
+            }
+        }
     }
-
-
 
 }

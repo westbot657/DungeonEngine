@@ -166,6 +166,11 @@ class Player(Entity):
                         "damage": damage
                     })
 
+        self.health -= damage
+
+        if self.health <= 0:
+            raise Exception(f"TODO: I have no idea how to do player death...")
+
 
     @classmethod
     def loadData(cls, engine) -> dict:

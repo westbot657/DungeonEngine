@@ -24,6 +24,10 @@ class StatusEffectManager:
     def fullStats(self, function_memory:FunctionMemory):
         return "\n".join([effect.fullStats() for effect in self.effects]).strip()
 
+    def onPlayerHit(self, function_memory:FunctionMemory):
+        ...
+
+
     def _get_save(self, function_memory:FunctionMemory):
         ...
     

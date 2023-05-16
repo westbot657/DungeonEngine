@@ -11,6 +11,12 @@ try:
     from .EngineErrors import MemoryError
     from .FunctionalElement import FunctionalElement
     from .FunctionMemory import FunctionMemory
+    from .Weapon import Weapon
+    from .Tool import Tool
+    from .Item import Item
+    from .Ammo import Ammo
+    from .Armor import Armor
+    from .EngineOperation import _EngineOperation
 except ImportError:
     from Inventory import Inventory
     from Entity import Entity
@@ -22,6 +28,12 @@ except ImportError:
     from EngineErrors import MemoryError
     from FunctionalElement import FunctionalElement
     from FunctionMemory import FunctionMemory
+    from Weapon import Weapon
+    from Tool import Tool
+    from Item import Item
+    from Ammo import Ammo
+    from Armor import Armor
+    from EngineOperation import _EngineOperation
 
 from typing import Any
 
@@ -117,6 +129,42 @@ class Player(Entity):
     def onAttacked(self, function_memory:FunctionMemory, attacker, damage:int):
         ...
 
+        # armor onPlayerHit method
+        # status effect onPlayerHit methods
+        # equipped tool onPlayerHit method
+        # weapon onPlayerHit method
+
+        equipped_weapon: Weapon = self.inventory.getEquipped(Weapon)
+        equipped_tool: Tool = self.inventory.getEquipped(Tool)
+        equipped_armor: Armor = self.inventory.getEquipped(Armor)
+
+        function_memory.update({
+            "damage": damage,
+            "attacker": attacker
+        })
+
+        for gameObject in [equipped_armor, equipped_tool, equipped_weapon, self.status_effects]:
+            gameObject: Armor|Tool|Weapon|StatusEffectManager
+            ev = gameObject.onPlayerHit(function_memory, damage)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            
+            if (dmg := function_memory.symbol_table.get("damage", None)) is not None:
+                if isinstance(dmg, int):
+                    function_memory.update({
+                        "damage": max(0, dmg)
+                    })
+                    damage = max(0, dmg)
+                else:
+                    function_memory.update({
+                        "damage": damage
+                    })
 
 
     @classmethod

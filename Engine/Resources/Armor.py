@@ -97,36 +97,37 @@ class Armor(GameObject):
             res = v
             self.postEvaluate(function_memory)
 
-    def onDamageReduction(self, function_memory:FunctionMemory, damage:int):
+    def onPlayerHit(self, function_memory:FunctionMemory, damage:int):
 
         self.prepFunctionMemory(function_memory)
         function_memory.update({
             "damage": damage
         })
-        ev = self.damage_reduction.getNew(function_memory)
-        v = None
-        if isinstance(ev, Generator):
-            try:
-                v = ev.send(None)
-                while isinstance(v, _EngineOperation):
-                    res = yield v
-                    v = ev.send(res)
-            except StopIteration as e:
-                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+        reduced_damage = self.damage_reduction.getNew(function_memory)
+        # v = None
+        # if isinstance(ev, Generator):
+        #     try:
+        #         v = ev.send(None)
+        #         while isinstance(v, _EngineOperation):
+        #             res = yield v
+        #             v = ev.send(res)
+        #     except StopIteration as e:
+        #         v = e.value or (v if not isinstance(v, _EngineOperation) else None)
         
-        elif isinstance(ev, (int, float)):
-            v = ev
-        else:
-            Log["error"]["armor"]["event"]["on damage reduction"](f"invalid return from damage_reduction DynamicValue.getNew(): '{ev}'")
+        # elif isinstance(ev, (int, float)):
+        #     v = ev
+        # else:
+        #     Log["error"]["armor"]["event"]["on damage reduction"](f"invalid return from damage_reduction DynamicValue.getNew(): '{ev}'")
         
-        reduced_damage = v
+        # reduced_damage = v
+        function_memory.update({
+            "damage": reduced_damage
+        })
 
-        if on_damage_reduction := self.events.get("on_damage_reduction", None):
+        if on_player_hit := self.events.get("on_player_hit", None):
             #self.prepFunctionMemory(function_memory)
-            function_memory.update({
-                "damage": reduced_damage
-            })
-            ev = function_memory.generatorEvaluateFunction(on_damage_reduction)
+            
+            ev = function_memory.generatorEvaluateFunction(on_player_hit)
             v = None
             try:
                 v = ev.send(None)

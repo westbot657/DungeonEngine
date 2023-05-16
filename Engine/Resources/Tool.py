@@ -220,6 +220,24 @@ class Tool(GameObject):
 
             # function_memory.clear()
 
+    def onPlayerHit(self, function_memory:FunctionMemory):
+        if on_player_hit := self.events.get("on_player_hit", None):
+            self.prepFunctionMemory(function_memory)
+            #res = function_memory.evaluateFunction(on_unequip)
+            ev = function_memory.generatorEvaluateFunction(on_player_hit)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            res = v
+            self.postEvaluate(function_memory)
+
+
+
     def __repr__(self):
         return f"Tool: {self.name} {self.durability}/{self.max_durability}"
 

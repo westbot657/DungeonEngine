@@ -58,6 +58,9 @@ class StatusEffect(FunctionalElement):
 
         return f"{self.name} {self.level} {self.duration}s {self.cause.getDisplay()}"
 
+    def onPlayerHit(self, function_memory:FunctionMemory):
+        ...
+
     def _get_save(self, function_memory:FunctionMemory):
         d = {}
 

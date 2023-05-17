@@ -29,6 +29,7 @@ class Enemy(Entity):
         self.attacks = attacks
         self.uid = None
         super().__init__(location, position)
+        self.events = {}
 
 
     def quickStats(self, function_memory:FunctionMemory):
@@ -40,6 +41,8 @@ class Enemy(Entity):
         for attack in self.attacks:
             attack: Attack
             s.append(f"  {attack.quickStats(function_memory)}")
+
+    
 
     def _get_save(self, function_memory:FunctionMemory) -> dict:
         return {}

@@ -3,20 +3,22 @@
 try:
     from .AbstractEnemy import AbstractEnemy, Enemy
     from .FunctionMemory import FunctionMemory
+    from .FunctionalElement import FunctionalElement
     from .Player import Player
     from .EngineErrors import CombatError
 except ImportError:
     from AbstractEnemy import AbstractEnemy, Enemy
     from FunctionMemory import FunctionMemory
+    from FunctionalElement import FunctionalElement
     from Player import Player
     from EngineErrors import CombatError
 
-
-
 from enum import Enum, auto
 
+import random
 
-class Combat:
+
+class Combat(FunctionalElement):
 
     class Operation:
         class _Operation:
@@ -79,20 +81,34 @@ class Combat:
             self.task = task
             self.delay = delay
 
-    def __init__(self, abstract, enemies:list[Enemy], sequence:dict, data:dict, turn_order:list[str|dict]):
+    def __init__(self, abstract, enemies:list[Enemy], sequence:dict, data:dict):
         self.abstract = abstract
         self.enemies: list[Enemy] = enemies
         self.sequence: dict = sequence
         self.data: dict = data
         self.players: list[Player] = []
-        self._turn_order = turn_order
         self.turn_order: list[Player|Enemy] = []
-
         self.current_turn: int = 0
         self.scheduled_tasks: list[Combat.Task] = []
         self.tick = None
         self.turn = None
+        self.last_trigger = None
 
+    def getLocalVariables(self) -> dict:
+        d = {}
+        return d
+
+    def updateLocalVariables(self, locals: dict):
+        ...
+    
+    def prepFunctionMemory(self, function_memory:FunctionMemory):
+        function_memory.addContextData({
+            "#combat": self
+        })
+        function_memory.update(self.getLocalVariables())
+    
+    def postEvaluate(self, function_memory:FunctionMemory):
+        self.updateLocalVariables(function_memory.symbol_table)
 
     def addPlayer(self, player:Player):
         player._combat = self
@@ -112,27 +128,13 @@ class Combat:
         self.tick = self._mainloop(function_memory)
         self.tick.send(None)
         function_memory.engine.combats.append(self)
-        self.turn_order.clear()
-        for item in self._turn_order:
-            if isinstance(item, str):
-                for enemy in self.enemies:
-                    if enemy.uid == item:
-                        self.turn_order.append(enemy)
-                        break
-            elif item == {}:
-                self.turn_order.append(self.players[0])
-                # append first item in players list,
-                # which when .start() was called, is
-                # guranteed to only have 1 player in
-                # the players list.
-
 
     def handleOperation(self, function_memory:FunctionMemory, operation):
         match operation:
             case Combat.Operation._HandlePlayerJoin():
-                ...
+                self.turn_order.insert(self.current_turn+1, operation.player)
             case Combat.Operation._HandlePlayerLeave():
-                ...
+                self.turn_order.remove(operation.player)
             case Combat.Operation._HandleInput():
                 ...
             case Combat.Operation._EnemyAttack():
@@ -152,6 +154,7 @@ class Combat:
 
     def _mainloop(self, function_memory:FunctionMemory):
         result = yield None
+
         while True:
             if result == None:
                 result = yield None
@@ -169,7 +172,11 @@ class Combat:
                     except CombatError as e:
                         print(e)
 
+            if self.last_trigger is None:
+                if (start := self.sequence.get("@start", None)) is not None:
+                    self.prepFunctionMemory(function_memory)
 
+                    ...
 
             result = yield None
     

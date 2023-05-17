@@ -57,6 +57,7 @@ class Engine:
         self._function_memory = FunctionMemory(self)
         self.default_input_handler = self._default_input_handler
         self.players: dict[str, Player] = {}
+        self.combats: list[Combat] = []
         self.tasks: list[Generator] = []
         self._player_input_categories = ["common", "global", "world"]
         #self.default_input_handler.send(None)
@@ -284,6 +285,8 @@ class Engine:
             case _:
                 raise EngineError("Unknown Operation")
 
+
+
     def _main_loop_threaded(self):
         
     #    asyncio.run(self._async_main_loop())
@@ -302,11 +305,7 @@ class Engine:
                 continue
             # Main Loop
 
-            # check inputs
-            #while self.input_queue:
-
-                # run scheduled tasks
-
+            # run scheduled tasks
             while self.tasks:
                 task = self.tasks.pop(0)
                 v = None
@@ -320,6 +319,12 @@ class Engine:
                 except StopIteration as e:
                     print(f"Task completed: {task}  {v=}  {e.value=}")
 
+            for combat in self.combats:
+                op = combat.tick(None)
+
+                #
+                # do stuff with op
+
             # check inputs
             for player_id in [k for k in self.input_queue.copy().keys()]:
                 handler_getter, response_handler, text = self.input_queue[player_id]
@@ -327,7 +332,14 @@ class Engine:
                 response_handler: Generator|Callable
                 player_id: int
                 text: str
+
+                player: Player = Player.getPlayer(player_id)
                 if text:
+
+                    if player.in_combat:
+                        
+                        continue
+
 
                     res = TextPattern.handleInput(self._function_memory, player, text, player._text_pattern_categories)
                     #if isinstance(res, Generator):

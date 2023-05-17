@@ -3,9 +3,11 @@
 try:
     from .AbstractEnemy import AbstractEnemy, Enemy
     from .FunctionMemory import FunctionMemory
+    from .Player import Player
 except ImportError:
     from AbstractEnemy import AbstractEnemy, Enemy
     from FunctionMemory import FunctionMemory
+    from Player import Player
 
 
 
@@ -35,29 +37,61 @@ class Combat:
                 self.event_name = event_name
 
         class UniqueName(_Operation):
-            def __init__(self, enemy:Enemy):
+            def __init__(self):
                 super().__init__("UniqueName")
-                self.enemy = enemy
         
         class NumberedName(_Operation):
-            def __init__(self, enemy:Enemy):
+            def __init__(self):
                 super().__init__("NumberedName")
-                self.enemy = enemy
 
-
-    class Style(Enum):
-        SEQUENCED = auto()
-        BASIC = auto()
+    class Task:
+        def __init__(self, task, delay:int):
+            self.task = task
+            self.delay = delay
 
     def __init__(self, abstract, enemies:list[Enemy], sequence:dict, data:dict):
         self.abstract = abstract
         self.enemies = enemies
         self.sequence = sequence
         self.data = data
-
         self.players = []
+        self.scheduled_tasks: list[Combat.Task] = []
+        self.tick = None
 
-    
+    def addPlayer(self, player:Player):
+        player._combat = self
+        self.players.append(player)
+
+    def removePlayer(self, player:Player):
+        player._combat = None
+        if player in self.players:
+            self.players.remove(player)
+
+    def start(self, function_memory:FunctionMemory):
+        self.tick = self._mainloop(function_memory)
+        self.tick.send(None)
+        function_memory.engine.combats.append(self)
+
+    def _mainloop(self, function_memory:FunctionMemory):
+        result = yield None
+        remove = []
+        while True:
+            if result == None:
+                result = yield None
+                continue
+
+            remove.clear()
+            for task in self.scheduled_tasks:
+                task: Combat.Task
+                task.delay -= 1
+
+                if task.delay == 0:
+                    remove.append(task)
+                    task.task(function_memory)
+            
+            for task in remove: self.scheduled_tasks.remove(task)
+
+            result = yield None
     
 
 

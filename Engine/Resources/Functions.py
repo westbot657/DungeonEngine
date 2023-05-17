@@ -1665,7 +1665,7 @@ class Engine_Combat_UniqueName(LoaderFunction):
     @staticmethod
     def unique_name(function_memory:FunctionMemory, **kwargs):
         
-        return Combat.Operation.UniqueName(function_memory.ref("#enemy"))
+        return Combat.Operation.UniqueName()
 
 class Engine_Combat_NumberedName(LoaderFunction):
     id = Identifier("engine", "combat/", "numbered_name")
@@ -1676,7 +1676,7 @@ class Engine_Combat_NumberedName(LoaderFunction):
             case _: return None
     @staticmethod
     def numbered_name(function_memory:FunctionMemory, **kwargs):
-        
+        ...
 
 class Engine_Combat_Spawn(LoaderFunction):
     id = Identifier("engine", "combat/", "spawn")

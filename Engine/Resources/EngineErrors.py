@@ -44,3 +44,7 @@ class FunctionError(EngineError):
     def __init__(self, *args):
         super().__init__("FunctionError:", *args)
 
+class UnknownPlayerError(EngineError):
+    def __init__(self, player_id:int):
+        super().__init__(f"UnknownPlayerError: No player exists with id: '{player_id}'")
+

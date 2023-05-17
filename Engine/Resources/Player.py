@@ -8,7 +8,7 @@ try:
     from .EngineDummy import Engine
     from .Logger import Log
     from .Position import Position
-    from .EngineErrors import MemoryError
+    from .EngineErrors import MemoryError, UnknownPlayerError
     from .FunctionalElement import FunctionalElement
     from .FunctionMemory import FunctionMemory
     from .Weapon import Weapon
@@ -25,7 +25,7 @@ except ImportError:
     from EngineDummy import Engine
     from Logger import Log
     from Position import Position
-    from EngineErrors import MemoryError
+    from EngineErrors import MemoryError, UnknownPlayerError
     from FunctionalElement import FunctionalElement
     from FunctionMemory import FunctionMemory
     from Weapon import Weapon
@@ -42,7 +42,7 @@ import json
 class Player(Entity):
     _loaded = {}
 
-    def __init__(self, discord_id:int, name:str, max_health:int, health:int, inventory:Inventory, location:Location, position:Position, _text_pattern_categories:list[str]):
+    def __init__(self, discord_id:int, name:str, max_health:int, health:int, inventory:Inventory, location:Location, position:Position, _text_pattern_categories:list[str], in_combat:bool):
         self.discord_id = discord_id
         self.name = name
         self.max_health = max_health
@@ -50,6 +50,8 @@ class Player(Entity):
         self.inventory = inventory
         self.inventory.setParent(self)
         self.status_effects = StatusEffectManager()
+        self.in_combat = in_combat
+        self._combat = None
 
         self.dungeon_data = {}
         self._text_pattern_categories = _text_pattern_categories
@@ -173,6 +175,12 @@ class Player(Entity):
 
 
     @classmethod
+    def getPlayer(cls, player_id):
+        if player_id in cls._loaded:
+            return cls._loaded.get(player_id)
+        raise UnknownPlayerError(player_id)
+
+    @classmethod
     def loadData(cls, engine) -> dict:
 
         Inventory._default_equips = {
@@ -192,6 +200,7 @@ class Player(Entity):
             location_str: str = data.get("location")
             position_list: list = data.get("position")
             inv_list: list = data.get("inventory")
+            in_combat: bool = data.get("in_combat", False)
 
             _text_pattern_categories: list[str] = data.get("text_pattern_categories")
 
@@ -200,7 +209,7 @@ class Player(Entity):
             position: Position = Position(*position_list)
             inventory: Inventory = Inventory.from_list(engine, inv_list)
             
-            p = cls(Id, name, max_health, health, inventory, location, position, _text_pattern_categories)
+            p = cls(Id, name, max_health, health, inventory, location, position, _text_pattern_categories, in_combat)
             cls._loaded.update({Id: p})
             Log["loadup"]["player"]("player instance created")
         Log["loadup"]["player"](f"Loaded players: {cls._loaded}")

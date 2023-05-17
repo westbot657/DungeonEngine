@@ -47,6 +47,7 @@
                 "tick": 232
             }
         ],
+        "in_combat": false,
         "text_pattern_categories": [
             "common",
             "global",

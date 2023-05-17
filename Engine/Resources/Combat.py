@@ -67,6 +67,9 @@ class Combat:
         if player in self.players:
             self.players.remove(player)
 
+    def onInput(self, player:Player, text:str):
+        ...
+
     def start(self, function_memory:FunctionMemory):
         self.tick = self._mainloop(function_memory)
         self.tick.send(None)
@@ -85,10 +88,12 @@ class Combat:
                 task: Combat.Task
                 task.delay -= 1
 
-                if task.delay == 0:
+                if task.delay <= 0:
                     remove.append(task)
-                    task.task(function_memory)
-            
+                    task.task(self, function_memory)
+
+
+
             for task in remove: self.scheduled_tasks.remove(task)
 
             result = yield None

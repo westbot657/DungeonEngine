@@ -1630,6 +1630,23 @@ class Engine_Interaction_Interact(LoaderFunction):
 ### XXX Engine Combat XXX ###
 ####XXX###############XXX####
 
+class Engine_Combat_Start(LoaderFunction):
+    id = Identifier("engine", "combat/", "start")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "combat": str()|dict()
+            }: return cls.start
+            case _: return None
+    @staticmethod
+    def start(function_memory:FunctionMemory, combat:str|dict):
+        if isinstance(combat, str): # reference external combat file
+            ...
+        elif isinstance(combat, dict): # inline combat
+            ...
+
+
 class Engine_Combat_Trigger(LoaderFunction):
     id = Identifier("engine", "combat/", "trigger")
     @classmethod

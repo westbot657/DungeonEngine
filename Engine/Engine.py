@@ -285,7 +285,8 @@ class Engine:
             case _:
                 raise EngineError("Unknown Operation")
 
-
+    def _handler_getter_wrapper(self, handler):
+        yield handler
 
     def _main_loop_threaded(self):
         
@@ -320,10 +321,20 @@ class Engine:
                     print(f"Task completed: {task}  {v=}  {e.value=}")
 
             for combat in self.combats:
-                op = combat.tick(None)
+                ops: dict = combat.tick(None)
 
-                #
-                # do stuff with op
+                for player_id, op in ops.items():
+                    if isinstance(op, _EngineOperation):
+                        try:
+                            self.evaluateResult(
+                                self._handler_getter_wrapper(combat.onInput),
+                                combat.onInput,
+                                op, player_id, ""
+                            )
+                        except EngineError as e:
+                            print(e)
+                    else:
+                        print(f"\n\ncombat returned non-engine operation??\n\n")
 
             # check inputs
             for player_id in [k for k in self.input_queue.copy().keys()]:
@@ -337,9 +348,8 @@ class Engine:
                 if text:
 
                     if player.in_combat:
-                        
+                        player._combat.onInput(player, text)
                         continue
-
 
                     res = TextPattern.handleInput(self._function_memory, player, text, player._text_pattern_categories)
                     #if isinstance(res, Generator):

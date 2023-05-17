@@ -29,7 +29,6 @@ class AbstractCombat:
         self.sequence: dict = data.get("sequence", {})
         self.data: dict = data.get("data", {})
 
-
     def getEnemies(self, function_memory:FunctionMemory) -> list:
         _unknown = []
         abstracts = {}
@@ -43,7 +42,6 @@ class AbstractCombat:
                     if isinstance(res, Enemy):
                         pass
 
-
     def createInstance(self, function_memory:FunctionMemory, **override_values):
         return Combat(self,
             self.getEnemies(function_memory),
@@ -51,7 +49,14 @@ class AbstractCombat:
             Util.deepCopy(self.data)
         )
 
-
+    @classmethod
+    def getCombat(cls, function_memory:FunctionMemory, combat_id:str|Identifier):
+        combat_id = Identifier.fromString(combat_id).full()
+        
+        if (combat := cls._loaded.get(combat_id, None)) is not None:
+            combat: AbstractCombat
+            return combat.createInstance()
+        raise CombatError(f"No combat with id: '{combat_id}'")
 
 
     @classmethod

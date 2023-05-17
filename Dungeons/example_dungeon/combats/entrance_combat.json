@@ -39,5 +39,10 @@
             ]
         },
         "zombie1-1-health-check-3": {}
-    }
+    },
+    "turn_order": [
+        {},
+        "zombie1-1",
+        "zombie1-2"
+    ]
 }

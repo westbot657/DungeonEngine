@@ -12,6 +12,7 @@ class OpType(Enum):
     FAILURE = auto()
     CANCEL = auto()
     STOP_LOOP = auto()
+    START_COMBAT = auto()
 
 class _EngineOperation:
     def __init__(self, operation_type):
@@ -87,4 +88,8 @@ class EngineOperation:
         def __init__(self):
             super().__init__(OpType.STOP_LOOP)
 
-
+    class StartCombat(_EngineOperation):
+        def __init__(self, combat, player):
+            super().__init__(OpType.START_COMBAT)
+            self.combat = combat
+            self.player = player

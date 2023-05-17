@@ -27,6 +27,7 @@ class Enemy(Entity):
         self.max_health = max_health
         self.health = health
         self.attacks = attacks
+        self.uid = None
         super().__init__(location, position)
 
 

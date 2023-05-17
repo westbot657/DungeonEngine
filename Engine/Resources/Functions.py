@@ -1632,6 +1632,7 @@ class Engine_Interaction_Interact(LoaderFunction):
 
 class Engine_Combat_Start(LoaderFunction):
     id = Identifier("engine", "combat/", "start")
+    pre_evaluate_args = False
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1642,9 +1643,21 @@ class Engine_Combat_Start(LoaderFunction):
     @staticmethod
     def start(function_memory:FunctionMemory, combat:str|dict):
         if isinstance(combat, str): # reference external combat file
-            ...
+            return EngineOperation.StartCombat(
+                AbstractCombat.getCombat(combat),
+                function_memory.ref("#player")
+            )
         elif isinstance(combat, dict): # inline combat
-            ...
+
+            identifier = Identifier("engine", "inline_combat/", "")
+
+            abstract: AbstractCombat = AbstractCombat(identifier, combat)
+            identifier.name = f"combat_{id(abstract)}"
+
+            return EngineOperation.StartCombat(
+                abstract.createInstance(function_memory),
+                function_memory.ref("#player")
+            )
 
 
 class Engine_Combat_Trigger(LoaderFunction):

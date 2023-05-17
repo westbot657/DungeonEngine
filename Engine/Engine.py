@@ -255,6 +255,12 @@ class Engine:
                 wrapper.send(None)
                 self.input_queue.update({player_id: [handler_getter, wrapper, ""]})
 
+            case EngineOperation.StartCombat():
+                player: Player = result.player
+                combat: Combat = result.combat
+                combat.addPlayer(player)
+                combat.start(FunctionMemory(self))
+                
             case EngineOperation.MovePlayer():
                 player = result.player
                 target_location = result.target_location

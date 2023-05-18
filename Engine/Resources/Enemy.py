@@ -31,7 +31,7 @@ class Enemy(Entity):
         self.attacks = attacks
         self.uid = None
         super().__init__(location, position)
-        self.events = {}
+        self.events: dict[str, dict] = {}
 
     def getLocalVariables(self) -> dict:
         d = {}
@@ -62,21 +62,41 @@ class Enemy(Entity):
 
         return "\n".join(s)
 
-    def onEvent(self, function_memory:FunctionMemory, current_trigger:str, event_name:str):
-        if current_trigger in self.events:
-            if (event := self.events[current_trigger].get(event_name, None)):
-                self.prepFunctionMemory(function_memory)
+    def setEvents(self, events):
+        self.events = Util.deepCopy(events)
+        self.events.update({
+            "@required": {
+                "on_attacked": { # when an enemy is attacked
+                    
+                },
+                "on_turn": { # when it's the enemies turn
+                    
+                },
+                "on_death": { # whren enemy dies
+                    
+                },
+                "on_spawn": { # when enemy spawns
+                    
+                }
+            }
+        })
 
-                ev = function_memory.generatorEvaluateFunction(event)
-                v = None
-                try:
-                    v = ev.send(None)
-                    while isinstance(v, _EngineOperation):
-                        res = yield v
-                        v = ev.send(res)
-                except StopIteration as e:
-                    v = e.value or (v if not isinstance(v, _EngineOperation) else None)
-                return v
+    def onEvent(self, function_memory:FunctionMemory, current_trigger:str, event_name:str):
+        for trigger in [current_trigger, "@global", "@required"]:
+            if trigger in self.events:
+                if (event := self.events[trigger].get(event_name, None)):
+                    self.prepFunctionMemory(function_memory)
+
+                    ev = function_memory.generatorEvaluateFunction(event)
+                    v = None
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, _EngineOperation):
+                            res = yield v
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                    return v
 
     def _get_save(self, function_memory:FunctionMemory) -> dict:
         return {}

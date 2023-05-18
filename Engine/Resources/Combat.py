@@ -6,19 +6,28 @@ try:
     from .FunctionalElement import FunctionalElement
     from .Player import Player
     from .EngineErrors import CombatError
+    from .EngineOperation import EngineOperation, _EngineOperation
+    from .TextPattern import TextPattern
+    from .Util import Util
 except ImportError:
     from AbstractEnemy import AbstractEnemy, Enemy
     from FunctionMemory import FunctionMemory
     from FunctionalElement import FunctionalElement
     from Player import Player
     from EngineErrors import CombatError
+    from EngineOperation import EngineOperation, _EngineOperation
+    from TextPattern import TextPattern
+    from Util import Util
 
 from enum import Enum, auto
 
-import random
+import random, re, json
 
 
 class Combat(FunctionalElement):
+
+    with open("../resources/combat.json", "r+", encoding="utf-8") as f:
+        _combat_config = json.load(f)
 
     class JoinPriority(Enum):
         NEXT = auto()
@@ -111,6 +120,8 @@ class Combat(FunctionalElement):
         self.turn = None
         self.last_trigger = None
         self.input_requests = [] # may not need?
+        self.function_memory = None
+        self.combat_config = Util.deepCopy(self._combat_config)
 
     def getEnemy(self, enemy_id:str):
         for enemy in self.enemies:
@@ -148,11 +159,21 @@ class Combat(FunctionalElement):
 
     def onInput(self, player:Player, text:str):
         self.scheduled_tasks.insert(0, Combat.Task(Combat.Operation._HandleInput(player, text), 0))
+        
 
     def start(self, function_memory:FunctionMemory):
         self.tick = self._mainloop(function_memory)
         self.tick.send(None)
         function_memory.engine.combats.append(self)
+
+    # def responseHandler(self):
+    #     while True:
+    #         engine, player_id, text = yield EngineOperation.Continue()
+
+
+    def evaluateResult(self, op:_EngineOperation, player_id:int, text:str=""):
+        self.function_memory.engine.evaluateResult(self.function_memory.engine._default_input_handler, self.function_memory.engine.default_input_handler, op, player_id, text)
+
 
     def handleOperation(self, function_memory:FunctionMemory, operation):
         match operation:
@@ -177,13 +198,63 @@ class Combat(FunctionalElement):
                 self.turn = self.turn_order[self.current_turn]
 
             case Combat.Operation._HandleInput():
-                print(f"combat recieved input '{operation.text}' from {operation.player}")
-                if self.turn == operation.player:
+                text = operation.text
+                player = operation.player
+                print(f"combat recieved input '{text}' from {player}")
+                
+                res = TextPattern.handleInput(function_memory, player, text, player._text_pattern_categories)
+                #if isinstance(res, Generator):
+                v = None
+                try:
+                    v = res.send(None)
+                    if isinstance(v, _EngineOperation):
+                        #ret = yield v
+                        function_memory.engine.evaluateResult(function_memory.engine._default_input_handler, res, v, player.discord_id, text)
+                        #v = res.send(ret)
+                except StopIteration as e:
+                    if isinstance(e.value, _EngineOperation):
+                        self.evaluateResult(e.value, player.discord_id)
+                        # function_memory.engine.evaluateResult(function_memory.engine._default_input_handler, function_memory.engine.default_input_handler, e.value, player.discord_id, text)
+
+                if self.turn == player:
                     ...
                     # TODO: text matching for attacking or using an item
+
+                    enemy_name_regexes = []
+                    for entity in self.turn_order:
+                        if isinstance(entity, Enemy):
+                            enemy_name_regexes.append(
+                                re.sub(r" +", " *", entity.name.lower())
+                            )
+                    enemy_names_regex = fr"(?P<enemy_name>{'|'.join(enemy_name_regexes)})"
+
+                    self.prepFunctionMemory(function_memory)
+
+                    function_memory.addContextData({
+                        "#enemy_names_regex": enemy_names_regex,
+                        "#player": player,
+                        "#text": text
+                    })
+
+                    ev = function_memory.generatorEvaluateFunction(self.combat_config["on_player_turn_input"])
+                    v = None
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, _EngineOperation):
+                            res = yield (player.discord_id, v)
+                            v = None
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        if isinstance(e.value, _EngineOperation):
+                            res = yield (player.discord_id, e.value)
+                        else:
+                            v = e.value or v
+                            
                 else:
                     ...
                     # TODO: text matching for when it's not a player's turn
+
+
 
             case Combat.Operation._EnemyAttack():
                 ...
@@ -229,14 +300,17 @@ class Combat(FunctionalElement):
                     self.current_turn = 0
             case _:
                 raise CombatError(f"Unrecognized combat operation: '{operation}'")
+        yield (0, EngineOperation.Continue())
+
 
     def _mainloop(self, function_memory:FunctionMemory):
-        result = yield {}
-
+        self.function_memory = function_memory
+        #result = yield {}
+        result = None
         while True:
-            if result == None:
-                result = yield {}
-                continue
+            # if result == None:
+            #     result = yield {}
+            #     continue
 
             for task in self.scheduled_tasks.copy():
                 task: Combat.Task
@@ -244,19 +318,43 @@ class Combat(FunctionalElement):
                 if task.delay <= 0:
                     self.scheduled_tasks.remove(task)
                     op = task.task
-
+                    
                     try:
-                        self.handleOperation(function_memory, op)
+                        ev = self.handleOperation(function_memory, op)
+                        v = None
+                        player_id = 0
+                        try:
+                            player_id, v = ev.send(None)
+                            if isinstance(v, _EngineOperation):
+                                function_memory.engine.evaluateResult(function_memory.engine._default_input_handler, function_memory.engine.default_input_handler, v, player_id, "")
+                        except StopIteration as e:
+                            if isinstance(e.value, _EngineOperation):
+                                function_memory.engine.evaluateResult(function_memory.engine._default_input_handler, function_memory.engine.default_input_handler, e.value, player_id, "")
                     except CombatError as e:
                         print(e)
 
             if self.last_trigger is None:
+                self.last_trigger = "@start"
                 if (start := self.sequence.get("@start", None)) is not None:
                     self.prepFunctionMemory(function_memory)
 
+                    ev = function_memory.generatorEvaluateFunction(start)
+                    v = None
+                    try:
+                        v = ev.send(None)
+                        if isinstance(v, _EngineOperation):
+                            self.evaluateResult(v, 0)
+                    except StopIteration as e:
+                        if isinstance(e.value, _EngineOperation):
+                            self.evaluateResult(e.value, 0)
                     ...
 
             result = yield {}
     
+    def quickStats(self, function_memory:FunctionMemory):
+        ...
+    
+    def fullStats(self, function_memory:FunctionMemory):
+        ...
 
 

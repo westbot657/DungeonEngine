@@ -18,8 +18,8 @@ except ImportError:
     from DynamicValue import DynamicValue
     from Enemy import Enemy
     from Logger import Log
-    from .Position import Position
-    from .Location import Location
+    from Position import Position
+    from Location import Location
 
 import glob, json, re
 

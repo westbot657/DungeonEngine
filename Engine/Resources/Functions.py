@@ -877,6 +877,11 @@ class Engine_Text_Match(LoaderFunction):
     def pattern_match(function_memory:FunctionMemory, **kwargs):
         text = kwargs.pop("text")
 
+        if "match_type" in kwargs:
+            match_type = kwargs.pop("match_type")
+        else:
+            match_type = "match"
+
         if not isinstance(text, str):
             ev = function_memory.generatorEvaluateFunction(text)
             v = None
@@ -905,7 +910,13 @@ class Engine_Text_Match(LoaderFunction):
                     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                 pattern = str(v)
             
-            if m := re.match(pattern, text):
+            match match_type:
+                case "search": f = re.search
+                case "findall": f = re.findall
+                case "fullmatch": f = re.fullmatch
+                case _: f = re.match
+
+            if m := f(pattern, text):
                 d = m.groupdict()
                 if d:
                     function_memory.update(d)

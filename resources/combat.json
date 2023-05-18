@@ -1,0 +1,24 @@
+{
+    "on_player_turn_input": {
+        "functions": [
+            {
+                "function": "engine:text/match",
+                "text": {"#ref": "#text"},
+                "matches": [
+                    {
+                        "pattern": {
+                            "function": "engine:text/builder",
+                            "text": [
+                                "(?:attack|fight|stab|hit|slice|slash *at|shoot) *",
+                                {"#ref": "#enemy_names_regex"},
+                                ""
+                            ],
+                            "seperator": ""
+                        }
+                        
+                    }
+                ]
+            }
+        ]
+    }
+}

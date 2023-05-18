@@ -143,31 +143,6 @@ class Engine:
                     self._function_memory.clear()
                     ConsoleCommand.handle_input(self._function_memory, text)
 
-                # elif player := self.getPlayer(player_id, None):
-                #     player: Player
-                    
-                #     self._function_memory.clear()
-                    
-                #     res = TextPattern.handleInput(self._function_memory, player, text, player._text_pattern_categories)
-                #     #if isinstance(res, Generator):
-                #     v = None
-                #     try:
-                #         v = res.send(None)
-                #         if isinstance(v, _EngineOperation):
-                #             #ret = yield v
-                #             self.evaluateResult(self._default_input_handler, res, v, player_id, text)
-                #             #v = res.send(ret)
-                #     except StopIteration as e:
-                        
-                #         if isinstance(e.value, _EngineOperation):
-                #             _, player_id, text = yield e.value
-                #             continue
-                #     _, player_id, text = yield EngineOperation.Continue()
-                #     #else:
-                #     #    _, player_id, text = yield res
-
-                #     continue
-
             except EngineBreak: pass
             _, player_id, text = yield EngineOperation.Continue()
 
@@ -291,7 +266,8 @@ class Engine:
                 #self.io_hook.sendOutput(player_id, result.value)
                 if result.value: Log["debug"]["engine"]["evaluate-result"](f"EngineOperation.Continue ({result.value})")
                 #if self.input_queue[player_id][1] == self._default_input_handler:
-                self.input_queue[player_id][2] = ""
+                if player_id in self.input_queue:
+                    self.input_queue[player_id][2] = ""
             case _:
                 raise EngineError("Unknown Operation")
 
@@ -368,6 +344,7 @@ class Engine:
 
                     if player.in_combat:
                         player._combat.onInput(player, text)
+                        self.input_queue[player.discord_id][2] = ""
                         continue
 
                     res = TextPattern.handleInput(self._function_memory, player, text, player._text_pattern_categories)

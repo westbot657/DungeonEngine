@@ -755,13 +755,34 @@ class Engine_Player_AttackEnemy(LoaderFunction):
                 "player": Player(),
                 "enemy": Enemy()
             }:
+                return cls.attack_enemy
+            case _: return None
+    @staticmethod
+    def attack_enemy(function_memory:FunctionMemory, player:Player, enemy:Enemy):
+        return player.attackEnemy(function_memory, enemy)
+
+# ^ Player ^ #
+
+####XXX##############XXX####
+### XXX Engine Enemy XXX ###
+####XXX##############XXX####
+
+class Engine_Enemy_AttackPlayer(LoaderFunction):
+    id = Identifier("engine", "enemy/", "attack_player")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "enemy": Enemy(),
+                "player": Player()
+            }:
                 return cls.attack_player
             case _: return None
     @staticmethod
-    def attack_player(function_memory:FunctionMemory, player:Player, enemy:Enemy):
-        ...
+    def attack_player(function_memory:FunctionMemory, enemy:Enemy, player:Player):
+        return enemy.attackPlayer(function_memory, player)
 
-# ^ Player ^ #
+# ^ Enemy ^ #
 
 ####XXX#################XXX####
 ### XXX Engine Location XXX ###

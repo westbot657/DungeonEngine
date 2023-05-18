@@ -21,6 +21,8 @@ except:
     from AbstractAttack import AbstractAttack, Attack
     from EngineOperation import _EngineOperation
 
+import json
+
 class Enemy(Entity):
     
     def __init__(self, abstract, name:str, max_health:int, health:int, attacks:list, location:Location, position:Position):
@@ -64,22 +66,8 @@ class Enemy(Entity):
 
     def setEvents(self, events):
         self.events = Util.deepCopy(events)
-        self.events.update({
-            "@required": {
-                "on_attacked": { # when an enemy is attacked
-                    
-                },
-                "on_turn": { # when it's the enemies turn
-                    
-                },
-                "on_death": { # whren enemy dies
-                    
-                },
-                "on_spawn": { # when enemy spawns
-                    
-                }
-            }
-        })
+        with open("../resources/enemy_required_events.json", "r+", encoding="utf-8") as f:
+            self.events.update(json.load(f))
 
     def onEvent(self, function_memory:FunctionMemory, current_trigger:str, event_name:str):
         for trigger in [current_trigger, "@global", "@required"]:
@@ -96,6 +84,8 @@ class Enemy(Entity):
                             v = ev.send(res)
                     except StopIteration as e:
                         v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+
+                    self.postEvaluate(function_memory)
                     return v
 
     def _get_save(self, function_memory:FunctionMemory) -> dict:

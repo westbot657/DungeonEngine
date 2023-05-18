@@ -1643,8 +1643,8 @@ class Engine_Combat_Start(LoaderFunction):
     @staticmethod
     def start(function_memory:FunctionMemory, combat:str|dict):
         if isinstance(combat, str): # reference external combat file
-            return EngineOperation.StartCombat(
-                AbstractCombat.getCombat(combat),
+            yield EngineOperation.StartCombat(
+                AbstractCombat.getCombat(function_memory, combat),
                 function_memory.ref("#player")
             )
         elif isinstance(combat, dict): # inline combat
@@ -1654,7 +1654,7 @@ class Engine_Combat_Start(LoaderFunction):
             abstract: AbstractCombat = AbstractCombat(identifier, combat)
             identifier.name = f"combat_{id(abstract)}"
 
-            return EngineOperation.StartCombat(
+            yield EngineOperation.StartCombat(
                 abstract.createInstance(function_memory),
                 function_memory.ref("#player")
             )

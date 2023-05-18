@@ -60,6 +60,10 @@ class Combat(FunctionalElement):
             def __init__(self):
                 super().__init__("NumberedName")
 
+        class DelayedAction(_Operation):
+            def __init__(self, action):
+                super().__init__("DelayedAction")
+                self.action = action
 
         class _EnemyAttack(_Operation):
             def __init__(self, enemy:Enemy, target:Player):
@@ -130,6 +134,7 @@ class Combat(FunctionalElement):
         self.updateLocalVariables(function_memory.symbol_table)
 
     def addPlayer(self, player:Player):
+        player.in_combat = True
         player._combat = self
         self.players.append(player)
         self.scheduled_tasks.insert(0, Combat.Task(Combat.Operation._HandlePlayerJoin(player, Combat.JoinPriority.NEXT), 0))
@@ -137,6 +142,7 @@ class Combat(FunctionalElement):
     def removePlayer(self, player:Player):
         self.scheduled_tasks.insert(0, Combat.Task(Combat.Operation._HandlePlayerLeave(player), 0))
         player._combat = None
+        player.in_combat = False
         if player in self.players:
             self.players.remove(player)
 
@@ -151,6 +157,7 @@ class Combat(FunctionalElement):
     def handleOperation(self, function_memory:FunctionMemory, operation):
         match operation:
             case Combat.Operation._HandlePlayerJoin():
+                
                 if operation.priority == Combat.JoinPriority.NEXT:
                     self.turn_order.insert(self.current_turn+1, operation.player)
                 elif operation.priority == Combat.JoinPriority.LAST:
@@ -170,6 +177,7 @@ class Combat(FunctionalElement):
                 self.turn = self.turn_order[self.current_turn]
 
             case Combat.Operation._HandleInput():
+                print(f"combat recieved input '{operation.text}' from {operation.player}")
                 if self.turn == operation.player:
                     ...
                     # TODO: text matching for attacking or using an item
@@ -212,7 +220,6 @@ class Combat(FunctionalElement):
                         if i <= self.current_turn:
                             self.current_turn -= 1
                             self.turn = self.turn_order[self.current_turn]
-
             case Combat.Operation.Message():
                 for player in self.players:
                     function_memory.engine.sendOutput(player, operation.message)
@@ -224,11 +231,11 @@ class Combat(FunctionalElement):
                 raise CombatError(f"Unrecognized combat operation: '{operation}'")
 
     def _mainloop(self, function_memory:FunctionMemory):
-        result = yield None
+        result = yield {}
 
         while True:
             if result == None:
-                result = yield None
+                result = yield {}
                 continue
 
             for task in self.scheduled_tasks.copy():
@@ -249,7 +256,7 @@ class Combat(FunctionalElement):
 
                     ...
 
-            result = yield None
+            result = yield {}
     
 
 

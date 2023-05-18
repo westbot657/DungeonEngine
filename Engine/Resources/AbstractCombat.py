@@ -55,7 +55,7 @@ class AbstractCombat:
         
         if (combat := cls._loaded.get(combat_id, None)) is not None:
             combat: AbstractCombat
-            return combat.createInstance()
+            return combat.createInstance(function_memory)
         raise CombatError(f"No combat with id: '{combat_id}'")
 
 

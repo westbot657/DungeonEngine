@@ -36,7 +36,7 @@ from threading import Thread
 
 
 from typing import Any, Generator, Callable
-import glob, json, re
+import time
 #import asyncio
 
 class Engine:
@@ -60,6 +60,10 @@ class Engine:
         self.combats: list[Combat] = []
         self.tasks: list[Generator] = []
         self._player_input_categories = ["common", "global", "world"]
+        self._frame_times = []
+        self._frame_start = 0
+        self._frame_end = 0
+        self.tps = []
         #self.default_input_handler.send(None)
 
     def evaluateFunction(self, data:dict, function_memory:FunctionMemory=None, context_data:dict=None, local_variables:dict=None):
@@ -307,6 +311,15 @@ class Engine:
             self.evaluateResult(self._default_input_handler, self.default_input_handler, EngineOperation.MovePlayer(player, player.location), player.discord_id, "")
 
         while self.thread_running:
+
+            self._frame_end = time.time()
+            self._frame_times = self._frame_times[1:] + [self._frame_end - self._frame_start]
+            self.tps = len(self._frame_times)/sum(self._frame_times)
+            self._frame_start = time.time()
+
+            #print(f"\033[0F\033[30G{self.tps}\r")
+
+
             if not self.running:
                 # Pause Menu thingy?
                 continue
@@ -327,7 +340,7 @@ class Engine:
                     print(f"Task completed: {task}  {v=}  {e.value=}")
 
             for combat in self.combats:
-                ops: dict = combat.tick(None)
+                ops: dict = combat.tick.send(None)
 
                 for player_id, op in ops.items():
                     if isinstance(op, _EngineOperation):

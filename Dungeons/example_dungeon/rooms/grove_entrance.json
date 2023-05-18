@@ -1,28 +1,5 @@
 {
     "name": "Grove Entrance",
-    "enter_message": {
-        "function": "engine:text/builder",
-        "text": [
-            {
-                "predicate": {
-                    ".example_dungeon.boss_defeated": true
-                },
-                "text": "there are 4 doors"
-            },
-            {
-                "predicate": {
-                    ".example_dungeon.boss_defeated": false
-                },
-                "text": "there are 3 doors"
-            },
-            {
-                "predicate": {
-                    ".ritual_staff": true
-                },
-                "text": "and there is a ritual staff in the corner"
-            }
-        ]
-    },
     "interactions": [
         {
             "type": "engine:interactable/door",
@@ -48,5 +25,11 @@
             "id": "ritual_staff",
             "loot": "example_dungeon:weapons/ritual_staff"
         }
-    ]
+    ],
+    "events": {
+        "on_enter": {
+            "function": "engine:combat/start",
+            "combat": "example_dungeon:combats/entrance_combat"
+        }
+    }
 }

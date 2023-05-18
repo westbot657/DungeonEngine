@@ -69,6 +69,10 @@ class AbstractDungeon:
     def loadData(cls, engine) -> list:
         files: list[str] = glob.glob("Dungeons/**/*.json")#, recursive=True)
 
+        for file in files.copy():
+            if "ec_functions.json" in file:
+                files.remove(file)
+
         Log["loadup"]["dungeon"](f"Loading {len(files)} dungeons...")
 
         for file in files:

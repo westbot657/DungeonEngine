@@ -20,6 +20,11 @@ import random
 
 class Combat(FunctionalElement):
 
+    class JoinPriority(Enum):
+        NEXT = auto()
+        LAST = auto()
+        RANDOM = auto()
+
     class Operation:
         class _Operation:
             def __init__(self, name:str, ):
@@ -31,7 +36,7 @@ class Combat(FunctionalElement):
                 self.message = message
 
         class Spawn(_Operation):
-            def __init__(self, enemies:list[Enemy]):
+            def __init__(self, enemies:list[Enemy], ):
                 super().__init__("Spawn")
                 self.enemies = enemies
 
@@ -63,7 +68,7 @@ class Combat(FunctionalElement):
                 self.text = text
 
         class _HandlePlayerJoin(_Operation):
-            def __init__(self, player:Player):
+            def __init__(self, player:Player, ):
                 super().__init__("HandlePlayerJoin")
                 self.player = player
         
@@ -142,7 +147,8 @@ class Combat(FunctionalElement):
             case Combat.Operation.Trigger():
                 ...
             case Combat.Operation.Spawn():
-                ...
+                for enemy in operation.enemies:
+                    ...
             case Combat.Operation.Message():
                 ...
             case Combat.Operation._NextTurn():

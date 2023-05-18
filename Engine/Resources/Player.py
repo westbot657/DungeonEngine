@@ -125,9 +125,10 @@ class Player(Entity):
 
         return text
 
-    ####XXX########XXX####
-    ### XXX Events XXX ###
-    ####XXX########XXX####
+
+    def attackEnemy(self, function_memory:FunctionMemory, enemy):
+        ...
+    
     def onAttacked(self, function_memory:FunctionMemory, attacker, damage:int):
         ...
 

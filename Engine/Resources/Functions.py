@@ -1712,12 +1712,32 @@ class Engine_Combat_Spawn(LoaderFunction):
     id = Identifier("engine", "combat/", "spawn")
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case {}: return cls.spawn
-            case _: return None
+        if ("enemy" in args) or ("enemies" in args):
+            return cls.spawn
+        return None
     @staticmethod
     def spawn(function_memory:FunctionMemory, **kwargs):
-        ...
+        priority = kwargs.get("priority", "last")
+        priority = Combat.JoinPriority.RANDOM if priority == "random" else Combat.JoinPriority.NEXT if priority == "next" else Combat.JoinPriority.LAST
+        if (enemy := kwargs.get("enemy", None)):
+            return Combat.Operation.Spawn([enemy], priority)
+        elif (enemies := kwargs.get("enemies", None)):
+            return Combat.Operation.Spawn(enemies, priority)
+
+class Engine_Combat_Despawn(LoaderFunction):
+    id = Identifier("engine", "combat/", "despawn")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if ("enemy" in args) or ("enemies" in args):
+            return cls.despawn
+        return None
+    @staticmethod
+    def despawn(function_memory:FunctionMemory, **kwargs):
+        if (enemy := kwargs.get("enemy", None)):
+            return Combat.Operation.Despawn([enemy])
+        elif (enemies := kwargs.get("enemies", None)):
+            return Combat.Operation.Despawn(enemies)
+        
 
 class Engine_Combat_Message(LoaderFunction):
     id = Identifier("engine", "combat/", "message")

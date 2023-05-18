@@ -55,7 +55,6 @@ class Attack(FunctionalElement):
     def quickStats(self, function_memory:FunctionMemory):
         return f"{self.name}  {self.damage.quickDisplay(function_memory)}dmg {self.range}ft {self.accuracy}% accuracy"
 
-
     def onAttack(self, function_memory:FunctionMemory, target):
 
         acc = random.randint(1, 100)
@@ -122,8 +121,6 @@ class Attack(FunctionalElement):
         if (dmg := function_memory.symbol_table.get("damage", None)) is not None:
             if isinstance(dmg, int) and 0 <= dmg:
                 damage = dmg
-        
-        
 
     def onMiss(self, function_memory:FunctionMemory, target):
         if (on_miss := self.events.get("on_miss", None)) is not None:

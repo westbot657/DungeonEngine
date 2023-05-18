@@ -36,8 +36,15 @@ class Combat(FunctionalElement):
                 self.message = message
 
         class Spawn(_Operation):
-            def __init__(self, enemies:list[Enemy], ):
+            def __init__(self, enemies:list[str], priority):
+                priority: Combat.JoinPriority
                 super().__init__("Spawn")
+                self.enemies = enemies
+                self.priority = priority
+
+        class Despawn(_Operation):
+            def __init__(self, enemies:list[str]):
+                super().__init__("Despawn")
                 self.enemies = enemies
 
         class Trigger(_Operation):
@@ -54,7 +61,6 @@ class Combat(FunctionalElement):
                 super().__init__("NumberedName")
 
 
-
         class _EnemyAttack(_Operation):
             def __init__(self, enemy:Enemy, target:Player):
                 super().__init__("EnemyAttack")
@@ -68,9 +74,11 @@ class Combat(FunctionalElement):
                 self.text = text
 
         class _HandlePlayerJoin(_Operation):
-            def __init__(self, player:Player, ):
+            def __init__(self, player:Player, priority):
+                priority: Combat.JoinPriority
                 super().__init__("HandlePlayerJoin")
                 self.player = player
+                self.priority = priority
         
         class _HandlePlayerLeave(_Operation):
             def __init__(self, player:Player):
@@ -98,6 +106,12 @@ class Combat(FunctionalElement):
         self.tick = None
         self.turn = None
         self.last_trigger = None
+        self.input_requests = [] # may not need?
+
+    def getEnemy(self, enemy_id:str):
+        for enemy in self.enemies:
+            if enemy.uid == enemy_id:
+                return enemy
 
     def getLocalVariables(self) -> dict:
         d = {}
@@ -118,7 +132,7 @@ class Combat(FunctionalElement):
     def addPlayer(self, player:Player):
         player._combat = self
         self.players.append(player)
-        self.scheduled_tasks.insert(0, Combat.Task(Combat.Operation._HandlePlayerJoin(player), 0))
+        self.scheduled_tasks.insert(0, Combat.Task(Combat.Operation._HandlePlayerJoin(player, Combat.JoinPriority.NEXT), 0))
 
     def removePlayer(self, player:Player):
         self.scheduled_tasks.insert(0, Combat.Task(Combat.Operation._HandlePlayerLeave(player), 0))
@@ -137,20 +151,71 @@ class Combat(FunctionalElement):
     def handleOperation(self, function_memory:FunctionMemory, operation):
         match operation:
             case Combat.Operation._HandlePlayerJoin():
-                self.turn_order.insert(self.current_turn+1, operation.player)
+                if operation.priority == Combat.JoinPriority.NEXT:
+                    self.turn_order.insert(self.current_turn+1, operation.player)
+                elif operation.priority == Combat.JoinPriority.LAST:
+                    self.turn_order.insert(self.current_turn, operation.player)
+                    self.current_turn += 1
+                elif operation.priority == Combat.JoinPriority.RANDOM:
+                    r = random.randint(1, len(self.turn_order))
+                    self.turn_order.insert(r, operation.player)
+                    if r <= self.current_turn:
+                        self.current_turn += 1
+
             case Combat.Operation._HandlePlayerLeave():
+                i = self.turn_order.index(operation.player)
                 self.turn_order.remove(operation.player)
+                if i <= self.current_turn:
+                    self.current_turn -= 1
+                self.turn = self.turn_order[self.current_turn]
+
             case Combat.Operation._HandleInput():
-                ...
+                if self.turn == operation.player:
+                    ...
+                    # TODO: text matching for attacking or using an item
+                else:
+                    ...
+                    # TODO: text matching for when it's not a player's turn
+
             case Combat.Operation._EnemyAttack():
                 ...
             case Combat.Operation.Trigger():
-                ...
+                self.last_trigger = operation.event_name
             case Combat.Operation.Spawn():
-                for enemy in operation.enemies:
-                    ...
+                if operation.priority == Combat.JoinPriority.NEXT:
+                    i = 0
+                    for enemy_id in operation.enemies:
+                        enemy = self.getEnemy(enemy_id)
+                        if enemy not in self.turn_order:
+                            self.turn_order.insert(self.current_turn+1+i, enemy)
+                            i += 1
+                elif operation.priority == Combat.JoinPriority.LAST:
+                    for enemy_id in operation.enemies:
+                        enemy = self.getEnemy(enemy_id)
+                        if enemy not in self.turn_order:
+                            self.turn_order.insert(self.current_turn, enemy)
+                            self.current_turn += 1
+                elif operation.priority == Combat.JoinPriority.RANDOM:
+                    for enemy_id in operation.enemies:
+                        r = random.randint(1, len(self.turn_order))
+                        enemy = self.getEnemy(enemy_id)
+                        if enemy not in self.turn_order:
+                            self.turn_order.insert(r, enemy)
+                            if r <= self.current_turn:
+                                self.current_turn += 1
+            case Combat.Operation.Despawn():
+                for enemy_id in operation.enemies:
+                    enemy = self.getEnemy(enemy_id)
+                    if enemy in self.turn_order:
+                        i = self.turn_order.index(enemy)
+                        self.turn_order.remove(enemy)
+                        if i <= self.current_turn:
+                            self.current_turn -= 1
+                            self.turn = self.turn_order[self.current_turn]
+
             case Combat.Operation.Message():
-                ...
+                for player in self.players:
+                    function_memory.engine.sendOutput(player, operation.message)
             case Combat.Operation._NextTurn():
                 self.current_turn += 1
                 if self.current_turn >= len(self.turn_order):

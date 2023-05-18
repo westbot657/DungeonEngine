@@ -745,6 +745,22 @@ class Engine_Player_GetLocation(LoaderFunction):
     @staticmethod
     def getLocation(function_memory:FunctionMemory):
         return function_memory.ref("#player").location.full()
+
+class Engine_Player_AttackEnemy(LoaderFunction):
+    id = Identifier("engine", "player/", "attack_enemy")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "player": Player(),
+                "enemy": Enemy()
+            }:
+                return cls.attack_player
+            case _: return None
+    @staticmethod
+    def attack_player(function_memory:FunctionMemory, player:Player, enemy:Enemy):
+        ...
+
 # ^ Player ^ #
 
 ####XXX#################XXX####

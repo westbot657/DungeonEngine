@@ -57,8 +57,11 @@ class Weapon(GameObject):
     def postEvaluate(self, function_memory:FunctionMemory):
         self.updateLocalVariables(function_memory.symbol_table)
 
+    def attackEnemy(self, function_memory:FunctionMemory, enemy):
+        ...
+        
     def onUse(self, function_memory:FunctionMemory):
-        if on_use := self.events.geT("on_use", None):
+        if on_use := self.events.get("on_use", None):
             self.prepFunctionMemory(function_memory)
 
             ev = function_memory.generatorEvaluateFunction(on_use)
@@ -74,7 +77,7 @@ class Weapon(GameObject):
             self.postEvaluate(function_memory)
 
     def onDamage(self, function_memory:FunctionMemory):
-        if on_damage := self.events.geT("on_damage", None):
+        if on_damage := self.events.get("on_damage", None):
             self.prepFunctionMemory(function_memory)
 
             ev = function_memory.generatorEvaluateFunction(on_damage)
@@ -90,7 +93,7 @@ class Weapon(GameObject):
             self.postEvaluate(function_memory)
 
     def onBreak(self, function_memory:FunctionMemory):
-        if on_break := self.events.geT("on_break", None):
+        if on_break := self.events.get("on_break", None):
             self.prepFunctionMemory(function_memory)
 
             ev = function_memory.generatorEvaluateFunction(on_break)
@@ -105,24 +108,8 @@ class Weapon(GameObject):
 
             self.postEvaluate(function_memory)
 
-    def onAttack(self, function_memory:FunctionMemory):
-        if on_attack := self.events.geT("on_attack", None):
-            self.prepFunctionMemory(function_memory)
-
-            ev = function_memory.generatorEvaluateFunction(on_attack)
-            v = None
-            try:
-                v = ev.send(None)
-                while isinstance(v, _EngineOperation):
-                    res = yield v
-                    v = ev.send(res)
-            except StopIteration as e:
-                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
-
-            self.postEvaluate(function_memory)
-
     def onEquip(self, function_memory:FunctionMemory):
-        if on_equip := self.events.geT("on_equip", None):
+        if on_equip := self.events.get("on_equip", None):
             self.prepFunctionMemory(function_memory)
 
             ev = function_memory.generatorEvaluateFunction(on_equip)
@@ -138,7 +125,7 @@ class Weapon(GameObject):
             self.postEvaluate(function_memory)
 
     def onUnequip(self, function_memory:FunctionMemory):
-        if on_unequip := self.events.geT("on_unequip", None):
+        if on_unequip := self.events.get("on_unequip", None):
             self.prepFunctionMemory(function_memory)
 
             ev = function_memory.generatorEvaluateFunction(on_unequip)
@@ -154,7 +141,7 @@ class Weapon(GameObject):
             self.postEvaluate(function_memory)
 
     def onRepair(self, function_memory:FunctionMemory):
-        if on_repair := self.events.geT("on_repair", None):
+        if on_repair := self.events.get("on_repair", None):
             self.prepFunctionMemory(function_memory)
 
             ev = function_memory.generatorEvaluateFunction(on_repair)

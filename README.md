@@ -2,6 +2,7 @@
 # Dungeon Building  
 
 Note: This is going to be a VERY long, detailed, guide to creating a dungeon and all it's components.  
+---
 [File Structure](#file-structure)  
 [Dungeons](#dungeons) | [Rooms](#rooms) | [Interactions](#interactions)    
 [Weapons](#weapons) | [Ammo](#ammo) | [Armor](#armor)  

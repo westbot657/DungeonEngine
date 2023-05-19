@@ -12,7 +12,6 @@ Note: This is going to be a VERY long, detailed, guide to creating a dungeon and
 [Interactable Types](#interactable-types)  
 
 [Engine Code](#engine-code)  
----
 
 ## File Structure
 ```

@@ -9,7 +9,9 @@ Note: This is going to be a VERY long, detailed, guide to creating a dungeon and
 [StatusEffects](#status-effects)  
 [Enemies](#enemies) | [Attacks](#attacks) | [Entities](#entities) | [Combats](#combats)  
 [Interactable Types](#interactable-types)  
-[Functions](#functions)  
+---
+[Engine Code](#engine-code)  
+
 
 ## File Structure
 ```
@@ -86,25 +88,27 @@ Door Interaction JSON:
 ```
 
 ## Weapons
-WIP
+WIP  
 
 ## Ammo
-WIP
+WIP  
 
 ## Armor
-WIP
+WIP  
 
 ## Items
 ```json
 {
-  "parent": "<item identifier>",
-  "name": "...",
-  "max_count": "<int>",
-  "count": "<int>",
-  "data": {...},
+  "parent": <item identifier>,
+  "name": <text>|{boot engine code},
+  "max_count": <int>,
+  "count": <int>|{boot engine code},
+  "data": {
+    "<name>: {boot engine code}
+  },
   "events": {
-    "on_use": {...},
-    "on_expended": {...}
+    "on_use": {engine code},
+    "on_expended": {engine code}
   }
 }
 ```
@@ -113,90 +117,54 @@ WIP
 ## Tools
 ```json
 {
-  "parent": "<tool identifier>",
-  "name": "...",
-  "max_durability": "<int>",
-  "durability": "<int>",
-  "data": {...},
+  "parent": <tool identifier>,
+  "name": <text>|{boot engine code},
+  "max_durability": <int>,
+  "durability": <int>|{boot engine code},
+  "data": {
+    "<name>": {boot engine code}
+  },
   "events": {
-    "on_use": {...},
-    "on_equip": {...},
-    "on_unequip": {...},
-    "on_damaged": {...},
-    "on_break": {...}
+    "on_use": {engine code},
+    "on_equip": {engine code},
+    "on_unequip": {engine code},
+    "on_damaged": {engine code},
+    "on_break": {engine code}
   }
 }
 ```
 
 
 ## Status Effects
-WIP
+WIP  
 
 ## Enemies
-WIP
+WIP  
 
 ## Attacks
-WIP
+WIP  
 
 ## Entities
-WIP
+WIP  
 
 ## Interactable Types
-WIP
+WIP  
 see the [door](./resources/interactable_types/door.json) interactable type as an example  
 
 ## Combats
-WIP
-
-## Functions
-
-Function and Parameter List:  
-- player:
-  - engine:player/message
-    * message
-  - engine:player/get_input
-  - engine:player/give_item
-    * item
-  - engine:player/heal
-    * amount
-  - engine:player/damage
-    * amount
-
-the following functions have more complex parameters.  
-more in-depth explanation can be found [here](#complex-parameters)
-- math:
-  - engine:math/solve
-
-- random:
-  - engine:random/weighted
-  - engine:random/uniform
-
-- logic:
-  - engine:logic/compare
-
-- text:
-  - engine:text/builder
-
-Usage:
-```json
-...
-  {
-    "function": "<function-id>",
-    "<parameter>": "<value>",
-    ...
-  }
-...
-```
+WIP  
 
 
-### Function Examples
-WIP
+## Engine Code
+WIP  
+
+Engine Code is the scripting language used for events and operations within user-made dungeons.  
+
+note:  
+`boot engine code` is evaluated on dungeon load up. This means the functions you can use in it are limited  
+`engine code` is evaluated as needed during runtime, it is not evaluated on load up.  
 
 
-
-
-#### complex parameters
-WIP
 
 
 

@@ -159,7 +159,6 @@ class Combat(FunctionalElement):
 
     def onInput(self, player:Player, text:str):
         self.scheduled_tasks.insert(0, Combat.Task(Combat.Operation._HandleInput(player, text), 0))
-        
 
     def start(self, function_memory:FunctionMemory):
         self.tick = self._mainloop(function_memory)
@@ -170,10 +169,46 @@ class Combat(FunctionalElement):
     #     while True:
     #         engine, player_id, text = yield EngineOperation.Continue()
 
-
     def evaluateResult(self, op:_EngineOperation, player_id:int, text:str=""):
         self.function_memory.engine.evaluateResult(self.function_memory.engine._default_input_handler, self.function_memory.engine.default_input_handler, op, player_id, text)
 
+    def playerAttackEnemy(self, player:Player, enemy:Enemy):
+        ...
+
+    def enemyAttackPlayer(self, enemy:Enemy, player:Player):
+        ev = enemy.attackPlayer(self.function_memory, player, self.last_trigger)
+        v = None
+        try:
+            v = ev.send(None)
+            while isinstance(v, (_EngineOperation, Enemy.Operation._Operation, Player.Operation._Operation)):
+                if isinstance(v, Enemy.Operation._Operation):
+                    # TODO: use this to store statistics?
+                    v = None
+                    v = ev.send(None)
+                elif isinstance(v, Player.Operation._Operation):
+                    # TODO: use this to store statistics?
+                    v = None
+                    v = ev.send(None)
+                else:
+                    res = yield v
+                    v = None
+                    v = ev.send(res)
+        except StopIteration as e:
+            if isinstance(e.value, _EngineOperation):
+                yield e.value
+            elif isinstance(e.value, Enemy.Operation._Operation):
+                # TODO: statistics
+                ...
+            elif isinstance(e.value, Player.Operation._Operation):
+                # TODO: statistics
+                ...
+
+
+    # im okay not implementing these 2 for a while
+    def playerAttackPlayer(self, attacking_player:Player, target_player:Player):
+        ...
+    def enemyAttackEnemy(self, attacking_enemy:Enemy, target_enemy:Enemy):
+        ...
 
     def handleOperation(self, function_memory:FunctionMemory, operation):
         match operation:

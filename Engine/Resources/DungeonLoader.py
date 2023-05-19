@@ -10,6 +10,7 @@ try:
     from .AbstractItem import AbstractItem, Item
     from .AbstractRoom import AbstractRoom, Room
     from .AbstractStatusEffect import AbstractStatusEffect, StatusEffect, StatusEffectCause
+    from .StatusEffectManager import StatusEffectManager
     from .AbstractTool import AbstractTool, Tool
     from .AbstractWeapon import AbstractWeapon, Weapon
     from .Functions import LoaderFunction
@@ -40,6 +41,7 @@ except ImportError:
     from AbstractItem import AbstractItem, Item
     from AbstractRoom import AbstractRoom, Room
     from AbstractStatusEffect import AbstractStatusEffect, StatusEffect, StatusEffectCause
+    from StatusEffectManager import StatusEffectManager
     from AbstractTool import AbstractTool, Tool
     from AbstractWeapon import AbstractWeapon, Weapon
     from Functions import LoaderFunction
@@ -91,6 +93,24 @@ class DungeonLoader:
         self.abstract_tools: dict[str, AbstractTool] = {}
         self.abstract_weapons: dict[str, AbstractWeapon] = {}
         self.players = {}
+
+        self.classes = {
+            "Player": Player,
+            "Enemy": Enemy,
+            "Attack": Attack,
+            "Weapon": Weapon,
+            "Armor": Armor,
+            "Ammo": Ammo,
+            "Tool": Tool,
+            "Combat": Combat,
+            "Item": Item,
+            "Room": Room,
+            "Dungeon": Dungeon,
+            "Interactable": Interactable,
+            "StatusEffect": StatusEffect,
+            "StatusEffectCause": StatusEffectCause,
+            "StatusEffectManager": StatusEffectManager
+        }
 
     def evaluateFunction(self, function_memory:FunctionMemory, data:dict):
         val = self._evaluateFunction(function_memory, data)

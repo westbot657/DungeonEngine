@@ -42,6 +42,23 @@ import json
 class Player(Entity):
     _loaded = {}
 
+    class Operation:
+        class _Operation:
+            def __init__(self, name:str):
+                self._name = name
+        
+        class CancelAttack(_Operation):
+            def __init__(self):
+                super().__init__("Cancel Attack")
+        
+        class ForceHit(_Operation):
+            def __init__(self):
+                super().__init__("Force Hit")
+
+        class ForceMiss(_Operation):
+            def __init__(self):
+                super().__init__("Force Miss")
+
     def __init__(self, discord_id:int, name:str, max_health:int, health:int, inventory:Inventory, location:Location, position:Position, _text_pattern_categories:list[str], in_combat:bool):
         self.discord_id = discord_id
         self.name = name

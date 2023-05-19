@@ -60,6 +60,7 @@ class Weapon(GameObject):
     def attackEnemy(self, function_memory:FunctionMemory, enemy):
         ...
         
+        
     def onUse(self, function_memory:FunctionMemory):
         if on_use := self.events.get("on_use", None):
             self.prepFunctionMemory(function_memory)

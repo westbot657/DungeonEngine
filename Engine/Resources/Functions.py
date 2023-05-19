@@ -170,9 +170,6 @@ class Engine_$1(LoaderFunction):
 
 """
 
-
-
-
 ####XXX#############XXX####
 ### XXX Engine Tool XXX####
 ####XXX#############XXX####
@@ -254,6 +251,7 @@ class Engine_Tool_SetName(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 # ^ Tool ^ #
 
 ####XXX###############XXX####
@@ -268,6 +266,7 @@ class Engine_Weapon_GetDurability(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Weapon_SetDurability(LoaderFunction):
     id = Identifier("engine", "Weapon/", "SetDurability")
     @classmethod
@@ -275,6 +274,7 @@ class Engine_Weapon_SetDurability(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Weapon_GetMaxDurability(LoaderFunction):
     id = Identifier("engine", "weapon/", "get_max_durability")
     return_type = int
@@ -283,6 +283,7 @@ class Engine_Weapon_GetMaxDurability(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Weapon_SetMaxDurability(LoaderFunction):
     id = Identifier("engine", "weapon/", "set_max_durability")
     @classmethod
@@ -290,6 +291,7 @@ class Engine_Weapon_SetMaxDurability(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Weapon_GetDamage(LoaderFunction):
     id = Identifier("engine", "weapon/", "get_damage")
     return_type = int
@@ -298,6 +300,7 @@ class Engine_Weapon_GetDamage(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Weapon_SetDamage(LoaderFunction):
     id = Identifier("engine", "weapon/", "set_damage")
     @classmethod
@@ -305,6 +308,7 @@ class Engine_Weapon_SetDamage(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Weapon_GetAmmoType(LoaderFunction):
     id = Identifier("engine", "weapon/", "get_ammo_type")
     return_type = AbstractAmmo
@@ -313,6 +317,7 @@ class Engine_Weapon_GetAmmoType(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Weapon_GetParentType(LoaderFunction):
     id = Identifier("engine", "weapon/", "get_parent_type")
     return_type = AbstractWeapon
@@ -321,6 +326,7 @@ class Engine_Weapon_GetParentType(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 # ^ Weapon ^ #
 
 ####XXX##############XXX####
@@ -335,6 +341,7 @@ class Engine_Armor_GetDurability(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Armor_SetDurability(LoaderFunction):
     id = Identifier("engine", "armor/", "set_durability")
     @classmethod
@@ -342,6 +349,7 @@ class Engine_Armor_SetDurability(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Armor_GetMaxDurability(LoaderFunction):
     id = Identifier("engine", "armor/", "get_max_durability")
     return_type = int
@@ -350,6 +358,7 @@ class Engine_Armor_GetMaxDurability(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Armor_SetMaxDurability(LoaderFunction):
     id = Identifier("engine", "armor/", "set_max_durability")
     @classmethod
@@ -357,6 +366,7 @@ class Engine_Armor_SetMaxDurability(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Armor_GetDamageReduction(LoaderFunction):
     id = Identifier("engine", "armor/", "get_damage_reduction")
     return_type = int
@@ -365,6 +375,7 @@ class Engine_Armor_GetDamageReduction(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Armor_SetDamageReduction(LoaderFunction):
     id = Identifier("engine", "armor/", "set_damage_reduction")
     @classmethod
@@ -372,6 +383,7 @@ class Engine_Armor_SetDamageReduction(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 # ^ Armor ^ #
 
 ####XXX#############XXX####
@@ -386,6 +398,7 @@ class Engine_Ammo_GetCount(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Ammo_SetCount(LoaderFunction):
     id = Identifier("engine", "ammo/", "set_count")
     @classmethod
@@ -393,6 +406,7 @@ class Engine_Ammo_SetCount(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Ammo_GetMaxCount(LoaderFunction):
     id = Identifier("engine", "ammo/", "get_max_count")
     return_type = int
@@ -401,6 +415,7 @@ class Engine_Ammo_GetMaxCount(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Ammo_GetParentType(LoaderFunction):
     id = Identifier("engine", "ammo/", "get_parent_type")
     return_type = AbstractAmmo
@@ -409,6 +424,7 @@ class Engine_Ammo_GetParentType(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Ammo_GetBonusDamage(LoaderFunction):
     id = Identifier("engine", "ammo/", "get_bonus_damage")
     return_type = int
@@ -417,6 +433,7 @@ class Engine_Ammo_GetBonusDamage(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 # ^ Ammo ^ #
 
 ####XXX#####################XXX####
@@ -439,6 +456,7 @@ class Engine_StatusEffect_GetLevel(LoaderFunction):
         if status_effect is not None:
             return status_effect.level
         return default
+
 class Engine_StatusEffect_SetLevel(LoaderFunction):
     id = Identifier("engine", "status_effect/", "set_level")
     @classmethod
@@ -446,6 +464,7 @@ class Engine_StatusEffect_SetLevel(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_StatusEffect_GetDuration(LoaderFunction):
     id = Identifier("engine", "status_effect/", "get_duration")
     return_type = int
@@ -454,6 +473,7 @@ class Engine_StatusEffect_GetDuration(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_StatusEffect_SetDuration(LoaderFunction):
     id = Identifier("engine", "status_effect/", "set_duration")
     @classmethod
@@ -461,6 +481,7 @@ class Engine_StatusEffect_SetDuration(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_StatusEffect_GetName(LoaderFunction):
     id = Identifier("engine", "status_effect/", "get_name")
     return_type = str
@@ -469,6 +490,7 @@ class Engine_StatusEffect_GetName(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_StatusEffect_GetCause(LoaderFunction):
     id = Identifier("engine", "status_effect/", "get_cause")
     @classmethod
@@ -476,6 +498,7 @@ class Engine_StatusEffect_GetCause(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 # ^ Status Effect ^ #
 
 ####XXX#############XXX####
@@ -490,6 +513,7 @@ class Engine_Item_GetCount(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Item_SetCount(LoaderFunction):
     id = Identifier("engine", "item/", "set_count")
     @classmethod
@@ -497,6 +521,7 @@ class Engine_Item_SetCount(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Item_GetMaxCount(LoaderFunction):
     id = Identifier("engine", "item/", "get_max_count")
     return_type = int
@@ -532,6 +557,7 @@ class Engine_Player_GetHealth(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_SetHealth(LoaderFunction):
     id = Identifier("engine", "player/", "set_health")
     @classmethod
@@ -539,6 +565,7 @@ class Engine_Player_SetHealth(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_GetMaxHealth(LoaderFunction):
     id = Identifier("engine", "player/", "get_max_health")
     return_type = int
@@ -547,6 +574,7 @@ class Engine_Player_GetMaxHealth(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_SetMaxHealth(LoaderFunction):
     id = Identifier("engine", "player/", "set_max_health")
     @classmethod
@@ -554,6 +582,7 @@ class Engine_Player_SetMaxHealth(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_AddMaxHealth(LoaderFunction):
     id = Identifier("engine", "player/", "add_max_health")
     @classmethod
@@ -561,6 +590,7 @@ class Engine_Player_AddMaxHealth(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_SubtractMaxHealth(LoaderFunction):
     id = Identifier("engine", "player/", "subtract_max_health")
     @classmethod
@@ -568,6 +598,7 @@ class Engine_Player_SubtractMaxHealth(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_Heal(LoaderFunction):
     id = Identifier("engine", "player/", "heal")
     return_type = int
@@ -582,6 +613,7 @@ class Engine_Player_Heal(LoaderFunction):
     def heal(function_memory:FunctionMemory, amount:int|dict):
         player = function_memory.ref("#player")
         player.addHealth(amount)
+
 class Engine_Player_Damage(LoaderFunction):
     id = Identifier("engine", "player/", "damage")
     @classmethod
@@ -589,6 +621,7 @@ class Engine_Player_Damage(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_GiveObject(LoaderFunction):
     id = Identifier("engine", "player/", "give_object")
     @classmethod
@@ -628,6 +661,7 @@ class Engine_Player_GiveStatusEffect(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_HasStatusEffect(LoaderFunction):
     id = Identifier("engine", "player/", "has_status_effect")
     @classmethod
@@ -635,6 +669,7 @@ class Engine_Player_HasStatusEffect(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_RemoveStatusEffect(LoaderFunction):
     id = Identifier("engine", "player/", "remove_status_effect")
     @classmethod
@@ -642,6 +677,7 @@ class Engine_Player_RemoveStatusEffect(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_GetStatusEffect(LoaderFunction):
     id = Identifier("engine", "player/", "get_status_effect")
     @classmethod
@@ -655,6 +691,7 @@ class Engine_Player_GetStatusEffect(LoaderFunction):
     @staticmethod
     def get_status_effect(function_memory, status_effect, default) -> StatusEffect:
         ...
+
 class Engine_Player_HasItem(LoaderFunction):
     id = Identifier("engine", "player/", "has_item")
     return_type = bool
@@ -663,6 +700,7 @@ class Engine_Player_HasItem(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_RemoveItem(LoaderFunction):
     id = Identifier("engine", "player/", "remove_item")
     @classmethod
@@ -670,6 +708,7 @@ class Engine_Player_RemoveItem(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_GetItem(LoaderFunction):
     id = Identifier("engine", "player/", "get_item")
     return_type = Item
@@ -678,6 +717,7 @@ class Engine_Player_GetItem(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_GetEquippedArmor(LoaderFunction):
     id = Identifier("engine", "player/", "get_equipped_armor")
     return_type = Armor
@@ -686,6 +726,7 @@ class Engine_Player_GetEquippedArmor(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_GetEquippedWeapon(LoaderFunction):
     id = Identifier("engine", "player/", "get_equipped_weapon")
     return_type = Weapon
@@ -694,6 +735,7 @@ class Engine_Player_GetEquippedWeapon(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 class Engine_Player_GetEquippedTool(LoaderFunction):
     id = Identifier("engine", "player/", "get_equipped_tool")
     return_type = Tool
@@ -761,6 +803,39 @@ class Engine_Player_AttackEnemy(LoaderFunction):
     def attack_enemy(function_memory:FunctionMemory, player:Player, enemy:Enemy):
         return player.attackEnemy(function_memory, enemy)
 
+class Engine_Player_CancelAttack(LoaderFunction):
+    id = Identifier("engine", "player/", "cancel_attack")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {}: return cls.cancel_attack
+            case _: return None
+    @staticmethod
+    def cancel_attack(function_memory:FunctionMemory, **kwargs):
+        return Player.Operation.CancelAttack()
+
+class Engine_Player_ForceHit(LoaderFunction):
+    id = Identifier("engine", "player/", "force_hit")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {}: return cls.force_hit
+            case _: return None
+    @staticmethod
+    def force_hit(function_memory:FunctionMemory, **kwargs):
+        return Player.Operation.ForceHit()
+
+class Engine_Player_ForceMiss(LoaderFunction):
+    id = Identifier("engine", "player/", "force_miss")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {}: return cls.force_miss
+            case _: return None
+    @staticmethod
+    def force_miss(function_memory:FunctionMemory, **kwargs):
+        return Player.Operation.ForceMiss()
+
 # ^ Player ^ #
 
 ####XXX##############XXX####
@@ -782,11 +857,56 @@ class Engine_Enemy_AttackPlayer(LoaderFunction):
     def attack_player(function_memory:FunctionMemory, enemy:Enemy, player:Player):
         return enemy.attackPlayer(function_memory, player)
 
+class Engine_Enemy_CancelAttack(LoaderFunction):
+    id = Identifier("engine", "enemy/", "cancel_attack")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        return cls.cancel_attack
+    @staticmethod
+    def cancel_attack(function_memory:FunctionMemory, **kwargs):
+        return Enemy.Operation.CancelAttack()
+
+class Engine_Enemy_SetAttack(LoaderFunction):
+    id = Identifier("engine", "enemy/", "set_attack")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "attack": Attack()|str()
+            }: return cls.set_attack
+            case _: return None
+    @staticmethod
+    def set_attack(function_memory:FunctionMemory, attack:Attack|str):
+        return Enemy.Operation.ChooseAttack(attack)
+
+class Engine_Enemy_ForceHit(LoaderFunction):
+    id = Identifier("engine", "enemy/", "force_hit")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {}: return cls.force_hit
+            case _: return None
+    @staticmethod
+    def force_hit(function_memory:FunctionMemory, **kwargs):
+        return Enemy.Operation.ForceHit()
+
+class Engine_Enemy_ForceMiss(LoaderFunction):
+    id = Identifier("engine", "enemy/", "force_miss")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {}: return cls.force_miss
+            case _: return None
+    @staticmethod
+    def force_miss(function_memory:FunctionMemory, **kwargs):
+        return Enemy.Operation.ForceMiss()
+
 # ^ Enemy ^ #
 
 ####XXX#################XXX####
 ### XXX Engine Location XXX ###
 ####XXX#################XXX####
+
 class Engine_Location_Exists(LoaderFunction):
     id = Identifier("engine", "location/", "exists")
     return_type = bool
@@ -862,7 +982,6 @@ class Engine_Random_Weighted(LoaderFunction):
         result = []
         for roll in rolls:
             result.append(random.choice(weighted_list))
-
 
 class Engine_Random_LootTable(LoaderFunction):
     id = Identifier("engine", "random/", "loot_table")
@@ -1051,7 +1170,6 @@ class Engine_Text_SetCase(LoaderFunction):
             return text.title()
         return text
 
-
 # ^ Text ^ #
 
 
@@ -1228,8 +1346,6 @@ class Engine_List_Builder(LoaderFunction):
         _list = kwargs.get("list")
         return _list # idk if this will work the way I think it will...
 
-
-
 # ^ List ^ #
 
 ####XXX################XXX####
@@ -1271,13 +1387,13 @@ class Engine_Control_Call(LoaderFunction):
             v = e.value or (v if not isinstance(v, _EngineOperation) else None)
         return v
 
-
 # ^ Control ^ #
 
 
 ####XXX##############XXX####
 ### XXX Engine Logic XXX ###
 ####XXX##############XXX####
+
 class Engine_Logic_Compare(LoaderFunction):
     id = Identifier("engine", "logic/", "compare")
     return_type = Tool
@@ -1581,12 +1697,12 @@ class Engine_Logic_Compare(LoaderFunction):
         else:
             return branch
 
-
 # ^ Logic ^ #
 
 ####XXX#############XXX####
 ### XXX Engine Math XXX ###
 ####XXX#############XXX####
+
 class Engine_Math_Solve(LoaderFunction):
     id = Identifier("engine", "math/", "solve")
     return_type = [int, float]
@@ -1707,7 +1823,6 @@ class Engine_Combat_Start(LoaderFunction):
                 function_memory.ref("#player")
             )
 
-
 class Engine_Combat_Trigger(LoaderFunction):
     id = Identifier("engine", "combat/", "trigger")
     @classmethod
@@ -1785,7 +1900,6 @@ class Engine_Combat_Despawn(LoaderFunction):
             return Combat.Operation.Despawn([enemy])
         elif (enemies := kwargs.get("enemies", None)):
             return Combat.Operation.Despawn(enemies)
-        
 
 class Engine_Combat_Message(LoaderFunction):
     id = Identifier("engine", "combat/", "message")
@@ -1797,7 +1911,6 @@ class Engine_Combat_Message(LoaderFunction):
     @staticmethod
     def message(function_memory:FunctionMemory, **kwargs):
         ...
-
 
 # ^ Combat ^ #
 

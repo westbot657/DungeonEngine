@@ -121,7 +121,12 @@ class Enemy(Entity):
                             ev.close()
                             return v
                         case Enemy.Operation.ChooseAttack():
-                            if v.attack in self.attacks:
+                            if isinstance(v.attack, str):
+                                for atk in self.attacks:
+                                    if atk.abstract.identifier.full() == v.attack:
+                                        attack = atk
+                                        break
+                            elif v.attack in self.attacks:
                                 attack = v.attack
                         case Enemy.Operation.ForceHit():
                             hit = True
@@ -138,22 +143,52 @@ class Enemy(Entity):
             if isinstance(e.value, _EngineOperation):
                 yield e.value
             elif isinstance(e.value, Enemy.Operation._Operation):
-                match v:
+                match e.value:
                     case Enemy.Operation.CancelAttack():
                         ev.close()
-                        return v
+                        return e.value
                     case Enemy.Operation.ChooseAttack():
-                        if v.attack in self.attacks:
-                            attack = v.attack
+                        if isinstance(e.value.attack, str):
+                            for atk in self.attacks:
+                                if atk.abstract.identifier.full() == e.value.attack:
+                                    attack = atk
+                                    break
+                        elif e.value.attack in self.attacks:
+                            attack = e.value.attack
                     case Enemy.Operation.ForceHit():
                         hit = True
                     case Enemy.Operation.ForceMiss():
                         hit = False
-                yield v
+                yield e.value
         
-        if hit is None:
+        if hit is False:
+            acc = 0
+        elif hit is True:
+            acc = 100
+        else:
+            acc = None
+        
+        ev = attack.onAttack(function_memory, player, acc)
+        v = None
+        try:
+            v = ev.send(None)
+            while isinstance(v, (_EngineOperation, Enemy.Operation._Operation)):
+                if isinstance(v, Enemy.Operation.CancelAttack):
+                    ev.close()
+                    return v
+                if isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = None
+                    v = ev.send(None)
+        except StopIteration as e:
+            if isinstance(e.value, (_EngineOperation, Enemy.Operation._Operation)):
+                if isinstance(e.value, Enemy.Operation.CancelAttack):
+                    ev.close()
+                    return e.value
+                if isinstance(v, _EngineOperation):
+                    return v
+            return e.value or v
             
-
 
     def onEvent(self, function_memory:FunctionMemory, current_trigger:str, event_name:str):
         for trigger in [current_trigger, "@global", "@required"]:

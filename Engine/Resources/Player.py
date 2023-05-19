@@ -37,7 +37,7 @@ except ImportError:
 
 from typing import Any
 
-import json
+import json, random
 
 class Player(Entity):
     _loaded = {}
@@ -73,6 +73,31 @@ class Player(Entity):
         self.dungeon_data = {}
         self._text_pattern_categories = _text_pattern_categories
         super().__init__(location, position)
+
+    def getLocalVariables(self):
+        d = {
+            ".uid": self.discord_id,
+            ".name": self.name,
+            ".max_health": self.max_health,
+            ".health": self.health,
+            ".inventory": self.inventory,
+            ".status_effects": self.status_effects,
+            ".in_combat": self.in_combat,
+            ".location": self.location
+        }
+        return d
+    
+    def updateLocalVariables(self, locals:dict):
+        ...
+    
+    def prepFunctionMemory(self, function_memory:FunctionMemory):
+        function_memory.addContextData({
+            "#player": self
+        })
+        function_memory.update(self.getLocalVariables())
+
+    def postEvaluate(self, function_memory:FunctionMemory):
+        self.updateLocalVariables(function_memory.symbol_table)
 
     def _getProperty(self, obj, propertyTree:list):
         while propertyTree:
@@ -144,10 +169,37 @@ class Player(Entity):
 
 
     def attackEnemy(self, function_memory:FunctionMemory, enemy):
-        ...
+
+        weapon = self.inventory.getEquipped(Weapon)
+
+        self.prepFunctionMemory(function_memory)
+        function_memory.addContextData({
+            "#enemy": enemy
+        })
+
+        acc = random.randint(0, 100)
+
+        ev = weapon.onAttack(function_memory, enemy, acc)
+        v = None
+        hit = None
+        try:
+            v = ev.send(None)
+            while isinstance(v, (_EngineOperation, Player.Operation._Operation)):
+                if isinstance(v, Player.Operation.CancelAttack):
+                    ev.close()
+                    return v
+                elif isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = None
+                    v = ev.send(None)
+        except StopIteration as e:
+            if isinstance(e.value, Player.Operation.CancelAttack):
+                ev.close()
+                return v
+            return e.value or v
+
     
     def onAttacked(self, function_memory:FunctionMemory, attacker, damage:int):
-        ...
 
         # armor onPlayerHit method
         # status effect onPlayerHit methods

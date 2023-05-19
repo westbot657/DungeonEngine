@@ -173,19 +173,23 @@ class Combat(FunctionalElement):
         self.function_memory.engine.evaluateResult(self.function_memory.engine._default_input_handler, self.function_memory.engine.default_input_handler, op, player_id, text)
 
     def playerAttackEnemy(self, player:Player, enemy:Enemy):
-        ...
+        ev = player.attackEnemy(self.function_memory, enemy)
+        v = None
+        damage = 0
+        try:
+            v = ev.send(None)
+
+        except StopIteration as e:
+            v = e.value or v
 
     def enemyAttackPlayer(self, enemy:Enemy, player:Player):
         ev = enemy.attackPlayer(self.function_memory, player, self.last_trigger)
         v = None
+        damage = 0
         try:
             v = ev.send(None)
-            while isinstance(v, (_EngineOperation, Enemy.Operation._Operation, Player.Operation._Operation)):
+            while isinstance(v, (_EngineOperation, Enemy.Operation._Operation)):
                 if isinstance(v, Enemy.Operation._Operation):
-                    # TODO: use this to store statistics?
-                    v = None
-                    v = ev.send(None)
-                elif isinstance(v, Player.Operation._Operation):
                     # TODO: use this to store statistics?
                     v = None
                     v = ev.send(None)
@@ -199,9 +203,21 @@ class Combat(FunctionalElement):
             elif isinstance(e.value, Enemy.Operation._Operation):
                 # TODO: statistics
                 ...
-            elif isinstance(e.value, Player.Operation._Operation):
+            elif isinstance(e.value, int):
+                damage = e.value
                 # TODO: statistics
-                ...
+
+        ev = player.onAttacked(self.function_memory, enemy, damage)
+        v = None
+        try:
+            v = ev.send(None)
+            while isinstance(v, _EngineOperation):
+                res = yield v
+                v = None
+                v = ev.send(res)
+        except StopIteration as e:
+            if isinstance(e.value, _EngineOperation):
+                return e.value
 
 
     # im okay not implementing these 2 for a while

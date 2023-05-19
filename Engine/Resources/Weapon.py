@@ -15,6 +15,8 @@ except ImportError:
     from FunctionMemory import FunctionMemory
     from EngineOperation import _EngineOperation
 
+import random
+
 class Weapon(GameObject):
     identifier = Identifier("engine", "object/", "weapon")
     def __init__(self, abstract, name:str, damage:DynamicValue, range:DynamicValue, max_durability:int, durability:int, ammo_type, events:dict):
@@ -56,16 +58,18 @@ class Weapon(GameObject):
     
     def postEvaluate(self, function_memory:FunctionMemory):
         self.updateLocalVariables(function_memory.symbol_table)
+        
+    def onAttack(self, function_memory:FunctionMemory, target, acc:int=None):
 
-    def attackEnemy(self, function_memory:FunctionMemory, enemy):
-        ...
-        
-        
-    def onUse(self, function_memory:FunctionMemory):
-        if on_use := self.events.get("on_use", None):
+        if acc is None: acc = random.randint(1, 100)
+
+        damage = self.damage.getNew(function_memory)
+
+
+        if on_attack := self.events.get("on_attack", None):
             self.prepFunctionMemory(function_memory)
 
-            ev = function_memory.generatorEvaluateFunction(on_use)
+            ev = function_memory.generatorEvaluateFunction(on_attack)
             v = None
             try:
                 v = ev.send(None)

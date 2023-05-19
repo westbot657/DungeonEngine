@@ -118,6 +118,7 @@ class Attack(FunctionalElement):
                 v = ev.send(None)
                 while isinstance(v, _EngineOperation):
                     res = yield v
+                    v = None
                     v = ev.send(res)
             except StopIteration as e:
                 v = e.value or (v if not isinstance(v, _EngineOperation) else None)
@@ -142,6 +143,7 @@ class Attack(FunctionalElement):
                 v = ev.send(None)
                 while isinstance(v, _EngineOperation):
                     res = yield v
+                    v = None
                     v = ev.send(res)
             except StopIteration as e:
                 v = e.value or (v if not isinstance(v, _EngineOperation) else None)

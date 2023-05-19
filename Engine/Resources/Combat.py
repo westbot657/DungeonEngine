@@ -129,12 +129,19 @@ class Combat(FunctionalElement):
                 return enemy
 
     def getLocalVariables(self) -> dict:
-        d = {}
+        d = {
+            ".enemies": self.enemies,
+            ".players": self.players,
+            ".current_turn": self.current_turn,
+            ".turn": self.turn,
+            ".last_trigger": self.last_trigger,
+            ".turn_order": self.turn_order
+        }
         return d
 
     def updateLocalVariables(self, locals: dict):
         ...
-    
+
     def prepFunctionMemory(self, function_memory:FunctionMemory):
         function_memory.addContextData({
             "#combat": self
@@ -305,10 +312,34 @@ class Combat(FunctionalElement):
                     ...
                     # TODO: text matching for when it's not a player's turn
 
-
-
             case Combat.Operation._EnemyAttack():
-                ...
+                enemy = operation.enemy
+                player = operation.player
+
+                ev = self.enemyAttackPlayer(enemy, player)
+                v = None
+                try:
+                    v = ev.send(None)
+                    while isinstance(v, _EngineOperation):
+                        res = yield (player.discord_id, v)
+                        v = None
+                        v = ev.send(res)
+                except StopIteration as e:
+                    if isinstance(e.value, _EngineOperation):
+                        res = yield (player.discord_id, e.value)
+                    else:
+                        v = e.value or v # idk why i'm doing this
+                
+                self.current_turn += 1
+                if self.current_turn >= len(self.turn_order):
+                    self.current_turn = 0
+                self.turn = self.turn_order[self.current_turn]
+
+                if isinstance(self.turn, Enemy):
+                    self.scheduled_tasks.append(
+                        Combat.Task(Combat.Operation._EnemyAttack(self.turn, random.choice(self.players)), 10000)
+                    )
+
             case Combat.Operation.Trigger():
                 self.last_trigger = operation.event_name
             case Combat.Operation.Spawn():
@@ -349,6 +380,12 @@ class Combat(FunctionalElement):
                 self.current_turn += 1
                 if self.current_turn >= len(self.turn_order):
                     self.current_turn = 0
+                self.turn = self.turn_order[self.current_turn]
+                
+                if isinstance(self.turn, Enemy):
+                    self.scheduled_tasks.append(
+                        Combat.Task(Combat.Operation._EnemyAttack(self.turn, random.choice(self.players)), 10000)
+                    )
             case _:
                 raise CombatError(f"Unrecognized combat operation: '{operation}'")
         yield (0, EngineOperation.Continue())

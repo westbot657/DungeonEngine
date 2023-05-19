@@ -36,15 +36,15 @@ Dungeons/
 Base JSON values:
 ```json
 {
-  "name": "...",
-  "version": 1.0,
-  "entry_point": "dungeon:rooms/room",
+  "name": <text>,
+  "version": <number>,
+  "entry_point": <room identifier>,
   "events": {
-    "on_enter": {...},
-    "on_exit": {...}
+    "on_enter": {engine code},
+    "on_exit": {engine code}
   }
   "data": {
-    "some_variable": "some value"
+    "<name>": <value>|{boot engine code}
   }
 }
 ```
@@ -54,17 +54,16 @@ More comming soon!
 
 ## Rooms
 
-Base JSON values:
 ```json
 {
-  "name": "<string>",
+  "name": <text>,
   "interactions": [
     // interactions will be explained below
   ],
   "events": {
-    "on_enter": {...},
-    "on_exit": {...},
-    "on_input": {...}
+    "on_enter": {engine code},
+    "on_exit": {engine code},
+    "on_input": {engine code}
   }
 }
 ```
@@ -77,13 +76,13 @@ Door Interaction JSON:
 ```json
 {
   "type": "engine:door",
-  "id": "<string>",
-  "target": "<room identifier>",
-  "travel_message": "<function|string>",
-  "lock_message": "<function|string>",
-  "locked": "<bool>",
-  "open_message": "<function|string>",
-  "disengeage_message": "<function|string>"
+  "id": <text>,
+  "target": <room identifier>,
+  "travel_message": <text>|{engine code},
+  "lock_message": <text>|{engine code},
+  "locked": <boolean>,
+  "open_message": <text>|{engine code},
+  "disengeage_message": <text>|{engine code}
 }
 ```
 
@@ -104,7 +103,7 @@ WIP
   "max_count": <int>,
   "count": <int>|{boot engine code},
   "data": {
-    "<name>: {boot engine code}
+    "<name>": {boot engine code}
   },
   "events": {
     "on_use": {engine code},

@@ -10,9 +10,9 @@ Note: This is going to be a VERY long, detailed, guide to creating a dungeon and
 [StatusEffects](#status-effects)  
 [Enemies](#enemies) | [Attacks](#attacks) | [Entities](#entities) | [Combats](#combats)  
 [Interactable Types](#interactable-types)  
----
-[Engine Code](#engine-code)  
 
+[Engine Code](#engine-code)  
+---
 
 ## File Structure
 ```

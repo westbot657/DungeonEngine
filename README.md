@@ -82,7 +82,7 @@ Door Interaction JSON:
   "lock_message": <text>|{engine code},
   "locked": <boolean>,
   "open_message": <text>|{engine code},
-  "disengeage_message": <text>|{engine code}
+  "disengage_message": <text>|{engine code}
 }
 ```
 

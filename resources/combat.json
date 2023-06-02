@@ -8,28 +8,24 @@
                     "functions": [
                         {
                             "function": "engine:text/match",
-                            "matches": [
-                                {
-                                    "pattern": {
-                                        "function": "engine:text/replace_pattern",
+                            "text": {
+                                "function": "engine:text/replace_pattern",
                                         "text": {
                                             "function": "engine:text/set_case",
                                             "case": "lower",
-                                            "text": {"#ref": "element.name"}
+                                            "text": {"#ref": "#text"}
                                         },
                                         "pattern": " +",
                                         "replacement": " "
+                            },
+                            "matches": [
+                                {
+                                    "pattern": {
+                                        "function": "engine:text/set_case",
+                                        "case": "lower",
+                                        "text": {"#ref": "element.name"}
                                     },
                                     "functions": [
-                                        {
-                                            "function": "engine:text/match",
-                                            "match_type": "find",
-                                            "text": {
-                                                "function": "engine:text/set_case",
-                                                "case": "lower",
-                                                "text": {"#ref": "#text"}
-                                            }
-                                        },
                                         {
                                             "function": "engine:control/break"
                                         }

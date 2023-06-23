@@ -60,7 +60,7 @@ class Engine:
         self.combats: list[Combat] = []
         self.tasks: list[Generator] = []
         self._player_input_categories = ["common", "global", "world"]
-        self._frame_times = []
+        self._frame_times = [1 for _ in range(60)]
         self._frame_start = 0
         self._frame_end = 0
         self.tps = []
@@ -290,7 +290,8 @@ class Engine:
 
             self._frame_end = time.time()
             self._frame_times = self._frame_times[1:] + [self._frame_end - self._frame_start]
-            self.tps = len(self._frame_times)/sum(self._frame_times)
+            if sum(self._frame_times) != 0:
+                self.tps = len(self._frame_times)/sum(self._frame_times)
             self._frame_start = time.time()
 
             #print(f"\033[0F\033[30G{self.tps}\r")

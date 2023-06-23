@@ -4,5 +4,6 @@
         "function": "engine:random/uniform",
         "min": 1,
         "max": 2
-    }
+    },
+    "range": 1
 }

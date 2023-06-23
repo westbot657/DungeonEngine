@@ -31,7 +31,7 @@
                 },
                 {
                     "function": "engine:combat/spawn",
-                    "spawn": [
+                    "enemies": [
                         "zombie1-1",
                         "zombie1-2"
                     ]

@@ -26,7 +26,7 @@ import random, re, json
 
 class Combat(FunctionalElement):
 
-    with open("../resources/combat.json", "r+", encoding="utf-8") as f:
+    with open("./resources/combat.json", "r+", encoding="utf-8") as f:
         _combat_config = json.load(f)
 
     class JoinPriority(Enum):

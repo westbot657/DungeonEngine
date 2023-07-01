@@ -1,8 +1,12 @@
 
 # How to Run the game
-1. make sure you have all the files on your computer with the same file structure as in this repo  
-2. run [DungeonEngine/Engine/ConsoleRunner.py](./Engine/ConsoleRunner.py) from the `DungeonEngine/` parent directory  
-3. I've had it take between 5 seconds and 3 minutes to load all resources, based on what computer I'm using, what apps are open in the background, etc...  
+1. make sure you have all the files on your computer with the same file structure as in this repo
+2. remove all files within [DungeonEngine/Engine/save_data/](./Engine/save_data/)
+3. remove/modify any file contents under the [DungeonEngine/Dungeons/](./Dungeons/) folder (do not change anything in [DungeonEngine/Dungeons/world/](./Dungeons/world/) though, that stuff is important for the Engine to run (see [dungeon building](#dungeon-building) for help on safely modifying the game)
+4. run [DungeonEngine/Engine/ConsoleRunner.py](./Engine/ConsoleRunner.py) from the `DungeonEngine/` parent directory
+5. I've had it take between 5 seconds and 3 minutes to load all resources, based on what computer I'm using, what apps are open in the background, etc...
+6. If you have issues, there's an issues feature here on github, but to be fair, idk how it works, so yeah.
+7. This Engine is still under development, don't expect much to work
 
 
 

@@ -1,4 +1,12 @@
 
+# How to Run the game
+1. make sure you have all the files on your computer with the same file structure as in this repo  
+2. run [DungeonEngine/Engine/ConsoleRunner.py](./Engine/ConsoleRunner.py) from the `DungeonEngine/` parent directory  
+3. I've had it take between 5 seconds and 3 minutes to load all resources, based on what computer I'm using, what apps are open in the background, etc...  
+
+
+
+
 # Dungeon Building  
 
 Note: This is going to be a VERY long, detailed, guide to creating a dungeon and all it's components.  

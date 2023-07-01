@@ -268,6 +268,9 @@ class Engine:
                 #if self.input_queue[player_id][1] == self._default_input_handler:
                 if player_id in self.input_queue:
                     self.input_queue[player_id][2] = ""
+            # case Combat.Operation._Operation():
+            #     print(f"\033[38;2;255;0;0mEngine got Combat Operation: {result}\0")
+
             case _:
                 raise EngineError("Unknown Operation")
 

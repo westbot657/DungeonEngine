@@ -11,6 +11,7 @@ try:
     from .DynamicValue import DynamicValue
     from .Util import Util
     from .Location import Location
+    from .Map import Map
 except ImportError:
     from Dungeon import Dungeon
     from Identifier import Identifier
@@ -22,6 +23,7 @@ except ImportError:
     from DynamicValue import DynamicValue
     from Util import Util
     from Location import Location
+    from Map import Map
 
 
 import glob, json, re
@@ -47,6 +49,9 @@ class AbstractDungeon:
         self.events: dict|None = data.get("events", {})
         self.data: dict = data.get("data", {})
 
+        if map := data.get("map", None): self.map = Map(map)
+        else: self.map = None
+
 
         #room_files: list[str] = glob.glob(f"Dungeons/{self.identifier.name}/rooms/*.json")
 
@@ -55,7 +60,7 @@ class AbstractDungeon:
 
 
     def createInstance(self, function_memory, **override_values):
-        return Dungeon(self,
+        dungeon = Dungeon(self,
             override_values.get("name", self.name),
             self.version,
             Environment(self.environment),
@@ -64,6 +69,8 @@ class AbstractDungeon:
             Util.deepCopy(self.data),
             self.createRooms(function_memory)
         )
+        dungeon.map = self.map
+        return dungeon
 
     @classmethod
     def loadData(cls, engine) -> list:

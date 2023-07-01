@@ -1,5 +1,8 @@
 {
     "@required": {
-        "on_turn": {}
+        "on_turn": {},
+        "on_attacked": {
+            
+        }
     }
 }

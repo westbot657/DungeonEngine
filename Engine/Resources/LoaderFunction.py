@@ -13,6 +13,8 @@ except ImportError:
 
 from typing import Any
 
+import json
+
 class LoaderFunction:
     _functions = {}
     _pre_evaluators = [] # a list of identifiers
@@ -168,7 +170,11 @@ class LoaderFunction:
     @classmethod
     def _call(cls, function_memory, data:dict):
         # check args
-        Log["debug"]["loader function"](f"calling '{cls.__name__}' with data: '{data}'")
+        try:
+            _dat = json.dumps(data, indent=2)
+        except TypeError as e:
+            _dat = str(data)
+        Log["debug"]["loader function"](f"calling '{cls.__name__}' with data:\n{_dat}\n")
         if call := cls.check(function_memory, data):
             return call(function_memory, **data)
         else:

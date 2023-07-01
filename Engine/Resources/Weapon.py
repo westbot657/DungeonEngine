@@ -65,10 +65,13 @@ class Weapon(GameObject):
 
         damage = self.damage.getNew(function_memory)
 
-
+        print("weapon.onAttack() called!")
         if on_attack := self.events.get("on_attack", None):
             self.prepFunctionMemory(function_memory)
-
+            function_memory.update({
+                "damage": damage,
+                "accuracy": acc
+            })
             ev = function_memory.generatorEvaluateFunction(on_attack)
             v = None
             try:
@@ -79,7 +82,13 @@ class Weapon(GameObject):
             except StopIteration as e:
                 v = e.value or (v if not isinstance(v, _EngineOperation) else None)
 
+            damage = int(function_memory.ref("damage"))
+            acc = int(function_memory.ref("accuracy"))
             self.postEvaluate(function_memory)
+        print(f"Weapon onAttack: v:{v}  damage:{damage}  accuracy:{acc}")
+        
+        target.onEvent(function_memory, None, "on_attacked")
+
 
     def onDamage(self, function_memory:FunctionMemory):
         if on_damage := self.events.get("on_damage", None):

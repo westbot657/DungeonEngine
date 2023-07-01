@@ -9,6 +9,10 @@ try:
     from .EngineOperation import EngineOperation, _EngineOperation
     from .TextPattern import TextPattern
     from .Util import Util
+    from .Logger import Log
+    from .Location import Location
+    from .Position import Position
+    from .Map import Map
 except ImportError:
     from AbstractEnemy import AbstractEnemy, Enemy
     from FunctionMemory import FunctionMemory
@@ -18,6 +22,10 @@ except ImportError:
     from EngineOperation import EngineOperation, _EngineOperation
     from TextPattern import TextPattern
     from Util import Util
+    from Logger import Log
+    from Location import Location
+    from Position import Position
+    from Map import Map
 
 from enum import Enum, auto
 
@@ -35,14 +43,15 @@ class Combat(FunctionalElement):
         RANDOM = auto()
 
     class Operation:
-        class _Operation:
+        class _Operation:#(_EngineOperation):
             def __init__(self, name:str, ):
                 self.name = name
         
         class Message(_Operation):
-            def __init__(self, message:str):
+            def __init__(self, message:str, *players):
                 super().__init__("Message")
                 self.message = message
+                self.players = players
 
         class Spawn(_Operation):
             def __init__(self, enemies:list[str], priority):
@@ -106,10 +115,15 @@ class Combat(FunctionalElement):
         def __init__(self, task, delay:int):
             self.task = task
             self.delay = delay
+        
+        def __repr__(self):
+            return f"Combat.Task:[{self.task}]"
 
     def __init__(self, abstract, enemies:list[Enemy], sequence:dict, data:dict):
         self.abstract = abstract
-        self.enemies: list[Enemy] = enemies
+        self.location: Location = None
+        self.abstract_enemies: list[AbstractEnemy] = enemies
+        self.enemies = []
         self.sequence: dict = sequence
         self.data: dict = data
         self.players: list[Player] = []
@@ -123,9 +137,18 @@ class Combat(FunctionalElement):
         self.function_memory = None
         self.combat_config = Util.deepCopy(self._combat_config)
 
-    def getEnemy(self, enemy_id:str):
-        for enemy in self.enemies:
-            if enemy.uid == enemy_id:
+        self._enemies = {}
+
+    def getEnemy(self, function_memory:FunctionMemory, enemy_id:str):
+        if enemy := self._enemies.get(enemy_id, None):
+            return enemy
+        
+        for abstract_enemy in self.abstract_enemies:
+            if abstract_enemy._id == enemy_id:
+                enemy = abstract_enemy.createInstance(function_memory, self.location.copy(), Map.getRandomEnemySpawnPosition(function_memory.engine.loader.getLocation(function_memory, self.location).map))
+                self._enemies.update({enemy_id: enemy})
+                self.enemies.append(enemy)
+                enemy.combat = self
                 return enemy
 
     def getLocalVariables(self) -> dict:
@@ -150,6 +173,9 @@ class Combat(FunctionalElement):
     
     def postEvaluate(self, function_memory:FunctionMemory):
         self.updateLocalVariables(function_memory.symbol_table)
+
+    def addTask(self, task:Operation._Operation, position:int=-1, delay:int=0):
+        self.scheduled_tasks.insert(position, Combat.Task(task, delay))
 
     def addPlayer(self, player:Player):
         player.in_combat = True
@@ -259,6 +285,8 @@ class Combat(FunctionalElement):
                 text = operation.text
                 player = operation.player
                 print(f"combat recieved input '{text}' from {player}")
+
+                Log["debug"]["INFO"](f"Combat data:  turn={self.turn}")
                 
                 res = TextPattern.handleInput(function_memory, player, text, player._text_pattern_categories)
                 #if isinstance(res, Generator):
@@ -342,40 +370,51 @@ class Combat(FunctionalElement):
 
             case Combat.Operation.Trigger():
                 self.last_trigger = operation.event_name
+
             case Combat.Operation.Spawn():
+                print("dungeon spawn enemies?")
                 if operation.priority == Combat.JoinPriority.NEXT:
                     i = 0
                     for enemy_id in operation.enemies:
-                        enemy = self.getEnemy(enemy_id)
+                        enemy = self.getEnemy(function_memory, enemy_id)
                         if enemy not in self.turn_order:
                             self.turn_order.insert(self.current_turn+1+i, enemy)
                             i += 1
                 elif operation.priority == Combat.JoinPriority.LAST:
                     for enemy_id in operation.enemies:
-                        enemy = self.getEnemy(enemy_id)
+                        enemy = self.getEnemy(function_memory, enemy_id)
                         if enemy not in self.turn_order:
                             self.turn_order.insert(self.current_turn, enemy)
                             self.current_turn += 1
                 elif operation.priority == Combat.JoinPriority.RANDOM:
                     for enemy_id in operation.enemies:
                         r = random.randint(1, len(self.turn_order))
-                        enemy = self.getEnemy(enemy_id)
+                        enemy = self.getEnemy(function_memory, enemy_id)
                         if enemy not in self.turn_order:
                             self.turn_order.insert(r, enemy)
                             if r <= self.current_turn:
                                 self.current_turn += 1
+                self.turn = self.turn_order[self.current_turn]
+
             case Combat.Operation.Despawn():
                 for enemy_id in operation.enemies:
-                    enemy = self.getEnemy(enemy_id)
+                    enemy = self.getEnemy(function_memory, enemy_id)
                     if enemy in self.turn_order:
                         i = self.turn_order.index(enemy)
                         self.turn_order.remove(enemy)
                         if i <= self.current_turn:
                             self.current_turn -= 1
-                            self.turn = self.turn_order[self.current_turn]
+                
+                self.turn = self.turn_order[self.current_turn]
+
             case Combat.Operation.Message():
-                for player in self.players:
-                    function_memory.engine.sendOutput(player, operation.message)
+                if operation.players:
+                    for player in operation.players:
+                        function_memory.engine.sendOutput(player, operation.message)
+                else:
+                    for player in self.players:
+                        function_memory.engine.sendOutput(player, operation.message)
+
             case Combat.Operation._NextTurn():
                 self.current_turn += 1
                 if self.current_turn >= len(self.turn_order):
@@ -386,6 +425,7 @@ class Combat(FunctionalElement):
                     self.scheduled_tasks.append(
                         Combat.Task(Combat.Operation._EnemyAttack(self.turn, random.choice(self.players)), 10000)
                     )
+
             case _:
                 raise CombatError(f"Unrecognized combat operation: '{operation}'")
         yield (0, EngineOperation.Continue())
@@ -406,7 +446,6 @@ class Combat(FunctionalElement):
                 if task.delay <= 0:
                     self.scheduled_tasks.remove(task)
                     op = task.task
-                    
                     try:
                         ev = self.handleOperation(function_memory, op)
                         v = None

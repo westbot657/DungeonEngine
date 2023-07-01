@@ -9,6 +9,7 @@ try:
     from .EngineOperation import EngineOperation, _EngineOperation
     from .Location import Location
     from .Environment import Environment
+    from .Map import Map
 except ImportError:
     from FunctionalElement import FunctionalElement
     from DynamicValue import DynamicValue
@@ -18,6 +19,7 @@ except ImportError:
     from EngineOperation import EngineOperation, _EngineOperation
     from Location import Location
     from Environment import Environment
+    from Map import Map
 
 class Room(FunctionalElement):
     def __init__(self, abstract, location:Location, name:str, events:dict, interactions:list[Interactable], environment:Environment):
@@ -28,6 +30,8 @@ class Room(FunctionalElement):
         self.interactions = interactions
         self.environment = environment
         self.players_in_room = []
+
+        self.map: Map = None
 
     def getLocalVariables(self) -> dict:
         l = {

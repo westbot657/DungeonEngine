@@ -15,6 +15,7 @@ try:
     from .EngineOperation import EngineOperation, _EngineOperation
     from .EngineErrors import EngineError, EngineBreak
     from .Location import Location
+    from .Map import Map
 except ImportError:
     from FunctionalElement import FunctionalElement
     from FunctionMemory import FunctionMemory
@@ -30,6 +31,7 @@ except ImportError:
     from EngineOperation import EngineOperation, _EngineOperation
     from EngineErrors import EngineError, EngineBreak
     from Location import Location
+    from Map import Map
 
 from typing import Generator
 
@@ -46,6 +48,8 @@ class Dungeon(FunctionalElement):
         self.events = events
         self.data = data
         self.rooms = rooms
+
+        self.map: Map = None
 
     def getLocalVariables(self) -> dict:
         d = {

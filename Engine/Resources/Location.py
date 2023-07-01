@@ -45,6 +45,17 @@ class Location:
     def __repr__(self):
         return self.full()
 
+    def __dict__(self):
+        return {
+            "%ENGINE:DATA-TYPE%": "Location",
+            "dungeon": self.dungeon,
+            "room_path": self.room_path,
+            "room": self.room
+        }
+
+    def copy(self):
+        return Location(self.dungeon, self.room_path, self.room)
+
     @classmethod
     def fromString(cls, location:str):
         if isinstance(location, Location): return location

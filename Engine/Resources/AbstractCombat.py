@@ -7,6 +7,9 @@ try:
     from .EngineErrors import CombatError
     from .Util import Util
     from .AbstractEnemy import AbstractEnemy, Enemy
+    from .Location import Location
+    from .Position import Position
+    from .Logger import Log
 except ImportError:
     from Combat import Combat
     from Identifier import Identifier
@@ -14,6 +17,9 @@ except ImportError:
     from EngineErrors import CombatError
     from Util import Util
     from AbstractEnemy import AbstractEnemy, Enemy
+    from Location import Location
+    from Position import Position
+    from Logger import Log
 
 import glob, json, re
 
@@ -29,25 +35,47 @@ class AbstractCombat:
         self.sequence: dict = data.get("sequence", {})
         self.data: dict = data.get("data", {})
 
-    def getEnemies(self, function_memory:FunctionMemory) -> list:
-        _unknown = []
-        abstracts = {}
+    def getEnemies(self, function_memory:FunctionMemory) -> list[AbstractEnemy]:
+        
+        enemies = []
         for enemy in self.enemies:
             if isinstance(enemy, str):
                 abstract:AbstractEnemy = AbstractEnemy.getFromIdentifier(enemy)
-                _unknown.append(abstract)
+                enemies.append(abstract)
+
             elif isinstance(enemy, dict):
+
                 if any(k in enemy for k in ["function", "functions", "@check", "#ref", "#call"]):
+                    Log["warning"]["abstract combat"][f"cannot load abstract enemy from data: '{enemy}'"]
                     res = function_memory.evaluateFunction(enemy)
                     if isinstance(res, Enemy):
                         pass
+                    elif isinstance(res, list):
+                        for r in res:
+                            pass
+                
+                else:
+                    identifier = Identifier("<combat>", "", "")
+                    e = AbstractEnemy(identifier, enemy)
+                    e.linkParent()
+                    identifier.path = id(self)
+                    identifier.name = e.name
+
+                    enemies.append(e)
+        
+        return enemies
+        
 
     def createInstance(self, function_memory:FunctionMemory, **override_values):
-        return Combat(self,
+        combat = Combat(self,
             self.getEnemies(function_memory),
             Util.deepCopy(self.sequence),
             Util.deepCopy(self.data)
         )
+
+        combat.location = function_memory.ref("#room").location.copy()
+
+        return combat
 
     @classmethod
     def getCombat(cls, function_memory:FunctionMemory, combat_id:str|Identifier):

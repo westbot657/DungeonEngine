@@ -131,7 +131,7 @@ class AbstractAttack(AbstractGameObject):
                 Log["ERROR"]["loadup"]["abstract"]["attack"](f"parent does not exist: '{p}'")
 
         Log["loadup"]["abstract"]["attack"]("verifying AbstractAttack completion...")
-        Log.track(len(cls._loaded), "loadup", "abtract", "attack")
+        Log.track(len(cls._loaded), "loadup", "abstract", "attack")
         for l, o in cls._loaded.copy().items():
             l: str
             o: AbstractAttack

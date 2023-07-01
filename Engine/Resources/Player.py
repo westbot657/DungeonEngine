@@ -170,7 +170,7 @@ class Player(Entity):
 
     def attackEnemy(self, function_memory:FunctionMemory, enemy):
 
-        weapon = self.inventory.getEquipped(Weapon)
+        weapon: Weapon = self.inventory.getEquipped(Weapon)
 
         self.prepFunctionMemory(function_memory)
         function_memory.addContextData({
@@ -182,6 +182,7 @@ class Player(Entity):
         ev = weapon.onAttack(function_memory, enemy, acc)
         v = None
         hit = None
+        print("player.attackEnemy() called!")
         try:
             v = ev.send(None)
             while isinstance(v, (_EngineOperation, Player.Operation._Operation)):
@@ -196,7 +197,9 @@ class Player(Entity):
             if isinstance(e.value, Player.Operation.CancelAttack):
                 ev.close()
                 return v
+            print(f"Player attack: {e.value=}  {v=}")
             return e.value or v
+
 
     
     def onAttacked(self, function_memory:FunctionMemory, attacker, damage:int):
@@ -284,6 +287,17 @@ class Player(Entity):
             Log["loadup"]["player"]("player instance created")
         Log["loadup"]["player"](f"Loaded players: {cls._loaded}")
         return cls._loaded
+
+    def __dict__(self):
+        return {
+            "%ENGINE:DATA-TYPE": "Player",
+            "id": self.discord_id,
+            "name": self.name,
+            "health": self.health,
+            "max_health": self.max_health,
+            "location": dict(self.location),
+            "position": dict(self.position)
+        }
 
     @classmethod
     def saveData(cls, engine):

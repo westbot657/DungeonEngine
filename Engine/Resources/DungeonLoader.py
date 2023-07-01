@@ -141,6 +141,10 @@ class DungeonLoader:
                     return True
         return False
 
+    def stopIterationEval(self, e_value, v):
+        # or (isinstance(v, Combat.Operation._Operation)
+        return e_value or (v if not isinstance(v, _EngineOperation) else None)
+
     def generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
         ev = self._generatorEvaluateFunction(function_memory, data)
         v = None
@@ -150,7 +154,7 @@ class DungeonLoader:
                 res = yield v
                 v = ev.send(res)
         except StopIteration as e:
-            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            v = self.stopIterationEval(e.value, v)
         return v
 
     def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict, prepEval:bool=False):
@@ -165,11 +169,11 @@ class DungeonLoader:
                     v = None
                     try:
                         v = ev.send(None)
-                        while isinstance(v, _EngineOperation):
+                        while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                        v = self.stopIterationEval(e.value, v)
                     if v: result = v
                 return result
             elif (func := data.get("function", None)) is not None:
@@ -190,7 +194,7 @@ class DungeonLoader:
                                     v = ev.send(res)
                             except StopIteration as e:
                                 #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
-                                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                                v = self.stopIterationEval(e.value, v)
                             args.update({key: v})
                         else:
                             args.update({key: item})
@@ -199,12 +203,16 @@ class DungeonLoader:
                         v = None
                         try:
                             v = r.send(None)
-                            while isinstance(v, _EngineOperation):
+                            while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
                                 res = yield v
                                 v = r.send(res)
                         except StopIteration as e:
-                            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                            v = self.stopIterationEval(e.value, v)
                         res = v
+                    elif isinstance(r, Combat.Operation._Operation):
+                        print(f"\033[38;2;255;0;0mCOMBAT TASK FROM FUNCTION!\033[0m")
+                        yield r
+                        return
                     else:
                         res = r
                     if var := data.get("#store", None):
@@ -236,21 +244,21 @@ class DungeonLoader:
                         v = None
                         try:
                             v = ev.send(None)
-                            while isinstance(v, _EngineOperation):
+                            while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
                                 res = yield v
                                 v = ev.send(res)
                         except StopIteration as e:
-                            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                            v = self.stopIterationEval(e.value, v)
                         _func_mem.update({key: v})
                 ev = _func_mem.call(func_name)
                 v = None
                 try:
                     v = ev.send(None)
-                    while isinstance(v, _EngineOperation):
+                    while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
                         res = yield v
                         v = ev.send(res)
                 except StopIteration as e:
-                    v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                    v = self.stopIterationEval(e.value, v)
                 if (store := data.get("#store", None)) is not None:
                     function_memory.update({
                         store: v
@@ -269,11 +277,11 @@ class DungeonLoader:
                             v = None
                             try:
                                 v = ev.send(None)
-                                while isinstance(v, _EngineOperation):
+                                while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
                                     res = yield v
                                     v = ev.send(res)
                             except StopIteration as e:
-                                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                                v = self.stopIterationEval(e.value, v)
                             function_memory.store(key, v)
             elif (store := data.get("#store-player", None)) is not None:
                 if isinstance(store, dict):
@@ -286,33 +294,33 @@ class DungeonLoader:
                 v = None
                 try:
                     v = ev.send(None)
-                    while isinstance(v, _EngineOperation):
+                    while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
                         res = yield v
                         v = ev.send(res)
                 except StopIteration as e:
-                    v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                    v = self.stopIterationEval(e.value, v)
                 res = v
                 if res and ((true_branch := data.get("true", None)) is not None):
                     ev = self._generatorEvaluateFunction(function_memory, true_branch)
                     v = None
                     try:
                         v = ev.send(None)
-                        while isinstance(v, _EngineOperation):
+                        while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                        v = self.stopIterationEval(e.value, v)
                     return v
                 elif (false_branch := data.get("false", None)) is not None:
                     ev = self._generatorEvaluateFunction(function_memory, false_branch)
                     v = None
                     try:
                         v = ev.send(None)
-                        while isinstance(v, _EngineOperation):
+                        while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                        v = self.stopIterationEval(e.value, v)
                     return v
                 else:
                     return None
@@ -323,11 +331,11 @@ class DungeonLoader:
                     v = None
                     try:
                         v = ev.send(None)
-                        while isinstance(v, _EngineOperation):
+                        while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                        v = self.stopIterationEval(e.value, v)
                     dat.update({key: v})
                 return dat
         elif isinstance(data, list):
@@ -337,11 +345,11 @@ class DungeonLoader:
                 v = None
                 try:
                     v = ev.send(None)
-                    while isinstance(v, _EngineOperation):
+                    while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
                         res = yield v
                         v = ev.send(res)
                 except StopIteration as e:
-                    v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                    v = self.stopIterationEval(e.value, v)
                 dat.append(v)
             return dat
         else:
@@ -540,25 +548,25 @@ class DungeonLoader:
             case Environment(): ...
             case Identifier():
                 return {
-                    "%ENGINE:DATA-TYPE%": "identifier",
+                    "%ENGINE:DATA-TYPE%": "Identifier",
                     "value": obj.full()
                 }
             case Interactable(): ...
             case Item(): ...
             case Location():
                 return {
-                    "%ENGINE:DATA-TYPE%": "location",
+                    "%ENGINE:DATA-TYPE%": "Location",
                     "value": obj.full()
                 }
             case LootTable(): ...
             case Player():
                 return {
-                    "%ENGINE:DATA-TYPE%": "player",
+                    "%ENGINE:DATA-TYPE%": "Player",
                     "id": obj.discord_id
                 }
             case Position():
                 return {
-                    "%ENGINE:DATA-TYPE%": "position",
+                    "%ENGINE:DATA-TYPE%": "Position",
                     "x": obj.x,
                     "y": obj.y
                 }

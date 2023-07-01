@@ -122,7 +122,7 @@ class FunctionMemory:
                 res = yield v
                 v = ev.send(res)
         except StopIteration as e:
-            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            v = self.engine.loader.stopIterationEval(e.value, v)
         return v
 
     def call2(self, name:str):

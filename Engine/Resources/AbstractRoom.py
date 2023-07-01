@@ -11,6 +11,7 @@ try:
     from .DynamicValue import DynamicValue
     from .Location import Location
     from .Environment import Environment
+    from .Map import Map
 except ImportError:
     from Room import Room
     from Identifier import Identifier
@@ -22,6 +23,7 @@ except ImportError:
     from DynamicValue import DynamicValue
     from Location import Location
     from Environment import Environment
+    from Map import Map
 
 import glob, json, re
 
@@ -44,6 +46,9 @@ class AbstractRoom:
         self.interactions: list = data.get("interactions", [])
 
         self.is_template: bool = data.get("template", False)
+
+        if map := data.get("map", None): self.map = Map(map)
+        else: self.map = None
 
     def _set_parent(self, parent):
         self.parent = parent
@@ -101,13 +106,15 @@ class AbstractRoom:
 
 
     def createInstance(self, function_memory:FunctionMemory, **override_values):
-        return Room(self,
+        room = Room(self,
             Location.fromString(self.identifier.full()),
             override_values.get("name", self.getName()),
             self.getEvents(),
             self.getInteractions(function_memory),
             Environment(self.environment)
         )
+        room.map = self.map
+        return room
 
     @classmethod
     def getDungeonAbstractRooms(cls, function_memory:FunctionMemory, dungeon_name:str):

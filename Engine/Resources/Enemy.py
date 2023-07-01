@@ -57,6 +57,8 @@ class Enemy(Entity):
         super().__init__(location, position)
         self.events: dict[str, dict] = {}
 
+        self.combat = None
+
     def getLocalVariables(self) -> dict:
         d = {
             ".name": self.name,
@@ -188,9 +190,19 @@ class Enemy(Entity):
                 if isinstance(v, _EngineOperation):
                     return v
             return e.value or v
-            
+    
+    def damage(self, function_memory:FunctionMemory, amount:int):
+        ...
+    
+    def heal(self, function_memory:FunctionMemory, amount:int):
+        ...
+    
+    def kill(self, function_memory:FunctionMemory):
+        ...
 
     def onEvent(self, function_memory:FunctionMemory, current_trigger:str, event_name:str):
+        if current_trigger is None and self.combat is not None:
+            current_trigger = self.combat.last_trigger
         for trigger in [current_trigger, "@global", "@required"]:
             if trigger in self.events:
                 if (event := self.events[trigger].get(event_name, None)):

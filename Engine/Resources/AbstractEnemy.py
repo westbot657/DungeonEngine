@@ -10,6 +10,7 @@ try:
     from .Logger import Log
     from .Position import Position
     from .Location import Location
+    from .FunctionMemory import FunctionMemory
 except ImportError:
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
@@ -20,6 +21,7 @@ except ImportError:
     from Logger import Log
     from Position import Position
     from Location import Location
+    from FunctionMemory import FunctionMemory
 
 import glob, json, re
 
@@ -55,6 +57,7 @@ class AbstractEnemy:
         self.max_health: int|None = data.get("max_health", None)
         self.health: int|None = data.get("health", self.max_health)
         self.attacks: list = data.get("attacks", [])
+        self._id = data.get("id", None)
     
         self.is_template: bool = data.get("template", False)
     
@@ -127,7 +130,7 @@ class AbstractEnemy:
 
         return out
 
-    def createInstance(self, function_memory, location:Location, position:Position, **override_values) -> Enemy:
+    def createInstance(self, function_memory:FunctionMemory, location:Location, position:Position, **override_values) -> Enemy:
         return Enemy(self,
             override_values.get("name", self.getName()),
             override_values.get("max_health", self.getMaxHealth()),
@@ -145,6 +148,28 @@ class AbstractEnemy:
             return abstract
     
         raise InvalidObjectError(f"No Abstract Enemy exists with id: '{identifier}'")
+
+    @classmethod
+    def loadFromDict(cls, data:dict):
+        ...
+
+    def linkParent(self):
+
+        if not AbstractEnemy._link_parents:
+            return
+
+        _, parent = AbstractEnemy._link_parents.pop()
+        self._set_parent(AbstractEnemy._loaded.get(parent))
+
+        try:
+            self.getName()
+            self.getMaxHealth()
+            self.getHealth()
+            self.getAttacks()
+        except InvalidObjectError as err:
+            print(f"Failed to load enemy: {self.identifier}  {err}")
+        
+        AbstractEnemy._link_parents.clear()
 
     @classmethod
     def loadData(cls, engine:Engine) -> list:

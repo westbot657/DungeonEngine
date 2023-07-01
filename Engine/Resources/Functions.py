@@ -901,6 +901,62 @@ class Engine_Enemy_ForceMiss(LoaderFunction):
     def force_miss(function_memory:FunctionMemory, **kwargs):
         return Enemy.Operation.ForceMiss()
 
+class Engine_Enemy_SetHealth(LoaderFunction):
+    id = Identifier("engine", "enemy/", "set_health")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "enemy": Enemy(),
+                "health": int()
+            }: return cls.set_health
+            case _: return None
+    @staticmethod
+    def set_health(function_memory:FunctionMemory, enemy:Enemy, health:int):
+        ...
+
+class Engine_Enemy_Heal(LoaderFunction):
+    id = Identifier("engine", "enemy/", "heal")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "enemy": Enemy(),
+                "amount": int()
+            }: return cls.heal
+            case _: return None
+    @staticmethod
+    def heal(function_memory:FunctionMemory, enemy:Enemy, amount:int):
+        ...
+
+class Engine_Enemy_Damage(LoaderFunction):
+    id = Identifier("engine", "enemy/", "damage")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "enemy": Enemy(),
+                "amount": int()
+            }: return cls.damage
+            case _: return None
+    @staticmethod
+    def damage(function_memory:FunctionMemory, enemy:Enemy, amount:int):
+        enemy.damage(function_memory, amount)
+
+class Engine_Enemy_SetMaxHealth(LoaderFunction):
+    id = Identifier("engine", "enemy/", "set_max_health")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "enemy": Enemy(),
+                "max_health": int()
+            }: return cls.set_max_health
+            case _: return None
+    @staticmethod
+    def set_max_health(function_memory:FunctionMemory, enemy:Enemy, max_health:int):
+        ...
+
 # ^ Enemy ^ #
 
 ####XXX#################XXX####
@@ -1260,8 +1316,8 @@ class Engine_List_ForEach(LoaderFunction):
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
             case {
-                "list": list(),
-                "run": list()
+                "list": list()|dict(),
+                "run": dict()
             }:
                 return cls.for_each
             case _: return None
@@ -1269,7 +1325,12 @@ class Engine_List_ForEach(LoaderFunction):
     @staticmethod
     def for_each(function_memory:FunctionMemory, **args):
 
-        lst: list = args.get("list")
+        lst: list|dict = args.get("list")
+
+        if isinstance(lst, dict):
+            lst = function_memory.evaluateFunction(lst)
+
+
         func: dict = args.get("run")
         for l in lst:
 
@@ -1384,7 +1445,7 @@ class Engine_Control_Call(LoaderFunction):
                 res = yield v
                 v = ev.send(res)
         except StopIteration as e:
-            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            v = function_memory.engine.loader.stopIterationEval(e.value, v)
         return v
 
 # ^ Control ^ #
@@ -1835,7 +1896,7 @@ class Engine_Combat_Trigger(LoaderFunction):
     @staticmethod
     def trigger(function_memory:FunctionMemory, **kwargs):
         trig_f = kwargs.get("trigger")
-
+        combat: Combat = function_memory.ref("#combat")
         ev = function_memory.generatorEvaluateFunction(trig_f)
         trig = None
         try:
@@ -1846,7 +1907,7 @@ class Engine_Combat_Trigger(LoaderFunction):
         except StopIteration as e:
             trig = e.value or (trig if not isinstance(trig, _EngineOperation) else None)
 
-        return Combat.Operation.Trigger(trig)
+        combat.addTask(Combat.Operation.Trigger(trig))
 
 class Engine_Combat_UniqueName(LoaderFunction):
     id = Identifier("engine", "combat/", "unique_name")
@@ -1869,7 +1930,7 @@ class Engine_Combat_NumberedName(LoaderFunction):
             case _: return None
     @staticmethod
     def numbered_name(function_memory:FunctionMemory, **kwargs):
-        ...
+        return Combat.Operation.NumberedName()
 
 class Engine_Combat_Spawn(LoaderFunction):
     id = Identifier("engine", "combat/", "spawn")
@@ -1882,10 +1943,11 @@ class Engine_Combat_Spawn(LoaderFunction):
     def spawn(function_memory:FunctionMemory, **kwargs):
         priority = kwargs.get("priority", "last")
         priority = Combat.JoinPriority.RANDOM if priority == "random" else Combat.JoinPriority.NEXT if priority == "next" else Combat.JoinPriority.LAST
+        combat: Combat = function_memory.ref("#combat")
         if (enemy := kwargs.get("enemy", None)):
-            return Combat.Operation.Spawn([enemy], priority)
+            combat.addTask(Combat.Operation.Spawn([enemy], priority))
         elif (enemies := kwargs.get("enemies", None)):
-            return Combat.Operation.Spawn(enemies, priority)
+            combat.addTask(Combat.Operation.Spawn(enemies, priority))
 
 class Engine_Combat_Despawn(LoaderFunction):
     id = Identifier("engine", "combat/", "despawn")
@@ -1896,10 +1958,11 @@ class Engine_Combat_Despawn(LoaderFunction):
         return None
     @staticmethod
     def despawn(function_memory:FunctionMemory, **kwargs):
+        combat: Combat = function_memory.ref("#combat")
         if (enemy := kwargs.get("enemy", None)):
-            return Combat.Operation.Despawn([enemy])
+            combat.addTask(Combat.Operation.Despawn([enemy]))
         elif (enemies := kwargs.get("enemies", None)):
-            return Combat.Operation.Despawn(enemies)
+            combat.addTask(Combat.Operation.Despawn(enemies))
 
 class Engine_Combat_Message(LoaderFunction):
     id = Identifier("engine", "combat/", "message")
@@ -1910,7 +1973,12 @@ class Engine_Combat_Message(LoaderFunction):
             case _: return None
     @staticmethod
     def message(function_memory:FunctionMemory, **kwargs):
-        ...
+        if "players" in kwargs: players = kwargs.get("players")
+        elif "player" in kwargs: players = (kwargs.get("player"),)
+        else: players = tuple()
+        
+        combat: Combat = function_memory.ref("#combat")
+        combat.addTask(Combat.Operation.Message(kwargs.get("message"), *players))
 
 # ^ Combat ^ #
 

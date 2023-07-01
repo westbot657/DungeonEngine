@@ -12,5 +12,15 @@ class Position(FunctionalElement):
         self.x = x
         self.y = y
     
+    def copy(self):
+        return Position(self.x, self.y)
+
+    def __dict__(self):
+        return {
+            "%ENGINE:DATA-TYPE%": "Position",
+            "x": self.x,
+            "y": self.y
+        }
+
     def _get_save(self, function_memory):
         return [self.x, self.y]

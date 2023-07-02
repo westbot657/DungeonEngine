@@ -3,9 +3,11 @@
 try:
     from .EngineErrors import FunctionCallError, ParseError, IdentifierError
     from .Identifier import Identifier
+    from .GameObject import GameObject
 except ImportError:
     from EngineErrors import FunctionCallError, ParseError, IdentifierError
     from Identifier import Identifier
+    from GameObject import GameObject
 
 import json, re
 
@@ -95,16 +97,17 @@ class ConsoleCommand:
         for arg, con in arg_tree.items():
             arg: str
             con: dict|None
-            arg_name, arg_types = arg.split(":")
-            arg_types = arg_types.split("|")
+            arg_name, arg_types = arg.split(":", 1)
+            arg_types = arg_types.strip().split("|")
             for tp in arg_types:
+                tp = tp.strip()
                 try:
                     match tp:
-                        case "str":
+                        case "engine:str":
                             string, other = cls._parse_string(text)
                             text = other
                             args.append(string)
-                        case "int":
+                        case "engine:int":
                             n, other = text.split(" ", 1)
                             if re.match(r"(\d+|0[Bb][01_]+|0[Oo][0-7_]+|0[Xx][a-fA-F0-9_]+)", n):
                                 if "__" in n: raise ParseError("numbers can only have up to 1 '_' between numeric characters")
@@ -112,7 +115,7 @@ class ConsoleCommand:
                                 text = other
                             else:
                                 raise ParseError("expected 'int'")
-                        case "float":
+                        case "engine:float":
                             n, other = text.split(" ", 1)
                             if re.match(r"[0-9_]+\.[0-9_]+", n):
                                 if "__" in n: raise ParseError("numbers can only have up to 1 '_' between numeric characters")
@@ -120,7 +123,7 @@ class ConsoleCommand:
                                 text = other
                             else:
                                 raise ParseError("expected 'float'")
-                        case "bool":
+                        case "engine:bool":
                             n, other = text.split(" ", 1)
                             if n == "true":
                                 args.append(True)
@@ -128,7 +131,7 @@ class ConsoleCommand:
                                 args.append(False)
                             else:
                                 raise ParseError("expected 'true' or 'false'")
-                        case "dict" | "list":
+                        case "engine:dict" | "engine:list":
                             s = text
                             out = None
                             while out is None:
@@ -141,30 +144,34 @@ class ConsoleCommand:
                                             s = s[0:col].strip()
                                         else:
                                             raise e
-                        case "engine:ammo":
+                        case "engine:Ammo":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_ammo.get(n, None):
                                 return a
-                        case "engine:armor":
+                        case "engine:Armor":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_armor.get(n, None):
                                 return a
-                        case "engine:attack":
+                        case "engine:Attack":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_attacks.get(n, None):
                                 return a
-                        case "engine:item":
+                        case "engine:Item":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_items.get(n, None):
                                 return a
-                        case "engine:tool":
+                        case "engine:Tool":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_tools.get(n, None):
                                 return a
-                        case "engine:weapon":
+                        case "engine:Weapon":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_weapons.get(n, None):
                                 return a
+                        case "engine:GameObjectType":
+                            n, other = text.split(" ", 1)
+
+
                         case _:
                             raise FunctionCallError(f"unrecognized value type: '{tp}'")
                     if con is None:

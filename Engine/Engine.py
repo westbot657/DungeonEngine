@@ -312,7 +312,6 @@ class Engine:
 
             #print(f"\033[0F\033[30G{self.tps}\r")
 
-
             if not self.running:
                 # Pause Menu thingy?
                 continue
@@ -383,7 +382,6 @@ class Engine:
                         if isinstance(e.value, _EngineOperation):
                             self.evaluateResult(self._default_input_handler, self.default_input_handler, e.value, player_id, text)
 
-
                     if isinstance(response_handler, Generator):
                         if not Util.generator_started(response_handler):
                             result = response_handler.send(None)
@@ -416,7 +414,7 @@ class Engine:
                             except EngineError as e:
                                 print(e)
                             continue
-                            
+
                     elif isinstance(response_handler, Callable):
                         result = response_handler(self, player_id, text)
                         if isinstance(result, Generator):

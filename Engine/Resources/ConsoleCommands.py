@@ -14,9 +14,9 @@ except ImportError:
 @ConsoleCommand(
     Identifier("engine", "", "new-player"),
     {
-        "player_id:int": {
-            "max_health:int": {
-                "name:str": None
+        "player_id: engine:int": {
+            "max_health: engine:int": {
+                "name: enigne:str": None
             }
         }
     }
@@ -28,7 +28,7 @@ def engine_NewPlayer(function_memory, player_id, max_health, name):
 @ConsoleCommand(
     Identifier("engine", "", "run-function"),
     {
-        "function:dict": None
+        "function: engine:dict": None
     }
 )
 def engine_runFunction(function_memory, function):
@@ -38,9 +38,9 @@ def engine_runFunction(function_memory, function):
 @ConsoleCommand(
     Identifier("engine", "", "give"),
     {
-        "target:Player": {
-            "objectType:GameObjectType": {
-                "gameObject:str": None
+        "target: engine:Player": {
+            "objectType: engine:GameObjectType": {
+                "gameObject: engine:str": None
             }
         }
     }

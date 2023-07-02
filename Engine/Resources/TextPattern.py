@@ -42,6 +42,7 @@ class TextPattern:
     @classmethod
     def handleInput(cls, function_memory, player, text:str, categories:list[str]=None):
         if not categories: categories = ["default"]
+        ret = None
         for pattern in cls._patterns:
             pattern: TextPattern
             if not any(c in pattern.categories for c in categories):

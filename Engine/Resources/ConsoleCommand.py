@@ -22,8 +22,9 @@ class ConsoleCommand:
         ConsoleCommand._commands.update({self.identity.full(): self})
 
     def call(self, function_memory, *args):
-        raise FunctionCallError(f"Command: '{self.identity.full()}' is not properly defined")
-
+        if not self.command_exec:
+            raise FunctionCallError(f"Command: '{self.identity.full()}' is not properly defined")
+        return self.command_exec(function_memory, *args)
     @classmethod
     def _parse_string(cls, text:str) -> tuple[str, str]:
         string = ""
@@ -37,7 +38,7 @@ class ConsoleCommand:
                     string += m.group()
                     text = text[2:]
                 elif text[0] == quote:
-                    string += quote
+                    # string += quote
                     text = text[1:]
                     return string, text.strip()
                 else:
@@ -179,6 +180,7 @@ class ConsoleCommand:
 
     def _run(self, function_memory, text:str):
         args = ConsoleCommand._parse_args(function_memory, self.args, text)
+        return self.call(function_memory, *args)
 
 
     @classmethod
@@ -191,6 +193,7 @@ class ConsoleCommand:
 
         if command := cls._commands.get(cmd, None):
             #try:
+            print(f"Running command {command}")
             command._run(function_memory, text)
             #except Exception as e:
             #    print(e, e.args)

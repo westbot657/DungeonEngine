@@ -31,6 +31,7 @@ from Resources.EngineOperation      import EngineOperation, _EngineOperation, Op
 from Resources.EngineErrors         import EngineError, EngineBreak
 from Resources.Util                 import Util
 from Resources.ConsoleCommands      import ConsoleCommand # import the base class through the file that adds sub classes
+from Resources.Position             import Position
 
 from threading import Thread
 
@@ -95,7 +96,19 @@ class Engine:
 
     def loadGame(self):
         self.loader.loadGame(self)
+
+        # self.engine_player = Player(
+        #     0,
+        #     "EnginePlayer",
+        #     -1, 0,
+        #     Inventory(self._function_memory, []),
+        #     Location("world", "rooms/", "start"),
+        #     Position(0, 0),
+        #     ["%commands%"],
+        #     False
+        # )
         self.players = self.loader.players
+        # self.players.update({0: self.engine_player})
 
     def saveGame(self):
         self.loader.saveGame(self)
@@ -342,6 +355,12 @@ class Engine:
                 response_handler: Generator|Callable
                 player_id: int
                 text: str
+
+                if player_id == 0:
+                    if text:
+                        self.input_queue.update({0: [self._default_input_handler, self.default_input_handler, ""]})
+                        ConsoleCommand.handle_input(self._function_memory, text)
+                    continue
 
                 player: Player = Player.getPlayer(player_id)
                 if text:

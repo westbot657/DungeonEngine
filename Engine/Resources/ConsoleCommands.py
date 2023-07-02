@@ -22,7 +22,7 @@ except ImportError:
     }
 )
 def engine_NewPlayer(function_memory, player_id, max_health, name):
-    ...
+    Player.newPlayer(function_memory, player_id, name, max_health)
 
 
 @ConsoleCommand(

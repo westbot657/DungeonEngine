@@ -74,6 +74,22 @@ class Player(Entity):
         self._text_pattern_categories = _text_pattern_categories
         super().__init__(location, position)
 
+    @classmethod
+    def newPlayer(cls, function_memory:FunctionMemory, discord_id:int, name:str, max_health:int):
+        new_player = cls(
+            discord_id,
+            name,
+            max_health, max_health,
+            Inventory(function_memory, []),
+            Location("engine", "rooms/", "start"),
+            Position(0, 0),
+            function_memory.engine._player_input_categories,
+            False
+        )
+
+        cls._loaded.update({discord_id: new_player})
+        return new_player
+
     def getLocalVariables(self):
         d = {
             ".uid": self.discord_id,

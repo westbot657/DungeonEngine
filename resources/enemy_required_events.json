@@ -2,7 +2,12 @@
     "@required": {
         "on_turn": {},
         "on_attacked": {
-            
+            "functions": [
+                {
+                    "function": "engine:enemy/damage",
+                    "amount": {"#ref": "damage"}
+                }
+            ]
         }
     }
 }

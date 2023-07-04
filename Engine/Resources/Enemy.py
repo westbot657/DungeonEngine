@@ -192,15 +192,18 @@ class Enemy(Entity):
             return e.value or v
     
     def damage(self, function_memory:FunctionMemory, amount:int):
-        ...
+        self.health -= amount
     
     def heal(self, function_memory:FunctionMemory, amount:int):
+        self.health = min(self.max_health, self.health + amount)
         ...
     
     def kill(self, function_memory:FunctionMemory):
+        # uhhh....
         ...
 
     def onEvent(self, function_memory:FunctionMemory, current_trigger:str, event_name:str):
+        print(f"Enemy.onEvent() called!  {event_name=} {current_trigger=}")
         if current_trigger is None and self.combat is not None:
             current_trigger = self.combat.last_trigger
         for trigger in [current_trigger, "@global", "@required"]:

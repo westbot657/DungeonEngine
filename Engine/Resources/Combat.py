@@ -379,12 +379,14 @@ class Combat(FunctionalElement):
                         enemy = self.getEnemy(function_memory, enemy_id)
                         if enemy not in self.turn_order:
                             self.turn_order.insert(self.current_turn+1+i, enemy)
+                            enemy.combat = self
                             i += 1
                 elif operation.priority == Combat.JoinPriority.LAST:
                     for enemy_id in operation.enemies:
                         enemy = self.getEnemy(function_memory, enemy_id)
                         if enemy not in self.turn_order:
                             self.turn_order.insert(self.current_turn, enemy)
+                            enemy.combat = self
                             self.current_turn += 1
                 elif operation.priority == Combat.JoinPriority.RANDOM:
                     for enemy_id in operation.enemies:
@@ -392,6 +394,7 @@ class Combat(FunctionalElement):
                         enemy = self.getEnemy(function_memory, enemy_id)
                         if enemy not in self.turn_order:
                             self.turn_order.insert(r, enemy)
+                            enemy.combat = self
                             if r <= self.current_turn:
                                 self.current_turn += 1
                 self.turn = self.turn_order[self.current_turn]

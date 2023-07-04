@@ -170,6 +170,7 @@ class ConsoleCommand:
                                 return a
                         case "engine:GameObjectType":
                             n, other = text.split(" ", 1)
+                            
 
 
                         case _:

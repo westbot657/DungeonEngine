@@ -85,8 +85,8 @@ class Weapon(GameObject):
             damage = int(function_memory.ref("damage"))
             acc = int(function_memory.ref("accuracy"))
             self.postEvaluate(function_memory)
-        print(f"Weapon onAttack: v:{v}  damage:{damage}  accuracy:{acc}")
-        
+        print(f"Weapon onAttack: damage:{damage}  accuracy:{acc}  target:{target}")
+
         target.onEvent(function_memory, None, "on_attacked")
 
 

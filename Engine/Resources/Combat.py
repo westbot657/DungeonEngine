@@ -88,6 +88,8 @@ class Combat(FunctionalElement):
                 super().__init__("EnemyAttack")
                 self.enemy = enemy
                 self.target = target
+            def __repr__(self):
+                return f"Combat.Task:EnemyAttack  enemy:{self.enemy} attacking target:{self.target}"
 
         class _HandleInput(_Operation):
             def __init__(self, player:Player, text:str):
@@ -110,6 +112,8 @@ class Combat(FunctionalElement):
         class _NextTurn(_Operation):
             def __init__(self):
                 super().__init__("NextTurn")
+            def __repr__(self):
+                return "Combat.Task:NextTurn"
 
     class Task:
         def __init__(self, task, delay:int):
@@ -216,6 +220,10 @@ class Combat(FunctionalElement):
             v = e.value or v
 
     def enemyAttackPlayer(self, enemy:Enemy, player:Player):
+        print("\n\n\nENEMY ATTACK PLAYER!!\n\n")
+        self.function_memory.update({
+            "damage": 0
+        })
         ev = enemy.attackPlayer(self.function_memory, player, self.last_trigger)
         v = None
         damage = 0
@@ -239,6 +247,8 @@ class Combat(FunctionalElement):
             elif isinstance(e.value, int):
                 damage = e.value
                 # TODO: statistics
+
+        damage = self.function_memory.ref("damage")
 
         ev = player.onAttacked(self.function_memory, enemy, damage)
         v = None
@@ -342,7 +352,7 @@ class Combat(FunctionalElement):
 
             case Combat.Operation._EnemyAttack():
                 enemy = operation.enemy
-                player = operation.player
+                player = operation.target
 
                 ev = self.enemyAttackPlayer(enemy, player)
                 v = None
@@ -411,6 +421,7 @@ class Combat(FunctionalElement):
                 self.turn = self.turn_order[self.current_turn]
 
             case Combat.Operation.Message():
+                Log["debug"]["combat"]["message"](operation.message)
                 if operation.players:
                     for player in operation.players:
                         function_memory.engine.sendOutput(player, operation.message)
@@ -447,6 +458,7 @@ class Combat(FunctionalElement):
                 task: Combat.Task
                 task.delay -= 1
                 if task.delay <= 0:
+                    Log["debug"]["combat"](f"running combat-task: {task}")
                     self.scheduled_tasks.remove(task)
                     op = task.task
                     try:

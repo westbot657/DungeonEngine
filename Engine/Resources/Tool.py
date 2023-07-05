@@ -220,7 +220,7 @@ class Tool(GameObject):
 
             # function_memory.clear()
 
-    def onPlayerHit(self, function_memory:FunctionMemory):
+    def onPlayerHit(self, function_memory:FunctionMemory, damage:int):
         if on_player_hit := self.events.get("on_player_hit", None):
             self.prepFunctionMemory(function_memory)
             #res = function_memory.evaluateFunction(on_unequip)

@@ -844,17 +844,17 @@ class Engine_Player_ForceMiss(LoaderFunction):
 
 class Engine_Enemy_AttackPlayer(LoaderFunction):
     id = Identifier("engine", "enemy/", "attack_player")
+    pre_evaluator = True
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case {
-                "enemy": Enemy(),
-                "player": Player()
-            }:
-                return cls.attack_player
-            case _: return None
+        return cls.attack_player
     @staticmethod
-    def attack_player(function_memory:FunctionMemory, enemy:Enemy, player:Player):
+    def attack_player(function_memory:FunctionMemory, **kwargs):
+        if "enemy" in kwargs: enemy = kwargs.get("enemy")
+        else: enemy = function_memory.ref("#enemy")
+        
+        if "player" in kwargs: player = kwargs.get("player")
+        else: player = function_memory.ref("#player")
         return enemy.attackPlayer(function_memory, player)
 
 class Engine_Enemy_CancelAttack(LoaderFunction):
@@ -931,16 +931,16 @@ class Engine_Enemy_Heal(LoaderFunction):
 
 class Engine_Enemy_Damage(LoaderFunction):
     id = Identifier("engine", "enemy/", "damage")
+    pre_evaluator = True
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case {
-                "enemy": Enemy(),
-                "amount": int()
-            }: return cls.damage
-            case _: return None
+        if "amount" in args:
+            return cls.damage
+        return None
     @staticmethod
-    def damage(function_memory:FunctionMemory, enemy:Enemy, amount:int):
+    def damage(function_memory:FunctionMemory, **kwargs):
+        amount = kwargs.get("amount")
+        enemy = kwargs.get("enemy", function_memory.ref("#enemy"))
         enemy.damage(function_memory, amount)
 
 class Engine_Enemy_SetMaxHealth(LoaderFunction):
@@ -1932,6 +1932,16 @@ class Engine_Combat_NumberedName(LoaderFunction):
     def numbered_name(function_memory:FunctionMemory, **kwargs):
         return Combat.Operation.NumberedName()
 
+class Engine_Combat_NextTurn(LoaderFunction):
+    id = Identifier("engine", "combat/", "next_turn")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        return cls.next_turn
+    @staticmethod
+    def next_turn(function_memory:FunctionMemory):
+        combat: Combat = function_memory.ref("#combat")
+        combat.addTask(Combat.Operation._NextTurn())
+
 class Engine_Combat_Spawn(LoaderFunction):
     id = Identifier("engine", "combat/", "spawn")
     @classmethod
@@ -1983,6 +1993,33 @@ class Engine_Combat_Message(LoaderFunction):
 # ^ Combat ^ #
 
 
+
+####XXX##############XXX####
+### XXX Engine Debug XXX ###
+####XXX##############XXX####
+
+class Engine_Log_Debug(LoaderFunction):
+    id = Identifier("engine", "log/", "debug")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        return cls.debug
+    @staticmethod
+    def debug(function_memory:FunctionMemory, **kwargs):
+        Log["debug"]
+        if tags := kwargs.get("tags", None):
+            for tag in tags:
+                Log[tag]
+        Log(kwargs.get("message", "<no message>"))
+
+class Engine_Debug_Breakpoint(LoaderFunction):
+    id = Identifier("engine", "debug/", "breakpoint")
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        return cls.debug
+    @staticmethod
+    def debug(function_memory:FunctionMemory):
+        breakpoint()
+# ^ Debug ^ #
 
 
 

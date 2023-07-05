@@ -65,7 +65,7 @@ except ImportError:
 
 
 from typing import Any, Generator
-import re
+import re, time
 
 class DungeonLoader:
 
@@ -644,7 +644,7 @@ class DungeonLoader:
     @TextPattern(r"\b(?:inventory|bag|items)\b", TextPattern.CheckType.SEARCH, ["global"])
     @staticmethod
     def checkTextInventory(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
-        function_memory.engine.sendOutput(player, player.inventory.fullStats(function_memory))
+        function_memory.engine.sendOutput(player, player.fullInventoryStats(function_memory))
 
     # @TextPattern(r"\b(?:go *to|travel *to) *(?P<location_name>.*)\b", TextPattern.CheckType.SEARCH, ["world"])
     # @staticmethod
@@ -691,6 +691,9 @@ class DungeonLoader:
         )
 
     def loadGame(self, engine:Engine):
+
+        start_time = time.time()
+
         Log["loadup"]["loader"]("Loading Abstract Status Effects...")
         self.abstract_status_effects = AbstractStatusEffect.loadData(engine)
 
@@ -742,6 +745,7 @@ class DungeonLoader:
 
         Log["loadup"]["loader"]("Engine resource loading completed")
 
+        Log["loadup"]["loader"](f"Loading finished in {time.time()-start_time} seconds")
 
     def saveGame(self, engine:Engine):
         # TODO: implement saving

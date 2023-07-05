@@ -1,11 +1,42 @@
 {
     "@required": {
-        "on_turn": {},
+        "on_attack_hit": {
+            "functions": [
+                {
+                    "function": "engine:combat/message",
+                    "message": {
+                        "function": "engine:text/builder",
+                        "text": [
+                            {"#ref": "#enemy.name"},
+                            "attacks",
+                            {"#ref": "#player.name"},
+                            "with",
+                            {"#ref": "attack"},
+                            "dealing",
+                            {"#ref": "damage"},
+                            "damage"
+                        ]
+                    }
+                }
+            ]
+        },
         "on_attacked": {
             "functions": [
                 {
+                    "function": "engine:log/debug",
+                    "tags": [
+                        "enemy",
+                        "required",
+                        "on_attacked"
+                    ],
+                    "message": "enemy take damage?"
+                },
+                {
                     "function": "engine:enemy/damage",
-                    "amount": {"#ref": "damage"}
+                    "amount": {"#ref": "#damage"}
+                },
+                {
+                    "function": "engine:combat/next_turn"
                 }
             ]
         }

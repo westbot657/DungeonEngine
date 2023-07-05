@@ -80,14 +80,23 @@ class Weapon(GameObject):
                     res = yield v
                     v = ev.send(res)
             except StopIteration as e:
-                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                v = function_memory.engine.loader.stopIterationEval(e.value, v)
 
             damage = int(function_memory.ref("damage"))
             acc = int(function_memory.ref("accuracy"))
             self.postEvaluate(function_memory)
         print(f"Weapon onAttack: damage:{damage}  accuracy:{acc}  target:{target}")
 
-        target.onEvent(function_memory, None, "on_attacked")
+        function_memory.addContextData({"#damage": damage})
+        ev = target.onEvent(function_memory, None, "on_attacked")
+        v = None
+        try:
+            v = ev.send(None)
+            while isinstance(v, _EngineOperation):
+                res = yield v
+                v = ev.send(res)
+        except StopIteration as e:
+            v = function_memory.engine.loader.stopIterationEval(e.value, v)
 
 
     def onDamage(self, function_memory:FunctionMemory):
@@ -170,7 +179,7 @@ class Weapon(GameObject):
 
             self.postEvaluate(function_memory)
 
-    def onPlayerHit(self, function_memory:FunctionMemory):
+    def onPlayerHit(self, function_memory:FunctionMemory, damage:int):
         if on_player_hit := self.events.get("on_player_hit", None):
             self.prepFunctionMemory(function_memory)
             #res = function_memory.evaluateFunction(on_unequip)

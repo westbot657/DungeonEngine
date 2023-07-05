@@ -47,7 +47,7 @@ class Enemy(Entity):
             def __init__(self):
                 super().__init__("Cancel Attack")
 
-    def __init__(self, abstract, name:str, max_health:int, health:int, attacks:list, location:Location, position:Position):
+    def __init__(self, abstract, name:str, max_health:int, health:int, attacks:list[Attack], location:Location, position:Position):
         self.abstract = abstract
         self.name = name
         self.max_health = max_health
@@ -58,6 +58,9 @@ class Enemy(Entity):
         self.events: dict[str, dict] = {}
 
         self.combat = None
+
+    def __repr__(self):
+        return f"Enemy{' ' + str(self.uid) if self.uid else ''} '{self.name}' {self.health}/{self.max_health} ({self.abstract})  ({super().__repr__()})"
 
     def getLocalVariables(self) -> dict:
         d = {
@@ -96,10 +99,10 @@ class Enemy(Entity):
 
     def setEvents(self, events):
         self.events = Util.deepCopy(events)
-        with open("../resources/enemy_required_events.json", "r+", encoding="utf-8") as f:
+        with open("./resources/enemy_required_events.json", "r+", encoding="utf-8") as f:
             self.events.update(json.load(f))
 
-    def attackPlayer(self, function_memory:FunctionMemory, player, current_trigger:str):
+    def attackPlayer(self, function_memory:FunctionMemory, player, current_trigger:str|None=None):
 
         attack = random.choice(self.attacks)
 
@@ -189,7 +192,18 @@ class Enemy(Entity):
                     return e.value
                 if isinstance(v, _EngineOperation):
                     return v
-            return e.value or v
+            #return e.value or v
+        
+        ev = self.onEvent(function_memory, current_trigger, "on_attack_hit")
+        v = None
+        try:
+            v = ev.send(None)
+            while isinstance(v, _EngineOperation):
+                res = yield v
+                v = None
+                v = ev.send(res)
+        except StopIteration as e:
+            v = function_memory.engine.loader.stopIterationEval(e.value, v)
     
     def damage(self, function_memory:FunctionMemory, amount:int):
         self.health -= amount
@@ -200,18 +214,19 @@ class Enemy(Entity):
     
     def kill(self, function_memory:FunctionMemory):
         # uhhh....
+        print("<insert enemy death here>")
         ...
 
     def onEvent(self, function_memory:FunctionMemory, current_trigger:str, event_name:str):
-        print(f"Enemy.onEvent() called!  {event_name=} {current_trigger=}")
         if current_trigger is None and self.combat is not None:
             current_trigger = self.combat.last_trigger
+        print(f"Enemy.onEvent() called!  {event_name=} {current_trigger=}")
         for trigger in [current_trigger, "@global", "@required"]:
             if trigger in self.events:
                 if (event := self.events[trigger].get(event_name, None)):
                     self.prepFunctionMemory(function_memory)
 
-                    ev = function_memory.generatorEvaluateFunction(event)
+                    ev = function_memory.generatorEvaluateFunction(Util.deepCopy(event))
                     v = None
                     try:
                         v = ev.send(None)

@@ -11,6 +11,7 @@ try:
     from .Position import Position
     from .Location import Location
     from .FunctionMemory import FunctionMemory
+    from .Util import Util
 except ImportError:
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
@@ -22,6 +23,7 @@ except ImportError:
     from Position import Position
     from Location import Location
     from FunctionMemory import FunctionMemory
+    from Util import Util
 
 import glob, json, re
 
@@ -60,7 +62,12 @@ class AbstractEnemy:
         self._id = data.get("id", None)
     
         self.is_template: bool = data.get("template", False)
+
+        self.events = data.get("events", {})
     
+    def __repr__(self):
+        return f"AbstractEnemy: {self.identifier.full()}"
+
     def _set_parent(self, parent):
         self.parent = parent
         parent.children.append(self)
@@ -113,16 +120,21 @@ class AbstractEnemy:
             else:
                 Log["ERROR"]["loadup"]["abstract"]["enemy"](f"Failed to load attack; does not exist: '{atk}'")
                 continue
+        
+        if (not out) and self.parent:
+            out = self.parent.getAttacks()
+
         return out
 
-    def _assertListAttackType(self, attacks) -> list[AbstractAttack]:
+    def _assertListAttackType(self, function_memory:FunctionMemory, attacks) -> list[Attack]:
         out = []
         for atk in attacks:
             if isinstance(atk, AbstractAttack):
-                out.append(atk)
+                out.append(atk.createInstance(function_memory))
             elif isinstance(atk, str):
                 if abstract := AbstractAttack._loaded.get(atk, None):
-                    out.append(abstract)
+                    abstract: AbstractAttack
+                    out.append(abstract.createInstance(function_memory))
                 else:
                     raise InvalidObjectError(f"attack '{atk}' does not exist! ({self.identifier})")
             else:
@@ -131,14 +143,18 @@ class AbstractEnemy:
         return out
 
     def createInstance(self, function_memory:FunctionMemory, location:Location, position:Position, **override_values) -> Enemy:
-        return Enemy(self,
+        enemy = Enemy(self,
             override_values.get("name", self.getName()),
             override_values.get("max_health", self.getMaxHealth()),
             DynamicValue(override_values.get("health", self.getHealth())).getCachedOrNew(function_memory),
-            self._assertListAttackType(override_values.get("attacks", self.getAttacks())),
+            self._assertListAttackType(function_memory, override_values.get("attacks", self.getAttacks())),
             location,
             position
         )
+
+        enemy.setEvents(Util.deepCopy(self.events))
+
+        return enemy
     
     @classmethod
     def getFromIdentifier(cls, identifier:Identifier|str):

@@ -24,6 +24,9 @@ class Attack(FunctionalElement):
         self.data = data
         self.events = events
     
+    def __repr__(self):
+        return f"{self.name}"
+
     def getLocalVariables(self) -> dict:
         d = {
             ".name": self.name,
@@ -56,7 +59,7 @@ class Attack(FunctionalElement):
         return f"{self.name}  {self.damage.quickDisplay(function_memory)}dmg {self.range}ft {self.accuracy}% accuracy"
 
     def onAttack(self, function_memory:FunctionMemory, target, acc=None):
-
+        print("\n\nAttack.onAttack() called!\n\n")
         if acc is None:
             acc = random.randint(1, 100)
         if (on_attack := self.events.get("on_attack", None)) is not None:
@@ -101,16 +104,17 @@ class Attack(FunctionalElement):
         return v
 
     def onHit(self, function_memory:FunctionMemory, target):
-
+        print("\n\nattack hit!\n\n")
+        print(self.damage)
         damage = self.damage.getNew(function_memory)
+
+        function_memory.update({
+            "damage": damage,
+            "target": target
+        })
 
         if (on_hit := self.events.get("on_hit", None)) is not None:
             self.prepFunctionMemory(function_memory)
-
-            function_memory.update({
-                "damage": damage,
-                "target": target
-            })
 
             ev = function_memory.generatorEvaluateFunction(on_hit)
             v = None
@@ -130,11 +134,14 @@ class Attack(FunctionalElement):
         return damage
 
     def onMiss(self, function_memory:FunctionMemory, target):
+        print("\n\nattack missed!\n\n")
+
         if (on_miss := self.events.get("on_miss", None)) is not None:
             self.prepFunctionMemory(function_memory)
 
             function_memory.update({
-                "target": target
+                "target": target,
+                "damage": 0
             })
 
             ev = function_memory.generatorEvaluateFunction(on_miss)

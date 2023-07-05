@@ -18,6 +18,9 @@ class DynamicValue(FunctionalElement):
         self.raw_data = raw_data
         self.cached_value = None
 
+    def __repr__(self):
+        return f"DynamicValue:{self.raw_data}"
+
     def getLocalVariables(self):
         return {
             ".value": self.cached_value

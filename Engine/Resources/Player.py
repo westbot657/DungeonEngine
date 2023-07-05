@@ -173,11 +173,11 @@ class Player(Entity):
     def __repr__(self):
         return self.name
 
-    def fullInventoryStats(self):
+    def fullInventoryStats(self, function_memory:FunctionMemory):
         text = "\n".join([
             f"{self.name} | {self.health}/{self.max_health} | {self.location}",
-            self.inventory.fullStats(),
-            self.status_effects.fullStats()
+            self.inventory.fullStats(function_memory),
+            self.status_effects.fullStats(function_memory)
         ]).strip()
 
 

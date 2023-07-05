@@ -1,5 +1,6 @@
 {
     "name": "Vine Whip",
     "range": 3,
-    "damage": 2
+    "damage": 2,
+    "accuracy": 10
 }

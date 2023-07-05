@@ -149,14 +149,13 @@ class FunctionMemory:
             raise MemoryError(f"Global environment variable not defined: '{name}'")
 
         elif name.startswith("#"):
+            if "." in name:
+                props = [(f".{prop}" if not prop.startswith("#") else prop) for prop in name.split(".")]
+                prop = props.pop(0)
+                if prop in self.context_data:
+                    return self._getProperty(self.context_data[prop], props)
+
             if name in self.context_data:
-
-                if "." in name:
-                    props = [(f".{prop}" if not prop.startswith("#") else prop) for prop in name.split(".")]
-                    prop = props.pop(0)
-                    if prop in self.context_data:
-                        return self._getProperty(self.context_data[prop], props)
-
                 return self.context_data[name]
             raise MemoryError(f"Local context variable not defined: '{name}'")
 

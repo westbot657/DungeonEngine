@@ -1,25 +1,5 @@
 {
     "@required": {
-        "on_attack_hit": {
-            "functions": [
-                {
-                    "function": "engine:combat/message",
-                    "message": {
-                        "function": "engine:text/builder",
-                        "text": [
-                            {"#ref": "#enemy.name"},
-                            "attacks",
-                            {"#ref": "#player.name"},
-                            "with",
-                            {"#ref": "attack"},
-                            "dealing",
-                            {"#ref": "damage"},
-                            "damage"
-                        ]
-                    }
-                }
-            ]
-        },
         "on_attacked": {
             "functions": [
                 {

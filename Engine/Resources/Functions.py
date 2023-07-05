@@ -1055,6 +1055,22 @@ class Engine_Random_LootTable(LoaderFunction):
         table = LootTable.fromDict({"rolls": rolls, "pools": pools})
         return table.roll(function_memory)
 
+class Engine_Random_Choice(LoaderFunction):
+    id = Identifier("engine", "random/", "choice")
+    pre_evaluate_args = False
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "options": list()
+            }: return cls.choice
+            case _: return None
+    @staticmethod
+    def choice(function_memory:FunctionMemory, options:list):
+        ret = random.choice(options)
+        
+        return function_memory.generatorEvaluateFunction(ret)
+
 # ^ Random ^ #
 
 ####XXX#############XXX####
@@ -1406,6 +1422,7 @@ class Engine_List_Builder(LoaderFunction):
     def list_builder(function_memory:FunctionMemory, **kwargs):
         _list = kwargs.get("list")
         return _list # idk if this will work the way I think it will...
+
 
 # ^ List ^ #
 

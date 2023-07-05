@@ -6,5 +6,64 @@
         "max": 2
     },
     "range": 1,
-    "accuracy": 20
+    "accuracy": 20,
+    "events": {
+        "on_hit": {
+            "function": "engine:combat/message",
+            "message": {
+                "function": "engine:random/choice",
+                "options": [
+                    {
+                        "function": "engine:text/builder",
+                        "text": [
+                            {"#ref": "#enemy.name"},
+                            "bites",
+                            {"#ref": "target.name"},
+                            "dealing",
+                            {"#ref": "damage"},
+                            "damage"
+                        ]
+                    },
+                    {
+                        "function": "engine:text/builder",
+                        "text": [
+                            {"#ref": "#enemy.name"},
+                            "takes a bite at",
+                            {"#ref": "target.name"},
+                            "and deals",
+                            {"#ref": "damage"},
+                            "damage"
+
+                        ]
+                    }
+                ]
+            }
+        },
+        "on_miss": {
+            "function": "engine:combat/message",
+            "message": {
+                "function": "engine:random/choice",
+                "options": [
+                    {
+                        "function": "engine:text/builder",
+                        "text": [
+                            {"#ref": "#enemy.name"},
+                            "bites",
+                            {"#ref": "target.name"},
+                            "but doesn't do any damage"
+                        ]
+                    },
+                    {
+                        "function": "engine:text/builder",
+                        "text": [
+                            {"#ref": "#enemy.name"},
+                            "takes a bite at",
+                            {"#ref": "target.name"},
+                            "but misses"
+                        ]
+                    }
+                ]
+            }
+        }
+    }
 }

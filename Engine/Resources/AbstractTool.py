@@ -110,8 +110,10 @@ class AbstractTool(AbstractGameObject):
     def loadData(cls, engine:Engine) -> list:
         files: list[str] = glob.glob("**/tools/*.json", recursive=True)
         #print(files)
+        Log["loadup"]["abstract"]["tool"](f"found {len(files)} tool file{'s' if len(files) != 1 else ''}")
         for file in files:
             file: str
+            Log["loadup"]["abstract"]["tool"](f"loading AbstractTool from '{file}'")
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
 
@@ -142,7 +144,6 @@ class AbstractTool(AbstractGameObject):
             if o.is_template:
                 Log.success()
                 continue
-
             try:
                 o.getName()
                 o.getMaxDurability()
@@ -156,6 +157,7 @@ class AbstractTool(AbstractGameObject):
 
         cls._link_parents.clear()
 
+        Log["loadup"]["abstract"]["tool"]("AbstractTool loading complete")
         return cls._loaded
 
 if __name__ == "__main__":

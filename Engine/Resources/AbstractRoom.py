@@ -138,7 +138,7 @@ class AbstractRoom:
     @classmethod
     def loadData(cls, engine:Engine):
         files: list[str] = glob.glob("**/rooms/**/*.json", recursive=True)
-        Log["loadup"]["abstract"]["room"](f"found {len(files)} item files")
+        Log["loadup"]["abstract"]["room"](f"found {len(files)} room files")
 
         for file in files:
             file: str

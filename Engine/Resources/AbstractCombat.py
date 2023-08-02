@@ -91,14 +91,17 @@ class AbstractCombat:
     def loadData(cls, engine) -> list:
         files: list[str] = glob.glob("**/combats/*.json", recursive=True)
 
+        Log["loadup"]["abstract"]["combat"](f"found {len(files)} combat file{'s' if len(files) != 1 else ''}")
         for file in files:
             file: str
+            Log["loadup"]["abstract"]["combat"](f"loading AbstractCombat from '{file}'")
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
             
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})
 
+        Log["loadup"]["abstract"]["combat"]("AbstractCombat loading complete")
         return cls._loaded
 
 

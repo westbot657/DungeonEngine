@@ -149,8 +149,10 @@ class AbstractWeapon(AbstractGameObject):
     def loadData(cls, engine:Engine) -> list:
         files: list[str] = glob.glob("**/weapons/*.json", recursive=True)
         #print(files)
+        Log["loadup"]["abstract"]["weapon"](f"found {len(files)} weapon file{'s' if len(files) != 1 else ''}")
         for file in files:
             file: str
+            Log["loadup"]["abstract"]["weapon"](f"loading AbstractWeapon from '{file}'")
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
 
@@ -172,9 +174,14 @@ class AbstractWeapon(AbstractGameObject):
             else:
                 Log["ERROR"]["loadup"]["abstract"]["weapon"](f"parent does not exist: '{p}'")
 
+        Log["loadup"]["abstract"]["weapon"]("verifying AbstractWeapon completion...")
+        Log.track(len(cls._loaded), "loadup", "abstract", "weapon")
         for l, o in cls._loaded.copy().items():
             l: str
             o: AbstractWeapon
+            if o.is_template:
+                Log.success()
+                continue
             try:
                 o.getName()
                 o.getRange()
@@ -182,14 +189,17 @@ class AbstractWeapon(AbstractGameObject):
                 o.getMaxDurability()
                 o.getDurability()
                 o.getAmmoType()
+                Log.success()
             except InvalidObjectError as err:
                 e: AbstractWeapon = cls._loaded.pop(l)
-                print(f"Failed to load weapon: {e.identifier}  {err}")
+                Log.ERROR("loadup", "abstract", "weapon", f"failed to load weapon: {e.identifier}. {err}")
                 continue
 
+        Log.end_track()
 
         cls._link_parents.clear()
 
+        Log["loadup"]["abstract"]["weapon"]("AbstractWeapon loading complete")
         return cls._loaded
 
 if __name__ == "__main__":

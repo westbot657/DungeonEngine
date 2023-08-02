@@ -142,6 +142,12 @@ class AbstractEnemy:
 
         return out
 
+    def get_parent_chain(self):
+        if self.parent is None:
+            return []
+        else:
+            return [self.parent] + self.parent.get_parent_chain()
+
     def createInstance(self, function_memory:FunctionMemory, location:Location, position:Position, **override_values) -> Enemy:
         enemy = Enemy(self,
             override_values.get("name", self.getName()),
@@ -190,20 +196,34 @@ class AbstractEnemy:
     @classmethod
     def loadData(cls, engine:Engine) -> list:
         files: list[str] = glob.glob("**/enemies/*.json", recursive=True)
-        #print(files)
+        
+        Log["loadup"]["abstract"]["enemy"](f"found {len(files)} enemy file{'s' if len(files) != 1 else ''}")
         for file in files:
             file: str
+            Log["loadup"]["abstract"]["enemy"](f"loading AbstractEnemy from '{file}'")
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
 
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})
 
+        Log["loadup"]["abstract"]["enemy"]("linking AbstractEnemy parents...")
         for w, p in cls._link_parents:
             w: AbstractEnemy
             p: str
-            w._set_parent(cls._loaded.get(p))
+            if parent := cls._loaded.get(p, None):
+                if parent is w:
+                    Log["ERROR"]["loadup"]["abstract"]["enemy"]("cannot set object as it's own parent")
+                    continue
+                elif parent in w.get_parent_chain():
+                    Log["ERROR"]["loadup"]["abstract"]["enemy"]("circular parent loop found")
+                    continue
+                w._set_parent(cls._loaded.get(p))
+            else:
+                Log["ERROR"]["loadup"]["abstract"]["enemy"](f"parent does not exist: '{p}'")
 
+        Log["loadup"]["abstract"]["enemy"]("verifying AbstractEnemy completion...")
+        Log.track(len(cls._loaded), "loadup", "abstract", "enemy")
         for l, o in cls._loaded.copy().items():
             l: str
             o: AbstractEnemy
@@ -212,12 +232,16 @@ class AbstractEnemy:
                 o.getMaxHealth()
                 o.getHealth()
                 o.getAttacks()
+                Log.success()
             except InvalidObjectError as err:
                 e: AbstractEnemy = cls._loaded.pop(l)
-                print(f"Failed to load enemy: {e.identifier}  {err}")
+                Log.ERROR("loadup", "abstract", "enemy", f"failed to load enemy: {e.identifier}. {err}")
+
+        Log.end_track()
 
         cls._link_parents.clear()
 
+        Log["loadup"]["abstract"]["enemy"]("AbstractEnemy loading complete")
         return cls._loaded
 
 

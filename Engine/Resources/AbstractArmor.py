@@ -97,8 +97,11 @@ class AbstractArmor(AbstractGameObject):
     @classmethod
     def loadData(cls, engine) -> list:
         files: list[str] = glob.glob("**/armor/*.json", recursive=True)
+        
+        Log["loadup"]["abstract"]["armor"](f"found {len(files)} armor file{'s' if len(files) != 1 else ''}")
         for file in files:
             file: str
+            Log["loadup"]["abstract"]["armor"](f"loading AbstractArmor from '{file}'")
             with open(file, "r+", encoding="utf-8") as f:
                 data = json.load(f)
 

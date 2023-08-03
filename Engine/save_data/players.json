@@ -3,7 +3,7 @@
         "id": 1,
         "name": "Weston",
         "max_health": 20,
-        "health": 11,
+        "health": 20,
         "location": "world:rooms/start",
         "position": [0, 0],
         "inventory": [

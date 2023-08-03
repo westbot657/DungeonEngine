@@ -31,6 +31,8 @@ class Weapon(GameObject):
 
         self.owner = None
 
+        self.loaded_ammo = None
+
     def __repr__(self):
         return f"Weapon {self.name}: damage:{self.damage} range:{self.range}  durability:{self.durability}"
 

@@ -184,6 +184,7 @@ class ConsoleCommand:
                             return args + a
                 except ParseError:
                     pass
+        return []
 
 
     def _run(self, function_memory, text:str):

@@ -146,9 +146,11 @@ class Inventory(FunctionalElement):
         d = []
 
         for obj in self.contents:
-            obj: GameObject
-            dat = {}
-
-            obj.
+            obj: Weapon|Ammo|Tool|Item|Armor
+            dat: dict = obj._get_save(function_memory)
+            if self.isEquipped(obj):
+                dat.update({"equipped": True})
+            
+            d.append(dat)
 
         return d

@@ -81,10 +81,15 @@ class AbstractStatusEffect:
             c = self.cause
         if c is not None:
             return c
-        return StatusEffectCause.getCauseType()
-        # raise InvalidObjectError(f"StatusEffect has no cause! ({self.identifier})") # *more existential crisis*
-
-
+        return StatusEffectCause.getCauseType(c)
+        
+    def _assertCause(self, cause):
+        if isinstance(cause, StatusEffectCause):
+            return cause()
+        elif isinstance(cause, dict):
+            return StatusEffectCause.load(cause)
+        raise InvalidObjectError(f"StatusEffect has invalid cause: '{cause}'") # *existential crisis part 2*
+    
     def createInstance(self, function_memory:FunctionMemory, **override_values):
         if self.is_template:
             pass
@@ -95,7 +100,7 @@ class AbstractStatusEffect:
                 override_values.get("level", self.getLevel()),
                 override_values.get("duration", self.getDuration()),
                 DynamicValue(override_values.get("tick_interval", self.getTickInterval())).getCachedOrNew(function_memory),
-                self.getCause(),
+                self._assertCause((override_values.get("cause", self.getCause()))),
                 self.events,
                 self.getters
             )

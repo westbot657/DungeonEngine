@@ -140,7 +140,7 @@ class Dungeon(FunctionalElement):
 
         rooms = {}
 
-        for room in self.rooms:
+        for room in self.rooms.values():
             room: Room
             room._save_to(function_memory, rooms)
 
@@ -149,7 +149,7 @@ class Dungeon(FunctionalElement):
 
         if data:
             with open(filename, "w+", encoding="utf-8") as f:
-                json.dump(data, f)
+                json.dump(data, f, indent=4)
         
 
     def onEnter(self, function_memory:FunctionMemory, player:Player, enter_first_room=True):

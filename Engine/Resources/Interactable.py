@@ -73,7 +73,7 @@ class Interactable(FunctionalElement):
 
         field_save = {}
 
-        for field_name, field_data in abstract_fields:
+        for field_name, field_data in abstract_fields.items():
             field_name: str
             field_data: dict
             field_value = self.field_values[field_name]["value"]
@@ -92,7 +92,9 @@ class Interactable(FunctionalElement):
             else:
                 data_save.update({name: value})
 
-        d = {}
+        d = {
+            "type": self.abstract.identifier.full()
+        }
         if field_save:
             d.update({"fields": field_save})
         if data_save:

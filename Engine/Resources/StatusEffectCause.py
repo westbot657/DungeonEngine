@@ -1,4 +1,4 @@
-# pylint: disable=[W,R,C,import-error]
+# pylint: disable=[W,R,C,import-error,assignment-from-none]
 
 try:
     from .FunctionalElement import FunctionalElement
@@ -23,7 +23,13 @@ class StatusEffectCause(FunctionalElement):
         self.name = name
 
     def getDisplay(self):
-        return f"[{self.name}]"
+        return None #f"[{self.name}]"
+
+    @classmethod
+    def load(cls, data:dict):
+        if data.get("type", None) == "status_effect_cause":
+            c = cls._cause_types[data.get("cause_type", "UnknownStatusEffectCause")](**data.get("data", {}))
+        return cls._cause_types["UnknownStatusEffectCause"]()
 
     def __repr__(self):
         extra = self.getDisplay()
@@ -31,13 +37,22 @@ class StatusEffectCause(FunctionalElement):
             return f"{self.name} {extra}"
         return self.name
 
+    def _get_save(self, function_memory):
+        return {
+            "type": "engine:status_effect_cause",
+            "cause_type": self.__class__.__name__,
+            "data": {}
+        }
+
 class UnknownStatusEffectCause(StatusEffectCause):
     def __init__(self):
         super().__init__("Unknown Effect Cause")
 
+
 class PassiveStatusEffectCause(StatusEffectCause):
     def __init__(self):
         super().__init__("Passive Effect")
+
 
 class SelfInflictedStatusEffectCause(StatusEffectCause):
     def __init__(self, player):
@@ -47,13 +62,31 @@ class SelfInflictedStatusEffectCause(StatusEffectCause):
     def getDisplay(self):
         return f"({self.player})"
 
+    def _get_save(self, function_memory):
+        return {
+            "type": "engine:status_effect_cause",
+            "cause_type": self.__class__.__name__,
+            "cause": f"{self}",
+            "data": {
+                "player": f"{self.player}"
+            }
+        }
+
 class EnemyInflictedStatusEffectCause(StatusEffectCause):
     def __init__(self, enemy):
         super().__init__("Enemy Inflicted")
         self.enemy = enemy
-    
+
     def getDisplay(self):
         return f"({self.enemy})"
 
-
+    def _get_save(self, function_memory):
+        return {
+            "type": "engine:status_effect_cause",
+            "cause_type": self.__class__.__name__,
+            "cause": f"{self}",
+            "data": {
+                "enemy": f"{self.enemy}"
+            }
+        }
 

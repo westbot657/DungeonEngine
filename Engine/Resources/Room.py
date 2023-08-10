@@ -161,7 +161,7 @@ class Room(FunctionalElement):
 
         for interaction in self.interactions:
             interaction: Interactable
-            interaction._save_to(interactions)
+            interaction._save_to(function_memory, interactions)
         
         if interactions:
             dat.update({"interactions": interactions})

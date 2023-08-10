@@ -29,7 +29,12 @@ class StatusEffectManager:
 
 
     def _get_save(self, function_memory:FunctionMemory):
-        ...
+        data = []
+
+        for effect in self.effects:
+            data.append(effect._get_save(function_memory))
+        
+        return data
     
     
 

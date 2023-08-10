@@ -286,6 +286,7 @@ class Player(Entity):
             position_list: list = data.get("position")
             inv_list: list = data.get("inventory")
             in_combat: bool = data.get("in_combat", False)
+            status_effects: list = data.get("status_effects", [])
 
             _text_pattern_categories: list[str] = data.get("text_pattern_categories")
 
@@ -315,7 +316,7 @@ class Player(Entity):
     def saveData(cls, function_memory:FunctionMemory):
         # TODO: implement this
         data = []
-        for player_id, player in cls._loaded:
+        for player_id, player in cls._loaded.items():
             player_id: int
             player: Player
             save_data = {

@@ -62,6 +62,13 @@ class StatusEffect(FunctionalElement):
         ...
 
     def _get_save(self, function_memory:FunctionMemory):
-        d = {}
+        d = {
+            "type": "engine:status_effect",
+            "effect": self.abstract.identifier.full(),
+            "level": self.level,
+            "cause": self.cause._get_cause()
+        }
+
+
 
         return d

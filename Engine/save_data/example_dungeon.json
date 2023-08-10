@@ -1,8 +1,31 @@
 {
-    "dungeon": {
-        "data": {
-            "boss_defeated": true
+    "rooms": {
+        "example_dungeon:rooms/grove_entrance": {
+            "interactions": {
+                "left_tunnel": {
+                    "fields": {
+                        "target": "example_dungeon:left_tunnel",
+                        "travel_message": null,
+                        "locked": null,
+                        "lock_message": null
+                    }
+                },
+                "right_tunnel": {
+                    "fields": {
+                        "target": "example_dungeon:right_tunnel"
+                    }
+                },
+                "boss_room_door": {
+                    "fields": {
+                        "target": "example_dungeon:boss_room"
+                    }
+                },
+                "ritual_staff": {
+                    "fields": {
+                        "loot": "example_dungeon:weapons/ritual_staff"
+                    }
+                }
+            }
         }
-    },
-    "rooms": {}
+    }
 }

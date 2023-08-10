@@ -175,7 +175,7 @@ class Player(Entity):
 
     def fullInventoryStats(self, function_memory:FunctionMemory):
         text = "\n".join([
-            f"{self.name} | {self.health}/{self.max_health} | {self.location}",
+            f"{self.name} | {self.health}/{self.max_health} | {self.location.translate(function_memory)}",
             self.inventory.fullStats(function_memory),
             self.status_effects.fullStats(function_memory)
         ]).strip()

@@ -45,6 +45,11 @@ class Location:
     def __repr__(self):
         return self.full()
 
+    def translate(self, function_memory):
+        dun = function_memory.getLocation(Location(self.dungeon, "", ""))
+        loc = function_memory.getLocation(self)
+        return f"{dun.name}: {loc.name}"
+
     def __dict__(self):
         return {
             "%ENGINE:DATA-TYPE%": "Location",

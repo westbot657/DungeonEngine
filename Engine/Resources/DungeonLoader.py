@@ -493,7 +493,7 @@ class DungeonLoader:
         ...
     
     def constructGameObject(self, function_memory:FunctionMemory, data:dict) -> GameObject:
-        Log["loadup"]["loader"]("Constructing new GameObject...")
+        Log["loadup"]["loader"](f"Constructing new GameObject: data={data}")
         if obj_type := data.get("type", None):
             identifier = Identifier.fromString(obj_type)
             identifier.path = "abstract/"
@@ -525,6 +525,8 @@ class DungeonLoader:
             if location.dungeon == name:
                 if (room := dungeon.rooms.get(location.full(), None)) is not None:
                     return room
+                elif (not location.room_path) and (not location.room):
+                    return dungeon
         raise LocationError(f"Could not find location: '{location.full()}'")
 
     # TODO: 

@@ -93,7 +93,6 @@ class Interactable(FunctionalElement):
                 data_save.update({name: value})
 
         d = {
-            "type": self.abstract.identifier.full()
         }
         if field_save:
             d.update({"fields": field_save})

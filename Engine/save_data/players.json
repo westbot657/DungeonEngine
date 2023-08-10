@@ -4,8 +4,11 @@
         "name": "Weston",
         "max_health": 20,
         "health": 20,
-        "location": "world:rooms/start",
-        "position": [0, 0],
+        "location": "energia_city:rooms/center_street",
+        "position": [
+            0,
+            0
+        ],
         "inventory": [
             {
                 "type": "engine:armor",
@@ -16,12 +19,12 @@
             {
                 "type": "engine:armor",
                 "parent": "engine:armor/leather_armor",
-                "durability": 20,
                 "name": "Batman T-shirt"
             },
             {
                 "type": "engine:item",
                 "parent": "engine:items/stick",
+                "data": {},
                 "count": 35
             },
             {
@@ -33,25 +36,22 @@
             },
             {
                 "type": "engine:tool",
-                "parent": "engine:tools/fishing_rod"
+                "parent": "engine:tools/fishing_rod",
+                "data": {}
             },
             {
                 "type": "engine:tool",
                 "parent": "engine:tools/test_tool",
+                "data": {},
                 "equipped": true
             }
         ],
-        "status_effects": [
-            {
-                "effect": "engine:status_effects/passive_regeneration",
-                "tick": 232
-            }
-        ],
+        "status_effects": [],
         "in_combat": false,
         "text_pattern_categories": [
-            "common",
             "global",
-            "world"
+            "common",
+            "dungeon"
         ]
     }
 ]

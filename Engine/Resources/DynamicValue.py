@@ -72,9 +72,16 @@ class DynamicValue(FunctionalElement):
             return str(self.raw_data)
         return function_memory.engine.loader.loader_function.quickDisplay(function_memory, self.raw_data)
         
-
     def fullDisplay(self, function_memory:FunctionMemory):
         if not isinstance(self.raw_data, dict):
             return str(self.raw_data)
         return function_memory.engine.loader.loader_function.fullDisplay(function_memory, self.raw_data)
+
+    def __eq__(self, other):
+        if isinstance(other, DynamicValue):
+            return self is other
+        return self.raw_data == other
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 

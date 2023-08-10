@@ -55,10 +55,10 @@ class AbstractWeapon(AbstractGameObject):
             AbstractWeapon._link_parents.append((self, data["parent"]))
 
         self.name: str|None = data.get("name", None)
-        self.damage: int|None = data.get("damage", None)
-        self.range: int|None = data.get("range", None)
+        self.damage: int|dict|None = data.get("damage", None)
+        self.range: int|dict|None = data.get("range", None)
         self.max_durability: int|None = data.get("max_durability", None)
-        self.durability: int|None = data.get("durability", self.max_durability)
+        self.durability: int|dict|None = data.get("durability", self.max_durability)
 
         self.events: dict = data.get("events", {})
 
@@ -75,7 +75,7 @@ class AbstractWeapon(AbstractGameObject):
         if n is not None: return n
         raise InvalidObjectError(f"Weapon has no name! ({self.identifier})")
     
-    def getDamage(self) -> int:
+    def getDamage(self) -> int|dict:
         if self.damage is None:
             d = self.parent.getDamage() if self.parent else None
         else:
@@ -83,7 +83,7 @@ class AbstractWeapon(AbstractGameObject):
         if d is not None: return d
         raise InvalidObjectError(f"Weapon has no damage! ({self.identifier})")
 
-    def getRange(self) -> int:
+    def getRange(self) -> int|dict:
         if self.range is None:
             r = self.parent.getRange() if self.parent else None
         else:
@@ -99,7 +99,7 @@ class AbstractWeapon(AbstractGameObject):
         if d is not None: return d
         raise InvalidObjectError(f"Weapon has no max_durability! ({self.identifier})")
 
-    def getDurability(self) -> int:
+    def getDurability(self) -> int|dict:
         if self.durability is None:
             d = self.parent.getDurability() if self.parent else None
         else:
@@ -112,7 +112,10 @@ class AbstractWeapon(AbstractGameObject):
             if self.parent and ((a := self.parent.getAmmoType()) is not None):
                 return a
             return AbstractAmmo._loaded["engine:ammo/none"]
-        return AbstractAmmo._loaded["engine:ammo/none"]
+        a = AbstractAmmo._loaded.get(self.ammo_type, None)
+        if a is None:
+            raise InvalidObjectError(f"Weapon ammo_type is invalid: '{self.ammo_type}'")
+        return a
 
     def getEvents(self):
         if self.events is None:
@@ -138,7 +141,7 @@ class AbstractWeapon(AbstractGameObject):
             return Weapon(self,
                 override_values.get("name", self.getName()),
                 DynamicValue(override_values.get("damage", self.getDamage())),
-                DynamicValue(override_values.get("range", self.getRange())),
+                DynamicValue(override_values.get("range", self.getRange())).getCachedOrNew(function_memory),
                 override_values.get("max_durability", self.getMaxDurability()),
                 DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(function_memory),
                 self._assertAmmoType(override_values.get("ammo_type", self.getAmmoType())),

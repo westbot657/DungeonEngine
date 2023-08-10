@@ -13,7 +13,7 @@
 
 # Dungeon Building  
 
-Note: This is going to be a VERY long, detailed, guide to creating a dungeon and all it's components.  
+Note: This is going to be a VERY long, detailed, guide to creating a dungeon and all it's components  
 ---
 [File Structure](#file-structure)  
 [Dungeons](#dungeons) | [Rooms](#rooms) | [Interactions](#interactions)    
@@ -26,7 +26,7 @@ Note: This is going to be a VERY long, detailed, guide to creating a dungeon and
 [Engine Code](#engine-code)  
 
 ## File Structure
-```
+```file_tree
 Dungeons/
 |- <dungeon_id>
 |  |- resources/

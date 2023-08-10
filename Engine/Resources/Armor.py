@@ -62,7 +62,6 @@ class Armor(GameObject):
     def postEvaluate(self, function_memory:FunctionMemory):
         self.updateLocalVariables(function_memory.symbol_table)
 
-
     def onEquip(self, function_memory:FunctionMemory):
         if on_equip := self.events.get("on_equip", None):
             self.prepFunctionMemory(function_memory)
@@ -165,7 +164,6 @@ class Armor(GameObject):
                 except StopIteration as e:
                     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
                 return v
-
 
     def onDamaged(self, function_memory:FunctionMemory):
         if on_damaged := self.events.get("on_damaged", None):

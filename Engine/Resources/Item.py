@@ -98,7 +98,6 @@ class Item(GameObject):
                 except StopIteration as e:
                     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
 
-
     def onExpended(self, function_memory:FunctionMemory):
         if on_expended := self.events.get("on_expended", None):
             self.prepFunctionMemory(function_memory)
@@ -113,3 +112,18 @@ class Item(GameObject):
                 v = e.value or (v if not isinstance(v, _EngineOperation) else None)
             res = v
             self.postEvaluate(function_memory)
+
+    def _get_save(self, function_memory:FunctionMemory):
+        d = {
+            "type": "engine:item",
+            "parent": self.abstract.identifier.full(),
+            "data": self.data
+        }
+
+        if self.name != self.abstract.getName():
+            d.update({"name": self.name})
+        if self.max_count != self.abstract.getMaxCount():
+            d.update({"max_count": self.max_count})
+        if self.count != self.abstract.getCount():
+            d.update({"count": self.count})
+        return d

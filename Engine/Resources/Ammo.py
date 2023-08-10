@@ -47,7 +47,6 @@ class Ammo(GameObject):
     def postEvaluate(self, function_memory:FunctionMemory):
         self.updateLocalVariables(function_memory.symbol_table)
 
-
     # on_load: when ammo is loaded into a weapon
     def onLoad(self, function_memory:FunctionMemory):
         ...

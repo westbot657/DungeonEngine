@@ -183,7 +183,6 @@ class Player(Entity):
 
         return text
 
-
     def attackEnemy(self, function_memory:FunctionMemory, enemy):
 
         weapon: Weapon = self.inventory.getEquipped(Weapon)
@@ -216,8 +215,6 @@ class Player(Entity):
             print(f"Player attack: {e.value=}  {v=}")
             return e.value or v
 
-
-    
     def onAttacked(self, function_memory:FunctionMemory, attacker, damage:int):
 
         # armor onPlayerHit method
@@ -261,7 +258,6 @@ class Player(Entity):
 
         if self.health <= 0:
             raise Exception(f"TODO: I have no idea how to do player death...")
-
 
     @classmethod
     def getPlayer(cls, player_id):
@@ -316,9 +312,30 @@ class Player(Entity):
         }
 
     @classmethod
-    def saveData(cls, engine):
+    def saveData(cls, function_memory:FunctionMemory):
         # TODO: implement this
-        pass
+        data = []
+        for player_id, player in cls._loaded:
+            player_id: int
+            player: Player
+            save_data = {
+                "id": player_id,
+                "name": player.name,
+                "max_health": player.max_health,
+                "health": player.health,
+                "location": player.location._get_save(function_memory),
+                "position": player.position._get_save(function_memory),
+                "inventory": player.inventory._get_save(function_memory),
+                "status_effects": player.status_effects._get_save(function_memory),
+                "in_combat": player.in_combat,
+                "text_pattern_categories": player._text_pattern_categories
+            }
+
+            data.append(save_data)
+
+        with open("Engine/save_data/players.json", "w+", encoding="utf-8") as f:
+            json.dump(data, f, indent=4)
+
 
 
 if __name__ == "__main__":

@@ -143,6 +143,12 @@ class Inventory(FunctionalElement):
         return inv
 
     def _get_save(self, function_memory:FunctionMemory):
-        d = {}
+        d = []
+
+        for obj in self.contents:
+            obj: GameObject
+            dat = {}
+
+            obj.
 
         return d

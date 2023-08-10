@@ -19,7 +19,7 @@ import random
 
 class Weapon(GameObject):
     identifier = Identifier("engine", "object/", "weapon")
-    def __init__(self, abstract, name:str, damage:DynamicValue, range:DynamicValue, max_durability:int, durability:int, ammo_type, events:dict):
+    def __init__(self, abstract, name:str, damage:DynamicValue, range:int, max_durability:int, durability:int, ammo_type, events:dict):
         self.abstract = abstract
         self.name = name
         self.damage = damage
@@ -99,7 +99,6 @@ class Weapon(GameObject):
                 v = ev.send(res)
         except StopIteration as e:
             v = function_memory.engine.loader.stopIterationEval(e.value, v)
-
 
     def onDamage(self, function_memory:FunctionMemory):
         if on_damage := self.events.get("on_damage", None):
@@ -197,4 +196,23 @@ class Weapon(GameObject):
             res = v
             self.postEvaluate(function_memory)
 
+    def _get_save(self, function_memory:FunctionMemory):
+        d = {
+            "type": "engine:weapon",
+            "parent": self.abstract.identifier.full()
+        }
 
+        if self.name != self.abstract.getName():
+            d.update({"name": self.name})
+        if self.damage != self.abstract.getDamage():
+            d.update({"damage": self.damage.raw_data})
+        if self.range != self.abstract.getRange():
+            d.update({"range": self.range})
+        if self.max_durability != self.abstract.getMaxDurability():
+            d.update({"max_durability": self.max_durability})
+        if self.durability != self.abstract.getDurability():
+            d.update({"durability": self.durability})
+        if self.ammo_type != self.abstract.getAmmoType():
+            d.update({"ammo_type": self.ammo_type.identifier.full()})
+
+        return d

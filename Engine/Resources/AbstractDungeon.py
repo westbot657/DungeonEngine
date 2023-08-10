@@ -37,6 +37,7 @@ import glob, json, re
 
 class AbstractDungeon:
     _loaded = {}
+    _dungeon_instances = []
 
     def __init__(self, identifier:Identifier, data:dict):
         self.identifier = identifier
@@ -70,6 +71,7 @@ class AbstractDungeon:
             self.createRooms(function_memory)
         )
         dungeon.map = self.map
+        AbstractDungeon._dungeon_instances.append(dungeon)
         return dungeon
 
     @classmethod
@@ -110,7 +112,9 @@ class AbstractDungeon:
 
     @classmethod
     def saveData(cls, function_memory:FunctionMemory):
-        ...
+        for dungeon in cls._dungeon_instances:
+            dungeon: Dungeon
+            dungeon.saveData(function_memory)
 
 
 if __name__ == "__main__":

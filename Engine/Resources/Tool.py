@@ -236,8 +236,6 @@ class Tool(GameObject):
             res = v
             self.postEvaluate(function_memory)
 
-
-
     def __repr__(self):
         return f"Tool: {self.name} {self.durability}/{self.max_durability}"
 
@@ -247,5 +245,17 @@ class Tool(GameObject):
     def quickStats(self, function_memory:FunctionMemory):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
 
+    def _get_save(self, function_memory:FunctionMemory):
+        d = {
+            "type": "engine:tool",
+            "parent": self.abstract.identifier.full(),
+            "data": self.data
+        }
 
-
+        if self.name != self.abstract.getName():
+            d.update({"name": self.name})
+        if self.max_durability != self.abstract.getMaxDurability():
+            d.update({"max_durability": self.max_durability})
+        if self.durability != self.abstract.getDurability():
+            d.update({"durability": self.durability})
+        return d

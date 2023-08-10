@@ -41,7 +41,8 @@ class FunctionMemory:
     #         cls._instance.init()
     #     return cls._instance
 
-    
+    def saveGame(self):
+        self.engine.saveGame()
 
     def __init__(self, engine:Engine):
         self.symbol_table = {}

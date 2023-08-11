@@ -4,7 +4,7 @@
     "attacks": [
         "example_dungeon:attacks/natures_wrath",
         {
-            "parent": "engine:attacks/vine_whip",
+            "parent": "example_dungeon:attacks/vine_whip",
             "name": "Branch Thrash"
         }
     ]

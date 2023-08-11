@@ -8,6 +8,17 @@
 6. If you have issues, there's an issues feature here on github, but to be fair, idk how it works, so yeah.
 7. This Engine is still under development, don't expect much to work
 
+# tutorial (until I make an actual tutorial)
+1. once the game has fully loaded, type `[0]: engine:new-player <id> <max_health> <name>`
+  - note:
+    - id may not be 0
+    - max_health will eventually be removed once I find a good default
+    - name can contain spaces if surrounded by quotes (ex: "Example name idk")
+2. this will create a new player (whaaAAA????)
+3. now when you intend to type text as your player, start each message with `[<player_id>]: ` (including the trailing space)
+4. `[0]: ...` is reserved for running commands
+5. more coming soon
+
 
 
 

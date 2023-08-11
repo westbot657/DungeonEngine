@@ -3,10 +3,26 @@
     "version": 0.1,
     "entry_point": "example_dungeon:rooms/grove_entrance",
     "events": {
-        "on_enter": {
-            "function": "engine:player/message",
-            "message": "You enter the dark and gloomy grove of the Shadow Ent"
-        }
+        "on_enter": [
+            {
+                "function": "engine:player/message",
+                "message": {
+                    "function": "engine:text/builder",
+                    "text": [
+                        "You enter the Ancient Grove of the Shadow Ent. \nYou see a small pedestal",
+                        {
+                            "@check": {
+                                "function": "engine:player/has_game_object",
+                                "game_object": "example_dungeon:weapons/ritual_staff"
+                            },
+                            "true": "",
+                            "false": "with an old ritual `staff` on it"
+                        },
+                        "with an overgrown `door` with a faded emblem on it with passages to the `right` and `left`"
+                    ]
+                }
+            }
+        ]
     },
     "data": {
         "boss_defeated": false

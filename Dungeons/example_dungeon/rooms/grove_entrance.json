@@ -2,34 +2,70 @@
     "name": "Grove Entrance",
     "interactions": [
         {
-            "type": "engine:interactable/door",
+            "type": "engine:interactable/passage",
             "id": "left_tunnel",
             "target": "example_dungeon:left_tunnel",
-            "travel_message": "",
-            "lock_message": "",
-            "locked": false
+            "travel_message": "You move into the left tunnel"
         },
         {
-            "type": "engine:interactable/door",
+            "type": "engine:interactable/passage",
             "id": "right_tunnel",
-            "target": "example_dungeon:right_tunnel"
+            "target": "example_dungeon:right_tunnel",
+            "travel_message": "You move into the right tunnel"
         },
         {
             "type": "engine:interactable/door",
             "id": "boss_room_door",
             "target": "example_dungeon:boss_room",
+            "lock_message": "You pull at the door but the vines hold it fast against your efforts",
             "locked": true
         },
         {
             "type": "engine:interactable/loot",
             "id": "ritual_staff",
             "loot": "example_dungeon:weapons/ritual_staff"
+        },
+        {
+            "type": "engine:interactable/door",
+            "id": "exit",
+            "target": "world:rooms/start",
+            "travel_message": "You emerge from the dark and overgrown grove"
         }
     ],
     "events": {
-        "on_enter": {
-            "function": "engine:combat/start",
-            "combat": "example_dungeon:combats/entrance_combat"
+        
+        "on_input": {
+            "function": "engine:text/match",
+            "text": {
+                "#ref": "#text"
+            },
+            "matches": [
+                {
+                    "pattern": "Left",
+                    "function": "engine:interaction/interact",
+                    "interactable": ".left_tunnel"
+                },
+                {
+                    "pattern": "Right",
+                    "function": "engine:interaction/interact",
+                    "interactable": ".right_tunnel"
+                },
+                {
+                    "pattern": "Door",
+                    "function": "engine:interaction/interact",
+                    "interactable": ".boss_room_door"
+                },
+                {
+                    "pattern": "Staff",
+                    "function": "engine:interaction/interact",
+                    "interactable": ".ritual_staff"
+                },
+                {
+                    "pattern": "(exit|leave)",
+                    "function": "engine:interaction/interact",
+                    "interactable": ".exit"
+                }
+            ]
         }
     }
 }

@@ -692,14 +692,16 @@ class Engine_Player_GetStatusEffect(LoaderFunction):
     def get_status_effect(function_memory, status_effect, default) -> StatusEffect:
         ...
 
-class Engine_Player_HasItem(LoaderFunction):
-    id = Identifier("engine", "player/", "has_item")
+class Engine_Player_HasGameObject(LoaderFunction):
+    id = Identifier("engine", "player/", "has_game_object")
     return_type = bool
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
             case {}: ...
             case _: return None
+    def has_item(self):
+        ...
 
 class Engine_Player_RemoveItem(LoaderFunction):
     id = Identifier("engine", "player/", "remove_item")

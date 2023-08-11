@@ -698,10 +698,16 @@ class Engine_Player_HasGameObject(LoaderFunction):
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
-            case {}: ...
+            case {
+                "game_object": str()
+            }: return cls.has_item
             case _: return None
-    def has_item(self):
-        ...
+    def has_item(self, function_memory:FunctionMemory, game_object:str):
+        object_identifier = Identifier.fromString(game_object)
+        player = function_memory.ref("#player")
+
+        return player.inventory.containsGameObject(object_identifier)
+
 
 class Engine_Player_RemoveItem(LoaderFunction):
     id = Identifier("engine", "player/", "remove_item")

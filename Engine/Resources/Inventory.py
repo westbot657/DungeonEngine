@@ -87,6 +87,12 @@ class Inventory(FunctionalElement):
                 matches.append(c)
         return matches
 
+    def containsGameObject(self, game_object:Identifier):
+        for c in self.contents:
+            if c.identifier == game_object:
+                return True
+        return False
+
     def isEquipped(self, gameObject:GameObject):
         return gameObject in self.equips.values()
 

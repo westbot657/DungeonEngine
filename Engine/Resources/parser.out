@@ -1,0 +1,2078 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> expressions
+Rule 1     statement -> VARIABLE = expression
+Rule 2     function_call -> FUNCTION parameters scope
+Rule 3     function_call -> FUNCTION parameters tag_list
+Rule 4     function_call -> FUNCTION parameters
+Rule 5     function_call -> FUNCTION
+Rule 6     tag -> TAG expression
+Rule 7     tag_list -> tag # scope tag_list
+Rule 8     tag_list -> tag # scope
+Rule 9     scope -> { expressions }
+Rule 10    expressions -> statement expressions
+Rule 11    expressions -> statement
+Rule 12    parameters -> ( param_element )
+Rule 13    parameters -> ( )
+Rule 14    param_element_pos -> WORD : expression , param_element_pos
+Rule 15    param_element_pos -> WORD : expression ,
+Rule 16    param_element_pos -> WORD : expression
+Rule 17    param_element -> expression , param_element
+Rule 18    param_element -> expression , param_element_pos
+Rule 19    param_element -> expression ,
+Rule 20    param_element -> expression
+Rule 21    statement -> expression
+Rule 22    statement -> BREAK
+Rule 23    statement -> CONTINUE
+Rule 24    expression -> function_call
+Rule 25    expression -> expression + expression
+Rule 26    expression -> expression - expression
+Rule 27    expression -> expression * expression
+Rule 28    expression -> expression / expression
+Rule 29    expression -> - expression
+Rule 30    comma_expressions -> expression , comma_expressions
+Rule 31    comma_expressions -> expression ,
+Rule 32    comma_expressions -> expression
+Rule 33    expression -> MIN ( comma_expressions )
+Rule 34    expression -> MAX ( comma_expressions )
+Rule 35    expression -> ( expression )
+Rule 36    statement -> RETURN expression
+Rule 37    statement -> RETURN
+Rule 38    expression -> NUMBER
+Rule 39    expression -> BOOLEAN
+Rule 40    expression -> STRING
+Rule 41    expression -> VARIABLE
+Rule 42    expression -> WORD
+Rule 43    expression -> scope
+
+Terminals, with rules where they appear
+
+#                    : 7 8
+(                    : 12 13 33 34 35
+)                    : 12 13 33 34 35
+*                    : 27
++                    : 25
+,                    : 14 15 17 18 19 30 31
+-                    : 26 29
+/                    : 28
+:                    : 14 15 16
+=                    : 1
+BOOLEAN              : 39
+BREAK                : 22
+CONTINUE             : 23
+FUNCTION             : 2 3 4 5
+MAX                  : 34
+MIN                  : 33
+NUMBER               : 38
+RETURN               : 36 37
+STRING               : 40
+TAG                  : 6
+VARIABLE             : 1 41
+WORD                 : 14 15 16 42
+error                : 
+{                    : 9
+}                    : 9
+
+Nonterminals, with rules where they appear
+
+comma_expressions    : 30 33 34
+expression           : 1 6 14 15 16 17 18 19 20 21 25 25 26 26 27 27 28 28 29 30 31 32 35 36
+expressions          : 9 10 0
+function_call        : 24
+param_element        : 12 17
+param_element_pos    : 14 18
+parameters           : 2 3 4
+scope                : 2 7 8 43
+statement            : 10 11
+tag                  : 7 8
+tag_list             : 3 7
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . expressions
+    (10) expressions -> . statement expressions
+    (11) expressions -> . statement
+    (1) statement -> . VARIABLE = expression
+    (21) statement -> . expression
+    (22) statement -> . BREAK
+    (23) statement -> . CONTINUE
+    (36) statement -> . RETURN expression
+    (37) statement -> . RETURN
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    VARIABLE        shift and go to state 3
+    BREAK           shift and go to state 5
+    CONTINUE        shift and go to state 6
+    RETURN          shift and go to state 7
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expressions                    shift and go to state 1
+    statement                      shift and go to state 2
+    expression                     shift and go to state 4
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 1
+
+    (0) S' -> expressions .
+
+
+
+state 2
+
+    (10) expressions -> statement . expressions
+    (11) expressions -> statement .
+    (10) expressions -> . statement expressions
+    (11) expressions -> . statement
+    (1) statement -> . VARIABLE = expression
+    (21) statement -> . expression
+    (22) statement -> . BREAK
+    (23) statement -> . CONTINUE
+    (36) statement -> . RETURN expression
+    (37) statement -> . RETURN
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    $end            reduce using rule 11 (expressions -> statement .)
+    }               reduce using rule 11 (expressions -> statement .)
+    VARIABLE        shift and go to state 3
+    BREAK           shift and go to state 5
+    CONTINUE        shift and go to state 6
+    RETURN          shift and go to state 7
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    statement                      shift and go to state 2
+    expressions                    shift and go to state 20
+    expression                     shift and go to state 4
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 3
+
+    (1) statement -> VARIABLE . = expression
+    (41) expression -> VARIABLE .
+
+    =               shift and go to state 21
+    +               reduce using rule 41 (expression -> VARIABLE .)
+    -               reduce using rule 41 (expression -> VARIABLE .)
+    *               reduce using rule 41 (expression -> VARIABLE .)
+    /               reduce using rule 41 (expression -> VARIABLE .)
+    VARIABLE        reduce using rule 41 (expression -> VARIABLE .)
+    BREAK           reduce using rule 41 (expression -> VARIABLE .)
+    CONTINUE        reduce using rule 41 (expression -> VARIABLE .)
+    RETURN          reduce using rule 41 (expression -> VARIABLE .)
+    MIN             reduce using rule 41 (expression -> VARIABLE .)
+    MAX             reduce using rule 41 (expression -> VARIABLE .)
+    (               reduce using rule 41 (expression -> VARIABLE .)
+    NUMBER          reduce using rule 41 (expression -> VARIABLE .)
+    BOOLEAN         reduce using rule 41 (expression -> VARIABLE .)
+    STRING          reduce using rule 41 (expression -> VARIABLE .)
+    WORD            reduce using rule 41 (expression -> VARIABLE .)
+    FUNCTION        reduce using rule 41 (expression -> VARIABLE .)
+    {               reduce using rule 41 (expression -> VARIABLE .)
+    $end            reduce using rule 41 (expression -> VARIABLE .)
+    }               reduce using rule 41 (expression -> VARIABLE .)
+
+
+state 4
+
+    (21) statement -> expression .
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+  ! shift/reduce conflict for - resolved as shift
+    VARIABLE        reduce using rule 21 (statement -> expression .)
+    BREAK           reduce using rule 21 (statement -> expression .)
+    CONTINUE        reduce using rule 21 (statement -> expression .)
+    RETURN          reduce using rule 21 (statement -> expression .)
+    MIN             reduce using rule 21 (statement -> expression .)
+    MAX             reduce using rule 21 (statement -> expression .)
+    (               reduce using rule 21 (statement -> expression .)
+    NUMBER          reduce using rule 21 (statement -> expression .)
+    BOOLEAN         reduce using rule 21 (statement -> expression .)
+    STRING          reduce using rule 21 (statement -> expression .)
+    WORD            reduce using rule 21 (statement -> expression .)
+    FUNCTION        reduce using rule 21 (statement -> expression .)
+    {               reduce using rule 21 (statement -> expression .)
+    $end            reduce using rule 21 (statement -> expression .)
+    }               reduce using rule 21 (statement -> expression .)
+    +               shift and go to state 22
+    -               shift and go to state 23
+    *               shift and go to state 24
+    /               shift and go to state 25
+
+  ! -               [ reduce using rule 21 (statement -> expression .) ]
+
+
+state 5
+
+    (22) statement -> BREAK .
+
+    VARIABLE        reduce using rule 22 (statement -> BREAK .)
+    BREAK           reduce using rule 22 (statement -> BREAK .)
+    CONTINUE        reduce using rule 22 (statement -> BREAK .)
+    RETURN          reduce using rule 22 (statement -> BREAK .)
+    -               reduce using rule 22 (statement -> BREAK .)
+    MIN             reduce using rule 22 (statement -> BREAK .)
+    MAX             reduce using rule 22 (statement -> BREAK .)
+    (               reduce using rule 22 (statement -> BREAK .)
+    NUMBER          reduce using rule 22 (statement -> BREAK .)
+    BOOLEAN         reduce using rule 22 (statement -> BREAK .)
+    STRING          reduce using rule 22 (statement -> BREAK .)
+    WORD            reduce using rule 22 (statement -> BREAK .)
+    FUNCTION        reduce using rule 22 (statement -> BREAK .)
+    {               reduce using rule 22 (statement -> BREAK .)
+    $end            reduce using rule 22 (statement -> BREAK .)
+    }               reduce using rule 22 (statement -> BREAK .)
+
+
+state 6
+
+    (23) statement -> CONTINUE .
+
+    VARIABLE        reduce using rule 23 (statement -> CONTINUE .)
+    BREAK           reduce using rule 23 (statement -> CONTINUE .)
+    CONTINUE        reduce using rule 23 (statement -> CONTINUE .)
+    RETURN          reduce using rule 23 (statement -> CONTINUE .)
+    -               reduce using rule 23 (statement -> CONTINUE .)
+    MIN             reduce using rule 23 (statement -> CONTINUE .)
+    MAX             reduce using rule 23 (statement -> CONTINUE .)
+    (               reduce using rule 23 (statement -> CONTINUE .)
+    NUMBER          reduce using rule 23 (statement -> CONTINUE .)
+    BOOLEAN         reduce using rule 23 (statement -> CONTINUE .)
+    STRING          reduce using rule 23 (statement -> CONTINUE .)
+    WORD            reduce using rule 23 (statement -> CONTINUE .)
+    FUNCTION        reduce using rule 23 (statement -> CONTINUE .)
+    {               reduce using rule 23 (statement -> CONTINUE .)
+    $end            reduce using rule 23 (statement -> CONTINUE .)
+    }               reduce using rule 23 (statement -> CONTINUE .)
+
+
+state 7
+
+    (36) statement -> RETURN . expression
+    (37) statement -> RETURN .
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+  ! shift/reduce conflict for - resolved as shift
+  ! shift/reduce conflict for MIN resolved as shift
+  ! shift/reduce conflict for MAX resolved as shift
+  ! shift/reduce conflict for ( resolved as shift
+  ! shift/reduce conflict for NUMBER resolved as shift
+  ! shift/reduce conflict for BOOLEAN resolved as shift
+  ! shift/reduce conflict for STRING resolved as shift
+  ! shift/reduce conflict for VARIABLE resolved as shift
+  ! shift/reduce conflict for WORD resolved as shift
+  ! shift/reduce conflict for FUNCTION resolved as shift
+  ! shift/reduce conflict for { resolved as shift
+    BREAK           reduce using rule 37 (statement -> RETURN .)
+    CONTINUE        reduce using rule 37 (statement -> RETURN .)
+    RETURN          reduce using rule 37 (statement -> RETURN .)
+    $end            reduce using rule 37 (statement -> RETURN .)
+    }               reduce using rule 37 (statement -> RETURN .)
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+  ! VARIABLE        [ reduce using rule 37 (statement -> RETURN .) ]
+  ! -               [ reduce using rule 37 (statement -> RETURN .) ]
+  ! MIN             [ reduce using rule 37 (statement -> RETURN .) ]
+  ! MAX             [ reduce using rule 37 (statement -> RETURN .) ]
+  ! (               [ reduce using rule 37 (statement -> RETURN .) ]
+  ! NUMBER          [ reduce using rule 37 (statement -> RETURN .) ]
+  ! BOOLEAN         [ reduce using rule 37 (statement -> RETURN .) ]
+  ! STRING          [ reduce using rule 37 (statement -> RETURN .) ]
+  ! WORD            [ reduce using rule 37 (statement -> RETURN .) ]
+  ! FUNCTION        [ reduce using rule 37 (statement -> RETURN .) ]
+  ! {               [ reduce using rule 37 (statement -> RETURN .) ]
+
+    expression                     shift and go to state 26
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 8
+
+    (24) expression -> function_call .
+
+    +               reduce using rule 24 (expression -> function_call .)
+    -               reduce using rule 24 (expression -> function_call .)
+    *               reduce using rule 24 (expression -> function_call .)
+    /               reduce using rule 24 (expression -> function_call .)
+    VARIABLE        reduce using rule 24 (expression -> function_call .)
+    BREAK           reduce using rule 24 (expression -> function_call .)
+    CONTINUE        reduce using rule 24 (expression -> function_call .)
+    RETURN          reduce using rule 24 (expression -> function_call .)
+    MIN             reduce using rule 24 (expression -> function_call .)
+    MAX             reduce using rule 24 (expression -> function_call .)
+    (               reduce using rule 24 (expression -> function_call .)
+    NUMBER          reduce using rule 24 (expression -> function_call .)
+    BOOLEAN         reduce using rule 24 (expression -> function_call .)
+    STRING          reduce using rule 24 (expression -> function_call .)
+    WORD            reduce using rule 24 (expression -> function_call .)
+    FUNCTION        reduce using rule 24 (expression -> function_call .)
+    {               reduce using rule 24 (expression -> function_call .)
+    $end            reduce using rule 24 (expression -> function_call .)
+    }               reduce using rule 24 (expression -> function_call .)
+    )               reduce using rule 24 (expression -> function_call .)
+    ,               reduce using rule 24 (expression -> function_call .)
+    #               reduce using rule 24 (expression -> function_call .)
+
+
+state 9
+
+    (29) expression -> - . expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expression                     shift and go to state 28
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 10
+
+    (33) expression -> MIN . ( comma_expressions )
+
+    (               shift and go to state 29
+
+
+state 11
+
+    (35) expression -> ( . expression )
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expression                     shift and go to state 30
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 12
+
+    (34) expression -> MAX . ( comma_expressions )
+
+    (               shift and go to state 31
+
+
+state 13
+
+    (38) expression -> NUMBER .
+
+    +               reduce using rule 38 (expression -> NUMBER .)
+    -               reduce using rule 38 (expression -> NUMBER .)
+    *               reduce using rule 38 (expression -> NUMBER .)
+    /               reduce using rule 38 (expression -> NUMBER .)
+    VARIABLE        reduce using rule 38 (expression -> NUMBER .)
+    BREAK           reduce using rule 38 (expression -> NUMBER .)
+    CONTINUE        reduce using rule 38 (expression -> NUMBER .)
+    RETURN          reduce using rule 38 (expression -> NUMBER .)
+    MIN             reduce using rule 38 (expression -> NUMBER .)
+    MAX             reduce using rule 38 (expression -> NUMBER .)
+    (               reduce using rule 38 (expression -> NUMBER .)
+    NUMBER          reduce using rule 38 (expression -> NUMBER .)
+    BOOLEAN         reduce using rule 38 (expression -> NUMBER .)
+    STRING          reduce using rule 38 (expression -> NUMBER .)
+    WORD            reduce using rule 38 (expression -> NUMBER .)
+    FUNCTION        reduce using rule 38 (expression -> NUMBER .)
+    {               reduce using rule 38 (expression -> NUMBER .)
+    $end            reduce using rule 38 (expression -> NUMBER .)
+    }               reduce using rule 38 (expression -> NUMBER .)
+    )               reduce using rule 38 (expression -> NUMBER .)
+    ,               reduce using rule 38 (expression -> NUMBER .)
+    #               reduce using rule 38 (expression -> NUMBER .)
+
+
+state 14
+
+    (39) expression -> BOOLEAN .
+
+    +               reduce using rule 39 (expression -> BOOLEAN .)
+    -               reduce using rule 39 (expression -> BOOLEAN .)
+    *               reduce using rule 39 (expression -> BOOLEAN .)
+    /               reduce using rule 39 (expression -> BOOLEAN .)
+    VARIABLE        reduce using rule 39 (expression -> BOOLEAN .)
+    BREAK           reduce using rule 39 (expression -> BOOLEAN .)
+    CONTINUE        reduce using rule 39 (expression -> BOOLEAN .)
+    RETURN          reduce using rule 39 (expression -> BOOLEAN .)
+    MIN             reduce using rule 39 (expression -> BOOLEAN .)
+    MAX             reduce using rule 39 (expression -> BOOLEAN .)
+    (               reduce using rule 39 (expression -> BOOLEAN .)
+    NUMBER          reduce using rule 39 (expression -> BOOLEAN .)
+    BOOLEAN         reduce using rule 39 (expression -> BOOLEAN .)
+    STRING          reduce using rule 39 (expression -> BOOLEAN .)
+    WORD            reduce using rule 39 (expression -> BOOLEAN .)
+    FUNCTION        reduce using rule 39 (expression -> BOOLEAN .)
+    {               reduce using rule 39 (expression -> BOOLEAN .)
+    $end            reduce using rule 39 (expression -> BOOLEAN .)
+    }               reduce using rule 39 (expression -> BOOLEAN .)
+    )               reduce using rule 39 (expression -> BOOLEAN .)
+    ,               reduce using rule 39 (expression -> BOOLEAN .)
+    #               reduce using rule 39 (expression -> BOOLEAN .)
+
+
+state 15
+
+    (40) expression -> STRING .
+
+    +               reduce using rule 40 (expression -> STRING .)
+    -               reduce using rule 40 (expression -> STRING .)
+    *               reduce using rule 40 (expression -> STRING .)
+    /               reduce using rule 40 (expression -> STRING .)
+    VARIABLE        reduce using rule 40 (expression -> STRING .)
+    BREAK           reduce using rule 40 (expression -> STRING .)
+    CONTINUE        reduce using rule 40 (expression -> STRING .)
+    RETURN          reduce using rule 40 (expression -> STRING .)
+    MIN             reduce using rule 40 (expression -> STRING .)
+    MAX             reduce using rule 40 (expression -> STRING .)
+    (               reduce using rule 40 (expression -> STRING .)
+    NUMBER          reduce using rule 40 (expression -> STRING .)
+    BOOLEAN         reduce using rule 40 (expression -> STRING .)
+    STRING          reduce using rule 40 (expression -> STRING .)
+    WORD            reduce using rule 40 (expression -> STRING .)
+    FUNCTION        reduce using rule 40 (expression -> STRING .)
+    {               reduce using rule 40 (expression -> STRING .)
+    $end            reduce using rule 40 (expression -> STRING .)
+    }               reduce using rule 40 (expression -> STRING .)
+    )               reduce using rule 40 (expression -> STRING .)
+    ,               reduce using rule 40 (expression -> STRING .)
+    #               reduce using rule 40 (expression -> STRING .)
+
+
+state 16
+
+    (42) expression -> WORD .
+
+    +               reduce using rule 42 (expression -> WORD .)
+    -               reduce using rule 42 (expression -> WORD .)
+    *               reduce using rule 42 (expression -> WORD .)
+    /               reduce using rule 42 (expression -> WORD .)
+    VARIABLE        reduce using rule 42 (expression -> WORD .)
+    BREAK           reduce using rule 42 (expression -> WORD .)
+    CONTINUE        reduce using rule 42 (expression -> WORD .)
+    RETURN          reduce using rule 42 (expression -> WORD .)
+    MIN             reduce using rule 42 (expression -> WORD .)
+    MAX             reduce using rule 42 (expression -> WORD .)
+    (               reduce using rule 42 (expression -> WORD .)
+    NUMBER          reduce using rule 42 (expression -> WORD .)
+    BOOLEAN         reduce using rule 42 (expression -> WORD .)
+    STRING          reduce using rule 42 (expression -> WORD .)
+    WORD            reduce using rule 42 (expression -> WORD .)
+    FUNCTION        reduce using rule 42 (expression -> WORD .)
+    {               reduce using rule 42 (expression -> WORD .)
+    $end            reduce using rule 42 (expression -> WORD .)
+    }               reduce using rule 42 (expression -> WORD .)
+    )               reduce using rule 42 (expression -> WORD .)
+    ,               reduce using rule 42 (expression -> WORD .)
+    #               reduce using rule 42 (expression -> WORD .)
+
+
+state 17
+
+    (43) expression -> scope .
+
+    +               reduce using rule 43 (expression -> scope .)
+    -               reduce using rule 43 (expression -> scope .)
+    *               reduce using rule 43 (expression -> scope .)
+    /               reduce using rule 43 (expression -> scope .)
+    VARIABLE        reduce using rule 43 (expression -> scope .)
+    BREAK           reduce using rule 43 (expression -> scope .)
+    CONTINUE        reduce using rule 43 (expression -> scope .)
+    RETURN          reduce using rule 43 (expression -> scope .)
+    MIN             reduce using rule 43 (expression -> scope .)
+    MAX             reduce using rule 43 (expression -> scope .)
+    (               reduce using rule 43 (expression -> scope .)
+    NUMBER          reduce using rule 43 (expression -> scope .)
+    BOOLEAN         reduce using rule 43 (expression -> scope .)
+    STRING          reduce using rule 43 (expression -> scope .)
+    WORD            reduce using rule 43 (expression -> scope .)
+    FUNCTION        reduce using rule 43 (expression -> scope .)
+    {               reduce using rule 43 (expression -> scope .)
+    $end            reduce using rule 43 (expression -> scope .)
+    }               reduce using rule 43 (expression -> scope .)
+    )               reduce using rule 43 (expression -> scope .)
+    ,               reduce using rule 43 (expression -> scope .)
+    #               reduce using rule 43 (expression -> scope .)
+
+
+state 18
+
+    (2) function_call -> FUNCTION . parameters scope
+    (3) function_call -> FUNCTION . parameters tag_list
+    (4) function_call -> FUNCTION . parameters
+    (5) function_call -> FUNCTION .
+    (12) parameters -> . ( param_element )
+    (13) parameters -> . ( )
+
+  ! shift/reduce conflict for ( resolved as shift
+    +               reduce using rule 5 (function_call -> FUNCTION .)
+    -               reduce using rule 5 (function_call -> FUNCTION .)
+    *               reduce using rule 5 (function_call -> FUNCTION .)
+    /               reduce using rule 5 (function_call -> FUNCTION .)
+    VARIABLE        reduce using rule 5 (function_call -> FUNCTION .)
+    BREAK           reduce using rule 5 (function_call -> FUNCTION .)
+    CONTINUE        reduce using rule 5 (function_call -> FUNCTION .)
+    RETURN          reduce using rule 5 (function_call -> FUNCTION .)
+    MIN             reduce using rule 5 (function_call -> FUNCTION .)
+    MAX             reduce using rule 5 (function_call -> FUNCTION .)
+    NUMBER          reduce using rule 5 (function_call -> FUNCTION .)
+    BOOLEAN         reduce using rule 5 (function_call -> FUNCTION .)
+    STRING          reduce using rule 5 (function_call -> FUNCTION .)
+    WORD            reduce using rule 5 (function_call -> FUNCTION .)
+    FUNCTION        reduce using rule 5 (function_call -> FUNCTION .)
+    {               reduce using rule 5 (function_call -> FUNCTION .)
+    $end            reduce using rule 5 (function_call -> FUNCTION .)
+    }               reduce using rule 5 (function_call -> FUNCTION .)
+    )               reduce using rule 5 (function_call -> FUNCTION .)
+    ,               reduce using rule 5 (function_call -> FUNCTION .)
+    #               reduce using rule 5 (function_call -> FUNCTION .)
+    (               shift and go to state 33
+
+  ! (               [ reduce using rule 5 (function_call -> FUNCTION .) ]
+
+    parameters                     shift and go to state 32
+
+state 19
+
+    (9) scope -> { . expressions }
+    (10) expressions -> . statement expressions
+    (11) expressions -> . statement
+    (1) statement -> . VARIABLE = expression
+    (21) statement -> . expression
+    (22) statement -> . BREAK
+    (23) statement -> . CONTINUE
+    (36) statement -> . RETURN expression
+    (37) statement -> . RETURN
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    VARIABLE        shift and go to state 3
+    BREAK           shift and go to state 5
+    CONTINUE        shift and go to state 6
+    RETURN          shift and go to state 7
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expressions                    shift and go to state 34
+    statement                      shift and go to state 2
+    expression                     shift and go to state 4
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 20
+
+    (10) expressions -> statement expressions .
+
+    $end            reduce using rule 10 (expressions -> statement expressions .)
+    }               reduce using rule 10 (expressions -> statement expressions .)
+
+
+state 21
+
+    (1) statement -> VARIABLE = . expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expression                     shift and go to state 35
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 22
+
+    (25) expression -> expression + . expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expression                     shift and go to state 36
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 23
+
+    (26) expression -> expression - . expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expression                     shift and go to state 37
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 24
+
+    (27) expression -> expression * . expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expression                     shift and go to state 38
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 25
+
+    (28) expression -> expression / . expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expression                     shift and go to state 39
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 26
+
+    (36) statement -> RETURN expression .
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+  ! shift/reduce conflict for - resolved as shift
+    VARIABLE        reduce using rule 36 (statement -> RETURN expression .)
+    BREAK           reduce using rule 36 (statement -> RETURN expression .)
+    CONTINUE        reduce using rule 36 (statement -> RETURN expression .)
+    RETURN          reduce using rule 36 (statement -> RETURN expression .)
+    MIN             reduce using rule 36 (statement -> RETURN expression .)
+    MAX             reduce using rule 36 (statement -> RETURN expression .)
+    (               reduce using rule 36 (statement -> RETURN expression .)
+    NUMBER          reduce using rule 36 (statement -> RETURN expression .)
+    BOOLEAN         reduce using rule 36 (statement -> RETURN expression .)
+    STRING          reduce using rule 36 (statement -> RETURN expression .)
+    WORD            reduce using rule 36 (statement -> RETURN expression .)
+    FUNCTION        reduce using rule 36 (statement -> RETURN expression .)
+    {               reduce using rule 36 (statement -> RETURN expression .)
+    $end            reduce using rule 36 (statement -> RETURN expression .)
+    }               reduce using rule 36 (statement -> RETURN expression .)
+    +               shift and go to state 22
+    -               shift and go to state 23
+    *               shift and go to state 24
+    /               shift and go to state 25
+
+  ! -               [ reduce using rule 36 (statement -> RETURN expression .) ]
+
+
+state 27
+
+    (41) expression -> VARIABLE .
+
+    +               reduce using rule 41 (expression -> VARIABLE .)
+    -               reduce using rule 41 (expression -> VARIABLE .)
+    *               reduce using rule 41 (expression -> VARIABLE .)
+    /               reduce using rule 41 (expression -> VARIABLE .)
+    VARIABLE        reduce using rule 41 (expression -> VARIABLE .)
+    BREAK           reduce using rule 41 (expression -> VARIABLE .)
+    CONTINUE        reduce using rule 41 (expression -> VARIABLE .)
+    RETURN          reduce using rule 41 (expression -> VARIABLE .)
+    MIN             reduce using rule 41 (expression -> VARIABLE .)
+    MAX             reduce using rule 41 (expression -> VARIABLE .)
+    (               reduce using rule 41 (expression -> VARIABLE .)
+    NUMBER          reduce using rule 41 (expression -> VARIABLE .)
+    BOOLEAN         reduce using rule 41 (expression -> VARIABLE .)
+    STRING          reduce using rule 41 (expression -> VARIABLE .)
+    WORD            reduce using rule 41 (expression -> VARIABLE .)
+    FUNCTION        reduce using rule 41 (expression -> VARIABLE .)
+    {               reduce using rule 41 (expression -> VARIABLE .)
+    $end            reduce using rule 41 (expression -> VARIABLE .)
+    }               reduce using rule 41 (expression -> VARIABLE .)
+    )               reduce using rule 41 (expression -> VARIABLE .)
+    ,               reduce using rule 41 (expression -> VARIABLE .)
+    #               reduce using rule 41 (expression -> VARIABLE .)
+
+
+state 28
+
+    (29) expression -> - expression .
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+    +               reduce using rule 29 (expression -> - expression .)
+    -               reduce using rule 29 (expression -> - expression .)
+    VARIABLE        reduce using rule 29 (expression -> - expression .)
+    BREAK           reduce using rule 29 (expression -> - expression .)
+    CONTINUE        reduce using rule 29 (expression -> - expression .)
+    RETURN          reduce using rule 29 (expression -> - expression .)
+    MIN             reduce using rule 29 (expression -> - expression .)
+    MAX             reduce using rule 29 (expression -> - expression .)
+    (               reduce using rule 29 (expression -> - expression .)
+    NUMBER          reduce using rule 29 (expression -> - expression .)
+    BOOLEAN         reduce using rule 29 (expression -> - expression .)
+    STRING          reduce using rule 29 (expression -> - expression .)
+    WORD            reduce using rule 29 (expression -> - expression .)
+    FUNCTION        reduce using rule 29 (expression -> - expression .)
+    {               reduce using rule 29 (expression -> - expression .)
+    $end            reduce using rule 29 (expression -> - expression .)
+    }               reduce using rule 29 (expression -> - expression .)
+    )               reduce using rule 29 (expression -> - expression .)
+    ,               reduce using rule 29 (expression -> - expression .)
+    #               reduce using rule 29 (expression -> - expression .)
+    *               shift and go to state 24
+    /               shift and go to state 25
+
+  ! *               [ reduce using rule 29 (expression -> - expression .) ]
+  ! /               [ reduce using rule 29 (expression -> - expression .) ]
+  ! +               [ shift and go to state 22 ]
+  ! -               [ shift and go to state 23 ]
+
+
+state 29
+
+    (33) expression -> MIN ( . comma_expressions )
+    (30) comma_expressions -> . expression , comma_expressions
+    (31) comma_expressions -> . expression ,
+    (32) comma_expressions -> . expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    comma_expressions              shift and go to state 40
+    expression                     shift and go to state 41
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 30
+
+    (35) expression -> ( expression . )
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+    )               shift and go to state 42
+    +               shift and go to state 22
+    -               shift and go to state 23
+    *               shift and go to state 24
+    /               shift and go to state 25
+
+
+state 31
+
+    (34) expression -> MAX ( . comma_expressions )
+    (30) comma_expressions -> . expression , comma_expressions
+    (31) comma_expressions -> . expression ,
+    (32) comma_expressions -> . expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    comma_expressions              shift and go to state 43
+    expression                     shift and go to state 41
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 32
+
+    (2) function_call -> FUNCTION parameters . scope
+    (3) function_call -> FUNCTION parameters . tag_list
+    (4) function_call -> FUNCTION parameters .
+    (9) scope -> . { expressions }
+    (7) tag_list -> . tag # scope tag_list
+    (8) tag_list -> . tag # scope
+    (6) tag -> . TAG expression
+
+  ! shift/reduce conflict for { resolved as shift
+    +               reduce using rule 4 (function_call -> FUNCTION parameters .)
+    -               reduce using rule 4 (function_call -> FUNCTION parameters .)
+    *               reduce using rule 4 (function_call -> FUNCTION parameters .)
+    /               reduce using rule 4 (function_call -> FUNCTION parameters .)
+    VARIABLE        reduce using rule 4 (function_call -> FUNCTION parameters .)
+    BREAK           reduce using rule 4 (function_call -> FUNCTION parameters .)
+    CONTINUE        reduce using rule 4 (function_call -> FUNCTION parameters .)
+    RETURN          reduce using rule 4 (function_call -> FUNCTION parameters .)
+    MIN             reduce using rule 4 (function_call -> FUNCTION parameters .)
+    MAX             reduce using rule 4 (function_call -> FUNCTION parameters .)
+    (               reduce using rule 4 (function_call -> FUNCTION parameters .)
+    NUMBER          reduce using rule 4 (function_call -> FUNCTION parameters .)
+    BOOLEAN         reduce using rule 4 (function_call -> FUNCTION parameters .)
+    STRING          reduce using rule 4 (function_call -> FUNCTION parameters .)
+    WORD            reduce using rule 4 (function_call -> FUNCTION parameters .)
+    FUNCTION        reduce using rule 4 (function_call -> FUNCTION parameters .)
+    $end            reduce using rule 4 (function_call -> FUNCTION parameters .)
+    }               reduce using rule 4 (function_call -> FUNCTION parameters .)
+    )               reduce using rule 4 (function_call -> FUNCTION parameters .)
+    ,               reduce using rule 4 (function_call -> FUNCTION parameters .)
+    #               reduce using rule 4 (function_call -> FUNCTION parameters .)
+    {               shift and go to state 19
+    TAG             shift and go to state 47
+
+  ! {               [ reduce using rule 4 (function_call -> FUNCTION parameters .) ]
+
+    scope                          shift and go to state 44
+    tag_list                       shift and go to state 45
+    tag                            shift and go to state 46
+
+state 33
+
+    (12) parameters -> ( . param_element )
+    (13) parameters -> ( . )
+    (17) param_element -> . expression , param_element
+    (18) param_element -> . expression , param_element_pos
+    (19) param_element -> . expression ,
+    (20) param_element -> . expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    )               shift and go to state 49
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    param_element                  shift and go to state 48
+    expression                     shift and go to state 50
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 34
+
+    (9) scope -> { expressions . }
+
+    }               shift and go to state 51
+
+
+state 35
+
+    (1) statement -> VARIABLE = expression .
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+  ! shift/reduce conflict for - resolved as shift
+    VARIABLE        reduce using rule 1 (statement -> VARIABLE = expression .)
+    BREAK           reduce using rule 1 (statement -> VARIABLE = expression .)
+    CONTINUE        reduce using rule 1 (statement -> VARIABLE = expression .)
+    RETURN          reduce using rule 1 (statement -> VARIABLE = expression .)
+    MIN             reduce using rule 1 (statement -> VARIABLE = expression .)
+    MAX             reduce using rule 1 (statement -> VARIABLE = expression .)
+    (               reduce using rule 1 (statement -> VARIABLE = expression .)
+    NUMBER          reduce using rule 1 (statement -> VARIABLE = expression .)
+    BOOLEAN         reduce using rule 1 (statement -> VARIABLE = expression .)
+    STRING          reduce using rule 1 (statement -> VARIABLE = expression .)
+    WORD            reduce using rule 1 (statement -> VARIABLE = expression .)
+    FUNCTION        reduce using rule 1 (statement -> VARIABLE = expression .)
+    {               reduce using rule 1 (statement -> VARIABLE = expression .)
+    $end            reduce using rule 1 (statement -> VARIABLE = expression .)
+    }               reduce using rule 1 (statement -> VARIABLE = expression .)
+    +               shift and go to state 22
+    -               shift and go to state 23
+    *               shift and go to state 24
+    /               shift and go to state 25
+
+  ! -               [ reduce using rule 1 (statement -> VARIABLE = expression .) ]
+
+
+state 36
+
+    (25) expression -> expression + expression .
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+    +               reduce using rule 25 (expression -> expression + expression .)
+    -               reduce using rule 25 (expression -> expression + expression .)
+    VARIABLE        reduce using rule 25 (expression -> expression + expression .)
+    BREAK           reduce using rule 25 (expression -> expression + expression .)
+    CONTINUE        reduce using rule 25 (expression -> expression + expression .)
+    RETURN          reduce using rule 25 (expression -> expression + expression .)
+    MIN             reduce using rule 25 (expression -> expression + expression .)
+    MAX             reduce using rule 25 (expression -> expression + expression .)
+    (               reduce using rule 25 (expression -> expression + expression .)
+    NUMBER          reduce using rule 25 (expression -> expression + expression .)
+    BOOLEAN         reduce using rule 25 (expression -> expression + expression .)
+    STRING          reduce using rule 25 (expression -> expression + expression .)
+    WORD            reduce using rule 25 (expression -> expression + expression .)
+    FUNCTION        reduce using rule 25 (expression -> expression + expression .)
+    {               reduce using rule 25 (expression -> expression + expression .)
+    $end            reduce using rule 25 (expression -> expression + expression .)
+    }               reduce using rule 25 (expression -> expression + expression .)
+    )               reduce using rule 25 (expression -> expression + expression .)
+    ,               reduce using rule 25 (expression -> expression + expression .)
+    #               reduce using rule 25 (expression -> expression + expression .)
+    *               shift and go to state 24
+    /               shift and go to state 25
+
+  ! *               [ reduce using rule 25 (expression -> expression + expression .) ]
+  ! /               [ reduce using rule 25 (expression -> expression + expression .) ]
+  ! +               [ shift and go to state 22 ]
+  ! -               [ shift and go to state 23 ]
+
+
+state 37
+
+    (26) expression -> expression - expression .
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+    +               reduce using rule 26 (expression -> expression - expression .)
+    -               reduce using rule 26 (expression -> expression - expression .)
+    VARIABLE        reduce using rule 26 (expression -> expression - expression .)
+    BREAK           reduce using rule 26 (expression -> expression - expression .)
+    CONTINUE        reduce using rule 26 (expression -> expression - expression .)
+    RETURN          reduce using rule 26 (expression -> expression - expression .)
+    MIN             reduce using rule 26 (expression -> expression - expression .)
+    MAX             reduce using rule 26 (expression -> expression - expression .)
+    (               reduce using rule 26 (expression -> expression - expression .)
+    NUMBER          reduce using rule 26 (expression -> expression - expression .)
+    BOOLEAN         reduce using rule 26 (expression -> expression - expression .)
+    STRING          reduce using rule 26 (expression -> expression - expression .)
+    WORD            reduce using rule 26 (expression -> expression - expression .)
+    FUNCTION        reduce using rule 26 (expression -> expression - expression .)
+    {               reduce using rule 26 (expression -> expression - expression .)
+    $end            reduce using rule 26 (expression -> expression - expression .)
+    }               reduce using rule 26 (expression -> expression - expression .)
+    )               reduce using rule 26 (expression -> expression - expression .)
+    ,               reduce using rule 26 (expression -> expression - expression .)
+    #               reduce using rule 26 (expression -> expression - expression .)
+    *               shift and go to state 24
+    /               shift and go to state 25
+
+  ! *               [ reduce using rule 26 (expression -> expression - expression .) ]
+  ! /               [ reduce using rule 26 (expression -> expression - expression .) ]
+  ! +               [ shift and go to state 22 ]
+  ! -               [ shift and go to state 23 ]
+
+
+state 38
+
+    (27) expression -> expression * expression .
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+    +               reduce using rule 27 (expression -> expression * expression .)
+    -               reduce using rule 27 (expression -> expression * expression .)
+    *               reduce using rule 27 (expression -> expression * expression .)
+    /               reduce using rule 27 (expression -> expression * expression .)
+    VARIABLE        reduce using rule 27 (expression -> expression * expression .)
+    BREAK           reduce using rule 27 (expression -> expression * expression .)
+    CONTINUE        reduce using rule 27 (expression -> expression * expression .)
+    RETURN          reduce using rule 27 (expression -> expression * expression .)
+    MIN             reduce using rule 27 (expression -> expression * expression .)
+    MAX             reduce using rule 27 (expression -> expression * expression .)
+    (               reduce using rule 27 (expression -> expression * expression .)
+    NUMBER          reduce using rule 27 (expression -> expression * expression .)
+    BOOLEAN         reduce using rule 27 (expression -> expression * expression .)
+    STRING          reduce using rule 27 (expression -> expression * expression .)
+    WORD            reduce using rule 27 (expression -> expression * expression .)
+    FUNCTION        reduce using rule 27 (expression -> expression * expression .)
+    {               reduce using rule 27 (expression -> expression * expression .)
+    $end            reduce using rule 27 (expression -> expression * expression .)
+    }               reduce using rule 27 (expression -> expression * expression .)
+    )               reduce using rule 27 (expression -> expression * expression .)
+    ,               reduce using rule 27 (expression -> expression * expression .)
+    #               reduce using rule 27 (expression -> expression * expression .)
+
+  ! +               [ shift and go to state 22 ]
+  ! -               [ shift and go to state 23 ]
+  ! *               [ shift and go to state 24 ]
+  ! /               [ shift and go to state 25 ]
+
+
+state 39
+
+    (28) expression -> expression / expression .
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+    +               reduce using rule 28 (expression -> expression / expression .)
+    -               reduce using rule 28 (expression -> expression / expression .)
+    *               reduce using rule 28 (expression -> expression / expression .)
+    /               reduce using rule 28 (expression -> expression / expression .)
+    VARIABLE        reduce using rule 28 (expression -> expression / expression .)
+    BREAK           reduce using rule 28 (expression -> expression / expression .)
+    CONTINUE        reduce using rule 28 (expression -> expression / expression .)
+    RETURN          reduce using rule 28 (expression -> expression / expression .)
+    MIN             reduce using rule 28 (expression -> expression / expression .)
+    MAX             reduce using rule 28 (expression -> expression / expression .)
+    (               reduce using rule 28 (expression -> expression / expression .)
+    NUMBER          reduce using rule 28 (expression -> expression / expression .)
+    BOOLEAN         reduce using rule 28 (expression -> expression / expression .)
+    STRING          reduce using rule 28 (expression -> expression / expression .)
+    WORD            reduce using rule 28 (expression -> expression / expression .)
+    FUNCTION        reduce using rule 28 (expression -> expression / expression .)
+    {               reduce using rule 28 (expression -> expression / expression .)
+    $end            reduce using rule 28 (expression -> expression / expression .)
+    }               reduce using rule 28 (expression -> expression / expression .)
+    )               reduce using rule 28 (expression -> expression / expression .)
+    ,               reduce using rule 28 (expression -> expression / expression .)
+    #               reduce using rule 28 (expression -> expression / expression .)
+
+  ! +               [ shift and go to state 22 ]
+  ! -               [ shift and go to state 23 ]
+  ! *               [ shift and go to state 24 ]
+  ! /               [ shift and go to state 25 ]
+
+
+state 40
+
+    (33) expression -> MIN ( comma_expressions . )
+
+    )               shift and go to state 52
+
+
+state 41
+
+    (30) comma_expressions -> expression . , comma_expressions
+    (31) comma_expressions -> expression . ,
+    (32) comma_expressions -> expression .
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+    ,               shift and go to state 53
+    )               reduce using rule 32 (comma_expressions -> expression .)
+    +               shift and go to state 22
+    -               shift and go to state 23
+    *               shift and go to state 24
+    /               shift and go to state 25
+
+
+state 42
+
+    (35) expression -> ( expression ) .
+
+    +               reduce using rule 35 (expression -> ( expression ) .)
+    -               reduce using rule 35 (expression -> ( expression ) .)
+    *               reduce using rule 35 (expression -> ( expression ) .)
+    /               reduce using rule 35 (expression -> ( expression ) .)
+    VARIABLE        reduce using rule 35 (expression -> ( expression ) .)
+    BREAK           reduce using rule 35 (expression -> ( expression ) .)
+    CONTINUE        reduce using rule 35 (expression -> ( expression ) .)
+    RETURN          reduce using rule 35 (expression -> ( expression ) .)
+    MIN             reduce using rule 35 (expression -> ( expression ) .)
+    MAX             reduce using rule 35 (expression -> ( expression ) .)
+    (               reduce using rule 35 (expression -> ( expression ) .)
+    NUMBER          reduce using rule 35 (expression -> ( expression ) .)
+    BOOLEAN         reduce using rule 35 (expression -> ( expression ) .)
+    STRING          reduce using rule 35 (expression -> ( expression ) .)
+    WORD            reduce using rule 35 (expression -> ( expression ) .)
+    FUNCTION        reduce using rule 35 (expression -> ( expression ) .)
+    {               reduce using rule 35 (expression -> ( expression ) .)
+    $end            reduce using rule 35 (expression -> ( expression ) .)
+    }               reduce using rule 35 (expression -> ( expression ) .)
+    )               reduce using rule 35 (expression -> ( expression ) .)
+    ,               reduce using rule 35 (expression -> ( expression ) .)
+    #               reduce using rule 35 (expression -> ( expression ) .)
+
+
+state 43
+
+    (34) expression -> MAX ( comma_expressions . )
+
+    )               shift and go to state 54
+
+
+state 44
+
+    (2) function_call -> FUNCTION parameters scope .
+
+    +               reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    -               reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    *               reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    /               reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    VARIABLE        reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    BREAK           reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    CONTINUE        reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    RETURN          reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    MIN             reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    MAX             reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    (               reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    NUMBER          reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    BOOLEAN         reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    STRING          reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    WORD            reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    FUNCTION        reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    {               reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    $end            reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    }               reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    )               reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    ,               reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+    #               reduce using rule 2 (function_call -> FUNCTION parameters scope .)
+
+
+state 45
+
+    (3) function_call -> FUNCTION parameters tag_list .
+
+    +               reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    -               reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    *               reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    /               reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    VARIABLE        reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    BREAK           reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    CONTINUE        reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    RETURN          reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    MIN             reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    MAX             reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    (               reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    NUMBER          reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    BOOLEAN         reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    STRING          reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    WORD            reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    FUNCTION        reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    {               reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    $end            reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    }               reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    )               reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    ,               reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+    #               reduce using rule 3 (function_call -> FUNCTION parameters tag_list .)
+
+
+state 46
+
+    (7) tag_list -> tag . # scope tag_list
+    (8) tag_list -> tag . # scope
+
+    #               shift and go to state 55
+
+
+state 47
+
+    (6) tag -> TAG . expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expression                     shift and go to state 56
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 48
+
+    (12) parameters -> ( param_element . )
+
+    )               shift and go to state 57
+
+
+state 49
+
+    (13) parameters -> ( ) .
+
+    {               reduce using rule 13 (parameters -> ( ) .)
+    TAG             reduce using rule 13 (parameters -> ( ) .)
+    +               reduce using rule 13 (parameters -> ( ) .)
+    -               reduce using rule 13 (parameters -> ( ) .)
+    *               reduce using rule 13 (parameters -> ( ) .)
+    /               reduce using rule 13 (parameters -> ( ) .)
+    VARIABLE        reduce using rule 13 (parameters -> ( ) .)
+    BREAK           reduce using rule 13 (parameters -> ( ) .)
+    CONTINUE        reduce using rule 13 (parameters -> ( ) .)
+    RETURN          reduce using rule 13 (parameters -> ( ) .)
+    MIN             reduce using rule 13 (parameters -> ( ) .)
+    MAX             reduce using rule 13 (parameters -> ( ) .)
+    (               reduce using rule 13 (parameters -> ( ) .)
+    NUMBER          reduce using rule 13 (parameters -> ( ) .)
+    BOOLEAN         reduce using rule 13 (parameters -> ( ) .)
+    STRING          reduce using rule 13 (parameters -> ( ) .)
+    WORD            reduce using rule 13 (parameters -> ( ) .)
+    FUNCTION        reduce using rule 13 (parameters -> ( ) .)
+    $end            reduce using rule 13 (parameters -> ( ) .)
+    }               reduce using rule 13 (parameters -> ( ) .)
+    )               reduce using rule 13 (parameters -> ( ) .)
+    ,               reduce using rule 13 (parameters -> ( ) .)
+    #               reduce using rule 13 (parameters -> ( ) .)
+
+
+state 50
+
+    (17) param_element -> expression . , param_element
+    (18) param_element -> expression . , param_element_pos
+    (19) param_element -> expression . ,
+    (20) param_element -> expression .
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+    ,               shift and go to state 58
+    )               reduce using rule 20 (param_element -> expression .)
+    +               shift and go to state 22
+    -               shift and go to state 23
+    *               shift and go to state 24
+    /               shift and go to state 25
+
+
+state 51
+
+    (9) scope -> { expressions } .
+
+    +               reduce using rule 9 (scope -> { expressions } .)
+    -               reduce using rule 9 (scope -> { expressions } .)
+    *               reduce using rule 9 (scope -> { expressions } .)
+    /               reduce using rule 9 (scope -> { expressions } .)
+    VARIABLE        reduce using rule 9 (scope -> { expressions } .)
+    BREAK           reduce using rule 9 (scope -> { expressions } .)
+    CONTINUE        reduce using rule 9 (scope -> { expressions } .)
+    RETURN          reduce using rule 9 (scope -> { expressions } .)
+    MIN             reduce using rule 9 (scope -> { expressions } .)
+    MAX             reduce using rule 9 (scope -> { expressions } .)
+    (               reduce using rule 9 (scope -> { expressions } .)
+    NUMBER          reduce using rule 9 (scope -> { expressions } .)
+    BOOLEAN         reduce using rule 9 (scope -> { expressions } .)
+    STRING          reduce using rule 9 (scope -> { expressions } .)
+    WORD            reduce using rule 9 (scope -> { expressions } .)
+    FUNCTION        reduce using rule 9 (scope -> { expressions } .)
+    {               reduce using rule 9 (scope -> { expressions } .)
+    $end            reduce using rule 9 (scope -> { expressions } .)
+    }               reduce using rule 9 (scope -> { expressions } .)
+    )               reduce using rule 9 (scope -> { expressions } .)
+    ,               reduce using rule 9 (scope -> { expressions } .)
+    #               reduce using rule 9 (scope -> { expressions } .)
+    TAG             reduce using rule 9 (scope -> { expressions } .)
+
+
+state 52
+
+    (33) expression -> MIN ( comma_expressions ) .
+
+    +               reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    -               reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    *               reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    /               reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    VARIABLE        reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    BREAK           reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    CONTINUE        reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    RETURN          reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    MIN             reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    MAX             reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    (               reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    NUMBER          reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    BOOLEAN         reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    STRING          reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    WORD            reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    FUNCTION        reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    {               reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    $end            reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    }               reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    )               reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    ,               reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+    #               reduce using rule 33 (expression -> MIN ( comma_expressions ) .)
+
+
+state 53
+
+    (30) comma_expressions -> expression , . comma_expressions
+    (31) comma_expressions -> expression , .
+    (30) comma_expressions -> . expression , comma_expressions
+    (31) comma_expressions -> . expression ,
+    (32) comma_expressions -> . expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    )               reduce using rule 31 (comma_expressions -> expression , .)
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expression                     shift and go to state 41
+    comma_expressions              shift and go to state 59
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 54
+
+    (34) expression -> MAX ( comma_expressions ) .
+
+    +               reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    -               reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    *               reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    /               reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    VARIABLE        reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    BREAK           reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    CONTINUE        reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    RETURN          reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    MIN             reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    MAX             reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    (               reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    NUMBER          reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    BOOLEAN         reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    STRING          reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    WORD            reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    FUNCTION        reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    {               reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    $end            reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    }               reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    )               reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    ,               reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+    #               reduce using rule 34 (expression -> MAX ( comma_expressions ) .)
+
+
+state 55
+
+    (7) tag_list -> tag # . scope tag_list
+    (8) tag_list -> tag # . scope
+    (9) scope -> . { expressions }
+
+    {               shift and go to state 19
+
+    scope                          shift and go to state 60
+
+state 56
+
+    (6) tag -> TAG expression .
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+    #               reduce using rule 6 (tag -> TAG expression .)
+    +               shift and go to state 22
+    -               shift and go to state 23
+    *               shift and go to state 24
+    /               shift and go to state 25
+
+
+state 57
+
+    (12) parameters -> ( param_element ) .
+
+    {               reduce using rule 12 (parameters -> ( param_element ) .)
+    TAG             reduce using rule 12 (parameters -> ( param_element ) .)
+    +               reduce using rule 12 (parameters -> ( param_element ) .)
+    -               reduce using rule 12 (parameters -> ( param_element ) .)
+    *               reduce using rule 12 (parameters -> ( param_element ) .)
+    /               reduce using rule 12 (parameters -> ( param_element ) .)
+    VARIABLE        reduce using rule 12 (parameters -> ( param_element ) .)
+    BREAK           reduce using rule 12 (parameters -> ( param_element ) .)
+    CONTINUE        reduce using rule 12 (parameters -> ( param_element ) .)
+    RETURN          reduce using rule 12 (parameters -> ( param_element ) .)
+    MIN             reduce using rule 12 (parameters -> ( param_element ) .)
+    MAX             reduce using rule 12 (parameters -> ( param_element ) .)
+    (               reduce using rule 12 (parameters -> ( param_element ) .)
+    NUMBER          reduce using rule 12 (parameters -> ( param_element ) .)
+    BOOLEAN         reduce using rule 12 (parameters -> ( param_element ) .)
+    STRING          reduce using rule 12 (parameters -> ( param_element ) .)
+    WORD            reduce using rule 12 (parameters -> ( param_element ) .)
+    FUNCTION        reduce using rule 12 (parameters -> ( param_element ) .)
+    $end            reduce using rule 12 (parameters -> ( param_element ) .)
+    }               reduce using rule 12 (parameters -> ( param_element ) .)
+    )               reduce using rule 12 (parameters -> ( param_element ) .)
+    ,               reduce using rule 12 (parameters -> ( param_element ) .)
+    #               reduce using rule 12 (parameters -> ( param_element ) .)
+
+
+state 58
+
+    (17) param_element -> expression , . param_element
+    (18) param_element -> expression , . param_element_pos
+    (19) param_element -> expression , .
+    (17) param_element -> . expression , param_element
+    (18) param_element -> . expression , param_element_pos
+    (19) param_element -> . expression ,
+    (20) param_element -> . expression
+    (14) param_element_pos -> . WORD : expression , param_element_pos
+    (15) param_element_pos -> . WORD : expression ,
+    (16) param_element_pos -> . WORD : expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    )               reduce using rule 19 (param_element -> expression , .)
+    WORD            shift and go to state 63
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expression                     shift and go to state 50
+    param_element                  shift and go to state 61
+    param_element_pos              shift and go to state 62
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 59
+
+    (30) comma_expressions -> expression , comma_expressions .
+
+    )               reduce using rule 30 (comma_expressions -> expression , comma_expressions .)
+
+
+state 60
+
+    (7) tag_list -> tag # scope . tag_list
+    (8) tag_list -> tag # scope .
+    (7) tag_list -> . tag # scope tag_list
+    (8) tag_list -> . tag # scope
+    (6) tag -> . TAG expression
+
+    +               reduce using rule 8 (tag_list -> tag # scope .)
+    -               reduce using rule 8 (tag_list -> tag # scope .)
+    *               reduce using rule 8 (tag_list -> tag # scope .)
+    /               reduce using rule 8 (tag_list -> tag # scope .)
+    VARIABLE        reduce using rule 8 (tag_list -> tag # scope .)
+    BREAK           reduce using rule 8 (tag_list -> tag # scope .)
+    CONTINUE        reduce using rule 8 (tag_list -> tag # scope .)
+    RETURN          reduce using rule 8 (tag_list -> tag # scope .)
+    MIN             reduce using rule 8 (tag_list -> tag # scope .)
+    MAX             reduce using rule 8 (tag_list -> tag # scope .)
+    (               reduce using rule 8 (tag_list -> tag # scope .)
+    NUMBER          reduce using rule 8 (tag_list -> tag # scope .)
+    BOOLEAN         reduce using rule 8 (tag_list -> tag # scope .)
+    STRING          reduce using rule 8 (tag_list -> tag # scope .)
+    WORD            reduce using rule 8 (tag_list -> tag # scope .)
+    FUNCTION        reduce using rule 8 (tag_list -> tag # scope .)
+    {               reduce using rule 8 (tag_list -> tag # scope .)
+    $end            reduce using rule 8 (tag_list -> tag # scope .)
+    }               reduce using rule 8 (tag_list -> tag # scope .)
+    )               reduce using rule 8 (tag_list -> tag # scope .)
+    ,               reduce using rule 8 (tag_list -> tag # scope .)
+    #               reduce using rule 8 (tag_list -> tag # scope .)
+    TAG             shift and go to state 47
+
+    tag                            shift and go to state 46
+    tag_list                       shift and go to state 64
+
+state 61
+
+    (17) param_element -> expression , param_element .
+
+    )               reduce using rule 17 (param_element -> expression , param_element .)
+
+
+state 62
+
+    (18) param_element -> expression , param_element_pos .
+
+    )               reduce using rule 18 (param_element -> expression , param_element_pos .)
+
+
+state 63
+
+    (14) param_element_pos -> WORD . : expression , param_element_pos
+    (15) param_element_pos -> WORD . : expression ,
+    (16) param_element_pos -> WORD . : expression
+    (42) expression -> WORD .
+
+    :               shift and go to state 65
+    ,               reduce using rule 42 (expression -> WORD .)
+    +               reduce using rule 42 (expression -> WORD .)
+    -               reduce using rule 42 (expression -> WORD .)
+    *               reduce using rule 42 (expression -> WORD .)
+    /               reduce using rule 42 (expression -> WORD .)
+    )               reduce using rule 42 (expression -> WORD .)
+
+
+state 64
+
+    (7) tag_list -> tag # scope tag_list .
+
+    +               reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    -               reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    *               reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    /               reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    VARIABLE        reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    BREAK           reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    CONTINUE        reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    RETURN          reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    MIN             reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    MAX             reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    (               reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    NUMBER          reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    BOOLEAN         reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    STRING          reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    WORD            reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    FUNCTION        reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    {               reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    $end            reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    }               reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    )               reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    ,               reduce using rule 7 (tag_list -> tag # scope tag_list .)
+    #               reduce using rule 7 (tag_list -> tag # scope tag_list .)
+
+
+state 65
+
+    (14) param_element_pos -> WORD : . expression , param_element_pos
+    (15) param_element_pos -> WORD : . expression ,
+    (16) param_element_pos -> WORD : . expression
+    (24) expression -> . function_call
+    (25) expression -> . expression + expression
+    (26) expression -> . expression - expression
+    (27) expression -> . expression * expression
+    (28) expression -> . expression / expression
+    (29) expression -> . - expression
+    (33) expression -> . MIN ( comma_expressions )
+    (34) expression -> . MAX ( comma_expressions )
+    (35) expression -> . ( expression )
+    (38) expression -> . NUMBER
+    (39) expression -> . BOOLEAN
+    (40) expression -> . STRING
+    (41) expression -> . VARIABLE
+    (42) expression -> . WORD
+    (43) expression -> . scope
+    (2) function_call -> . FUNCTION parameters scope
+    (3) function_call -> . FUNCTION parameters tag_list
+    (4) function_call -> . FUNCTION parameters
+    (5) function_call -> . FUNCTION
+    (9) scope -> . { expressions }
+
+    -               shift and go to state 9
+    MIN             shift and go to state 10
+    MAX             shift and go to state 12
+    (               shift and go to state 11
+    NUMBER          shift and go to state 13
+    BOOLEAN         shift and go to state 14
+    STRING          shift and go to state 15
+    VARIABLE        shift and go to state 27
+    WORD            shift and go to state 16
+    FUNCTION        shift and go to state 18
+    {               shift and go to state 19
+
+    expression                     shift and go to state 66
+    function_call                  shift and go to state 8
+    scope                          shift and go to state 17
+
+state 66
+
+    (14) param_element_pos -> WORD : expression . , param_element_pos
+    (15) param_element_pos -> WORD : expression . ,
+    (16) param_element_pos -> WORD : expression .
+    (25) expression -> expression . + expression
+    (26) expression -> expression . - expression
+    (27) expression -> expression . * expression
+    (28) expression -> expression . / expression
+
+    ,               shift and go to state 67
+    )               reduce using rule 16 (param_element_pos -> WORD : expression .)
+    +               shift and go to state 22
+    -               shift and go to state 23
+    *               shift and go to state 24
+    /               shift and go to state 25
+
+
+state 67
+
+    (14) param_element_pos -> WORD : expression , . param_element_pos
+    (15) param_element_pos -> WORD : expression , .
+    (14) param_element_pos -> . WORD : expression , param_element_pos
+    (15) param_element_pos -> . WORD : expression ,
+    (16) param_element_pos -> . WORD : expression
+
+    )               reduce using rule 15 (param_element_pos -> WORD : expression , .)
+    WORD            shift and go to state 68
+
+    param_element_pos              shift and go to state 69
+
+state 68
+
+    (14) param_element_pos -> WORD . : expression , param_element_pos
+    (15) param_element_pos -> WORD . : expression ,
+    (16) param_element_pos -> WORD . : expression
+
+    :               shift and go to state 65
+
+
+state 69
+
+    (14) param_element_pos -> WORD : expression , param_element_pos .
+
+    )               reduce using rule 14 (param_element_pos -> WORD : expression , param_element_pos .)
+
+WARNING: 
+WARNING: Conflicts:
+WARNING: 
+WARNING: shift/reduce conflict for - in state 4 resolved as shift
+WARNING: shift/reduce conflict for - in state 7 resolved as shift
+WARNING: shift/reduce conflict for MIN in state 7 resolved as shift
+WARNING: shift/reduce conflict for MAX in state 7 resolved as shift
+WARNING: shift/reduce conflict for ( in state 7 resolved as shift
+WARNING: shift/reduce conflict for NUMBER in state 7 resolved as shift
+WARNING: shift/reduce conflict for BOOLEAN in state 7 resolved as shift
+WARNING: shift/reduce conflict for STRING in state 7 resolved as shift
+WARNING: shift/reduce conflict for VARIABLE in state 7 resolved as shift
+WARNING: shift/reduce conflict for WORD in state 7 resolved as shift
+WARNING: shift/reduce conflict for FUNCTION in state 7 resolved as shift
+WARNING: shift/reduce conflict for { in state 7 resolved as shift
+WARNING: shift/reduce conflict for ( in state 18 resolved as shift
+WARNING: shift/reduce conflict for - in state 26 resolved as shift
+WARNING: shift/reduce conflict for { in state 32 resolved as shift
+WARNING: shift/reduce conflict for - in state 35 resolved as shift

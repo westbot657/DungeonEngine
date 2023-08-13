@@ -23,6 +23,8 @@ class LoaderFunction:
     pre_evaluator: bool = False
     pre_evaluate_args: bool = True
 
+    script_flags: dict = {}
+
     @classmethod
     def getRelatedFunctions(cls, value_type:str|Identifier) -> list:
         if isinstance(value_type, Identifier): value_type = value_type.full()

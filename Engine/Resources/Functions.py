@@ -1104,6 +1104,19 @@ class Engine_Text_Builder(LoaderFunction):
 class Engine_Text_Match(LoaderFunction):
     id = Identifier("engine", "text/", "match")
     pre_evaluate_args = False
+
+    script_flags = {
+        "args": {
+            "text": "required parameter",
+            "match_type": "optional parameter",
+            "matches": "tags"
+        },
+        "tags": {
+            "tag": "pattern",
+            "scope": "functions"
+        }
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         if "text" in args:
@@ -1336,6 +1349,14 @@ class Engine_Dict_ForEach(LoaderFunction):
 class Engine_List_ForEach(LoaderFunction):
     id = Identifier("engine", "list/", "for_each")
     pre_evaluate_args = False
+
+    script_flags = {
+        "args": {
+            "list": "required parameter",
+            "run": "scope"
+        }
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:

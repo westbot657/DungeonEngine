@@ -31,6 +31,7 @@ try:
     from .AbstractInteractable import AbstractInteractable, Interactable
     from .Entity import Entity
     from .DynamicValue import DynamicValue
+    from .EngineScript import EngineScript
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -62,6 +63,7 @@ except ImportError:
     from AbstractInteractable import AbstractInteractable, Interactable
     from Entity import Entity
     from DynamicValue import DynamicValue
+    from EngineScript import EngineScript
 
 
 from typing import Any, Generator
@@ -160,12 +162,39 @@ class DungeonLoader:
     def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict, prepEval:bool=False):
         v = None
         if isinstance(data, dict):
-            if (funcs := data.get("functions", None)) is not None:
+            if (script_file := data.get("#script", None)) is not None:
+                d = EngineScript(script_file)
+                data.clear()
+                data.update(d.getScript())
+                ev = self._generatorEvaluateFunction(function_memory, d.getScript())
+                v = None
+                try:
+                    v = ev.send(None)
+                    while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
+                        res = yield v
+                        v = ev.send(res)
+                except StopIteration as e:
+                    v = self.stopIterationEval(e.value, v)
+                return v
+            elif (funcs := data.get("functions", None)) is not None:
                 if (predicate := data.get("predicate", None)) is not None:
                     if not function_memory.checkPredicate(predicate): return None
                 result = None
-                for func in funcs:
-                    ev = self._generatorEvaluateFunction(function_memory, func)
+                if isinstance(funcs, list):
+                    for func in funcs:
+                        ev = self._generatorEvaluateFunction(function_memory, func)
+                        v = None
+                        try:
+                            v = ev.send(None)
+                            while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
+                                res = yield v
+                                v = ev.send(res)
+                        except StopIteration as e:
+                            v = self.stopIterationEval(e.value, v)
+                        if v: result = v
+                    return result
+                elif isinstance(funcs, dict):
+                    ev = self._generatorEvaluateFunction(function_memory, funcs)
                     v = None
                     try:
                         v = ev.send(None)
@@ -174,8 +203,7 @@ class DungeonLoader:
                             v = ev.send(res)
                     except StopIteration as e:
                         v = self.stopIterationEval(e.value, v)
-                    if v: result = v
-                return result
+                    return v
             elif (func := data.get("function", None)) is not None:
                 if f := self.loader_function.getFunction(func):
                     f: LoaderFunction
@@ -352,20 +380,39 @@ class DungeonLoader:
                     v = self.stopIterationEval(e.value, v)
                 dat.append(v)
             return dat
+        elif isinstance(data, EngineScript):
+            ev = self._generatorEvaluateFunction(function_memory, data.getScript())
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = self.stopIterationEval(e.value, v)
+            return v
         else:
             return data
 
     # TODO: Validate that this runs in parity to _generatorEvaluateFunction
     def _evaluateFunction(self, function_memory:FunctionMemory, data:dict):
         if isinstance(data, dict):
-            if (funcs := data.get("functions", None)) is not None:
+            if (script_file := data.get("#script", None)) is not None:
+                d = EngineScript(script_file)
+                data.clear()
+                data.update(d.getScript())
+                return self._evaluateFunction(function_memory, d.getScript())
+            elif (funcs := data.get("functions", None)) is not None:
                 if (predicate := data.get("predicate", None)) is not None:
                     if not function_memory.checkPredicate(predicate): return None
                 result = None
-                for func in funcs:
-                    res = self._evaluateFunction(function_memory, func)
-                    if res: result = res
-                return result
+                if isinstance(funcs, list):
+                    for func in funcs:
+                        res = self._evaluateFunction(function_memory, func)
+                        if res: result = res
+                    return result
+                elif isinstance(funcs, dict):
+                    return self._evaluateFunction(function_memory, funcs)
             elif (func := data.get("function", None)) is not None:
                 if f := self.loader_function.getFunction(func):
                     f: LoaderFunction
@@ -448,6 +495,8 @@ class DungeonLoader:
             for item in data:
                 dat.append(self._evaluateFunction(function_memory, item))
             return dat
+        elif isinstance(data, EngineScript):
+            return self._evaluateFunction(function_memory, data.getScript())
         else:
             return data
 

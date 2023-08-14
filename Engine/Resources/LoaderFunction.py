@@ -173,7 +173,7 @@ class LoaderFunction:
     def _call(cls, function_memory, data:dict):
         # check args
         try:
-            _dat = json.dumps(data, indent=2)
+            _dat = json.dumps(data)#, indent=2)
         except TypeError as e:
             _dat = str(data)
         Log["debug"]["loader function"](f"calling '{cls.__name__}'")# with data:\n{_dat}\n")

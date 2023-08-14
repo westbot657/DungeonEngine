@@ -33,7 +33,6 @@
         }
     ],
     "events": {
-        
         "on_input": {
             "function": "engine:text/match",
             "text": {

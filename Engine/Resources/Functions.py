@@ -176,6 +176,13 @@ class Engine_$1(LoaderFunction):
 
 class Engine_Tool_CancelUse(LoaderFunction):
     id = Identifier("engine", "tool/", "cancel_use")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         return cls.cancel_use
@@ -186,11 +193,20 @@ class Engine_Tool_CancelUse(LoaderFunction):
 class Engine_Tool_GetDurability(LoaderFunction):
     id = Identifier("engine", "tool/", "get_durability")
     return_type = int
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "tool": "required parameter"
+        }
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
             case {
-                "tool": str()|dict() # FIXME: this may be incorrect syntax, I can't tell right now
+                "tool": str()|dict()
             }: return cls.get_durability_given
             case _:
                 if function_memory.ref("#tool"):
@@ -205,11 +221,21 @@ class Engine_Tool_GetDurability(LoaderFunction):
 
 class Engine_Tool_SetDurability(LoaderFunction):
     id = Identifier("engine", "tool/", "set_durability")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 1,
+        "args": {
+            "durability": "required parameter",
+            "tool": "optional parameter"
+        }
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
             case {
-                "tool": str()|dict(), # FIXME: this may be incorrect syntax, I can't tell right now
+                "tool": str()|dict(),
                 "durability": int()
             }: return cls.get_durability_given
             case {
@@ -229,6 +255,13 @@ class Engine_Tool_SetDurability(LoaderFunction):
 class Engine_Tool_GetMaxDurability(LoaderFunction):
     id = Identifier("engine", "tool/", "get_max_durability")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -238,6 +271,14 @@ class Engine_Tool_GetMaxDurability(LoaderFunction):
 class Engine_Tool_GetName(LoaderFunction):
     id = Identifier("engine", "tool/", "get_name")
     return_type = str
+
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -246,6 +287,13 @@ class Engine_Tool_GetName(LoaderFunction):
 
 class Engine_Tool_SetName(LoaderFunction):
     id = Identifier("engine", "tool/", "set_name")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -261,6 +309,13 @@ class Engine_Tool_SetName(LoaderFunction):
 class Engine_Weapon_GetDurability(LoaderFunction):
     id = Identifier("engine", "Weapon/", "GetDurability")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -269,6 +324,13 @@ class Engine_Weapon_GetDurability(LoaderFunction):
 
 class Engine_Weapon_SetDurability(LoaderFunction):
     id = Identifier("engine", "Weapon/", "SetDurability")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -278,6 +340,14 @@ class Engine_Weapon_SetDurability(LoaderFunction):
 class Engine_Weapon_GetMaxDurability(LoaderFunction):
     id = Identifier("engine", "weapon/", "get_max_durability")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -286,6 +356,14 @@ class Engine_Weapon_GetMaxDurability(LoaderFunction):
 
 class Engine_Weapon_SetMaxDurability(LoaderFunction):
     id = Identifier("engine", "weapon/", "set_max_durability")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -295,6 +373,14 @@ class Engine_Weapon_SetMaxDurability(LoaderFunction):
 class Engine_Weapon_GetDamage(LoaderFunction):
     id = Identifier("engine", "weapon/", "get_damage")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -303,6 +389,14 @@ class Engine_Weapon_GetDamage(LoaderFunction):
 
 class Engine_Weapon_SetDamage(LoaderFunction):
     id = Identifier("engine", "weapon/", "set_damage")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -312,6 +406,14 @@ class Engine_Weapon_SetDamage(LoaderFunction):
 class Engine_Weapon_GetAmmoType(LoaderFunction):
     id = Identifier("engine", "weapon/", "get_ammo_type")
     return_type = AbstractAmmo
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -321,6 +423,14 @@ class Engine_Weapon_GetAmmoType(LoaderFunction):
 class Engine_Weapon_GetParentType(LoaderFunction):
     id = Identifier("engine", "weapon/", "get_parent_type")
     return_type = AbstractWeapon
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -336,6 +446,14 @@ class Engine_Weapon_GetParentType(LoaderFunction):
 class Engine_Armor_GetDurability(LoaderFunction):
     id = Identifier("engine", "armor/", "get_durability")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -344,6 +462,14 @@ class Engine_Armor_GetDurability(LoaderFunction):
 
 class Engine_Armor_SetDurability(LoaderFunction):
     id = Identifier("engine", "armor/", "set_durability")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -353,6 +479,14 @@ class Engine_Armor_SetDurability(LoaderFunction):
 class Engine_Armor_GetMaxDurability(LoaderFunction):
     id = Identifier("engine", "armor/", "get_max_durability")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -361,6 +495,14 @@ class Engine_Armor_GetMaxDurability(LoaderFunction):
 
 class Engine_Armor_SetMaxDurability(LoaderFunction):
     id = Identifier("engine", "armor/", "set_max_durability")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -370,6 +512,14 @@ class Engine_Armor_SetMaxDurability(LoaderFunction):
 class Engine_Armor_GetDamageReduction(LoaderFunction):
     id = Identifier("engine", "armor/", "get_damage_reduction")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -378,6 +528,14 @@ class Engine_Armor_GetDamageReduction(LoaderFunction):
 
 class Engine_Armor_SetDamageReduction(LoaderFunction):
     id = Identifier("engine", "armor/", "set_damage_reduction")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -393,6 +551,14 @@ class Engine_Armor_SetDamageReduction(LoaderFunction):
 class Engine_Ammo_GetCount(LoaderFunction):
     id = Identifier("engine", "ammo/", "get_count")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -401,6 +567,14 @@ class Engine_Ammo_GetCount(LoaderFunction):
 
 class Engine_Ammo_SetCount(LoaderFunction):
     id = Identifier("engine", "ammo/", "set_count")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -410,6 +584,14 @@ class Engine_Ammo_SetCount(LoaderFunction):
 class Engine_Ammo_GetMaxCount(LoaderFunction):
     id = Identifier("engine", "ammo/", "get_max_count")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -419,6 +601,14 @@ class Engine_Ammo_GetMaxCount(LoaderFunction):
 class Engine_Ammo_GetParentType(LoaderFunction):
     id = Identifier("engine", "ammo/", "get_parent_type")
     return_type = AbstractAmmo
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -428,6 +618,14 @@ class Engine_Ammo_GetParentType(LoaderFunction):
 class Engine_Ammo_GetBonusDamage(LoaderFunction):
     id = Identifier("engine", "ammo/", "get_bonus_damage")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -443,6 +641,17 @@ class Engine_Ammo_GetBonusDamage(LoaderFunction):
 class Engine_StatusEffect_GetLevel(LoaderFunction):
     id = Identifier("engine", "status_effect/", "get_level")
     return_type = int
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "status_effect": "required parameter",
+            "default": "required parameter"
+        }
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -459,6 +668,14 @@ class Engine_StatusEffect_GetLevel(LoaderFunction):
 
 class Engine_StatusEffect_SetLevel(LoaderFunction):
     id = Identifier("engine", "status_effect/", "set_level")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -468,6 +685,14 @@ class Engine_StatusEffect_SetLevel(LoaderFunction):
 class Engine_StatusEffect_GetDuration(LoaderFunction):
     id = Identifier("engine", "status_effect/", "get_duration")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -476,6 +701,14 @@ class Engine_StatusEffect_GetDuration(LoaderFunction):
 
 class Engine_StatusEffect_SetDuration(LoaderFunction):
     id = Identifier("engine", "status_effect/", "set_duration")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -485,6 +718,14 @@ class Engine_StatusEffect_SetDuration(LoaderFunction):
 class Engine_StatusEffect_GetName(LoaderFunction):
     id = Identifier("engine", "status_effect/", "get_name")
     return_type = str
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -493,6 +734,14 @@ class Engine_StatusEffect_GetName(LoaderFunction):
 
 class Engine_StatusEffect_GetCause(LoaderFunction):
     id = Identifier("engine", "status_effect/", "get_cause")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -508,6 +757,14 @@ class Engine_StatusEffect_GetCause(LoaderFunction):
 class Engine_Item_GetCount(LoaderFunction):
     id = Identifier("engine", "item/", "get_count")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -516,6 +773,14 @@ class Engine_Item_GetCount(LoaderFunction):
 
 class Engine_Item_SetCount(LoaderFunction):
     id = Identifier("engine", "item/", "set_count")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -525,6 +790,14 @@ class Engine_Item_SetCount(LoaderFunction):
 class Engine_Item_GetMaxCount(LoaderFunction):
     id = Identifier("engine", "item/", "get_max_count")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -538,6 +811,15 @@ class Engine_Item_GetMaxCount(LoaderFunction):
 
 class Engine_Player_Message(LoaderFunction):
     id = Identifier("engine", "player/", "message")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "message": "required parameter"
+        }
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -552,6 +834,14 @@ class Engine_Player_Message(LoaderFunction):
 class Engine_Player_GetHealth(LoaderFunction):
     id = Identifier("engine", "player/", "get_health")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -560,6 +850,14 @@ class Engine_Player_GetHealth(LoaderFunction):
 
 class Engine_Player_SetHealth(LoaderFunction):
     id = Identifier("engine", "player/", "set_health")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -569,6 +867,14 @@ class Engine_Player_SetHealth(LoaderFunction):
 class Engine_Player_GetMaxHealth(LoaderFunction):
     id = Identifier("engine", "player/", "get_max_health")
     return_type = int
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -577,6 +883,14 @@ class Engine_Player_GetMaxHealth(LoaderFunction):
 
 class Engine_Player_SetMaxHealth(LoaderFunction):
     id = Identifier("engine", "player/", "set_max_health")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -585,6 +899,14 @@ class Engine_Player_SetMaxHealth(LoaderFunction):
 
 class Engine_Player_AddMaxHealth(LoaderFunction):
     id = Identifier("engine", "player/", "add_max_health")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -593,6 +915,14 @@ class Engine_Player_AddMaxHealth(LoaderFunction):
 
 class Engine_Player_SubtractMaxHealth(LoaderFunction):
     id = Identifier("engine", "player/", "subtract_max_health")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -602,6 +932,16 @@ class Engine_Player_SubtractMaxHealth(LoaderFunction):
 class Engine_Player_Heal(LoaderFunction):
     id = Identifier("engine", "player/", "heal")
     return_type = int
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "amount": "required parameter"
+        }
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -616,6 +956,14 @@ class Engine_Player_Heal(LoaderFunction):
 
 class Engine_Player_Damage(LoaderFunction):
     id = Identifier("engine", "player/", "damage")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -624,6 +972,16 @@ class Engine_Player_Damage(LoaderFunction):
 
 class Engine_Player_GiveObject(LoaderFunction):
     id = Identifier("engine", "player/", "give_object")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "object": "required parameter"
+        }
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -656,6 +1014,14 @@ class Engine_Player_GiveObject(LoaderFunction):
 
 class Engine_Player_GiveStatusEffect(LoaderFunction):
     id = Identifier("engine", "player/", "give_status_effect")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -664,6 +1030,14 @@ class Engine_Player_GiveStatusEffect(LoaderFunction):
 
 class Engine_Player_HasStatusEffect(LoaderFunction):
     id = Identifier("engine", "player/", "has_status_effect")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -672,6 +1046,14 @@ class Engine_Player_HasStatusEffect(LoaderFunction):
 
 class Engine_Player_RemoveStatusEffect(LoaderFunction):
     id = Identifier("engine", "player/", "remove_status_effect")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -680,6 +1062,17 @@ class Engine_Player_RemoveStatusEffect(LoaderFunction):
 
 class Engine_Player_GetStatusEffect(LoaderFunction):
     id = Identifier("engine", "player/", "get_status_effect")
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "status_effect": "required parameter",
+            "default": "required parameter"
+        }
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -695,6 +1088,16 @@ class Engine_Player_GetStatusEffect(LoaderFunction):
 class Engine_Player_HasGameObject(LoaderFunction):
     id = Identifier("engine", "player/", "has_game_object")
     return_type = bool
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "game_object": "required parameter"
+        }
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -702,7 +1105,8 @@ class Engine_Player_HasGameObject(LoaderFunction):
                 "game_object": str()
             }: return cls.has_item
             case _: return None
-    def has_item(self, function_memory:FunctionMemory, game_object:str):
+    @staticmethod
+    def has_item(function_memory:FunctionMemory, game_object:str):
         object_identifier = Identifier.fromString(game_object)
         player = function_memory.ref("#player")
 
@@ -711,6 +1115,14 @@ class Engine_Player_HasGameObject(LoaderFunction):
 
 class Engine_Player_RemoveItem(LoaderFunction):
     id = Identifier("engine", "player/", "remove_item")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -720,6 +1132,14 @@ class Engine_Player_RemoveItem(LoaderFunction):
 class Engine_Player_GetItem(LoaderFunction):
     id = Identifier("engine", "player/", "get_item")
     return_type = Item
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -729,6 +1149,14 @@ class Engine_Player_GetItem(LoaderFunction):
 class Engine_Player_GetEquippedArmor(LoaderFunction):
     id = Identifier("engine", "player/", "get_equipped_armor")
     return_type = Armor
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -738,6 +1166,14 @@ class Engine_Player_GetEquippedArmor(LoaderFunction):
 class Engine_Player_GetEquippedWeapon(LoaderFunction):
     id = Identifier("engine", "player/", "get_equipped_weapon")
     return_type = Weapon
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -747,6 +1183,14 @@ class Engine_Player_GetEquippedWeapon(LoaderFunction):
 class Engine_Player_GetEquippedTool(LoaderFunction):
     id = Identifier("engine", "player/", "get_equipped_tool")
     return_type = Tool
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -756,6 +1200,14 @@ class Engine_Player_GetEquippedTool(LoaderFunction):
 class Engine_Player_GetInput(LoaderFunction): # NOTE: this function may (probably will) require special implementation
     id = Identifier("engine", "player/", "get_input")
     return_type = Tool
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         return cls.getInput
@@ -769,6 +1221,16 @@ class Engine_Player_GetInput(LoaderFunction): # NOTE: this function may (probabl
 class Engine_Player_SetLocation(LoaderFunction):
     id = Identifier("engine", "player/", "set_location")
     return_type = Tool
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "location": "required parameter"
+        }
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         Log["debug"]["loader function"]["set location"]["check"](f"args: {args}")
@@ -788,6 +1250,14 @@ class Engine_Player_SetLocation(LoaderFunction):
 class Engine_Player_GetLocation(LoaderFunction):
     id = Identifier("engine", "player/", "get_location")
     return_type = Tool
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         return cls.getLocation
@@ -798,6 +1268,16 @@ class Engine_Player_GetLocation(LoaderFunction):
 
 class Engine_Player_AttackEnemy(LoaderFunction):
     id = Identifier("engine", "player/", "attack_enemy")
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "player": "required parameter",
+            "enemy": "required parameter"
+        }
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -813,6 +1293,14 @@ class Engine_Player_AttackEnemy(LoaderFunction):
 
 class Engine_Player_CancelAttack(LoaderFunction):
     id = Identifier("engine", "player/", "cancel_attack")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -824,6 +1312,14 @@ class Engine_Player_CancelAttack(LoaderFunction):
 
 class Engine_Player_ForceHit(LoaderFunction):
     id = Identifier("engine", "player/", "force_hit")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -835,6 +1331,14 @@ class Engine_Player_ForceHit(LoaderFunction):
 
 class Engine_Player_ForceMiss(LoaderFunction):
     id = Identifier("engine", "player/", "force_miss")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -853,6 +1357,17 @@ class Engine_Player_ForceMiss(LoaderFunction):
 class Engine_Enemy_AttackPlayer(LoaderFunction):
     id = Identifier("engine", "enemy/", "attack_player")
     pre_evaluator = True
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 2,
+        "args": {
+            "enemy": "optional parameter",
+            "player": "optional parameter"
+        }
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         return cls.attack_player
@@ -867,6 +1382,14 @@ class Engine_Enemy_AttackPlayer(LoaderFunction):
 
 class Engine_Enemy_CancelAttack(LoaderFunction):
     id = Identifier("engine", "enemy/", "cancel_attack")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         return cls.cancel_attack
@@ -876,6 +1399,16 @@ class Engine_Enemy_CancelAttack(LoaderFunction):
 
 class Engine_Enemy_SetAttack(LoaderFunction):
     id = Identifier("engine", "enemy/", "set_attack")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "attack": "required parameter"
+        }
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -889,6 +1422,14 @@ class Engine_Enemy_SetAttack(LoaderFunction):
 
 class Engine_Enemy_ForceHit(LoaderFunction):
     id = Identifier("engine", "enemy/", "force_hit")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -900,6 +1441,14 @@ class Engine_Enemy_ForceHit(LoaderFunction):
 
 class Engine_Enemy_ForceMiss(LoaderFunction):
     id = Identifier("engine", "enemy/", "force_miss")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -911,6 +1460,17 @@ class Engine_Enemy_ForceMiss(LoaderFunction):
 
 class Engine_Enemy_SetHealth(LoaderFunction):
     id = Identifier("engine", "enemy/", "set_health")
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "enemy": "required parameter",
+            "health": "required parameter"
+        }
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -925,6 +1485,17 @@ class Engine_Enemy_SetHealth(LoaderFunction):
 
 class Engine_Enemy_Heal(LoaderFunction):
     id = Identifier("engine", "enemy/", "heal")
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "enemy": "required parameter",
+            "amount": "required parameter"
+        }
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -940,6 +1511,17 @@ class Engine_Enemy_Heal(LoaderFunction):
 class Engine_Enemy_Damage(LoaderFunction):
     id = Identifier("engine", "enemy/", "damage")
     pre_evaluator = True
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 1,
+        "args": {
+            "amount": "required parameter",
+            "enemy": "optional parameter"
+        }
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         if "amount" in args:
@@ -953,6 +1535,17 @@ class Engine_Enemy_Damage(LoaderFunction):
 
 class Engine_Enemy_SetMaxHealth(LoaderFunction):
     id = Identifier("engine", "enemy/", "set_max_health")
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "enemy": "required parameter",
+            "max_health": "required parameter"
+        }
+    }
+    
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -974,6 +1567,15 @@ class Engine_Enemy_SetMaxHealth(LoaderFunction):
 class Engine_Location_Exists(LoaderFunction):
     id = Identifier("engine", "location/", "exists")
     return_type = bool
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "location": "required parameter"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -996,9 +1598,19 @@ class Engine_Location_Exists(LoaderFunction):
 ### XXX Engine Random XXX ###
 ####XXX###############XXX####
 
-class Engine_Random_Uniform(LoaderFunction):
+class Engine_Random_Uniform(LoaderFunction): # TODO: split random range into it's own function
     id = Identifier("engine", "random/", "uniform")
     pre_evaluate_args = False
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "rolls": "required parameter",
+            "pool": "required parameter"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1029,6 +1641,16 @@ class Engine_Random_Uniform(LoaderFunction):
 class Engine_Random_Weighted(LoaderFunction):
     id = Identifier("engine", "random/", "weighted")
     pre_evaluate_args = False
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "rolls": "required parameter",
+            "pool": "required parameter"
+        }
+    }
+    
     @classmethod
     def chek(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1050,6 +1672,16 @@ class Engine_Random_Weighted(LoaderFunction):
 class Engine_Random_LootTable(LoaderFunction):
     id = Identifier("engine", "random/", "loot_table")
     pre_evaluate_args = False
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "rolls": "required parameter",
+            "pool": "required parameter"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1066,6 +1698,15 @@ class Engine_Random_LootTable(LoaderFunction):
 class Engine_Random_Choice(LoaderFunction):
     id = Identifier("engine", "random/", "choice")
     pre_evaluate_args = False
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "options": "required parameter"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1089,6 +1730,15 @@ class Engine_Text_Builder(LoaderFunction):
     id = Identifier("engine", "text/", "builder")
     return_type = str
     pre_evaluator = True
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "text": "required parameter"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1106,6 +1756,8 @@ class Engine_Text_Match(LoaderFunction):
     pre_evaluate_args = False
 
     script_flags = {
+        "required_args": 2,
+        "optional_args": -1,
         "args": {
             "text": "required parameter",
             "match_type": "optional parameter",
@@ -1184,12 +1836,23 @@ class Engine_Text_Match(LoaderFunction):
 
 class Engine_Text_Replace(LoaderFunction):
     id = Identifier("engine", "text/", "replace")
+
+    script_flags = {
+        "required_args": 3,
+        "optional_args": 0,
+        "args": {
+            "sequence": "required parameter",
+            "replacement": "required parameter",
+            "text": "required parameter"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
             case {
-                "text": str(),
                 "sequence": str(),
+                "text": str(),
                 "replacement": str()
             }: return cls.replace
             case _: return None
@@ -1200,6 +1863,18 @@ class Engine_Text_Replace(LoaderFunction):
 
 class Engine_Text_ReplacePattern(LoaderFunction):
     id = Identifier("engine", "text/", "replace_pattern")
+
+
+    script_flags = {
+        "required_args": 3,
+        "optional_args": 0,
+        "args": {
+            "pattern": "required parameter",
+            "replacement": "required parameter",
+            "text": "required parameter"
+        }
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1216,6 +1891,17 @@ class Engine_Text_ReplacePattern(LoaderFunction):
 
 class Engine_Text_Substring(LoaderFunction):
     id = Identifier("engine", "text/", "substring")
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 1,
+        "args": {
+            "text": "required parameter",
+            "start": "optional parameter",
+            "end": "optional parameter"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1231,6 +1917,15 @@ class Engine_Text_Substring(LoaderFunction):
 
 class Engine_Text_Length(LoaderFunction):
     id = Identifier("engine", "text/", "length")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "text": "required parameter"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1244,6 +1939,16 @@ class Engine_Text_Length(LoaderFunction):
 
 class Engine_Text_SetCase(LoaderFunction):
     id = Identifier("engine", "text/", "set_case")
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 2,
+        "args": {
+            "text": "required parameter",
+            "case": "required parameter"
+        }
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1281,6 +1986,16 @@ class Engine_Text_SetCase(LoaderFunction):
 class Engine_Dict_ForEach(LoaderFunction):
     id = Identifier("engine", "dict/", "for_each")
     pre_evaluate_args = False
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "dict": "required parameter",
+            "run": "scope"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1351,6 +2066,7 @@ class Engine_List_ForEach(LoaderFunction):
     pre_evaluate_args = False
 
     script_flags = {
+        "reuired_args": 1,
         "args": {
             "list": "required parameter",
             "run": "scope"
@@ -1409,6 +2125,13 @@ class Engine_List_ForEach(LoaderFunction):
 
 class Engine_List_Subset(LoaderFunction):
     id = Identifier("engine", "list/", "subset")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1419,6 +2142,13 @@ class Engine_List_Subset(LoaderFunction):
     
 class Engine_List_Pop(LoaderFunction):
     id = Identifier("engine", "list/", "pop")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1429,28 +2159,46 @@ class Engine_List_Pop(LoaderFunction):
     
 class Engine_List_Append(LoaderFunction):
     id = Identifier("engine", "list/", "append")
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": -1,
+        "args": {
+            "list": "required parameter",
+            "elements": "*paramaters"
+        }
+    }
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case _: return None
+        if ("list" in args) and ("elements" in args):
+            return cls.append
     @staticmethod
-    def _(function_memory:FunctionMemory, ):
-        return
+    def append(function_memory:FunctionMemory, **kwargs):
+        ls = kwargs.get("list")
+        elements = kwargs.get("elements")
 
-class Engine_List_Builder(LoaderFunction):
-    id = Identifier("engine", "list/", "builder")
-    @classmethod
-    def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case {
-                "list": list()
-            }: return cls.list_builder
-            case _: return None
+# class Engine_List_Builder(LoaderFunction):
+#     id = Identifier("engine", "list/", "builder")
 
-    @staticmethod
-    def list_builder(function_memory:FunctionMemory, **kwargs):
-        _list = kwargs.get("list")
-        return _list # idk if this will work the way I think it will...
+#     script_flags = {
+#         "required_args": 0,
+#         "optional_args": 0,
+#         "args": {}
+#     }
+    
+#     @classmethod
+#     def check(cls, function_memory:FunctionMemory, args:dict):
+#         match args:
+#             case {
+#                 "list": list()
+#             }: return cls.list_builder
+#             case _: return None
+
+#     @staticmethod
+#     def list_builder(function_memory:FunctionMemory, **kwargs):
+#         _list = kwargs.get("list")
+#         return _list # idk if this will work the way I think it will...
 
 
 # ^ List ^ #
@@ -1462,6 +2210,13 @@ class Engine_List_Builder(LoaderFunction):
 class Engine_Control_Break(LoaderFunction):
     id = Identifier("engine", "control/", "break")
 
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         return cls._break
@@ -1472,6 +2227,16 @@ class Engine_Control_Break(LoaderFunction):
 class Engine_Control_Call(LoaderFunction):
     id = Identifier("engine", "control/", "call")
     pre_evaluate_args = False
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": -1,
+        "args": {
+            "method": "required parameter",
+            "parameters": "**parameters"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         if "method" in args:
@@ -1879,6 +2644,15 @@ class Engine_Math_Solve(LoaderFunction):
 
 class Engine_Interaction_Interact(LoaderFunction):
     id = Identifier("engine", "interaction/", "interact")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "interactable": "required parameter"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1904,6 +2678,15 @@ class Engine_Interaction_Interact(LoaderFunction):
 class Engine_Combat_Start(LoaderFunction):
     id = Identifier("engine", "combat/", "start")
     pre_evaluate_args = False
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "combat": "required parameter"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1932,6 +2715,15 @@ class Engine_Combat_Start(LoaderFunction):
 
 class Engine_Combat_Trigger(LoaderFunction):
     id = Identifier("engine", "combat/", "trigger")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "trigger": "required parameter"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1957,6 +2749,13 @@ class Engine_Combat_Trigger(LoaderFunction):
 
 class Engine_Combat_UniqueName(LoaderFunction):
     id = Identifier("engine", "combat/", "unique_name")
+    
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1969,6 +2768,13 @@ class Engine_Combat_UniqueName(LoaderFunction):
 
 class Engine_Combat_NumberedName(LoaderFunction):
     id = Identifier("engine", "combat/", "numbered_name")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -1980,6 +2786,13 @@ class Engine_Combat_NumberedName(LoaderFunction):
 
 class Engine_Combat_NextTurn(LoaderFunction):
     id = Identifier("engine", "combat/", "next_turn")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         return cls.next_turn
@@ -1990,6 +2803,16 @@ class Engine_Combat_NextTurn(LoaderFunction):
 
 class Engine_Combat_Spawn(LoaderFunction):
     id = Identifier("engine", "combat/", "spawn")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": -1,
+        "args": {
+            "enemies": "*parameters",
+            "prioity": "optional parameter"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         if ("enemy" in args) or ("enemies" in args):
@@ -2002,11 +2825,20 @@ class Engine_Combat_Spawn(LoaderFunction):
         combat: Combat = function_memory.ref("#combat")
         if (enemy := kwargs.get("enemy", None)):
             combat.addTask(Combat.Operation.Spawn([enemy], priority))
-        elif (enemies := kwargs.get("enemies", None)):
+        if (enemies := kwargs.get("enemies", None)):
             combat.addTask(Combat.Operation.Spawn(enemies, priority))
 
 class Engine_Combat_Despawn(LoaderFunction):
     id = Identifier("engine", "combat/", "despawn")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": -1,
+        "args": {
+            "enemies": "*parameters"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         if ("enemy" in args) or ("enemies" in args):
@@ -2022,6 +2854,16 @@ class Engine_Combat_Despawn(LoaderFunction):
 
 class Engine_Combat_Message(LoaderFunction):
     id = Identifier("engine", "combat/", "message")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": -1,
+        "args": {
+            "message": "required parameter",
+            "players": "*parameters"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
@@ -2046,6 +2888,16 @@ class Engine_Combat_Message(LoaderFunction):
 
 class Engine_Log_Debug(LoaderFunction):
     id = Identifier("engine", "log/", "debug")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": -1,
+        "args": {
+            "message": "required parameter",
+            "tags": "*parameters"
+        }
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         return cls.debug
@@ -2059,6 +2911,13 @@ class Engine_Log_Debug(LoaderFunction):
 
 class Engine_Debug_Breakpoint(LoaderFunction):
     id = Identifier("engine", "debug/", "breakpoint")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         return cls.debug

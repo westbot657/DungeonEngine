@@ -1,0 +1,10 @@
+
+[engine:list/for_each] (<.enemies>)
+{
+    [engine:text/match] ([engine:text/replace_pattern] (" +", " ", [engine:text/set_case] (<#text>, "lower")), "search")
+    @pattern: [engine:text/set_case] (<element.name>, "lower")
+    #{
+        [engine:player/attack_enemy](<#player>, <element>)
+        break
+    }
+}

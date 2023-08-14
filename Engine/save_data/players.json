@@ -4,7 +4,7 @@
         "name": "Weston",
         "max_health": 20,
         "health": 20,
-        "location": "energia_city:rooms/center_street",
+        "location": "world:rooms/start",
         "position": [
             0,
             0

@@ -1,47 +1,5 @@
 {
     "on_player_turn_input": {
-        "functions": [
-            {
-                "function": "engine:list/for_each",
-                "list": {"#ref": ".enemies"},
-                "run": {
-                    "functions": [
-                        {
-                            "function": "engine:text/match",
-                            "text": {
-                                "function": "engine:text/replace_pattern",
-                                        "text": {
-                                            "function": "engine:text/set_case",
-                                            "case": "lower",
-                                            "text": {"#ref": "#text"}
-                                        },
-                                        "pattern": " +",
-                                        "replacement": " "
-                            },
-                            "match_type": "search",
-                            "matches": [
-                                {
-                                    "pattern": {
-                                        "function": "engine:text/set_case",
-                                        "case": "lower",
-                                        "text": {"#ref": "element.name"}
-                                    },
-                                    "functions": [
-                                        {
-                                            "function": "engine:player/attack_enemy",
-                                            "player": {"#ref": "#player"},
-                                            "enemy": {"#ref": "element"}
-                                        },
-                                        {
-                                            "function": "engine:control/break"
-                                        }
-                                    ]
-                                }
-                            ]
-                        }
-                    ]
-                }
-            }
-        ]
+        "#script": "combat_player_turn"
     }
 }

@@ -1,0 +1,9 @@
+
+[engine:text/match](<#text>)
+@pattern: "(leave|exit)" # {
+    [engine:interaction/interact](".exit_door")
+}
+@pattern: "west" # {
+    [engine:interaction/interact](".west_passage")
+}
+

@@ -14,30 +14,10 @@
     ],
     "events": {
         "on_enter": {
-            "functions": [
-                {
-                    "function": "engine:player/message",
-                    "message": "You are on Center Street.\nAvailable locations:\nWest Main Street"
-                }
-            ]
+            "#script": "energia_city/scripts/center_stret/on_enter"
         },
         "on_input": {
-            "function": "engine:text/match",
-            "text": {
-                "#ref": "#text"
-            },
-            "matches": [
-                {
-                    "pattern": "(leave|exit)",
-                    "function": "engine:interaction/interact",
-                    "interactable": ".exit_door"
-                },
-                {
-                    "pattern": "west",
-                    "function": "engine:interaction/interact",
-                    "interactable": ".west_passage"
-                }
-            ]
+            "#script": "energia_city/scripts/center_stret/on_input"
         }
     }
 }

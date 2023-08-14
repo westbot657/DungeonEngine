@@ -510,7 +510,7 @@ parser = yacc.yacc()
 # ast = parser.parse(example_script)#'2 * 3 + 4 * (5 - -<x>)') # 
 # print("ast:", ast)
 
-script_files = glob.glob("**/*.dungeon_script", recursive=True)
+script_files = glob.glob("**/*.dungeon_script", recursive=True) + glob.glob("**/*.ds", recursive=True)
 
 
 class EngineScript:
@@ -519,7 +519,10 @@ class EngineScript:
         self.script_file = script_file
 
         for f in script_files:
-            if f.endswith(f"{script_file.replace('.dungeon_script', '')}.dungeon_script"):
+            if f.replace("\\", "/").endswith(f"{script_file.replace('.dungeon_script', '').replace('.ds', '')}.dungeon_script".replace("\\", "/")):
+                self.script_file = f
+                break
+            elif f.replace("\\", "/").endswith(f"{script_file.replace('.dungeon_script', '').replace('.ds', '')}.ds".replace("\\", "/")):
                 self.script_file = f
                 break
 

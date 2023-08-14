@@ -1,0 +1,134 @@
+{
+	"name": "dungeon_script",
+	"tokenColors": [
+		{
+			"name": "namespace.dungeon_script",
+			"scope": [
+				"entity.name.class.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#179ddb"
+			}
+		},
+		{
+			"name": "Builtins2",
+			"scope": [
+				"entity.name.section.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#c2a318"
+			}
+		},
+		{
+			"name": "Builtins3",
+			"scope": [
+				"function.func.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#c2a318"
+			}
+		},
+		{
+			"name": "Operators",
+			"scope": [
+				"operator.math.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#af1c1c"
+			}
+		},
+		{
+			"name": "Symbols",
+			"scope": [
+				"support.other.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#2faa24"
+			}
+		},
+		{
+			"name": "Comparison",
+			"scope": [
+				"operator.compare.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#00fff2"
+			}
+		},
+		{
+			"name": "Numbers",
+			"scope": [
+				"constant.other.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#a15725"
+			}
+		},
+		{
+			"name": "Comment",
+			"scope": [
+				"comment.line.dungeon_script",
+				"comment.block.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#6A9955"
+			}
+		},
+		{
+			"name": "Variable",
+			"scope": [
+				"variable.parameter.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#00859c"
+			}
+		},
+		{
+			"name": "Keyword.Contol",
+			"scope": [
+				"keyword.control.dungeon_script",
+			],
+			"settings": {
+				"foreground": "#ac1fac"
+			}
+		},
+		{
+			"name": "Keyword.Other",
+			"scope": [
+				"keyword.other.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#4481b9"
+			}
+		},
+		{
+			"name": "Keyword.Other.Unit",
+			"scope": [
+				"keyword.other.unit.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#FFd700",
+				"fontStyle": "bold"
+			}
+		},
+		{
+			"name": "Keyword.Operators",
+			"scope": [
+				"keyword.operator.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#08b408"
+			}
+		},
+		{
+			"name": "Strings",
+			"scope": [
+				"string.dungeon_script"
+			],
+			"settings": {
+				"foreground": "#ac402d"
+			}
+		}
+	],
+	"semanticHighlighting": true
+}

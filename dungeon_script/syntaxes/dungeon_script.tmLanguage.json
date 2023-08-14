@@ -1,0 +1,116 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "dungeon_script",
+	"fileTypes": [
+		"dungeon_script"
+	],
+	"patterns": [
+		{
+			"include": "#comments"
+		},
+		{
+			"include": "#strings"
+		},
+		{
+			"include": "#keywords"
+		},
+		{
+			"name": "numbers.dungeon_script",
+			"match": "(\\d+(\\.\\d+)?|\\.\\d+)"
+		},
+		{
+			"name": "constant.value.dungeon_script",
+			"match": "\\b(true|false|none)\\b"
+		},
+		{
+			"name": "compare.dungeon_script",
+			"match": "(==|<=|>=|!=|<|>)"
+		},
+		{
+			"name": "operator.dungeon_script",
+			"match": "\\b(\\-|\\+|/|\\*|min|max)\\b"
+		},
+		{
+			"name": "constant.other.dungeon_script",
+			"match": "\\b(break|return)\\b"
+		},
+		{
+			"include": "#functions"
+		}
+	],
+	"repository": {
+		"comments": {
+			"patterns": [
+				{
+					"name": "comment.line.dungeon_script",
+					"match": "//.*"
+				}
+			]
+		},
+		"keywords": {
+			"patterns": [
+				{
+					"name": "control.dungeon_script",
+					"match": "\\b(break|return)\\b"
+				},
+				{
+					"name": "flag.dungeon_script",
+					"match": "(#|@[^:]*:)"
+				},
+				{
+					"name": "global.dungeon_script",
+					"begin": "<#",
+					"end": ">",
+					"patterns": [
+						{
+							"name": "refdot.dungeon_script",
+							"match": "\\."
+						}
+					]
+				},
+				{
+					"name": "reference.dungeon_script",
+					"begin": "<",
+					"end": ">",
+					"patterns": [
+						{
+							"name": "refdot.dungeon_script",
+							"match": "\\."
+						}
+					]
+				}
+			]
+		},
+		"strings": {
+			"name": "string.dungeon_script",
+			"begin": "\"",
+			"end": "\"",
+			"patterns": [
+				{
+					"name": "constant.character.escape.dungeon_script",
+					"match": "\\\\."
+				}
+			]
+		},
+		"functions": {
+			"patterns": [
+				{
+					"name": "function.dungeon_script",
+					"match": "\\[([^:]+:)(([^\/\\]]+\/)*)([^\\]]+)\\]",
+					"captures": {
+						"1": {
+							"name": "namespace.dungeon_script"
+						},
+						"2": {
+							"name": "path.dungeon_script"
+						},
+						"4": {
+							"name": "function.dungeon_script"
+						}
+					}
+				}
+			]
+		}
+	},
+	"scopeName": "source.dungeon_script"
+}

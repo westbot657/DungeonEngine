@@ -1,22 +1,13 @@
 
-[engine:list/for_each] (<.enemies>)
+[engine:list/for_each] (<.enemies>) // iterate through each enemy
 {
+    // check if the enemy's name is in the player input
     [engine:text/match] ([engine:text/replace_pattern] (" +", " ", [engine:text/set_case] (<#text>, "lower")), "search")
     @pattern: [engine:text/set_case] (<element.name>, "lower")
     #{
+        // if so, player attacks the enemy
         [engine:player/attack_enemy](<#player>, <element>)
         break
     }
 }
 
-<x> = true
-
-false
-
-none
-
-
-
-return 5
-
-// adasd

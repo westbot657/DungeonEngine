@@ -1,0 +1,51 @@
+
+[engine:control/check_predicate](%{
+    "environment": %{
+        "fish-habitable": false
+    }
+}) {
+    [engine:tool/cancel_use]()
+    [engine:player/message]("You can't fish here!")
+}
+
+
+[engine:control/check_predicate](%{
+    "environment": %{
+        "fish-habitable": true
+    }
+}) {
+    [engine:random/weighted](1, %[
+        %{
+            "bonus_rolls": 0,
+            "entries": %[
+                %{
+                    "weight": %{
+                        "functions": {
+                                <lure_level> = [engine:status_effect/get_level](
+                                [engine:player/get_status_effect]("lure", %{
+                                    "parent": "engine:status_effects/lure",
+                                    "level": 0,
+                                    "duration": -1
+                                }),
+                                0
+                            )
+
+                            return min(1, 0.05 + (.025 * <lure_level>))
+                            // value is limited between 0 and 1, otherwise each level 
+                            // increments the fish catch weight by a little bit
+                        }
+                    },
+                    "functions": {
+                        [engine:player/give_object]("engine:items/fish", 1)
+                        [engine:player/message]("You caught a fish!")
+                    }
+                },
+                %{
+                    "functions": {
+                        [engine:player/message]("You didn't catch anything")
+                    }
+                }
+            ]
+        }
+    ])
+}

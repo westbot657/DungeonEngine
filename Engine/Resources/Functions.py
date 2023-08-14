@@ -975,9 +975,10 @@ class Engine_Player_GiveObject(LoaderFunction):
 
     script_flags = {
         "required_args": 1,
-        "optional_args": 0,
+        "optional_args": 1,
         "args": {
-            "object": "required parameter"
+            "object": "required parameter",
+            "count": "optional parameter"
         }
     }
     
@@ -2224,6 +2225,42 @@ class Engine_Control_Break(LoaderFunction):
     def _break(function_memory:FunctionMemory):
         return EngineOperation.StopLoop()
 
+class Engine_Control_CheckPredicate(LoaderFunction):
+    id = Identifier("engine", "control/", "check_predicate")
+    pre_evaluate_args = False
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "predicate": "required parameter",
+            "functions": "scope"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "predicate": dict(),
+                "functions": dict()|list()
+            }: return cls.check_predicate
+            case _: return None
+    @staticmethod
+    def check_predicate(function_memory:FunctionMemory, predicate:dict, functions:dict|list):
+        if function_memory.checkPredicate(predicate):
+            ev = function_memory.generatorEvaluateFunction(functions)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = function_memory.engine.loader.stopIterationEval(e.value, v)
+            return v
+
+
 class Engine_Control_Call(LoaderFunction):
     id = Identifier("engine", "control/", "call")
     pre_evaluate_args = False
@@ -2540,7 +2577,7 @@ class Engine_Logic_Compare(LoaderFunction):
                             return True
                     return False
                 case {
-                    "not": dict()|bool()
+                    "not": dict()|bool()|int()|str()
                 }:
 
                     ev = cls._compare(function_memory, branch["not"])

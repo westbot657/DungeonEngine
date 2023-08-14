@@ -24,9 +24,18 @@ example_script = """
     [engine:text/match] ([engine:text/replace_pattern] (" +", " ", [engine:text/set_case] (<#text>, "lower")), "search")
     @pattern: [engine:text/set_case] (<element.name>, "lower")
     #{
+    
+        <x> = 5 << 3 and 6 >> 4
         [engine:player/attack_enemy](<#player>, <element>)
         break
     }
+
+    if (5 == 5) {
+        [engine:player/message]("hello!")
+    } elif (5 == 3) {
+        [engine:player/message]("wut?")
+    }
+
 }
 
 """
@@ -41,24 +50,68 @@ def flatten_list(ls):
 
 tokens = (
     "FUNCTION", "VARIABLE", "NUMBER", "STRING", "BOOLEAN",
-    "TAG", "WORD", "RETURN", "BREAK", "CONTINUE", "MIN", "MAX"
+    "TAG", "WORD", "RETURN", "BREAK", "CONTINUE", "MIN", "MAX",
+    "IF", "ELSEIF", "ELSE", "AND", "OR", "EE", "NE", "GT", "GE",
+    "LT", "LE", "NOT"
 )
 
-literals = ["=", "-", "+", "*", "/", "(", ")", "[", "]", "{", "}", ",", "#"]
+literals = [
+    "=", "-", "+", "*", "/", "(", ")",
+    "[", "]", "{", "}", ",", "#", "%", ":"
+]
 
-t_ignore = " \t;~`\n"
+t_ignore = " \t;~`"
 
 t_ignore_comment = r"\/\/.*"
 
-t_FUNCTION = r"\[[^\]]+\]"
-t_VARIABLE = r"\<[^>]+\>"
+t_FUNCTION = r"\[([^:\[]+:)(([^\/\]\[]+\/)*)([^\[\]]+)\]"
 
-t_BOOLEAN = r"(true|false)"
 t_TAG = r"@[^\:]+\:"
 
+# Define a rule so we can track line numbers
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
+
+# Compute column.
+#     input is the input text string
+#     token is a token instance
+def find_column(input, token):
+    line_start = input.rfind('\n', 0, token.lexpos) + 1
+    return (token.lexpos - line_start) + 1
+
+
+def t_BOOLEAN(t):
+    r"(true|false)"
+    t.value = t.value == "true"
+    return t
+
 def t_STRING(t):
-    r"(\"[^\"]*\"|'[^']*')"
+    r"(\"(\\.|[^\"\\])*\"|\'(\\.|[^\'\\])*\')"
     t.value = t.value[1:-1]
+    return t
+
+def t_VARIABLE(t):
+    r"\<[^<> ]+\>"
+    return t
+
+def t_COMP(t):
+    r"(<=|>=|<<|>>|==|!=)"
+    match t.value:
+        case "<=":
+            t.type = "LE"
+        case ">=":
+            t.type = "GE"
+        case "<<":
+            t.type = "LT"
+            t.value = "<"
+        case ">>":
+            t.type = "GT"
+            t.value = ">"
+        case "==":
+            t.type = "EE"
+        case "!=":
+            t.type = "NE"
     return t
 
 def t_WORD(t):
@@ -73,15 +126,32 @@ def t_WORD(t):
         t.type = "MIN"
     elif t.value == "max":
         t.type = "MAX"
+    elif t.value == "if":
+        t.type = "IF"
+    elif t.value == "elif":
+        t.type = "ELSEIF"
+    elif t.value == "else":
+        t.type = "ELSE"
+    elif t.value == "and":
+        t.type = "AND"
+    elif t.value == "or":
+        t.type = "OR"
+    elif t.value == "not":
+        t.type = "NOT"
     return t
 
 def t_NUMBER(t):
     r"(\d+(\.\d+)?|\.\d+)"
-    t.value = float(t.value)
+    if "." in t.value:
+        t.value = float(t.value)
+    else:
+        t.value = int(t.value)
     return t
 
 def t_error(t):
+    
     print("Illegal character '%s'" % t.value[0])
+    print(t)
     t.lexer.skip(1)
 
 lexer = lex.lex()
@@ -89,15 +159,53 @@ lexer = lex.lex()
 precedence = (
     ('left', '+', '-'),
     ('left', '*', '/'),
+    ('left', 'LT', 'LE', 'GT', 'GE', 'EE', 'NE'),
+    ('left', 'AND', 'OR')
 )
 
 start="expressions"
 
-
 def p_statement_assign(p):
-    'statement : VARIABLE "=" expression'
-    p[0] = {"#store": {p[1][1:-1]: p[3]}}
-    #names[p[1]] = p[3]
+    '''atom : VARIABLE "=" expression
+            | VARIABLE'''
+    if len(p) == 4:
+        if isinstance(p[3], dict) and "scope" in p[3] and len(p[3]) == 1:
+            p[3] = p[3]["scope"]["functions"]
+        p[0] = {"#store": {p[1][1:-1]: p[3]}}
+    else:
+        p[0] = {"#ref": p[1][1:-1]}
+
+def p_else_branch(p):
+    """else_branch : ELSE scope"""
+    p[0] = {
+        "false": p[2]["scope"]["functions"]
+    }
+
+def p_elif_branch(p):
+    """elif_branch : ELSEIF '(' expression ')' scope elif_branch
+                   | ELSEIF '(' expression ')' scope else_branch
+                   | ELSEIF '(' expression ')' scope"""
+    d = {
+        "false": {
+            "@check": p[3],
+            "true": p[5]["scope"]["functions"]
+        }
+    }
+    if len(p) == 7:
+        d["false"].update(p[6])
+    p[0] = d
+
+def p_if_statement(p):
+    '''if_condition : IF '(' expression ')' scope elif_branch
+                    | IF '(' expression ')' scope else_branch
+                    | IF '(' expression ')' scope'''
+    d = {
+        "@check": p[3],
+        "true": p[5]
+    }
+    if len(p) == 7:
+        d.update(p[6])
+    p[0] = d
 
 def p_function_call(p):
     '''function_call : FUNCTION parameters scope
@@ -284,7 +392,7 @@ def p_function_call(p):
     for n, vs in parameters["**kwargs"].items():
         data.update({n: vs})
     for n, s in parameters["scope"].items():
-        data.update({scope_name: {n: s}})
+        data.update({scope_name: s})
 
     p[0] = data
 
@@ -335,9 +443,9 @@ def p_parameters(p):
         p[0] = {"parameters": []}
 
 def p_param_element2(p):
-    """param_element_pos : WORD ':' expression ',' param_element_pos
-                         | WORD ':' expression ','
-                         | WORD ':' expression"""
+    """param_element_pos : WORD '=' expression ',' param_element_pos
+                         | WORD '=' expression ','
+                         | WORD '=' expression"""
     if len(p) == 6:
         p[0] = flatten_list([
             (p[1], p[3]), p[5]
@@ -366,23 +474,87 @@ def p_statement_break(p):
     p[0] = {"function": "engine:control/break"}
 
 def p_statement_expr(p):
-    '''statement : expression'''
+    '''statement : expression
+                 | if_condition'''
     p[0] = p[1]
 
 def p_expression_function_call(p):
-    '''expression : function_call'''
+    '''atom : function_call'''
     p[0] = p[1]
 
-def p_expression_binop(p):
-    '''expression : expression '+' expression
-                  | expression '-' expression
-                  | expression '*' expression
-                  | expression '/' expression'''
+def p_comp_expression(p):
+    """comp : NOT comp
+            | arith LT arith
+            | arith LE arith
+            | arith GT arith
+            | arith GE arith
+            | arith EE arith
+            | arith NE arith
+            | comp AND comp
+            | comp OR comp
+            | arith"""
+    if len(p) == 2:
+        p[0] = p[1]
+        return
+    
 
-    if isinstance(p[1], str):
-        p[1] = {"#ref": p[1][1:-1]}
-    if isinstance(p[3], str):
-        p[3] = {"#ref": p[3][1:-1]}
+    if len(p) == 3:
+        if isinstance(p[2], dict):
+            if p[2].get("function", None) == "engine:logic/compare":
+                p[2].pop("function")
+        p[0] = {
+            "function": "engine:logic/compare",
+            "not": p[2]
+        }
+        return
+
+    # if isinstance(p[1], str) and p[1].startswith("<"):
+    #     p[1] = {"#ref": p[1][1:-1]}
+    # if isinstance(p[3], str) and p[3].startswith("<"):
+    #     p[3] = {"#ref": p[3][1:-1]}
+
+    if isinstance(p[1], dict):
+        if p[1].get("function", None) == "engine:logic/compare":
+            p[1].pop("function")
+    if isinstance(p[3], dict):
+        if p[3].get("function", None) == "engine:logic/compare":
+            p[3].pop("function")
+    
+    match p[2]:
+        case "<":
+            p[0] = {"<": [p[1], p[3]]}
+        case ">":
+            p[0] = {">": [p[1], p[3]]}
+        case "<=":
+            p[0] = {"<=": [p[1], p[3]]}
+        case ">=":
+            p[0] = {">=": [p[1], p[3]]}
+        case "==":
+            p[0] = {"==": [p[1], p[3]]}
+        case "!=":
+            p[0] = {"!=": [p[1], p[3]]}
+        case "and":
+            p[0] = {"and": [p[1], p[3]]}
+        case "or":
+            p[0] = {"or": [p[1], p[3]]}
+        
+    p[0].update({"function": "engine:logic/compare"})
+
+def p_expression_binop(p):
+    '''arith : atom '+' atom
+             | atom '-' atom
+             | atom '*' atom
+             | atom '/' atom
+             | atom'''
+
+    if len(p) == 2:
+        p[0] = p[1]
+        return
+
+    # if isinstance(p[1], str) and p[1].startswith("<"):
+    #     p[1] = {"#ref": p[1][1:-1]}
+    # if isinstance(p[3], str) and p[3].startswith("<"):
+    #     p[3] = {"#ref": p[3][1:-1]}
 
     if isinstance(p[1], dict):
         if p[1].get("function", None) == "engine:math/solve":
@@ -403,7 +575,7 @@ def p_expression_binop(p):
     p[0].update({"function": "engine:math/solve"})
 
 def p_expression_uminus(p):
-    "expression : '-' expression"
+    "atom : '-' atom"
     if isinstance(p[2], str):
         p[2] = {"#ref": p[2][1:-1]}
 
@@ -423,8 +595,8 @@ def p_comma_sep_expressions(p):
         p[0] = flatten_list([p[1]])
 
 def p_expression_min(p):
-    """expression : MIN '(' comma_expressions ')'
-                  | MAX '(' comma_expressions ')'"""
+    """arith : MIN '(' comma_expressions ')'
+             | MAX '(' comma_expressions ')'"""
     ls = p[3]
     for l in ls:
         if isinstance(l, dict):
@@ -432,11 +604,11 @@ def p_expression_min(p):
                 l.pop("function")
     p[0] = {
         "function": "engine:math/solve",
-        p[1].value: l
+        p[1]: l
     }
 
 def p_expression_group(p):
-    "expression : '(' expression ')'"
+    "atom : '(' expression ')'"
     p[0] = p[2]
 
 def p_expression_return(p):
@@ -446,10 +618,6 @@ def p_expression_return(p):
         p[0] = p[2]
     else:
         p[0] = None
-
-def p_list(p):
-    "list : '[' comma_expressions ']'"
-    p[0] = p[2]
 
 def p_table_contents(p):
     """table_contents : STRING ':' expression ',' table_contents
@@ -464,29 +632,45 @@ def p_table_contents(p):
             p[5]
         ])
     else:
+        if isinstance(p[3], dict) and "scope" in p[3]:
+            p[3] = p[3]["scope"]
         p[0] = [(p[1], p[3])]
 
 def p_table(p):
-    "table : '%' '{' table_contents '}'"
-    d = {}
-    for k, v in p[3]:
-        d.update({k: v})
-    p[0] = d
+    """table : '%' '[' comma_expressions ']'
+             | '%' '{' table_contents '}'"""
+    #print(f"\n\ntable: {p.slice}\n\n")
+    if len(p[3]) > 0 and isinstance(p[3][0], tuple):
+        d = {}
+        for k, v in p[3]:
+            if isinstance(v, dict) and "scope" in v:
+                v = v["scope"]["functions"]
+            d.update({k: v})
+        p[0] = d
+    else:
+        if isinstance(p[3], dict) and "scope" in p[3]:
+            p[3] = p[3]["scope"]["functions"]
+        p[0] = p[3]
 
 def p_expression_other(p):
-    """expression : NUMBER
-                  | BOOLEAN
-                  | STRING
-                  | WORD
-                  | scope
-                  | list
-                  | table"""
+    """atom : NUMBER
+            | BOOLEAN
+            | STRING
+            | table
+            | WORD
+            | scope"""
     #print(p.slice)
+    if isinstance(p[1], dict) and "scope" in p[1] and len(p[1]) == 1:
+        p[1] = p[1]["scope"]["functions"]
     p[0] = p[1]
 
-def p_expression_variable(p):
-    "expression : VARIABLE"
-    p[0] = {"#ref": p[1][1:-1]}
+def p_expression_comp(p):
+    "expression : comp"
+    p[0] = p[1]
+
+# def p_expression_variable(p):
+#     "expression : VARIABLE"
+#     p[0] = {"#ref": p[1][1:-1]}
 
 # def p_expression_name(p):
 #     "expression : NAME"
@@ -501,6 +685,7 @@ def p_error(p):
         print(f"Syntax error at '{p.value}' ({p.lineno}, {p.lexpos})")
     else:
         print("Syntax error at EOF")
+    print(p)
 
 # Build the parser
 parser = yacc.yacc()
@@ -529,20 +714,25 @@ class EngineScript:
         self.script = ""
         self.compiled_script = {}
 
-    def compile(self):
-        with open(self.script_file, "r+", encoding="utf-8") as f:
-            self.script = f.read()
+    def setRawScript(self, script):
+        self.script = script
+        self.compile(ignore_file=True)
+
+    def compile(self, ignore_file=False):
+        if not ignore_file:
+            with open(self.script_file, "r+", encoding="utf-8") as f:
+                self.script = f.read()
         self.compiled_script = parser.parse(self.script)
     
     def getScript(self):
-        #if not self.compiled_script:
-        self.compile()
+        if not self.compiled_script:
+            self.compile()
         return self.compiled_script
 
 
 if __name__ == "__main__":
-    engine_script = EngineScript(example_script)
-
+    engine_script = EngineScript("fishing_rod/on_use")
+    #engine_script.setRawScript(example_script)
     engine_script.compile()
 
     print(json.dumps(engine_script.getScript(), indent=4))

@@ -668,18 +668,6 @@ def p_expression_comp(p):
     "expression : comp"
     p[0] = p[1]
 
-# def p_expression_variable(p):
-#     "expression : VARIABLE"
-#     p[0] = {"#ref": p[1][1:-1]}
-
-# def p_expression_name(p):
-#     "expression : NAME"
-#     try:
-#         p[0] = names[p[1]]
-#     except LookupError:
-#         print("Undefined name '%s'" % p[1])
-#         p[0] = 0
-
 def p_error(p):
     if p:
         print(f"Syntax error at '{p.value}' ({p.lineno}, {p.lexpos})")

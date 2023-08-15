@@ -34,6 +34,7 @@ Note: This is going to be a VERY long, detailed, guide to creating a dungeon and
 [Enemies](#enemies) | [Attacks](#attacks) | [Entities](#entities) | [Combats](#combats)  
 [Interactable Types](#interactable-types)  
 
+[Dungeon Script](./Dungeon%20Script.md)  
 [Engine Code](#engine-code)  
 
 ## File Structure

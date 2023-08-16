@@ -1,0 +1,7 @@
+{
+    "text": {
+        "color": [204, 204, 204, 255],
+        "size": 10,
+        "font": "./Engine/GraphicsEngine/resources/JetBrainsMono-Regular.ttf"
+    }
+}

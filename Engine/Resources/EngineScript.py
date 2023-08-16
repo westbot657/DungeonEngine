@@ -6,12 +6,14 @@ try:
     from .ply.ply import lex
     from .ply.ply import yacc
     from .Identifier import Identifier
+    from .Logger import Log
 except ImportError:
     from LoaderFunction import LoaderFunction
     from Functions import *
     from ply.ply import lex
     from ply.ply import yacc
     from Identifier import Identifier
+    from Logger import Log
 import re, json, glob
 
 example_script = """
@@ -357,10 +359,12 @@ def p_function_call(p):
                 else: raise Exception(f"function '{func.id.full()}' does not accept **kwargs")
             else: raise Exception(f"cannot put positional arg after key word arg")
     
-
-    data = {
-        "function": func.id.full()
-    }
+    if func.id.full() != "engine:control/check_predicate":
+        data = {
+            "function": func.id.full()
+        }
+    else:
+        data = {}
     if len(p) == 4:
         d = p[3]
         if isinstance(d, dict): # scope
@@ -679,16 +683,32 @@ def p_error(p):
 parser = yacc.yacc()
 
 
-# Parse an expression
-# ast = parser.parse(example_script)#'2 * 3 + 4 * (5 - -<x>)') # 
-# print("ast:", ast)
-
 script_files = glob.glob("**/*.dungeon_script", recursive=True) + glob.glob("**/*.ds", recursive=True)
 
 
 class EngineScript:
 
-    def __init__(self, script_file):
+    _scripts = {}
+
+    def __new__(cls, script_file):
+
+        for f in script_files:
+            if f.replace("\\", "/").endswith(f"{script_file.replace('.dungeon_script', '').replace('.ds', '')}.dungeon_script".replace("\\", "/")):
+                script_file = f
+                break
+            elif f.replace("\\", "/").endswith(f"{script_file.replace('.dungeon_script', '').replace('.ds', '')}.ds".replace("\\", "/")):
+                script_file = f
+                break
+
+        if script_file in EngineScript._scripts:
+            return EngineScript._scripts[script_file]
+        else:
+            self = super().__new__(cls)
+            self._init_(script_file)
+            EngineScript._scripts.update({script_file: self})
+            return self
+
+    def _init_(self, script_file):
         self.script_file = script_file
 
         for f in script_files:
@@ -701,6 +721,15 @@ class EngineScript:
 
         self.script = ""
         self.compiled_script = {}
+
+    @classmethod
+    def preCompileAll(cls):
+        Log["loadup"]["engine script"]("loading and compiling scripts")
+        for script_file in script_files:
+            Log["loadup"]["engine script"](f"compiling script '{script_file}'")
+            es = EngineScript(script_file)
+            es.compile()
+        Log["loadup"]["engine script"]("all scripts compiled")
 
     def setRawScript(self, script):
         self.script = script

@@ -745,6 +745,8 @@ class DungeonLoader:
 
         start_time = time.time()
 
+        EngineScript.preCompileAll()
+
         Log["loadup"]["loader"]("Loading Abstract Status Effects...")
         self.abstract_status_effects = AbstractStatusEffect.loadData(engine)
 

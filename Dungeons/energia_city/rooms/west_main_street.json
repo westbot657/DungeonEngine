@@ -1,13 +1,19 @@
 {
     "name": "West Main Street",
     "events": {
-        "on_enter": [
-            {
-                "function": "engine:player/message",
-                "message": "you went to West Main Street!"
-            }
-        ]
+        "on_enter": {
+            "#script": "energia_city/scripts/west_main_street/on_enter"
+        },
+        "on_input": {
+            "#script": "energia_city/scripts/west_main_street/on_input"
+        }
     },
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "center_street",
+            "target": "energia_city:rooms/center_street"
+        }
+    ],
     "environment": {}
 }

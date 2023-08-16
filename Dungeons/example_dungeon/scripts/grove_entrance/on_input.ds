@@ -1,0 +1,20 @@
+
+
+
+[engine:text/match]([engine:text/set_case](<#text>, "lower"))
+@pattern: "left" # {
+    [engine:interaction/interact](".left_tunnel")
+}
+@pattern: "right" # {
+    [engine:interaction/interact](".right_tunnel")
+}
+@pattern: "door" # {
+    [engine:interaction/interact](".boss_room_door")
+}
+@pattern: "staff" # {
+    [engine:interaction/interact](".ritual_staff")
+}
+@pattern: "(exit|leave)" # {
+    [engine:interaction/interact](".exit")
+}
+

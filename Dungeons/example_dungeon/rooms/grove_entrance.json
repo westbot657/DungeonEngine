@@ -34,37 +34,7 @@
     ],
     "events": {
         "on_input": {
-            "function": "engine:text/match",
-            "text": {
-                "#ref": "#text"
-            },
-            "matches": [
-                {
-                    "pattern": "Left",
-                    "function": "engine:interaction/interact",
-                    "interactable": ".left_tunnel"
-                },
-                {
-                    "pattern": "Right",
-                    "function": "engine:interaction/interact",
-                    "interactable": ".right_tunnel"
-                },
-                {
-                    "pattern": "Door",
-                    "function": "engine:interaction/interact",
-                    "interactable": ".boss_room_door"
-                },
-                {
-                    "pattern": "Staff",
-                    "function": "engine:interaction/interact",
-                    "interactable": ".ritual_staff"
-                },
-                {
-                    "pattern": "(exit|leave)",
-                    "function": "engine:interaction/interact",
-                    "interactable": ".exit"
-                }
-            ]
+            "#script": "example_dungeon/scripts/grove_entrance"
         }
     }
 }

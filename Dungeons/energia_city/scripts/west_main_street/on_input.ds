@@ -1,0 +1,8 @@
+
+
+[engine:text/match]([engine:text/set_case](<#text>, "lower"))
+@pattern: "center" # {
+    [engine:interaction/interact](".center_street")
+}
+
+

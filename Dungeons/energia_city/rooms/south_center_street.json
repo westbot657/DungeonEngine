@@ -1,0 +1,16 @@
+{
+    "name": "Center Street",
+    "interactions": [
+        {
+            
+        }
+    ],
+    "events": {
+        "on_enter": {
+            "#script": "energia_city/scripts/center_street/on_enter"
+        },
+        "on_input": {
+            "#script": "energia_city/scripts/center_street/on_input"
+        }
+    }
+}

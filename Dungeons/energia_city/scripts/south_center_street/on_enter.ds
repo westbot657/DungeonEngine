@@ -5,4 +5,8 @@
 //     }
 // ]
 
-[engine:player/message]("You are on Center Street.\nAvailable locations:\nWest Main Street")
+[engine:player/message](
+"You are on Center Street.
+Available Locations:
+| "
+)

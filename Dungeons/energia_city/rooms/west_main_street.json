@@ -10,9 +10,7 @@
     },
     "interactions": [
         {
-            "type": "engine:interactable/passage",
-            "id": "center_street",
-            "target": "energia_city:rooms/center_street"
+            
         }
     ],
     "environment": {}

@@ -1,0 +1,14 @@
+{
+    "Name": "",
+    "interactions": [
+
+    ],
+    "events": {
+        "on_input": {
+            "#script": "energia_city/scripts/"
+        },
+        "on_enter": {
+            "#script": "energia_city/scripts/"
+        }
+    }
+}

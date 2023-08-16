@@ -1,0 +1,11 @@
+{
+    "name": "Lobby",
+    "events": {
+        "on_enter": {
+            "#script": "energia_city/scripts/hotel/lobby/on_enter"
+        },
+        "on_input": {
+            "#script": "energia_city/scripts/hotel/lobby/on_input"
+        }
+    }
+}

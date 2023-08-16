@@ -307,7 +307,7 @@ class Engine_Tool_SetName(LoaderFunction):
 ####XXX###############XXX####
 
 class Engine_Weapon_GetDurability(LoaderFunction):
-    id = Identifier("engine", "Weapon/", "GetDurability")
+    id = Identifier("engine", "weapon/", "GetDurability")
     return_type = int
 
     script_flags = {
@@ -323,7 +323,7 @@ class Engine_Weapon_GetDurability(LoaderFunction):
             case _: return None
 
 class Engine_Weapon_SetDurability(LoaderFunction):
-    id = Identifier("engine", "Weapon/", "SetDurability")
+    id = Identifier("engine", "weapon/", "SetDurability")
 
     script_flags = {
         "required_args": 0,
@@ -830,7 +830,81 @@ class Engine_Player_Message(LoaderFunction):
     @staticmethod
     def send_message(function_memory:FunctionMemory, message:str):
         function_memory.engine.sendOutput(function_memory.ref("#player"), message)
-        
+
+class Engine_Player_SetTag(LoaderFunction):
+    id = Identifier("engine", "player/", "set_tag")
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "tag": "required parameter",
+            "value": "required parameter"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "tag": str(),
+                "value": str()|bool()|int()|float()
+            }: return cls.set_tag
+            case _: return None
+    @staticmethod
+    def set_tag(function_memory:FunctionMemory, tag:str, value:int|float|bool|str):
+        player: Player = function_memory.ref("#player")
+        player.dungeon_data.update({
+            tag: value
+        })
+
+class Engine_Player_GetTag(LoaderFunction):
+    id = Identifier("engine", "player/", "get_tag")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "tag": "required parameter"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "tag": str()
+            }: return cls.get_tag
+            case _: return None
+    @staticmethod
+    def get_tag(function_memory:FunctionMemory, tag:str):
+        player: Player = function_memory.ref("#player")
+        return player.dungeon_data.get(tag, None)
+
+class Engine_Player_ClearTag(LoaderFunction):
+    id = Identifier("engine", "player/", "clear_tag")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "tag": "required parameter"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "tag": str()
+            }: return cls.get_tag
+            case _: return None
+    @staticmethod
+    def get_tag(function_memory:FunctionMemory, tag:str):
+        player: Player = function_memory.ref("#player")
+        if tag in player.dungeon_data:
+            player.dungeon_data.pop(tag)
+
 class Engine_Player_GetHealth(LoaderFunction):
     id = Identifier("engine", "player/", "get_health")
     return_type = int

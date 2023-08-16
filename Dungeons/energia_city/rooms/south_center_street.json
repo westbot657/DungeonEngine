@@ -2,7 +2,14 @@
     "name": "Center Street",
     "interactions": [
         {
-            
+            "type": "engine:interactable/passage",
+            "id": "",
+            "target": "energia_city:rooms/city_center"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "",
+            "target": "energia_city:rooms/park"
         }
     ],
     "events": {

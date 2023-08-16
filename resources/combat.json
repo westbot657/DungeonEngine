@@ -1,5 +1,5 @@
 {
     "on_player_turn_input": {
-        "#script": "combat_player_turn"
+        "#script": "Engine/resources/combat_player_turn"
     }
 }

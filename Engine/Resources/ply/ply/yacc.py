@@ -1,3 +1,5 @@
+# pylint: disable=[W,R,C]
+
 # -----------------------------------------------------------------------------
 # ply: yacc.py
 #
@@ -93,7 +95,7 @@ pickle_protocol = 0            # Protocol to use when writing pickle files
 
 # String type-checking compatibility
 if sys.version_info[0] < 3:
-    string_types = basestring
+    string_types = basestring # pylint: disable=undefined-variable
 else:
     string_types = str
 
@@ -1362,7 +1364,7 @@ class Production(object):
         p = LRItem(self, n)
         # Precompute the list of productions immediately following.
         try:
-            p.lr_after = self.Prodnames[p.prod[n+1]]
+            p.lr_after = self.Prodnames[p.prod[n+1]] # pylint: disable=no-member
         except (IndexError, KeyError):
             p.lr_after = []
         try:

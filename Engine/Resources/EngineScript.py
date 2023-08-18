@@ -65,6 +65,7 @@ literals = [
 t_ignore = " \t;~`"
 
 t_ignore_comment = r"\/\/.*"
+t_ignore_comment2 = r"(?<!\/)\/\*(\*[^/]|[^*])+\*\/"
 
 t_FUNCTION = r"\[([^:\[]+:)(([^\/\]\[]+\/)*)([^\[\]]+)\]"
 
@@ -91,6 +92,23 @@ def t_BOOLEAN(t):
 def t_STRING(t):
     r"(\"(\\.|[^\"\\])*\"|\'(\\.|[^\'\\])*\')"
     t.value = t.value[1:-1]
+
+    matches = list(re.finditer(r"\\.", t.value))
+    matches.reverse()
+
+    replacements = {
+        "\\n": "\n",
+        "\\\"": "\"",
+        "\\\'": "\'",
+        "\\\\": "\\"
+    }
+    print(t.value)
+    print(matches)
+    for match in matches:
+        match:re.Match
+        print(f"match: {match.group()}")
+        t.value = t.value[0:match.start()] + replacements.get(match.group(), match.group()) + t.value[match.end():]
+    print(t.value)
     return t
 
 def t_VARIABLE(t):

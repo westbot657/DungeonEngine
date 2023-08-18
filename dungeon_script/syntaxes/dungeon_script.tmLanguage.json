@@ -45,6 +45,11 @@
 				{
 					"name": "comment.line.dungeon_script",
 					"match": "//.*"
+				},
+				{
+					"begin": "/\\*",
+					"end": "\\*/",
+					"name": "comment.line.dungeon_script"
 				}
 			]
 		},

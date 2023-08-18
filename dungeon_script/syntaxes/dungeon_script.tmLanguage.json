@@ -2,7 +2,8 @@
 	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
 	"name": "dungeon_script",
 	"fileTypes": [
-		"dungeon_script"
+		"dungeon_script",
+		"ds"
 	],
 	"patterns": [
 		{
@@ -51,31 +52,52 @@
 			"patterns": [
 				{
 					"name": "control.dungeon_script",
-					"match": "\\b(break|return)\\b"
+					"match": "\\b(if|elif|else|break|return)\\b"
 				},
 				{
 					"name": "flag.dungeon_script",
-					"match": "(#|@[^:]*:)"
+					"match": "(#|@[^:]*:|%)"
 				},
 				{
-					"name": "global.dungeon_script",
-					"begin": "<#",
+					"name": "globalmarker.dungeon_script",
+					"begin": "<(#)",
 					"end": ">",
 					"patterns": [
 						{
-							"name": "refdot.dungeon_script",
-							"match": "\\."
+							"name": "global.dungeon_script",
+							"match": "[^./>]+"
 						}
-					]
+					],
+					"beginCaptures": {
+						"1": {
+							"name": "global.dungeon_script"
+						}
+					}
 				},
 				{
-					"name": "reference.dungeon_script",
+					"name": "constmarker.dungeon_script",
+					"begin": "<(%)",
+					"end": ">",
+					"patterns": [
+						{
+							"name": "constant.dungeon_script",
+							"match": "[^./>]+"
+						}
+					],
+					"beginCaptures": {
+						"1": {
+							"name": "constant.dungeon_script"
+						}
+					}
+				},
+				{
+					"name": "referencemarker.dungeon_script",
 					"begin": "<",
 					"end": ">",
 					"patterns": [
 						{
-							"name": "refdot.dungeon_script",
-							"match": "\\."
+							"name": "reference.dungeon_script",
+							"match": "[^./>]+"
 						}
 					]
 				}
@@ -89,6 +111,10 @@
 				{
 					"name": "constant.character.escape.dungeon_script",
 					"match": "\\\\."
+				},
+				{
+					"name": "constant.character.escape.dungeon_script",
+					"match": "`[^`]*`"
 				}
 			]
 		},

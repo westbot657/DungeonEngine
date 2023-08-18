@@ -1,0 +1,117 @@
+{
+    "editor.tokenColorCustomizations": {
+        "textMateRules": [
+            {
+                "name": "dungeon_script - namespace",
+                "scope": [
+                    "namespace.dungeon_script"
+                ],
+                "settings": {
+                    "foreground": "#569CD6"
+                }
+            },
+            {
+                "name": "dungeon_script - path",
+                "scope": [
+                    "path.dungeon_script"
+                ],
+                "settings": {
+                    "foreground": "#9CDCFE"
+                }
+            },
+            {
+                "name": "dungeon_script - function",
+                "scope": [
+                    "function.dungeon_script"
+                ],
+                "settings": {
+                    "foreground": "#DCDCAA"
+                }
+            },
+            {
+                "name": "dungeon_script - variable",
+                "scope": [
+                    "reference.dungeon_script"
+                ],
+                "settings": {
+                    "foreground": "#4EC9B0"
+                }
+            },
+            {
+                "name": "dungeon_script - variable dot",
+                "scope": [
+                    "refdot.dungeon_script"
+                ],
+                "settings": {
+                    "foreground": "#CCCCCC"
+                }
+            },
+            {
+                "name": "dungeon_script - global",
+                "scope": [
+                    "global.dungeon_script"
+                ],
+                "settings": {
+                    "foreground": "#D16969"
+                }
+            },
+            {
+                "name": "dungeon_script - flag",
+                "scope": [
+                    "flag.dungeon_script"
+                ],
+                "settings": {
+                    "foreground": "#4FC1FF"
+                }
+            },
+            {
+                "name": "dungeon_script - control",
+                "scope": [
+                    "control.dungeon_script"
+                ],
+                "settings": {
+                    "foreground": "#C586C0"
+                }
+            },
+            {
+                "name": "dungeon_script - constant values",
+                "scope": [
+                    "constant.value.dungeon_script"
+                ],
+                "settings": {
+                    "foreground": "#569CD6"
+                }
+            },
+            {
+                "name": "dungeon_script - digits",
+                "scope": [
+                    "numbers.dungeon_script"
+                ],
+                "settings": {
+                    "foreground": "#B5CEA8"
+                }
+            },
+            {
+                "name": "dungeon_script - operators",
+                "scope": [
+                    "operator.dungeon_script"
+                ],
+                "settings": {
+                    "foreground": "#DCDCAA"
+                }
+            },
+            {
+                "name": "dungeon_script - const",
+                "scope": [
+                    "constant.dungeon_script"
+                ],
+                "settings": {
+                    "foreground": "#4FC1FF"
+                }
+            }
+        ]
+    },
+    "files.associations": {
+        "*.dungeon_script": "dungeon_script"
+    }
+}

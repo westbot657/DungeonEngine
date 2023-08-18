@@ -13,8 +13,8 @@
   "contributes": {
     "languages": [{
       "id": "dungeon_script",
-      "aliases": [],
-      "extensions": [".dungeon_script"],
+      "aliases": ["ds"],
+      "extensions": [".dungeon_script", ".ds"],
       "configuration": "./language-configuration.json"
     }],
     "grammars": [{

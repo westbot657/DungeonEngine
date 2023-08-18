@@ -190,7 +190,7 @@ def p_elif_branch(p):
     d = {
         "false": {
             "@check": p[3],
-            "true": p[5]["scope"]["functions"]
+            "true": p[5]["scope"]
         }
     }
     if len(p) == 7:
@@ -203,7 +203,7 @@ def p_if_statement(p):
                     | IF '(' expression ')' scope'''
     d = {
         "@check": p[3],
-        "true": p[5]["scope"]["functions"]
+        "true": p[5]["scope"]
     }
     if len(p) == 7:
         d.update(p[6])

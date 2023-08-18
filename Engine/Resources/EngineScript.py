@@ -203,7 +203,7 @@ def p_if_statement(p):
                     | IF '(' expression ')' scope'''
     d = {
         "@check": p[3],
-        "true": p[5]
+        "true": p[5]["scope"]["functions"]
     }
     if len(p) == 7:
         d.update(p[6])
@@ -748,9 +748,15 @@ class EngineScript:
 
 
 if __name__ == "__main__":
-    engine_script = EngineScript("fishing_rod/on_use")
-    #engine_script.setRawScript(example_script)
-    engine_script.compile()
 
-    print(json.dumps(engine_script.getScript(), indent=4))
 
+    while True:
+
+        try:
+            engine_script = EngineScript(input("> "))
+            #engine_script.setRawScript(example_script)
+            engine_script.compile()
+
+            print(json.dumps(engine_script.getScript(), indent=4))
+        except Exception as e:
+            print(e)

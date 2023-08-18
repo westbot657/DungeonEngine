@@ -1,0 +1,5 @@
+
+[engine:text/match](<#text>)
+@pattern: "(leave|exit)" # {
+    // 
+}

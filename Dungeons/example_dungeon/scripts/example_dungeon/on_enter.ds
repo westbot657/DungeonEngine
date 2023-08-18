@@ -1,0 +1,12 @@
+
+if ([engine:player/has_game_object]("example_dungeon:weapons/ritual_staff")) {
+    [engine:player/message](
+        "You enter the Ancient Grove of the Shadow Ent.
+You see a small pedestal, an overgrown `door` with a faded emblem on it, and passages to the `left` and `right`"
+    )
+} else {
+    [engine:player/message](
+        "You enter the Ancient Grove of the Shadow Ent.
+You see a small pedestal with an old ritual `staff` on it, an overgrown `door` with a faded emblem on it, and passages to the `left` and `right`"
+    )
+}

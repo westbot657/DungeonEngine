@@ -20,6 +20,9 @@ class Vector2:
     def __iter__(self):
         return iter([self.x, self.y])
 
+    def list(self):
+        return [self.x, self.y]
+
     def __repr__(self):
         return f"Vector2({self.x}, {self.y})"
 

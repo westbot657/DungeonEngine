@@ -1,0 +1,15 @@
+
+if (<.locked>) {
+    [engine:player/message](<.lock_message>)
+} else {
+    $response = [engine:player/get_input](<.open_message>)
+
+    [engine:text/match]($response)
+    @pattern: <%text/pattern/yes> # {
+        [engine:player/message](<.travel_message>)
+        [engine:player/set_location](<.target>)
+    }
+    @pattern: <%text/pattern/no> # {
+        [engine:player/message](<.disengage_message>)
+    }
+}

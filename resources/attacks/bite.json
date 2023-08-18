@@ -14,7 +14,7 @@
                 "function": "engine:random/choice",
                 "options": [
                     {
-                        "function": "engine:text/builder",
+                        "function": "engine:text/join",
                         "text": [
                             {"#ref": "#enemy.name"},
                             "bites",
@@ -25,7 +25,7 @@
                         ]
                     },
                     {
-                        "function": "engine:text/builder",
+                        "function": "engine:text/join",
                         "text": [
                             {"#ref": "#enemy.name"},
                             "takes a bite at",
@@ -33,7 +33,6 @@
                             "and deals",
                             {"#ref": "damage"},
                             "damage"
-
                         ]
                     }
                 ]
@@ -45,7 +44,7 @@
                 "function": "engine:random/choice",
                 "options": [
                     {
-                        "function": "engine:text/builder",
+                        "function": "engine:text/join",
                         "text": [
                             {"#ref": "#enemy.name"},
                             "bites",
@@ -54,7 +53,7 @@
                         ]
                     },
                     {
-                        "function": "engine:text/builder",
+                        "function": "engine:text/join",
                         "text": [
                             {"#ref": "#enemy.name"},
                             "takes a bite at",

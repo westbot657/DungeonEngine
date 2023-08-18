@@ -126,7 +126,7 @@ engine:ammo/get_bonus_damage
 # ^ Ammo ^ #
 
 # v Text v #
-engine:text/builder
+engine:text/join
 # ^ Text ^ #
 
 # v Random v #
@@ -1044,8 +1044,8 @@ class Engine_Player_Damage(LoaderFunction):
             case {}: ...
             case _: return None
 
-class Engine_Player_GiveObject(LoaderFunction):
-    id = Identifier("engine", "player/", "give_object")
+class Engine_Player_GiveGameObject(LoaderFunction):
+    id = Identifier("engine", "player/", "give_game_object")
 
     script_flags = {
         "required_args": 1,
@@ -1278,8 +1278,10 @@ class Engine_Player_GetInput(LoaderFunction): # NOTE: this function may (probabl
 
     script_flags = {
         "required_args": 0,
-        "optional_args": 0,
-        "args": {}
+        "optional_args": 1,
+        "args": {
+            "prompt": "optional parameter"
+        }
     }
     
     
@@ -1801,16 +1803,17 @@ class Engine_Random_Choice(LoaderFunction):
 ### XXX Engine Text XXX ###
 ####XXX#############XXX####
 
-class Engine_Text_Builder(LoaderFunction):
-    id = Identifier("engine", "text/", "builder")
+class Engine_Text_Join(LoaderFunction):
+    id = Identifier("engine", "text/", "join")
     return_type = str
     pre_evaluator = True
 
     script_flags = {
         "required_args": 1,
-        "optional_args": 0,
+        "optional_args": 1,
         "args": {
-            "text": "required parameter"
+            "text": "*parameters",
+            "seperator": "optional parameter"
         }
     }
     
@@ -1963,6 +1966,27 @@ class Engine_Text_ReplacePattern(LoaderFunction):
     @staticmethod
     def replace(function_memory:FunctionMemory, text:str, pattern:str, replacement:str):
         return re.sub(pattern, replacement, text)
+
+class Engine_Text_Format(LoaderFunction):
+    id = Identifier("engine", "text/", "format")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": -1,
+        "args": {
+            "text": "required parameter",
+            "options": "**parameters"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:list):
+        if "text" in args:
+            return cls.format
+        else: return None
+    @staticmethod
+    def format(function_memory:FunctionMemory, text:str, **options):
+        return text.format(**options)
 
 class Engine_Text_Substring(LoaderFunction):
     id = Identifier("engine", "text/", "substring")

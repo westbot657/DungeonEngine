@@ -88,7 +88,7 @@
 - engine:random/loot_table
 - engine:random/choice
 ## Text
-- engine:text/builder
+- engine:text/join
 - engine:text/match
 - engine:text/replace
 - engine:text/replace_pattern

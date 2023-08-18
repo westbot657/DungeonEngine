@@ -1,0 +1,13 @@
+
+if (not <.picked_up>) {
+    <obj> = [engine:player/give_game_object](<.loot>)
+    <.picked_up> = true
+
+    [engine:player/message](
+        [engine:text/format](
+            <.pickup_message>,
+            loot= <obj.name>
+        )
+    )
+}
+

@@ -17,6 +17,7 @@ variables            : "<local_variable>"
                      | "<#environment_variable>"
                      | "<%constant_value>"
                      | "<variable.with.attributes>"
+macros               | "$macro_name"
 comparison operators : "a == b"
                      | "a != b"
                      | "a >> b"
@@ -59,6 +60,8 @@ atom : VARIABLE '=' expression
      | function_call
 
 expression : comp
+           | MACRO '=' expression
+           | MACRO
 
 table : '%' '[' comma_expressions ']'
       | '%' '{' table_contents '}'
@@ -112,6 +115,7 @@ statement : BREAK
           | if_condition
           | RETURN expression
           | RETURN
+
 
 param_element : expression ',' param_element
               | expression ',' param_element_pos

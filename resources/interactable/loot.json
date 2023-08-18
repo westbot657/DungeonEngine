@@ -2,11 +2,17 @@
     "fields": {
         "loot": {
             "type": "engine:identifier"
+        },
+        "pickup_message": {
+            "type": "engine:text",
+            "required": false,
+            "default": "You picked up `{loot}`"
         }
     },
-    "interaction": [
-        {
-
-        }
-    ]
+    "interaction": {
+        "#script": "resources/interactable/scripts/loot_interaction.ds"
+    },
+    "data": {
+        "picked_up": false
+    }
 }

@@ -1,12 +1,18 @@
 
+
+$m1 = "You enter the Ancient Grove of the Shadow Ent.\nYou see a small pedestal"
+$m3 = ", an overgrown `door` with a faded emblem on it, and passages to the `left` and `right`"
+
 if ([engine:player/has_game_object]("example_dungeon:weapons/ritual_staff")) {
     [engine:player/message](
-        "You enter the Ancient Grove of the Shadow Ent.
-You see a small pedestal, an overgrown `door` with a faded emblem on it, and passages to the `left` and `right`"
+        [engine:text/join](
+            $m1, $m3, seperator=""
+        )
     )
 } else {
     [engine:player/message](
-        "You enter the Ancient Grove of the Shadow Ent.
-You see a small pedestal with an old ritual `staff` on it, an overgrown `door` with a faded emblem on it, and passages to the `left` and `right`"
+        [engine:text/join](
+            $m1, " with an old ritual `staff` on it", $m3, seperator=""
+        )
     )
 }

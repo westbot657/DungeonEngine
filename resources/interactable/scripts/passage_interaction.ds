@@ -1,0 +1,7 @@
+
+if (<.blocked>) {
+    [engine:player/message](<.blocked_message>)
+} else {
+    [engine:player/message](<.travel_message>)
+    [engine:player/set_location](<.target>)
+}

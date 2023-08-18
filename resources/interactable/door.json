@@ -30,58 +30,7 @@
             "default": "You step back from the door."
         }
     },
-    "interaction": [
-        {
-            "function": "engine:logic/compare",
-            "compare": {
-                "#ref": ".locked"
-            },
-            "true": {
-                "function": "engine:player/message",
-                "message": {
-                    "#ref": ".lock_message"
-                }
-            },
-            "false": {
-                "function": "engine:text/match",
-                "text": {
-                    "function" : "engine:player/get_input",
-                    "prompt": {
-                        "#ref": ".open_message"
-                    },
-                    "#store": "response"
-                },
-                "matches": [
-                    {
-                        "pattern": {
-                            "#ref": "%text/pattern/yes"
-                        },
-                        "functions": [
-                            {
-                                "function": "engine:player/message",
-                                "message": {
-                                    "#ref": ".travel_message"
-                                }
-                            },
-                            {
-                                "function": "engine:player/set_location",
-                                "location": {
-                                    "#ref": ".target"
-                                }
-                            }
-                        ]
-                    },
-                    {
-                        "pattern": {
-                            "#ref": "%text/pattern/no"
-                        },
-                        "function": "engine:player/message",
-                        "message": {
-                            "#ref": ".disengage_message"
-                        }
-                    }
-                ]
-            }
-        }
-    ]
+    "interaction": {
+        "#script": "resources/interactable/scripts/door_interaction"
+    }
 }

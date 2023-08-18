@@ -69,7 +69,7 @@
         "true": {
             "function": "engine:combat/trigger",
             "trigger": {
-                "function": "engine:text/builder",
+                "function": "engine:text/join",
                 "text": [
                     {"#ref": "#enemy.id"},
                     "health-check",

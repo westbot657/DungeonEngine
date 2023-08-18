@@ -16,31 +16,9 @@ except ImportError:
     from Logger import Log
 import re, json, glob
 
-example_script = """
-// example script: (based on combat.json)
 
-// this is a comment
+macros = {}
 
-[engine:list/for_each] (<.enemies>)
-{
-    [engine:text/match] ([engine:text/replace_pattern] (" +", " ", [engine:text/set_case] (<#text>, "lower")), "search")
-    @pattern: [engine:text/set_case] (<element.name>, "lower")
-    #{
-    
-        <x> = 5 << 3 and 6 >> 4
-        [engine:player/attack_enemy](<#player>, <element>)
-        break
-    }
-
-    if (5 == 5) {
-        [engine:player/message]("hello!")
-    } elif (5 == 3) {
-        [engine:player/message]("wut?")
-    }
-
-}
-
-"""
 def flatten_list(ls):
     out = []
     for l in ls:
@@ -54,7 +32,7 @@ tokens = (
     "FUNCTION", "VARIABLE", "NUMBER", "STRING", "BOOLEAN",
     "TAG", "WORD", "RETURN", "BREAK", "CONTINUE", "MIN", "MAX",
     "IF", "ELSEIF", "ELSE", "AND", "OR", "EE", "NE", "GT", "GE",
-    "LT", "LE", "NOT"
+    "LT", "LE", "NOT", "MACRO"
 )
 
 literals = [
@@ -70,6 +48,7 @@ t_ignore_comment2 = r"(?<!\/)\/\*(\*[^/]|[^*])+\*\/"
 t_FUNCTION = r"\[([^:\[]+:)(([^\/\]\[]+\/)*)([^\[\]]+)\]"
 
 t_TAG = r"@[^\:]+\:"
+t_MACRO = r"\$[a-zA-Z_][a-zA-Z0-9_]*"
 
 # Define a rule so we can track line numbers
 def t_newline(t):
@@ -102,13 +81,10 @@ def t_STRING(t):
         "\\\'": "\'",
         "\\\\": "\\"
     }
-    print(t.value)
-    print(matches)
     for match in matches:
         match:re.Match
-        print(f"match: {match.group()}")
         t.value = t.value[0:match.start()] + replacements.get(match.group(), match.group()) + t.value[match.end():]
-    print(t.value)
+    
     return t
 
 def t_VARIABLE(t):
@@ -185,8 +161,20 @@ precedence = (
 
 start="expressions"
 
+def p_macro_statement(p):
+    '''expression : MACRO '=' expression
+                  | MACRO'''
+    if len(p) == 4:
+        macros.update({p[1]: p[3]})
+        p[0] = None
+    else:
+        if p[1] in macros:
+            p[0] = macros[p[1]]
+        else:
+            raise Exception(f"Macro not defined: '{p[1]}'")
+
 def p_statement_assign(p):
-    '''atom : VARIABLE "=" expression
+    '''atom : VARIABLE '=' expression
             | VARIABLE'''
     if len(p) == 4:
         if isinstance(p[3], dict) and "scope" in p[3] and len(p[3]) == 1:
@@ -198,7 +186,7 @@ def p_statement_assign(p):
 def p_else_branch(p):
     """else_branch : ELSE scope"""
     p[0] = {
-        "false": p[2]["scope"]["functions"]
+        "false": p[2]["scope"]
     }
 
 def p_elif_branch(p):
@@ -314,7 +302,9 @@ def p_function_call(p):
 
                 if not found:
                     state = "*args"
-                    if args_name: parameters["*args"][args_name].append(value)
+                    if args_name:
+                        found = True
+                        parameters["*args"][args_name].append(value)
                     else:
                         state = "kwargs"
                         for n, v in parameters["kwargs"].items():
@@ -448,9 +438,21 @@ def p_statements(p):
     """expressions : statement expressions
                    | statement"""
     if len(p) == 3:
-        p[0] = {
-            "functions": [p[1]] + p[2]["functions"]
-        }
+        if p[1] and p[2]["functions"]:
+            p[0] = {
+                "functions": [p[1]] + p[2]["functions"]
+            }
+        elif p[1] and (not p[2]["functions"]):
+            p[0] = {
+                "functions": [p[1]]
+            }
+        elif (not p[1]) and p[2]["functions"]:
+            p[0] = {
+                "functions": p[2]["functions"]
+            }
+        elif (not p[1]) and (not p[2]["functions"]):
+            raise Exception("uhhhh...")
+            # this shouldn't be possible...
     else:
         p[0] = {
             "functions": [p[1]]
@@ -757,6 +759,9 @@ class EngineScript:
         if not ignore_file:
             with open(self.script_file, "r+", encoding="utf-8") as f:
                 self.script = f.read()
+
+        macros.clear()
+
         self.compiled_script = parser.parse(self.script)
     
     def getScript(self):
@@ -765,16 +770,32 @@ class EngineScript:
         return self.compiled_script
 
 
+
 if __name__ == "__main__":
 
+    import os, sys
 
-    while True:
+    if len(sys.argv) > 1:
+        f = sys.argv.pop(1)
+    else:
+        f = None
 
+    if f:
+        os.chdir("C:\\Users\\Westb\\Desktop\\Python-Projects\\DungeonEngine\\DungeonEngine")
         try:
-            engine_script = EngineScript(input("> "))
-            #engine_script.setRawScript(example_script)
+            engine_script = EngineScript(f)
             engine_script.compile()
-
             print(json.dumps(engine_script.getScript(), indent=4))
         except Exception as e:
             print(e)
+    else:
+
+        while True:
+
+            try:
+                engine_script = EngineScript(input("> "))
+                engine_script.compile()
+
+                print(json.dumps(engine_script.getScript(), indent=4))
+            except Exception as e:
+                print(e)

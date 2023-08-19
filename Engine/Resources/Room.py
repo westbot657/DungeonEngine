@@ -33,6 +33,7 @@ class Room(FunctionalElement):
 
         self.map: Map = None
 
+
     def getLocalVariables(self) -> dict:
         l = {
             ".name": self.name,
@@ -150,6 +151,13 @@ class Room(FunctionalElement):
             self.postEvaluate(function_memory)
             
             yield res
+
+    def onLoad(self, function_memory:FunctionMemory):
+        if (on_load := self.events.get("on_load", None)) is not None:
+            self.prepFunctionMemory(function_memory)
+            
+            function_memory.evaluateFunction(on_load)
+
 
     def _get_save(self, function_memory:FunctionMemory):
         dat = {}

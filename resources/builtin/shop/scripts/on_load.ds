@@ -1,12 +1,3 @@
-
-/*
-<shopkeeper>: str = name of the character running the shop
-<shop_items>: list[dict] = list of tables that define the shop's stock
-<greeting>: str = formattable string. contains {shopkeeper}
-<farewell>: str
-
-
-
 if (not [engine:variable/is_defined]("shopkeeper")) {
     [engine:control/raise_error](
         [engine:text/join](
@@ -47,9 +38,3 @@ if (not [engine:variable/is_defined]("farewell")) {
         )
     )
 }
-*/
-
-[engine:player/message]([engine:text/format](<greeting>, shopkeeper=<shopkeeper>))
-
-
-

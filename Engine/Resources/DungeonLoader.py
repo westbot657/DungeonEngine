@@ -788,6 +788,11 @@ class DungeonLoader:
         for k, v in self.abstract_dungeons.items():
             self.dungeons.update({k: v.createInstance(engine._function_memory)})
 
+        for dungeon in self.dungeons.values():
+            for room in dungeon.rooms:
+                room: Room
+                room.onLoad(engine._function_memory)
+
         Log["loadup"]["loader"]("Loading Players...")
         self.players = Player.loadData(engine)
 

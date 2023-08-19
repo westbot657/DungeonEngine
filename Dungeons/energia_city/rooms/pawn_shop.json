@@ -1,14 +1,18 @@
 {
     "Name": "Pawn Shop",
     "interactions": [
-
+        {
+            "type": "engine:interactable/door",
+            "id": "city_center",
+            "target": "energia_city:rooms/city_center"
+        }
     ],
     "events": {
         "on_input": {
-            "#script": "energia_city/scripts/"
+            "#script": "energia_city/scripts/pawn_shop/on_input"
         },
         "on_enter": {
-            "#script": "energia_city/scripts/"
+            "#script": "energia_city/scripts/pawn_shop/on_enter"
         }
     }
 }

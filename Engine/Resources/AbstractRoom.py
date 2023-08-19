@@ -89,7 +89,7 @@ class AbstractRoom:
     def getName(self):
         n = self.name or (self.parent.getName() if self.parent else None)
         if n is not None: return n
-        raise InvalidObjectError(f"Tool has no name! ({self.identifier})")
+        raise InvalidObjectError(f"Room has no name! ({self.identifier})")
     
     def getEvents(self):
         if self.events is None:

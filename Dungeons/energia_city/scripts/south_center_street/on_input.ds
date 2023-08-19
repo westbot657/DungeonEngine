@@ -1,7 +1,10 @@
 
 [engine:text/match](<#text>)
-@pattern: "(leave|exit)" # {
+@pattern: "center" # {
+    [engine:interaction/interact](".city_center")
 }
-@pattern: "" # {
+@pattern: "park" # {
+    [engine:interaction/interact](".park")
 }
+
 

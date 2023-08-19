@@ -1,12 +1,9 @@
-// "functions": [
-//     {
-//         "function": "engine:player/message",
-//         "message": "You are on Center Street.\nAvailable locations:\nWest Main Street"
-//     }
-// ]
+
 
 [engine:player/message](
-"You are on Center Street.
+"You are on South Center Street.
 Available Locations:
+| City Center
+| Park
 | "
 )

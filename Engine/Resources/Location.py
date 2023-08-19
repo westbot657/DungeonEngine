@@ -42,6 +42,9 @@ class Location:
         if self.full() == other.full():
             return True
 
+    def __str__(self):
+        return self.full()
+
     def __repr__(self):
         return self.full()
 

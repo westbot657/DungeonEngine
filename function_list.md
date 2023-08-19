@@ -52,7 +52,7 @@
 - engine:player/subtract_max_health
 - engine:player/heal
 - engine:player/damage
-- engine:player/give_object
+- engine:player/give_game_object
 - engine:player/give_status_effect
 - engine:player/has_status_effect
 - engine:player/remove_status_effect

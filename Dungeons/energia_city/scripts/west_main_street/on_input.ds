@@ -1,8 +1,11 @@
 
 
 [engine:text/match]([engine:text/set_case](<#text>, "lower"))
-@pattern: "" # {
-    
+@pattern: "center" # {
+    [engine:interaction/interact](".city_center")
+}
+@pattern: "park" # {
+    [engine:interaction/interact](".park")
 }
 
 

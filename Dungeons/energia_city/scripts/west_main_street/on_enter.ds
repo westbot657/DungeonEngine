@@ -2,6 +2,8 @@
 [engine:player/message](
     "West Main Street --
 Available Locations:
+| City `Center`
+| `Park`
 | "
 )
 

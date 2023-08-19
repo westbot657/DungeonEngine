@@ -36,7 +36,7 @@
                         }
                     },
                     "functions": {
-                        [engine:player/give_object]("engine:items/fish", 1)
+                        [engine:player/give_game_object]("engine:items/fish", 1)
                         [engine:player/message]("You caught a fish!")
                     }
                 },

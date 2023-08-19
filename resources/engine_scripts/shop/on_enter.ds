@@ -1,0 +1,55 @@
+
+/*
+<shopkeeper>: str = name of the character running the shop
+<shop_items>: list[dict] = list of tables that define the shop's stock
+<greeting>: str = formattable string. contains {shopkeeper}
+<farewell>: str
+
+
+
+if (not [engine:variable/is_defined]("shopkeeper")) {
+    [engine:control/raise_error](
+        [engine:text/join](
+            "shopkeeper not properly defined for shop in room: '",
+            <#player.location>,
+            "'",
+            seperator=""
+        )
+    )
+}
+if (not [engine:variable/is_defined]("shop_items")) {
+    [engine:control/raise_error](
+        [engine:text/join](
+            "shop_items not properly defined for shop in room: '",
+            <#player.location>,
+            "'",
+            seperator=""
+        )
+    )
+}
+if (not [engine:variable/is_defined]("greeting")) {
+    [engine:control/raise_error](
+        [engine:text/join](
+            "greeting not properly defined for shop in room: '",
+            <#player.location>,
+            "'",
+            seperator=""
+        )
+    )
+}
+if (not [engine:variable/is_defined]("farewell")) {
+    [engine:control/raise_error](
+        [engine:text/join](
+            "farewell not properly defined for shop in room: '",
+            <#player.location>,
+            "'",
+            seperator=""
+        )
+    )
+}
+*/
+
+[engine:player/message]([engine:text/format](<greeting>, shopkeeper=<shopkeeper>))
+
+
+

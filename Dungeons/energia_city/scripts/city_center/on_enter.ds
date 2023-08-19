@@ -1,0 +1,10 @@
+
+[engine:playeer/message](
+"Available Locations:
+| `North` Center Street
+| `East` Main Street
+| `South` Center Street
+| `West` Main Street
+| `Park`
+| `Pawn` Shop"
+)

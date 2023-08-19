@@ -73,6 +73,7 @@ class Player(Entity):
         self.dungeon_data = {}
         self._text_pattern_categories = _text_pattern_categories
         super().__init__(location, position)
+        self.last_location = location.copy()
 
     @classmethod
     def newPlayer(cls, function_memory:FunctionMemory, discord_id:int, name:str, max_health:int):
@@ -99,7 +100,8 @@ class Player(Entity):
             ".inventory": self.inventory,
             ".status_effects": self.status_effects,
             ".in_combat": self.in_combat,
-            ".location": self.location
+            ".location": self.location,
+            ".last_location": self.last_location
         }
         return d
     

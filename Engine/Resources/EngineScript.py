@@ -32,7 +32,7 @@ tokens = (
     "FUNCTION", "VARIABLE", "NUMBER", "STRING", "BOOLEAN",
     "TAG", "WORD", "RETURN", "BREAK", "CONTINUE", "MIN", "MAX",
     "IF", "ELSEIF", "ELSE", "AND", "OR", "EE", "NE", "GT", "GE",
-    "LT", "LE", "NOT", "MACRO"
+    "LT", "LE", "NOT", "MACRO", "PASS"
 )
 
 literals = [
@@ -134,6 +134,8 @@ def t_WORD(t):
         t.type = "OR"
     elif t.value == "not":
         t.type = "NOT"
+    elif t.value == "pass":
+        t.type = "PASS"
     return t
 
 def t_NUMBER(t):
@@ -161,6 +163,10 @@ precedence = (
 
 start="expressions"
 
+def p_pass(p):
+    '''expression : PASS'''
+    p[0] = None
+
 def p_macro_statement(p):
     '''expression : MACRO '=' expression
                   | MACRO'''
@@ -181,7 +187,10 @@ def p_statement_assign(p):
             p[3] = p[3]["scope"]["functions"]
         p[0] = {"#store": {p[1][1:-1]: p[3]}}
     else:
-        p[0] = {"#ref": p[1][1:-1]}
+        if p[1].startswith("<$"):
+            p[0] = {"#call": p[1][1:-1]}
+        else:
+            p[0] = {"#ref": p[1][1:-1]}
 
 def p_else_branch(p):
     """else_branch : ELSE scope"""

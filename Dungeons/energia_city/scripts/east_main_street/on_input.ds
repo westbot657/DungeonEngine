@@ -1,0 +1,16 @@
+
+[engine:text/match](<#text>)
+@pattern: "market" # {
+    [engine:interaction/interact](".market")
+}
+@pattern: "guardhouse" # {
+    [engine:interaction/interact](".guardhouse")
+}
+@pattern: "hall" # {
+    [engine:interaction/interact](".city_hall")
+}
+@pattern: "alley" # {
+    [engine:interaction/interact](".south_alley")
+}
+
+

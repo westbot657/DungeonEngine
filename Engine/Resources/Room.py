@@ -106,7 +106,9 @@ class Room(FunctionalElement):
     def onExit(self, function_memory:FunctionMemory, player:Player):
         if player.discord_id in self.players_in_room:
             self.players_in_room.remove(player.discord_id)
-        
+
+        player.last_location = self.location.copy()
+
         if (on_exit := self.events.get("on_exit", None)) is not None:
             self.prepFunctionMemory(function_memory)
             function_memory.addContextData({

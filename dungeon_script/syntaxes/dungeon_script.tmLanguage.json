@@ -33,7 +33,7 @@
 		},
 		{
 			"name": "constant.other.dungeon_script",
-			"match": "\\b(break|return)\\b"
+			"match": "\\b(break|return|pass)\\b"
 		},
 		{
 			"include": "#functions"
@@ -61,7 +61,7 @@
 				},
 				{
 					"name": "control.dungeon_script",
-					"match": "\\b(if|elif|else|break|return)\\b"
+					"match": "\\b(if|elif|else|break|return|pass)\\b"
 				},
 				{
 					"name": "flag.dungeon_script",

@@ -6,7 +6,7 @@ try:
     from .LootTable import LootTable
     from .EngineDummy import Engine
     from .EngineOperation import EngineOperation, _EngineOperation
-    from .EngineErrors import LocationError, FunctionError
+    from .EngineErrors import LocationError, FunctionError, FunctionCallError
     from .AbstractAmmo import AbstractAmmo, Ammo
     from .AbstractArmor import AbstractArmor, Armor
     from .AbstractAttack import AbstractAttack, Attack
@@ -30,7 +30,7 @@ except ImportError:
     from LootTable import LootTable
     from EngineDummy import Engine
     from EngineOperation import EngineOperation, _EngineOperation
-    from EngineErrors import LocationError, FunctionError
+    from EngineErrors import LocationError, FunctionError, FunctionCallError
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
     from AbstractAttack import AbstractAttack, Attack
@@ -2358,6 +2358,29 @@ class Engine_Control_CheckPredicate(LoaderFunction):
                 v = function_memory.engine.loader.stopIterationEval(e.value, v)
             return v
 
+class Engine_Control_RaiseError(LoaderFunction):
+    id = Identifier("engine", "control/", "raise_error")
+    
+    script_flags = {
+        "required_args": 0,
+        "optional_args": -1,
+        "args": {
+            "details": "*parameters"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "details": list()
+            }: return cls.raise_error
+            case _: return None
+
+    @staticmethod
+    def raise_error(function_memory:FunctionMemory, *details):
+        raise FunctionCallError(*details)
+
 
 class Engine_Control_Call(LoaderFunction):
     id = Identifier("engine", "control/", "call")
@@ -3015,6 +3038,37 @@ class Engine_Combat_Message(LoaderFunction):
 
 # ^ Combat ^ #
 
+####XXX#################XXX####
+### XXX Engine Variable XXX ###
+####XXX#################XXX####
+
+class Engine_Variable_IsDefined(LoaderFunction):
+    id = Identifier("engine", "variable/", "is_defined")
+    
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "var_name": "required parameter"
+        }
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "var_name": str
+            }: return cls.defined
+            case _: return None
+    @staticmethod
+    def defined(function_memory:FunctionMemory, var_name:str):
+        try:
+            function_memory.ref(var_name)
+            return True
+        except MemoryError:
+            return False
+
+# ^ Variable ^ #
 
 
 ####XXX##############XXX####

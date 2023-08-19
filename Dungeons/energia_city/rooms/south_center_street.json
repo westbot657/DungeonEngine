@@ -1,5 +1,5 @@
 {
-    "name": "Center Street",
+    "name": "South Center Street",
     "interactions": [
         {
             "type": "engine:interactable/passage",

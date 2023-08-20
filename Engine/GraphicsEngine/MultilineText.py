@@ -91,7 +91,7 @@ class MultilineText(GraphicElement):
         self.cursorPos = Vector2(0, 0)
         self.cursor_time = time.time()
 
-        self.text_width = self._font.render("t", self.antialias, self.color, self.background).get_width()
+        self.text_width = self._font.render("t", self.antialias, self.text_color, self.background).get_width()
 
         self.surface = self.pygame.Surface([*self.min_size], self.pygame.SRCALPHA, 32)
         self.surface.fill(self.background)
@@ -119,7 +119,7 @@ class MultilineText(GraphicElement):
 
         if font:
             self._font = self.pygame.font.Font(self.font, self.text_size)
-            self.text_width = self._font.render("t", self.antialias, self.color, self.background).get_width()
+            self.text_width = self._font.render("t", self.antialias, self.text_color, self.background).get_width()
 
         self.surfaces.clear()
         lines = self.text.split("\n")
@@ -139,7 +139,10 @@ class MultilineText(GraphicElement):
             height += surface.get_height() + self.line_spacing
             self.surfaces.append(surface)
 
-        self.cursorPos = Vector2.min(self.cursorPos, Vector2(len(self.lines[-1])*self.text_width, height-self.text_size))
+        if lines:
+            self.cursorPos = Vector2.min(self.cursorPos, Vector2(len(lines[-1])*self.text_width, height-self.text_size))
+        else:
+            self.cursorPos = Vector2(0, 0)
 
         height -= self.line_spacing
 
@@ -170,6 +173,8 @@ class MultilineText(GraphicElement):
         screen = self.getScreen()
 
         screen.blit(self.surface, [*pos])
+
+        self.doTyping(engine)
 
         super().update(engine)
 

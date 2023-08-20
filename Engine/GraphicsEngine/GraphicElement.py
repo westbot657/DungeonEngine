@@ -15,8 +15,9 @@ with open("./Engine/GraphicsEngine/defaults.json", "r+", encoding="utf-8") as f:
 
     DEFAULT_FONT = text_config["font"]
     DEFAULT_TEXTSIZE = text_config["size"]
-    DEFAULT_COLOR = []
-    DEFAULT_BACKGROUND = []
+    DEFAULT_COLOR = text_config["color"]
+    DEFAULT_BACKGROUND = text_config["background"]
+    DEFAULT_ANTIALIAS = text_config["antialias"]
 
 
 class GraphicElement:
@@ -42,7 +43,42 @@ class GraphicElement:
         self.parent = None
         self.children = []
 
+        self.draggable = False
+        self.clickable = False
+        self.hoverable = False
+
+        self.held = False
+        self.hovered = False
+        self.selected = False
+
         self._type: GraphicElement.Type = None
+
+        self._updaters = {}
+
+    def setDraggable(self):
+        self.draggable = True
+        self.clickable = True
+        self.hoverable = True
+        return self
+    
+    def setClickable(self):
+        self.clickable = True
+        self.hoverable = True
+        return self
+    
+    def setHoverable(self):
+        self.hoverable = True
+        return self
+
+    def bringToTop(self, child):
+        self.children.remove(child)
+        self.children.append(child)
+        self.parent.bringToTop()
+
+    def updater(self, _id):
+        def wrapper(method):
+            self._updaters.update({_id: method})
+        return wrapper
 
     def addChild(self, child):
         child.parent = self
@@ -53,35 +89,108 @@ class GraphicElement:
             child.parent = None
             self.children.pop(child)
 
+    def getTopParent(self):
+        return self.parent.getTopParent()
+
+    def getScreen(self):
+        return self.parent.getScreen()
+
+    def getRealPosition(self) -> Vector2:
+        parent_pos = self.parent.getRealPosition()
+        return self.position + parent_pos
+
+    def getPosition(self) -> Vector2:
+        parent_pos = self.parent.getPosition()
+        return self.position + parent_pos
+
+    def setPosition(self, position:Vector2):
+        self.position = position
+
+    def getSize(self) -> Vector2:
+        return Vector2(*self.surface.get_size())
+
+    def onLeftClick(self, engine):
+        pass
+
+    def onRightClick(self, engine):
+        pass
+
     def update(self, engine):
-        offset: Vector2 = self.parent.getOffset()
-        screen = self.parent.getScreen()
+        pos = self.getPosition()
+        screen = self.getScreen()
+
+        for updater in self._updaters.values():
+            updater(engine, self, screen)
+
+        if self.hoverable:
+            size = self.getSize()
+            
+            if engine.mouseCollides([*pos, *size]):
+                if self.clickable:
+                    if engine.mouse.onLeftClick():
+                        engine.mouse.setClicked(self)
+                        if self.draggable:
+                            engine.mouse.hold_offset = [*(engine.mouse.getPosition() - pos)]
+                            engine.mouse.holding_obj = True
+                            engine.mouse.held_obj = self
+                        else:
+                            self.onLeftClick(engine)
+                    if engine.mouse.onRightClick():
+                        engine.mouse.setClicked(self)
+                        self.onRightClick(engine)
 
         if self._type == GraphicElement.Type.TEXT:
-            ...
+            screen.blit(self.surface, list(pos))
+
         elif self._type == GraphicElement.Type.IMAGE:
             self.getFrame()
+            screen.blit(self.surface, list(pos))
 
         elif self._type == GraphicElement.Type.BOX:
-            ...
+            screen.blit(self.surface, list(pos))
 
+        for child in self.children:
+            child.update(engine)
+
+    def updateText(self, text:str|None=None, color:list|None=None, bg:list|None=None, antialias:bool|None=None, font:str|None=None, size:int|None=None):
+        if self._type != GraphicElement.Type.TEXT:
+            raise Exception("Cannot update text for non-text element")
+        
+        self.font = font or self.font
+        self.size = size or self.size
+        self.text = text if text is not None else self.text
+        self.antialias = antialias if antialias is not None else self.antialias
+        self.color = color or self.color
+        self.background = bg or self.background
+
+        _font = self.pygame.font.Font(self.font, self.size)
+
+        self.surface = _font.render(
+            self.text,
+            self.antialias,
+            self.color,
+            self.background
+        )
+
+    def updateBox(self, size:Vector2|None=None, color:list|None=None):
+        if self._type != GraphicElement.Type.BOX:
+            raise Exception("Cannot update size and color for non-box element")
+
+        box = self.pygame.Surface(list(size or self.size), self.pygame.SRCALPHA, 32)
+        box.fill(color or self.color)
+        self.surface = box
 
     @classmethod
-    def Text(cls, position:Vector2, text:str, textColor:list=DEFAULT_COLOR, backgroundColor:list=DEFAULT_BACKGROUND, antialias:bool=False, font:str=DEFAULT_FONT, size:int=DEFAULT_TEXTSIZE):
-        color = cls.pygame.Color(*textColor)
-        bg = cls.pygame.Color(*backgroundColor)
-
+    def Text(cls, position:Vector2, text:str, textColor:list=DEFAULT_COLOR, backgroundColor:list=DEFAULT_BACKGROUND, antialias:bool=DEFAULT_ANTIALIAS, font:str=DEFAULT_FONT, size:int=DEFAULT_TEXTSIZE):
         _font = cls.pygame.font.Font(font, size)
-        
-        obj = cls(_font.render(text, antialias, color, bg), position)
-
+        obj = cls(_font.render(text, antialias, textColor, backgroundColor), position)
+        obj.font = font
+        obj.size = size
         obj.text = text
         obj.antialias = antialias
-        obj.color = color
-        obj.background = bg
-        
+        obj.color = textColor
+        obj.background = backgroundColor
         obj._type = GraphicElement.Type.TEXT
-
         return obj
 
     def getFrame(self):
@@ -101,12 +210,14 @@ class GraphicElement:
             while self.current_frame >= len(self.config["frames"]):
                 self.current_frame -= len(self.config["frames"])
 
-        self.surface = self._img.subsurface((0, h*self.current_frame, w, h))
-
+        self.surface = self.pygame.transform.scale(self._img.subsurface((0, h*self.current_frame, w, h)), [*(self.scale * [w, h])])
 
     @classmethod
-    def Image(cls, file_name:str, position:Vector2, frame_height:int):
+    def Image(cls, file_name:str, position:Vector2, frame_height:int, scale:int|Vector2=1):
         import pygame
+
+        if isinstance(scale, int):
+            scale = Vector2(scale, scale)
 
         if os.path.exists(f"./{file_name}.json"):
             with open(f"./{file_name}.json", "r+", encoding="utf-8") as f:
@@ -126,6 +237,7 @@ class GraphicElement:
         obj.current_frame = 0
         obj.frame_height = frame_height
         obj._type = GraphicElement.Type.IMAGE
+        obj.scale = scale
 
         obj.getFrame()
         return obj

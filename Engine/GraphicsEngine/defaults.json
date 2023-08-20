@@ -1,7 +1,10 @@
 {
     "text": {
         "color": [204, 204, 204, 255],
+        "background": null,
         "size": 10,
-        "font": "./Engine/GraphicsEngine/resources/JetBrainsMono-Regular.ttf"
+        "font": "./Engine/GraphicsEngine/resources/JetBrainsMono-Regular.ttf",
+        "antialias": true,
+        "line spacing": 0
     }
 }

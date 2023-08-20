@@ -38,11 +38,11 @@ class Vector2:
             "y": self.y
         }
     
-    @classmethod
+    @staticmethod
     def min(vec1, vec2):
         return Vector2(min(vec1.x, vec2.x), min(vec1.y, vec2.y))
 
-    @classmethod
+    @staticmethod
     def max(vec1, vec2):
         return Vector2(max(vec1.x, vec2.x), max(vec1.y, vec2.y))
 

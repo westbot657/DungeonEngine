@@ -364,10 +364,11 @@ if __name__ == "__main__":
     @fade_box.updater("fade")
     def fade2(engine, obj, sreen):
         global tick, state, state2
-        tick += 1
+        tick += 5
         fade_box.updateBox(size=Vector2(*RESOLUTION), color=[0, 0, 0, tick])
         if tick >= 255:
             state = state2
+            obj._updaters.pop("fade")
     
     while state == "fade": time.sleep(1)
 

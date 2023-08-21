@@ -185,8 +185,7 @@ class GraphicElement:
             raise Exception("Cannot update size and color for non-box element")
 
         box = self.pygame.Surface(list(size or self.size), self.pygame.SRCALPHA, 32)
-        box.fill((color or self.color)[0:3])
-        
+        box.fill(color or self.color)
         self.surface = box
 
     @classmethod

@@ -15,17 +15,25 @@ except ImportError:
 
 from threading import Thread
 
-import tkinter
-import os
+import pyperclip
+import os, sys
 import pyautogui
 import pygame
+import time
 
 pygame.init()
 
 
-RESOLUTION = (1920*.75, 1080*.75)
+RESOLUTION = [1920*.75, 1080*.75]
 
 class GraphicEngine(GraphicElement):
+
+    keys = {
+        pygame.K_UP: "$↑",
+        pygame.K_RIGHT: "$→",
+        pygame.K_DOWN: "$↓",
+        pygame.K_LEFT: "$←"
+    }
 
     def __init__(self, window_icon=None, window_title=None):
         
@@ -38,6 +46,12 @@ class GraphicEngine(GraphicElement):
         self.window_title = window_title
 
         self.running = False
+        
+        self._resolution = RESOLUTION.copy()
+        RESOLUTION.clear()
+        RESOLUTION.append(1920)
+        RESOLUTION.append(1080)
+        self._screen: pygame.Surface = None
 
         self.pygame = pygame
 
@@ -89,12 +103,14 @@ class GraphicEngine(GraphicElement):
         return self.collides(self.mouse.position, region)
 
     def _mainloop(self):
+        global RESOLUTION
 
         GraphicElement.init(self, pygame)
         MultilineText.init(pygame)
 
         pygame.display.init()
-        self.screen = pygame.display.set_mode(RESOLUTION, pygame.RESIZABLE | pygame.SRCALPHA, 32)
+        self._screen = pygame.display.set_mode(self._resolution, pygame.RESIZABLE | pygame.SRCALPHA, 32)
+        self.screen = pygame.Surface(RESOLUTION, pygame.SRCALPHA, 32)
 
         if self.window_icon:
             ico = pygame.image.load(self.window_icon)
@@ -104,18 +120,24 @@ class GraphicEngine(GraphicElement):
 
         while self.running:
             self.screen.fill((0, 0, 0))
-
+            self._screen.fill((0, 0, 0))
             mouse_scrolled = False
 
             for event in pygame.event.get():
                 event: pygame.event.Event
                 if event.type == pygame.KEYDOWN:
                     self.keyboard._setKeyDown(event.key)
-                    self.keyboard._addUnicode(event.unicode)
+                    if event.unicode:
+                        self.keyboard._addUnicode(event.unicode)
+                    else:
+                        self.keyboard._addUnicode(self.keys.get(event.key, None))
                     #print(f"KEYDOWN: {event.key} ({event.unicode})")
                 elif event.type == pygame.KEYUP:
                     self.keyboard._setKeyUp(event.key)
-                    self.keyboard._removeUnicode(event.unicode)
+                    if event.unicode:
+                        self.keyboard._removeUnicode(event.unicode)
+                    else:
+                        self.keyboard._removeUnicode(self.keys.get(event.key, None))
                     #print(f"KEYUP: {event.key} ({event.unicode})")
                 elif event.type == pygame.MOUSEWHEEL:
                     mouse_scrolled = True
@@ -129,16 +151,28 @@ class GraphicEngine(GraphicElement):
                 elif event.type == pygame.QUIT:
                     pygame.display.quit()
                     self.running = False
-                    return
+                    break
+                elif event.type == pygame.VIDEORESIZE:
+                    self._resolution = [*event.dict['size']]
+            else:
+
+                if not mouse_scrolled:
+                    self.mouse.xscroll, self.mouse.yscroll = 0, 0
+
+                self.mouse._setButtons(*pygame.mouse.get_pressed())
+                self.mouse.position.x, self.mouse.position.y = pygame.mouse.get_pos()
+                self.update()
+
+                self._screen.blit(
+                pygame.transform.scale(self.screen, self._resolution), (0, 0)#, self._screen
+                )
+
+                pygame.display.update()
+                continue
             
-            if not mouse_scrolled:
-                self.mouse.xscroll, self.mouse.yscroll = 0, 0
-
-            self.mouse._setButtons(*pygame.mouse.get_pressed())
-            self.mouse.position.x, self.mouse.position.y = pygame.mouse.get_pos()
-            self.update()
-
-            pygame.display.flip()
+            sys.exit()
+            
+        sys.exit()
 
     def start(self):
         t = Thread(target=self._mainloop)
@@ -148,77 +182,225 @@ class GraphicEngine(GraphicElement):
     def stop(self):
         self.running = False
 
+# 38  79 120
+# 31  31  31
+#  7  48  89
+# 69 110 151
+
+PATH = "./Engine/GraphicsEngine/resources/"
+
+class Button:
+    def __init__(self, button_text:str, position:Vector2):
+        
+        self.text = GraphicElement.Text(position, button_text, size=20)
+        self.button_width = max(24, (self.text.text_width * len(button_text)) + 4)
+        self.button_height = max(24, (self.text.text_height) + 4)
+        
+        self.bg = GraphicElement.Image(f"{PATH}dungeon_game_icon.png", position, 24).setClickable()
+        self.bg._img = pygame.Surface((self.button_width, self.button_height), pygame.SRCALPHA, 32)
+        self.bg._img.fill([125, 125, 125], (2, 0, self.button_width-4, 1))
+        self.bg._img.fill([125, 125, 125], (1, 1, self.button_width-2, 1))
+        self.bg._img.fill([125, 125, 125], (0, 2, self.button_width, self.button_height-4))
+        self.bg._img.fill([125, 125, 125], (1, self.button_height-2, self.button_width-2, 1))
+        self.bg._img.fill([125, 125, 125], (2, self.button_height-1, self.button_width-4, 1))
+        
+        self.fill = pygame.Surface((self.button_width, self.button_height), pygame.SRCALPHA, 32)
+        self.fill.fill([45, 255, 0], (2, 1, self.button_width-4, 1))
+        self.fill.fill([45, 255, 0], (1, 2, self.button_width-2, 1))
+        self.fill.fill([45, 255, 0], (0, 3, self.button_width, self.button_height-6))
+        self.fill.fill([45, 255, 0], (1, self.button_height-3, self.button_width-2, 1))
+        self.fill.fill([45, 255, 0], (2, self.button_height-2, self.button_width-4, 1))
+        
+        self.frame = pygame.Surface((self.button_width, self.button_height), pygame.SRCALPHA, 32)
+        self.frame.fill([28, 159, 0], (2, 0, self.button_width-4, 1))
+        self.frame.fill([28, 159, 0], (1, 1, 1, 1))
+        self.frame.fill([28, 159, 0], (self.button_width-2, 1, 1, 1))
+        self.frame.fill([28, 159, 0], (0, 2, 1, self.button_height-4))
+        self.frame.fill([28, 159, 0], (self.button_width-1, 2, 1, self.button_height-4))
+        self.frame.fill([28, 159, 0], (1, 1, self.button_width-2, 1))
+        self.frame.fill([28, 159, 0], (self.button_width-2, 1, 1, 1))
+        self.frame.fill([28, 159, 0], (2, self.button_height-1, self.button_width-4, 1))
+        
+        self.surface = pygame.Surface((self.button_width, self.button_height), pygame.SRCALPHA, 32)
+        self.hover_tick = 0
+        self.position = position
+        
+        @self.bg.updater("update")
+        def bg_update(engine, obj, screen):
+            self.bg.position = self.position
+            if self.bg.hovered:
+                self.frame.set_alpha(255)
+                if self.hover_tick < 255:
+                    self.hover_tick += 5
+                    self.fill.set_alpha(self.hover_tick)
+            else:
+                if self.hover_tick > 0:
+                    self.hover_tick -= 5
+                    self.fill.set_alpha(self.hover_tick)
+                
+                if self.hover_tick == 0:
+                    self.frame.set_alpha(0)
+            self.surface.blit(self.bg._img, (0, 0))
+            self.surface.blit(self.text.surface, (0, 0))
+            self.surface.blit(self.fill, (0, 0))
+            self.surface.blit(self.frame, (0, 0))
+            
+            screen.blit(self.surface, [*self.bg.position])
+        
+        self.on_click = None
+        
+        
+    def onClick(self):
+        def wrapper(func):
+            self.on_click = func
+            self.bg.onLeftClick = self.on_click
+        return wrapper
+
 
 
 if __name__ == "__main__":
-    engine = GraphicEngine("./Engine/GraphicsEngine/resources/dungeon_builder_icon.png", "Dungeon Builder")
+    engine = GraphicEngine(f"{PATH}dungeon_game_icon.png", "Insert Dungeon Name Here")
     engine.start()
 
+    title = GraphicElement.Text(Vector2(0, 0), "<Insert Dungeon Name Here>", [255, 255, 255], size=30)
+    title.setPosition(Vector2((RESOLUTION[0]-title.getSize().x)/2, RESOLUTION[1]/4))
+    engine.addChild(title)
 
-    box = GraphicElement.Box(Vector2(10, 10), Vector2(50, 50), [255, 0, 0, 127])
-    engine.addChild(box)
+
+    logo = GraphicElement.Image(f"{PATH}dungeon_game_icon.png", Vector2(RESOLUTION[0]/2, RESOLUTION[1]/2), 32, 1)
+    engine.addChild(logo)
+    
+    frame = 0
+    tick = 0
+    size = 1/32
+    state = "load"
+    @logo.updater("fade in")
+    def fade_in(engine, obj, screen):
+        global frame, tick, size, title, state
+        tick += 1
+        title.setPosition(Vector2((RESOLUTION[0]-title.getSize().x)/2, RESOLUTION[1]/4))
+        obj.setPosition(Vector2((RESOLUTION[0] - size*32)/2, (RESOLUTION[1] - size*32)/2))
+        if frame > 255:
+            if tick >= 500:
+                state = "load2"
+                tick = 255
+            return
+        if tick >= 2:
+            frame += 1
+            size += 1/32
+            tick = 0
+            
+            obj.scale = Vector2(size, size)
+            obj._img.set_alpha(frame)
+            
+            title.surface.set_alpha(frame)
+
+    while state == "load": time.sleep(1)
+    
+    logo._updaters.pop("fade in")
+    
+    @logo.updater("fade")
+    def fade(engine, obj, screen):
+        global tick, state, size
+        
+        title.setPosition(Vector2((RESOLUTION[0]-title.getSize().x)/2, RESOLUTION[1]/4))
+        obj.setPosition(Vector2((RESOLUTION[0] - size*32)/2, (RESOLUTION[1] - size*32)/2))
+        
+        tick -= 5
+        obj._img.set_alpha(tick)
+        title.surface.set_alpha(tick)
+        if tick <= 0:
+            state = "select"
+    
+    while state == "load2": time.sleep(1)
+    logo._updaters.pop("fade")
+    engine.removeChild(logo)
+    engine.removeChild(title)
+
+    b = Button("Launch Game", Vector2(50, 50))
+    engine.addChild(b.bg)
+    @b.onClick()
+    def on_click(e):
+        print("clicked")
+
+    # launch_game_button = GraphicElement.Image(f"{PATH}launch_game_bg.png", Vector2(0, 0), 24, 1)
+    # launch_game_frame = GraphicElement.Image(f"{PATH}launch_game_frame.png", Vector2(0, 0), 24, 1)
+    # launch_game_frame = GraphicElement.Image(f"{PATH}launch_game_fill.png", Vector2(0, 0), 24, 1)
+    # launch_game_text = GraphicElement.Text(Vector2(0, 0), "Launch Game")
 
 
-    text = GraphicElement.Text(Vector2(200, 20), "Hello", size=20).setDraggable()
-    engine.addChild(text)
+    # launch_editor_button = GraphicElement.Image(f"{PATH}launch_editor_bg.png")
+    # launch_editor_frame = GraphicElement.Image(f"{PATH}launch_editor_frame.png", Vector2(0, 0), 24, 1)
+    # launch_editor_frame = GraphicElement.Image(f"{PATH}launch_editor_fill.png", Vector2(0, 0), 24, 1)
+    # launch_game_text = GraphicElement.Text(Vector2(0, 0), "Launch Editor")
 
-    text2 = GraphicElement.Text(Vector2(270, 20), "World!", size=20).setDraggable()
-    engine.addChild(text2)
+
+    while state == "select": time.sleep(1)
+
+    # box = GraphicElement.Box(Vector2(10, 10), Vector2(50, 50), [255, 0, 0, 127])
+    # engine.addChild(box)
+
+
+    # text = GraphicElement.Text(Vector2(200, 20), "Hello", size=20).setDraggable()
+    # engine.addChild(text)
+
+    # text2 = GraphicElement.Text(Vector2(270, 20), "World!", size=20).setDraggable()
+    # engine.addChild(text2)
     
 
-    def typing(engine, obj, screen):
-        if obj.selected:
-            for t in engine.keyboard.typing:
+    # def typing(engine, obj, screen):
+    #     if obj.selected:
+    #         for t in engine.keyboard.typing:
 
-                if t == "\b":
-                    if len(obj.text) >= 1:
-                        obj.updateText(obj.text[0:-1])
-                    else:
-                        obj.updateText("")
-                elif t in "\r\n":
-                    obj.selected = False
-                elif t in "\t":
-                    obj.updateText(obj.text + "    ")
-                else:
-                    obj.updateText(obj.text + t)
+    #             if t == "\b":
+    #                 if len(obj.text) >= 1:
+    #                     obj.updateText(obj.text[0:-1])
+    #                 else:
+    #                     obj.updateText("")
+    #             elif t in "\r\n":
+    #                 obj.selected = False
+    #             elif t in "\t":
+    #                 obj.updateText(obj.text + "    ")
+    #             else:
+    #                 obj.updateText(obj.text + t)
 
-                # print(obj.text)
+    #             # print(obj.text)
 
-    text.updater("typing")(typing)
-    text2.updater("typing")(typing)
-
-
-    img = GraphicElement.Image("./Engine/GraphicsEngine/resources/dungeon_builder_icon.png", Vector2(200, 200), 32, 4).setDraggable()
-    engine.addChild(img)
+    # text.updater("typing")(typing)
+    # text2.updater("typing")(typing)
 
 
-    drag = GraphicElement.Box(Vector2(300, 300), Vector2(50, 50), [0, 255, 0, 127])
-    corner1 = GraphicElement.Box(Vector2(295, 295), Vector2(6, 6), [255, 255, 0])
-    corner2 = GraphicElement.Box(Vector2(351, 351), Vector2(6, 6), [255, 255, 0])
-    drag.c1 = corner1
-    drag.c2 = corner2
-    @drag.updater("resizer")
-    def resize(engine, obj, screen):
-        obj.c1.update(engine)
-        obj.c2.update(engine)
-        if obj.held:
-            obj.c1.position = obj.position - [3, 3]
-            obj.c2.position = obj.position + obj.getSize() - [3, 3]
-        else:
-            minx = min(obj.c1.position.x + 3, obj.c2.position.x + 3)
-            maxx = max(obj.c1.position.x + 3, obj.c2.position.x + 3)
-            miny = min(obj.c1.position.y + 3, obj.c2.position.y + 3)
-            maxy = max(obj.c1.position.y + 3, obj.c2.position.y + 3)
-            obj.position = Vector2(minx, miny)
-            size = Vector2(maxx - minx, maxy - miny)
-            obj.updateBox(size)
-    engine.addChild(drag.setDraggable())
-    engine.addChild(corner1.setDraggable())
-    engine.addChild(corner2.setDraggable())
+    # img = GraphicElement.Image("./Engine/GraphicsEngine/resources/dungeon_builder_icon.png", Vector2(200, 200), 32, 4).setDraggable()
+    # engine.addChild(img)
 
 
-    mtext = MultilineText(Vector2(20, 300), "Hello,\nthis is a\n     test!!!!!", True, text_size=20, background=[31, 31, 31])
-    engine.addChild(mtext)
+    # drag = GraphicElement.Box(Vector2(300, 300), Vector2(50, 50), [0, 255, 0, 127])
+    # corner1 = GraphicElement.Box(Vector2(295, 295), Vector2(6, 6), [255, 255, 0])
+    # corner2 = GraphicElement.Box(Vector2(351, 351), Vector2(6, 6), [255, 255, 0])
+    # drag.c1 = corner1
+    # drag.c2 = corner2
+    # @drag.updater("resizer")
+    # def resize(engine, obj, screen):
+    #     obj.c1.update(engine)
+    #     obj.c2.update(engine)
+    #     if obj.held:
+    #         obj.c1.position = obj.position - [3, 3]
+    #         obj.c2.position = obj.position + obj.getSize() - [3, 3]
+    #     else:
+    #         minx = min(obj.c1.position.x + 3, obj.c2.position.x + 3)
+    #         maxx = max(obj.c1.position.x + 3, obj.c2.position.x + 3)
+    #         miny = min(obj.c1.position.y + 3, obj.c2.position.y + 3)
+    #         maxy = max(obj.c1.position.y + 3, obj.c2.position.y + 3)
+    #         obj.position = Vector2(minx, miny)
+    #         size = Vector2(maxx - minx, maxy - miny)
+    #         obj.updateBox(size)
+    # engine.addChild(drag.setDraggable())
+    # engine.addChild(corner1.setDraggable())
+    # engine.addChild(corner2.setDraggable())
+
+
+    # mtext = MultilineText(Vector2(0, 0), open("./Engine/GraphicsEngine/GraphicEngine.py", "r+", encoding="utf-8").read(), True, text_size=20, background=[31, 31, 31], fixed_size=Vector2(RESOLUTION[0]/2, RESOLUTION[1]))
+    # engine.addChild(mtext)
 
     # @mtext.updater("typing")
     # def typing2(engine, obj, screen):
@@ -236,4 +418,5 @@ if __name__ == "__main__":
     #                 obj.updateText(obj.text + "    ")
     #             else:
     #                 obj.updateText(obj.text + t)
+
 

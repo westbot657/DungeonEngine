@@ -65,6 +65,8 @@ class Mouse:
                 self.last_selected = self.clicked
                 self.last_selected.selected = True
             else:
+                if self.last_selected:
+                    self.last_selected.selected = False
                 self.last_selected = None
 
 

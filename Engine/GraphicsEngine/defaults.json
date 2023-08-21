@@ -5,6 +5,7 @@
         "size": 10,
         "font": "./Engine/GraphicsEngine/resources/JetBrainsMono-Regular.ttf",
         "antialias": true,
-        "line spacing": 0
+        "line spacing": 0,
+        "selection": [69, 110, 151, 127]
     }
 }

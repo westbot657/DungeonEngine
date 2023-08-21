@@ -87,7 +87,7 @@ class GraphicElement:
     def removeChild(self, child):
         if child in self.children:
             child.parent = None
-            self.children.pop(child)
+            self.children.remove(child)
 
     def getTopParent(self):
         return self.parent.getTopParent()
@@ -114,6 +114,9 @@ class GraphicElement:
 
     def onRightClick(self, engine):
         pass
+    
+    def onLeftDown(self, engine):
+        pass
 
     def update(self, engine):
         pos = self.getPosition()
@@ -135,6 +138,8 @@ class GraphicElement:
                             engine.mouse.held_obj = self
                         else:
                             self.onLeftClick(engine)
+                    elif engine.mouse.left_button:
+                        self.onLeftDown(engine)
                     if engine.mouse.onRightClick():
                         engine.mouse.setClicked(self)
                         self.onRightClick(engine)
@@ -191,11 +196,13 @@ class GraphicElement:
         obj.color = textColor
         obj.background = backgroundColor
         obj._type = GraphicElement.Type.TEXT
+        obj.text_width, obj.text_height = _font.render("t", antialias, textColor, backgroundColor).get_size()
         return obj
 
+    
+
     def getFrame(self):
-        import pygame
-        self._img: pygame.Surface
+        self._img: self.pygame.Surface
         w = self._img.get_width()
         h = self.frame_height
         ft = self.frame_time
@@ -210,13 +217,13 @@ class GraphicElement:
             while self.current_frame >= len(self.config["frames"]):
                 self.current_frame -= len(self.config["frames"])
 
-        self.surface = self.pygame.transform.scale(self._img.subsurface((0, h*self.current_frame, w, h)), [*(self.scale * [w, h])])
+        self.surface = self.pygame.transform.scale(self._img.subsurface((0, h*self.current_frame, w, h)), [*self.scale * [w, h]])
 
     @classmethod
     def Image(cls, file_name:str, position:Vector2, frame_height:int, scale:int|Vector2=1):
-        import pygame
+        
 
-        if isinstance(scale, int):
+        if isinstance(scale, (int, float)):
             scale = Vector2(scale, scale)
 
         if os.path.exists(f"./{file_name}.json"):
@@ -228,7 +235,7 @@ class GraphicElement:
                 "fps": 0
             }
         
-        img = pygame.image.load(f"./{file_name}")
+        img = cls.pygame.image.load(f"./{file_name}")
 
         obj = cls(img, position)
         obj._img = img

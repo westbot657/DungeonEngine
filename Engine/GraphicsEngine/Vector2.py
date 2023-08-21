@@ -46,3 +46,12 @@ class Vector2:
     def max(vec1, vec2):
         return Vector2(max(vec1.x, vec2.x), max(vec1.y, vec2.y))
 
+    def clamp(self, minx, miny, maxx, maxy):
+        if minx is not ...:
+            self.x = max(minx, self.x)
+        if miny is not ...:
+            self.y = max(miny, self.y)
+        if maxx is not ...:
+            self.x = min(maxx, self.x)
+        if maxy is not ...:
+            self.y = min(maxy, self.y)

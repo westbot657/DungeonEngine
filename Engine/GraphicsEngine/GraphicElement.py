@@ -100,7 +100,10 @@ class GraphicElement:
         return self.position + parent_pos
 
     def getPosition(self) -> Vector2:
-        parent_pos = self.parent.getPosition()
+        if self.parent:
+            parent_pos = self.parent.getPosition()
+        else:
+            parent_pos = Vector2(0, 0)
         return self.position + parent_pos
 
     def setPosition(self, position:Vector2):

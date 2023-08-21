@@ -122,7 +122,7 @@ class GraphicElement:
         pos = self.getPosition()
         screen = self.getScreen()
 
-        for updater in self._updaters.values():
+        for updater in list(self._updaters.values()):
             updater(engine, self, screen)
 
         if self.hoverable:

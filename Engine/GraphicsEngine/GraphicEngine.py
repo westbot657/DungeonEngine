@@ -189,74 +189,24 @@ class GraphicEngine(GraphicElement):
 
 PATH = "./Engine/GraphicsEngine/resources/"
 
-class Button:
-    def __init__(self, button_text:str, position:Vector2):
-        
-        self.text = GraphicElement.Text(position, button_text, size=20)
-        self.button_width = max(24, (self.text.text_width * len(button_text)) + 4)
-        self.button_height = max(24, (self.text.text_height) + 4)
-        
-        self.bg = GraphicElement.Image(f"{PATH}dungeon_game_icon.png", position, 24).setClickable()
-        self.bg._img = pygame.Surface((self.button_width, self.button_height), pygame.SRCALPHA, 32)
-        self.bg._img.fill([125, 125, 125], (2, 0, self.button_width-4, 1))
-        self.bg._img.fill([125, 125, 125], (1, 1, self.button_width-2, 1))
-        self.bg._img.fill([125, 125, 125], (0, 2, self.button_width, self.button_height-4))
-        self.bg._img.fill([125, 125, 125], (1, self.button_height-2, self.button_width-2, 1))
-        self.bg._img.fill([125, 125, 125], (2, self.button_height-1, self.button_width-4, 1))
-        
-        self.fill = pygame.Surface((self.button_width, self.button_height), pygame.SRCALPHA, 32)
-        self.fill.fill([45, 255, 0], (2, 1, self.button_width-4, 1))
-        self.fill.fill([45, 255, 0], (1, 2, self.button_width-2, 1))
-        self.fill.fill([45, 255, 0], (0, 3, self.button_width, self.button_height-6))
-        self.fill.fill([45, 255, 0], (1, self.button_height-3, self.button_width-2, 1))
-        self.fill.fill([45, 255, 0], (2, self.button_height-2, self.button_width-4, 1))
-        
-        self.frame = pygame.Surface((self.button_width, self.button_height), pygame.SRCALPHA, 32)
-        self.frame.fill([28, 159, 0], (2, 0, self.button_width-4, 1))
-        self.frame.fill([28, 159, 0], (1, 1, 1, 1))
-        self.frame.fill([28, 159, 0], (self.button_width-2, 1, 1, 1))
-        self.frame.fill([28, 159, 0], (0, 2, 1, self.button_height-4))
-        self.frame.fill([28, 159, 0], (self.button_width-1, 2, 1, self.button_height-4))
-        self.frame.fill([28, 159, 0], (1, 1, self.button_width-2, 1))
-        self.frame.fill([28, 159, 0], (self.button_width-2, 1, 1, 1))
-        self.frame.fill([28, 159, 0], (2, self.button_height-1, self.button_width-4, 1))
-        
-        self.surface = pygame.Surface((self.button_width, self.button_height), pygame.SRCALPHA, 32)
-        self.hover_tick = 0
+class Button(GraphicElement):
+    def __init__(self, position:Vector2, button_text:str):
         self.position = position
         
-        @self.bg.updater("update")
-        def bg_update(engine, obj, screen):
-            self.bg.position = self.position
-            if self.bg.hovered:
-                self.frame.set_alpha(255)
-                if self.hover_tick < 255:
-                    self.hover_tick += 5
-                    self.fill.set_alpha(self.hover_tick)
-            else:
-                if self.hover_tick > 0:
-                    self.hover_tick -= 5
-                    self.fill.set_alpha(self.hover_tick)
-                
-                if self.hover_tick == 0:
-                    self.frame.set_alpha(0)
-            self.surface.blit(self.bg._img, (0, 0))
-            self.surface.blit(self.text.surface, (0, 0))
-            self.surface.blit(self.fill, (0, 0))
-            self.surface.blit(self.frame, (0, 0))
-            
-            screen.blit(self.surface, [*self.bg.position])
+        self.text = GraphicElement.Text(self.position, button_text, size=20)
+        self.width, self.height = self.text.getSize() + [4, 4]
         
-        self.on_click = None
+        self.bg = GraphicElement.Image(f"{PATH}dungeon_game_icon.png", self.position, self.height)
+        self.bg._img = pygame.Surface((self.width, self.height))#, pygame.SRCALPHA, 32)
+        self.bg._img.fill([125, 125, 125], (2, 0, self.width-4, 1))
+        self.bg._img.fill([125, 125, 125], (1, 1, self.width-2, 1))
+        self.bg._img.fill([125, 125, 125], (0, 2, self.width, self.height-4))
+        self.bg._img.fill([125, 125, 125], (1, self.height-2, self.width-2, 1))
+        self.bg._img.fill([125, 125, 125], (2, self.height-1, self.width-4, 1))
         
-        
-    def onClick(self):
-        def wrapper(func):
-            self.on_click = func
-            self.bg.onLeftClick = self.on_click
-        return wrapper
+        super().__init__(pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32), self.position)
 
-
+        
 
 if __name__ == "__main__":
     engine = GraphicEngine(f"{PATH}dungeon_game_icon.png", "Insert Dungeon Name Here")
@@ -317,11 +267,11 @@ if __name__ == "__main__":
     engine.removeChild(logo)
     engine.removeChild(title)
 
-    b = Button("Launch Game", Vector2(50, 50))
-    engine.addChild(b.bg)
-    @b.onClick()
-    def on_click(e):
-        print("clicked")
+    # b = Button("Launch Game", Vector2(50, 50))
+    # engine.addChild(b.bg)
+    # @b.onClick()
+    # def on_click(e):
+    #     print("clicked")
 
     # launch_game_button = GraphicElement.Image(f"{PATH}launch_game_bg.png", Vector2(0, 0), 24, 1)
     # launch_game_frame = GraphicElement.Image(f"{PATH}launch_game_frame.png", Vector2(0, 0), 24, 1)

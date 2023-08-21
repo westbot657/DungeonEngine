@@ -129,6 +129,7 @@ class GraphicElement:
             size = self.getSize()
             
             if engine.mouseCollides([*pos, *size]):
+                engine.mouse.hovering = self
                 if self.clickable:
                     if engine.mouse.onLeftClick():
                         engine.mouse.setClicked(self)
@@ -143,6 +144,8 @@ class GraphicElement:
                     if engine.mouse.onRightClick():
                         engine.mouse.setClicked(self)
                         self.onRightClick(engine)
+            else:
+                self.hovered = False
 
         if self._type == GraphicElement.Type.TEXT:
             screen.blit(self.surface, list(pos))
@@ -182,7 +185,8 @@ class GraphicElement:
             raise Exception("Cannot update size and color for non-box element")
 
         box = self.pygame.Surface(list(size or self.size), self.pygame.SRCALPHA, 32)
-        box.fill(color or self.color)
+        box.fill((color or self.color)[0:3])
+        
         self.surface = box
 
     @classmethod

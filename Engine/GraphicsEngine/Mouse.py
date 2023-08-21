@@ -32,6 +32,7 @@ class Mouse:
 
     def update(self, engine):
         self.clicked = None
+        self.hovering = None
 
         if self.holding_obj:
             if (not self.left_button) and (self.p_left_button):

@@ -203,25 +203,60 @@ class Button(GraphicElement):
         
         super().__init__(pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32), self.position)
 
+        self.frame = GraphicElement.Image(f"{PATH}dungeon_game_icon.png", Vector2(self.position.x, 0), 32)
+        self.frame.frame_height = self.height
+        self.frame._img = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
+        self.frame._img.fill((0, 0, 0, 0))
+        self.frame._img.fill([28, 160, 0], (2, 0, self.width-4, 1))
+        self.frame._img.fill([28, 160, 0], (1, 1, 1, 1))
+        self.frame._img.fill([28, 160, 0], (self.width-2, 1, 1, 1))
+        self.frame._img.fill([28, 160, 0], (0, 2, 1, self.height-4))
+        self.frame._img.fill([28, 160, 0], (self.width-1, 2, 1, self.height-4))
+        self.frame._img.fill([28, 160, 0], (1, self.height-2, 1, 1))
+        self.frame._img.fill([28, 160, 0], (self.width-2, self.height-2, 1, 1))
+        self.frame._img.fill([28, 160, 0], (2, self.height-1, self.width-4, 1))
+        self.frame._img.set_alpha(0)
+
+        self.fill = GraphicElement.Image(f"{PATH}dungeon_game_icon.png", Vector2(self.position.x, 0), 32)
+        self.fill.frame_height = self.height
+        self.fill._img = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
+        self.fill._img.fill((0, 0, 0, 0))
+        self.fill._img.fill([45, 127, 0], (2, 1, self.width-4, 1))
+        self.fill._img.fill([45, 127, 0], (1, 2, self.width-2, self.height-4))
+        self.fill._img.fill([45, 127, 0], (2, self.height-4, self.width-2, 1))
+        self.fill._img.set_alpha(0)
+
         # self.hoverable = self.clickable = True
-        self.bg.setClickable()
         self.hover_tick = 0
-        self.bg.onLeftClick = self.onBGLeftClick
+        self.bg.setClickable()
         self.addChild(self.bg)
+        self.addChild(self.frame)
+        self.addChild(self.fill)
         self.addChild(self.text)
 
+        self.bg.updater("hover updater")(self.bg_updater)
 
-
-    def onBGLeftClick(self, engine):
-        ...
-
-    def update(self, engine):
-        super().update(engine)
-        
-        if self.hovered:
-            ...
+    def bg_updater(self, engine, _, screen):
+        if self.bg.hovered:
+            # print("hovered")
+            if self.hover_tick < 255:
+                self.hover_tick = min(self.hover_tick+5, 255)
+                self.fill._img.set_alpha(self.hover_tick*0.75)
+                # self.fill.getFrame()
+            self.frame._img.set_alpha(255)
         else:
-            ...
+            # print("not hovered")
+            self.frame._img.set_alpha(0)
+            if self.hover_tick > 0:
+                self.hover_tick = max(0, self.hover_tick-5)
+                self.fill._img.set_alpha(self.hover_tick*0.75)
+                # self.fill.getFrame()
+            
+
+    def onClick(self):
+        def wrapper(func):
+            self.bg.onLeftClick = func
+        return wrapper
 
 if __name__ == "__main__":
     engine = GraphicEngine(f"{PATH}dungeon_game_icon.png", "Insert Dungeon Name Here")
@@ -279,23 +314,68 @@ if __name__ == "__main__":
     
     while state == "load2": time.sleep(1)
     logo._updaters.pop("fade")
-    engine.removeChild(logo)
     engine.removeChild(title)
 
-    b = Button(Vector2(0, 0), "Launch Game")
-    engine.addChild(b)
-    @b.updater("positioning")
+    launch_game = Button(Vector2(0, 0), "Launch Game")
+    launch_editor = Button(Vector2(0, 0), "Launch Editor")
+    logo._img.set_alpha(255)
+    
+    engine.addChild(launch_game)
+    engine.addChild(launch_editor)
+    
+    state2 = ""
+    
+    @launch_game.updater("positioning")
     def position(engine, obj, screen):
         size = obj.getSize()
         obj.position.x = (RESOLUTION[0]/3) - (size.x/2)
-        obj.position.y = (RESOLUTION[1]/3) - (size.y/2)
+        obj.position.y = (RESOLUTION[1]*2/3) - (size.y/2)
+    
+    @launch_game.onClick()
+    def on_click_game(engine):
+        global state, state2
+        state = "fade"
+        state2 = "game"
+    @launch_editor.onClick()
+    def on_click_editor(engine):
+        global state, state2
+        state = "fade"
+        state2 = "editor"
+    @launch_editor.updater("positioning")
+    def position2(engine, obj, screen):
+        size = obj.getSize()
+        obj.position.x = (RESOLUTION[0]*2/3) - (size.x/2)
+        obj.position.y = (RESOLUTION[1]*2/3) - (size.y/2)
+    @logo.updater("positioning")
+    def position3(engine, obj, screen):
+        size = obj.getSize()
+        obj.position.x = (RESOLUTION[0]-size.x)/2
+        obj.position.y = RESOLUTION[1]*1/4
     
     # mtext = MultilineText(Vector2(RESOLUTION[0]/2, 0), open("./Engine/GraphicsEngine/GraphicEngine.py", "r+", encoding="utf-8").read(), True, text_size=20, background=[31, 31, 31], fixed_size=Vector2(RESOLUTION[0]/2, RESOLUTION[1]))
     # engine.addChild(mtext)
     # engine.addChild(b.bg)
 
-
     while state == "select": time.sleep(1)
+
+    fade_box = GraphicElement.Box(Vector2(0, 0), Vector2(*RESOLUTION), [0, 0, 0, 0])
+    engine.addChild(fade_box)
+    tick = 0
+    @fade_box.updater("fade")
+    def fade2(engine, obj, sreen):
+        global tick, state, state2
+        tick += 1
+        fade_box.updateBox(size=Vector2(*RESOLUTION), color=[0, 0, 0, tick])
+        if tick >= 255:
+            state = state2
+    
+    while state == "fade": time.sleep(1)
+
+    engine.removeChild(logo)
+    engine.removeChild(launch_game)
+    engine.removeChild(launch_editor)
+    engine.removeChild(fade_box)
+
 
     # box = GraphicElement.Box(Vector2(10, 10), Vector2(50, 50), [255, 0, 0, 127])
     # engine.addChild(box)

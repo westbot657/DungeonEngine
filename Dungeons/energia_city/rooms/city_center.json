@@ -1,5 +1,5 @@
 {
-    "Name": "City Center",
+    "name": "City Center",
     "interactions": [
         {
             "type": "engine:interactable/passage",

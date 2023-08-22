@@ -71,6 +71,7 @@ class MultilineText(GraphicElement):
         self._updaters = {}
         self.children = []
         self.parent = None
+        self.on_enter = None
         self._type = None
         self.text_size = options.get("text_size", DEFAULT_TEXTSIZE)
         self.text_color = options.get("text_color", DEFAULT_COLOR)
@@ -92,13 +93,18 @@ class MultilineText(GraphicElement):
         self.text_width, self.text_height = self._font.render("t", self.antialias, self.text_color, self.background).get_size()
         self.max_scroll = Vector2(0, 0)
         self.surface = self.pygame.Surface([*self.min_size], self.pygame.SRCALPHA, 32)
-        self.surface.fill(self.background)
+        self.surface.fill(self.background or [0, 0, 0])
         self.lines = []
         self.surfaces = []
         self.selection = [None, None]
         self.highlights = []
         self._highlight_offset = []
         self.updateText(text)
+
+    def onEnter(self):
+        def wrapper(func):
+            self.on_enter = func
+        return wrapper
 
     def updateText(self, text:str|None=None, color:list|None=None, bg:list|None=None, antialias:bool|None=None, font:str|None=None, size:int|None=None, line_spacing:int|None=None, min_size:Vector2|None=None, max_size:Vector2|None=None, fixed_size:Vector2|None=None):
         self.font = font or self.font
@@ -140,13 +146,14 @@ class MultilineText(GraphicElement):
         width = min(max(self.min_size.x, max_width), self.max_size.x)
         height = min(max(self.min_size.y, height), self.max_size.y)
         self.surface = self.pygame.Surface((width, height), self.pygame.SRCALPHA, 32)
-        self.surface.fill(self.background)
+        self.surface.fill(self.background or [0, 0, 0])
         y = 0
         for surface in self.surfaces:
             self.surface.blit(surface, [*self.scrolled + [0, y]])
             y += self.line_spacing + surface.get_height()
 
     def onLeftClick(self, engine):
+        _old = self.cursorPos
         relative_pos = engine.mouse.getPosition() - self.getPosition() - self.scrolled
         self.cursor_time = time.time()
         col = mround((relative_pos.x / self.text_width))
@@ -157,8 +164,9 @@ class MultilineText(GraphicElement):
         
         if self.pygame.K_LSHIFT in engine.keyboard.keys.keys() and (self.selection[0] is not None):
             self.selection[1] = self.cursorPos
-        elif self.selection[0] is None:
-            self.selection[0] = self.cursorPos
+        elif self.pygame.K_LSHIFT in engine.keyboard.keys.keys() and self.selection[0] is None:
+            self.selection[0] = _old
+            self.selection[1] = self.cursorPos
         else:
             self.selection = [self.cursorPos, None]
 
@@ -184,7 +192,7 @@ class MultilineText(GraphicElement):
             diff = (y - height) + self.scrolled.y
             self.scrolled.y -= diff
         
-        print(self.scrolled)
+        #print(self.scrolled)
 
     def getLine(self, index):
         return len(self.text[0:index].split("\n"))-1
@@ -377,6 +385,8 @@ class MultilineText(GraphicElement):
                         else:
                             self.text = self.text[0:self.cursorPos] + "\n" + self.text[self.cursorPos:]
                             self.cursorPos += 1
+                    if self.on_enter:
+                        self.on_enter(self)
                 elif t == "\t":
                     pre_line = self.text[0:self.cursorPos].split("\n")[-1]
                     if pre_line.strip() == "":
@@ -386,6 +396,9 @@ class MultilineText(GraphicElement):
                     else:
                         self.text = self.text[0:self.cursorPos] + "    " + self.text[self.cursorPos:]
                         self.cursorPos += 4
+                elif t == "\x18": # CTRL+X
+                    pyperclip.copy(self.getSelection())
+                    self.setSelection()
                 elif t == "\x03": # CTRL+C
                     pyperclip.copy(self.getSelection())
                 elif t == "\x16": # CTRL+V

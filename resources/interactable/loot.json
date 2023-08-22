@@ -1,7 +1,8 @@
 {
     "fields": {
         "loot": {
-            "type": "engine:identifier"
+            "type": "engine:identifier",
+            "required": true
         },
         "pickup_message": {
             "type": "engine:text",

@@ -1,5 +1,5 @@
 {
-    "Name": "Pawn Shop",
+    "name": "Pawn Shop",
     "interactions": [
         {
             "type": "engine:interactable/door",

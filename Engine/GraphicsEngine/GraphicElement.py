@@ -86,7 +86,7 @@ class GraphicElement:
 
     def removeChild(self, child):
         if child in self.children:
-            child.parent = None
+            #child.parent = None
             self.children.remove(child)
 
     def getTopParent(self):
@@ -100,10 +100,7 @@ class GraphicElement:
         return self.position + parent_pos
 
     def getPosition(self) -> Vector2:
-        if self.parent:
-            parent_pos = self.parent.getPosition()
-        else:
-            parent_pos = Vector2(0, 0)
+        parent_pos = self.parent.getPosition()
         return self.position + parent_pos
 
     def setPosition(self, position:Vector2):

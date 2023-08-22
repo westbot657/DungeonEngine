@@ -123,6 +123,7 @@ class AbstractRoom:
             room: AbstractRoom
             if room.identifier.namespace == dungeon_name:
                 rooms.update({room.identifier.full(): room})
+        Log["debug"]["abstract"]["room"](f"getAbstractRooms: dungeon: {dungeon_name}, rooms:{rooms}")
         return rooms
 
     @classmethod
@@ -131,6 +132,7 @@ class AbstractRoom:
         for room in cls._loaded.values():
             room: AbstractRoom
             if room.identifier.namespace == dungeon_name.split(":")[1]:
+                Log["dubug"]["abstract"]["room"][f"loading room '{room.identifier.full()}'"]
                 rooms.update({room.identifier.full(): room.createInstance(function_memory)})
         Log["debug"]["abstract"]["room"](f"getRooms: dungeon: {dungeon_name}, rooms:{rooms}")
         return rooms

@@ -21,6 +21,7 @@ import pyautogui
 import pygame
 import time
 import random
+from subprocess import Popen
 
 pygame.init()
 
@@ -48,6 +49,9 @@ class GraphicEngine(GraphicElement):
 
         self.running = False
         
+        GraphicElement.init(self, pygame)
+        MultilineText.init(pygame)
+
         self.pygame = pygame
 
     def bringToTop(self, child):
@@ -99,9 +103,6 @@ class GraphicEngine(GraphicElement):
 
     def _mainloop(self):
         global RESOLUTION
-
-        GraphicElement.init(self, pygame)
-        MultilineText.init(pygame)
 
         pygame.display.init()
         self.screen = pygame.display.set_mode(RESOLUTION, pygame.RESIZABLE | pygame.SRCALPHA, 32)
@@ -187,7 +188,7 @@ PATH = "./Engine/GraphicsEngine/resources/"
 class Button(GraphicElement):
     def __init__(self, position:Vector2, button_text:str):
         self.position = position
-        
+        self.parent = None
         self.text = GraphicElement.Text(Vector2(self.position.x, 0), button_text, size=40)
         self.width, self.height = self.text.getSize() + [4, 4]
         
@@ -377,65 +378,16 @@ if __name__ == "__main__":
     engine.removeChild(launch_editor)
     engine.removeChild(fade_box)
 
+    if state == "game":
 
-    # box = GraphicElement.Box(Vector2(10, 10), Vector2(50, 50), [255, 0, 0, 127])
-    # engine.addChild(box)
-
-
-    # text = GraphicElement.Text(Vector2(200, 20), "Hello", size=20).setDraggable()
-    # engine.addChild(text)
-
-    # text2 = GraphicElement.Text(Vector2(270, 20), "World!", size=20).setDraggable()
-    # engine.addChild(text2)
-    
-
-    # def typing(engine, obj, screen):
-    #     if obj.selected:
-    #         for t in engine.keyboard.typing:
-
-    #             if t == "\b":
-    #                 if len(obj.text) >= 1:
-    #                     obj.updateText(obj.text[0:-1])
-    #                 else:
-    #                     obj.updateText("")
-    #             elif t in "\r\n":
-    #                 obj.selected = False
-    #             elif t in "\t":
-    #                 obj.updateText(obj.text + "    ")
-    #             else:
-    #                 obj.updateText(obj.text + t)
-
-    #             # print(obj.text)
-
-    # text.updater("typing")(typing)
-    # text2.updater("typing")(typing)
+        engine.stop()
+        pygame.quit()
+        p = Popen("py -3.10 ./Engine/ConsoleRunner.py", shell=True)
+        sys.exit()
+    else:
+        test = MultilineText(Vector2(0, 0), "This\033[38;2;255;0;127m is a single line text box", True, text_size=20, fixed_size=Vector2(500, 300), background=[127, 127, 127])
+        test.single_line = True
+        engine.addChild(test)
 
 
-    # img = GraphicElement.Image("./Engine/GraphicsEngine/resources/dungeon_builder_icon.png", Vector2(200, 200), 32, 4).setDraggable()
-    # engine.addChild(img)
-
-
-    # drag = GraphicElement.Box(Vector2(300, 300), Vector2(50, 50), [0, 255, 0, 127])
-    # corner1 = GraphicElement.Box(Vector2(295, 295), Vector2(6, 6), [255, 255, 0])
-    # corner2 = GraphicElement.Box(Vector2(351, 351), Vector2(6, 6), [255, 255, 0])
-    # drag.c1 = corner1
-    # drag.c2 = corner2
-    # @drag.updater("resizer")
-    # def resize(engine, obj, screen):
-    #     obj.c1.update(engine)
-    #     obj.c2.update(engine)
-    #     if obj.held:
-    #         obj.c1.position = obj.position - [3, 3]
-    #         obj.c2.position = obj.position + obj.getSize() - [3, 3]
-    #     else:
-    #         minx = min(obj.c1.position.x + 3, obj.c2.position.x + 3)
-    #         maxx = max(obj.c1.position.x + 3, obj.c2.position.x + 3)
-    #         miny = min(obj.c1.position.y + 3, obj.c2.position.y + 3)
-    #         maxy = max(obj.c1.position.y + 3, obj.c2.position.y + 3)
-    #         obj.position = Vector2(minx, miny)
-    #         size = Vector2(maxx - minx, maxy - miny)
-    #         obj.updateBox(size)
-    # engine.addChild(drag.setDraggable())
-    # engine.addChild(corner1.setDraggable())
-    # engine.addChild(corner2.setDraggable())
 

@@ -8,7 +8,6 @@
     [engine:player/message]("You can't fish here!")
 }
 
-
 [engine:control/check_predicate](%{
     "environment": %{
         "fish-habitable": true

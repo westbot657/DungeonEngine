@@ -21,6 +21,7 @@ import pyautogui
 import pygame
 import time
 import random
+import re
 from subprocess import Popen
 
 pygame.init()
@@ -385,8 +386,33 @@ if __name__ == "__main__":
         p = Popen("py -3.10 ./Engine/ConsoleRunner.py", shell=True)
         sys.exit()
     else:
-        test = MultilineText(Vector2(0, 0), "This\033[38;2;255;0;127m is a single line text box", True, text_size=20, fixed_size=Vector2(500, 300), background=[127, 127, 127])
-        test.single_line = True
+        test = MultilineText(Vector2(0, 0), open("./resources/tools/scripts/fishing_rod/on_use.ds", "r+", encoding="utf-8").read(), True, text_size=14, fixed_size=Vector2(*RESOLUTION), background=[31, 31, 31])
+        
+        ec_highlighting = [
+            [r"\b(if|elif|else|return|break|pass)\b", "\033[38;2;197;134;192m\\1\033[0m"],
+            [r"\b(true|false|none|and|or)\b", "\033[38;2;86;156;214m\\1\033[0m"],
+            ["(//[^\n]*)", "\033[38;2;106;153;85m\\1\033[0m"],
+            [r"(\[)([^:\[\]]+:)((?:[^/\[\]]+/)*)([^\[\]]+)(\])", "\\1\033[38;2;86;156;214m\\2\033[38;2;156;220;254m\\3\033[38;2;220;220;170m\\4\033[0m\\5"],
+            [r"(\"(?:\\.|[^\"\\])*\")", "\033[38;2;206;145;120m\\1\033[0m"],
+            [r"((?<!<)%|@[^:]*:)", "\033[38;2;79;193;255m\\1\033[0m"],
+            [r"(\d+(?:\.\d+)?|\.\d+)", "\033[38;2;181;206;168m\\1\033[0m"],
+            [r"(<)([^#\$%][^>]*)(>)", "\\1\033[38;2;78;201;176m\\2\033[0m\\3"],
+            [r"(<)(#[^>]*)(>)", "\\1\033[38;2;209;105;105m\\2\033[0m\\3"],
+            [r"(<)(\$[^>]*)(>)", "\\1\033[38;2;220;220;170m\\2\033[0m\\3"],
+            [r"(<)(%[^>]*)(>)", "\\1\033[38;2;79;193;255m\\2\033[0m\\3"],
+        ]
+
+        @test.updater("highliting")
+        def ec_highlight(engine, obj, screen):
+            t = obj.text
+
+
+            for pattern, rep in ec_highlighting:
+                t = re.sub(pattern, rep, t)
+
+
+            obj._raw_text = t
+
         engine.addChild(test)
 
 

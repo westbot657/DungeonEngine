@@ -7,7 +7,7 @@ except ImportError:
     from GraphicElement import GraphicElement
     from Vector2 import Vector2
 
-import json, time, pyperclip
+import json, time, pyperclip, re
 
 with open("./Engine/GraphicsEngine/defaults.json", "r+", encoding="utf-8") as f:
     text_config = json.load(f)["text"]
@@ -24,6 +24,8 @@ def mround(number:float):
     if number % 1 < 0.5:
         return int(number)
     return int(number) + 1
+
+import pygame
 
 class MultilineText(GraphicElement):
     pygame = None
@@ -58,7 +60,11 @@ class MultilineText(GraphicElement):
             fixed_size (Vector2): fixed size of the text box
         """
         self.position = position
-        self.text = text
+        self._raw_text = text
+        self.text = re.sub("\033\\[(\\d+;)*\\d+m", "", text)
+
+        self.history = [(self.text, 0)]
+        self.future = []
         self.writable = writable
         self.hoverable = self.writable
         self.clickable = self.writable
@@ -85,12 +91,12 @@ class MultilineText(GraphicElement):
         if isinstance(self.fixed_size, Vector2):
             self.min_size = self.max_size = self.fixed_size
         self._font = self.pygame.font.Font(self.font, self.text_size)
-        self.cursor = self.pygame.Surface((2, 20), self.pygame.SRCALPHA, 32)
+        self.text_width, self.text_height = self._font.render("t", self.antialias, self.text_color, self.background).get_size()
+        self.cursor = self.pygame.Surface((2, self.text_height), self.pygame.SRCALPHA, 32)
         self.cursor.fill(self.text_color)
         self.cursorPos = 0
         self.cursorLocation = Vector2(0, 0)
         self.cursor_time = time.time()
-        self.text_width, self.text_height = self._font.render("t", self.antialias, self.text_color, self.background).get_size()
         self.max_scroll = Vector2(0, 0)
         self.surface = self.pygame.Surface([*self.min_size], self.pygame.SRCALPHA, 32)
         self.surface.fill(self.background or [0, 0, 0])
@@ -101,6 +107,31 @@ class MultilineText(GraphicElement):
         self._highlight_offset = []
         self.updateText(text)
 
+    def saveHistory(self):
+        if self.text != self.history[0][0]:
+            self.history.insert(0, (self.text, self.cursorPos))
+            self.future.clear()
+        elif self.cursorPos != self.history[0][1]:
+            self.history[0] = (self.history[0][0], self.cursorPos)
+
+        if len(self.history) >= 50:
+            self.history = self.history[0:50]
+
+    def undo(self):
+        if len(self.history) > 1:
+            # self.future.insert(0, self.text)
+            self.text, self.cursorPos = self.history.pop(0)
+        else:
+            self.text, _ = self.history[0]
+            self.focusCursor()
+
+
+    def redo(self):
+        if len(self.future) > 0:
+            self.history.insert(0, (self.text, self.cursorPos))
+            self.text, self.cursorpos = self.future.pop(0)
+            self.focusCursor()
+
     def onEnter(self):
         def wrapper(func):
             self.on_enter = func
@@ -109,7 +140,8 @@ class MultilineText(GraphicElement):
     def updateText(self, text:str|None=None, color:list|None=None, bg:list|None=None, antialias:bool|None=None, font:str|None=None, size:int|None=None, line_spacing:int|None=None, min_size:Vector2|None=None, max_size:Vector2|None=None, fixed_size:Vector2|None=None):
         self.font = font or self.font
         self.text_size = size or self.text_size
-        self.text = text if text is not None else self.text
+        # self._raw_text = text if text is not None else self._raw_text
+        self.text = re.sub("\033\\[(?:\\d+;)*\\d+m", "", text) if text is not None else self.text
         self.antialias = antialias if antialias is not None else self.antialias
         self.text_color = color or self.text_color
         self.background = bg or self.background
@@ -124,18 +156,62 @@ class MultilineText(GraphicElement):
             self.text_width, self.text_height = self._font.render("t", self.antialias, self.text_color, self.background).get_size()
         self.surfaces.clear()
         lines = self.text.split("\n")
+        _raw_lines = self._raw_text.split("\n")
+
         max_width = 0
         height = 0
+
+        i = 0
+
+        color = self.text_color
+
         for line in lines:
-            surface = self._font.render(
+            a: pygame.Surface = self._font.render(
                 line,
                 self.antialias,
-                self.text_color,
+                color,
                 self.background
             )
+            surface = pygame.Surface(a.get_size(), pygame.SRCALPHA, 32)
+            surface.blit(a, (0, 0))
             max_width = max(max_width, surface.get_width())
             height += surface.get_height() + self.line_spacing
+            
+            if len(_raw_lines) > i:
+                if re.search("\033\\[(\\d+;)*\\d+m", _raw_lines[i]):
+                    t = _raw_lines[i]
+                    colors = []
+                    while m := re.search("(\033\\[(?:\\d+;)*\\d+m)", t):
+                        m: re.Match
+                        t = t.replace(m.group(), "", 1)
+                        if m.group() == "\033[0m":
+                            if len(colors) > 0:
+                                colors[-1].insert(1, m.start())
+                            colors.append([m.start(), self.text_color])
+                        elif rgb := re.match("\033\\[38;2;(?P<r>\\d+);(?P<g>\\d+);(?P<b>\\d+)m", m.group()):
+                            rgb: re.Match
+                            col = rgb.groupdict()
+                            if len(colors) > 0:
+                                colors[-1].insert(1, m.start())
+                            colors.append([m.start(), [int(col["r"]), int(col["g"]), int(col["b"])]])
+                    colors[-1].insert(1, None)
+                    color = colors[-1][2]
+                    for s, e, _color in colors:
+                        #print(s*self.text_width, e, _color, line[s:e])
+                        sub = self._font.render(
+                            line[s:e],
+                            self.antialias,
+                            _color,
+                            self.background
+                        )
+                        #self.surface.blit(sub, (50, 50))
+                        surface.blit(sub, (s*self.text_width, 0))
+
             self.surfaces.append(surface)
+
+            i += 1
+        
+
         self.cursorPos = min(self.cursorPos, len(self.text))
         height -= self.line_spacing
         self.max_scroll.x = max(-1, max_width - self.max_size.x)
@@ -158,7 +234,7 @@ class MultilineText(GraphicElement):
         self.cursor_time = time.time()
         col = mround((relative_pos.x / self.text_width))
         lines = self.text.split("\n")
-        line = min(relative_pos.y // self.text_height, len(lines)-1)
+        line = int(min(relative_pos.y // self.text_height, len(lines)-1))
         self.cursorPos = len("\n".join(lines[0:line])) + min(col, len(lines[line]))
         if line > 0: self.cursorPos += 1
         
@@ -170,6 +246,7 @@ class MultilineText(GraphicElement):
         else:
             self.selection = [self.cursorPos, None]
 
+        self.saveHistory()
         self.updateText()
 
     def focusCursor(self):
@@ -190,7 +267,7 @@ class MultilineText(GraphicElement):
             self.scrolled.y -= diff - (self.text_height*0.5)
         elif y + self.scrolled.y > height:
             diff = (y - height) + self.scrolled.y
-            self.scrolled.y -= diff
+            self.scrolled.y -= diff + (self.text_height*0.5)
         
         #print(self.scrolled)
 
@@ -277,7 +354,7 @@ class MultilineText(GraphicElement):
         self.cursor_time = time.time()
         col = mround((relative_pos.x / self.text_width))
         lines = self.text.split("\n")
-        line = min(relative_pos.y // self.text_height, len(lines)-1)
+        line = int(min(relative_pos.y // self.text_height, len(lines)-1))
         self.cursorPos = len("\n".join(lines[0:line])) + min(col, len(lines[line]))
         if line > 0: self.cursorPos += 1
         
@@ -369,13 +446,24 @@ class MultilineText(GraphicElement):
                         self.selection = [None, None]
                         self.refresh_selection()
                 elif t == "\b":
+                    _t = self.text[self.cursorPos-1]
                     if (self.selection[0] is not None) and (self.selection[1] is not None):
                         self.setSelection()
                     elif self.cursorPos > 0:
                         self.text = self.text[0:self.cursorPos-1] + self.text[self.cursorPos:]
                         self.cursorPos -= 1
+                    if _t in " \n":
+                        self.saveHistory()
+                elif t == "\x7f": # delete
+                    _t = self.text[self.cursorPos]
+                    if (self.selection[0] is not None) and (self.selection[1] is not None):
+                        self.setSelection()
+                    elif self.cursorPos < len(self.text)-1:
+                        self.text = self.text[0:self.cursorPos] + self.text[self.cursorPos+1:]
+                    if _t in " \n":
+                        self.saveHistory()
                 elif t in "\r\n":
-                    
+                    self.saveHistory()
                     if self.single_line:
                         self.selected = False
                         engine.mouse.last_selected = None
@@ -387,7 +475,9 @@ class MultilineText(GraphicElement):
                             self.cursorPos += 1
                     if self.on_enter:
                         self.on_enter(self)
+                    
                 elif t == "\t":
+                    self.saveHistory()
                     pre_line = self.text[0:self.cursorPos].split("\n")[-1]
                     if pre_line.strip() == "":
                         p = 4 - (len(pre_line) % 4)
@@ -396,9 +486,11 @@ class MultilineText(GraphicElement):
                     else:
                         self.text = self.text[0:self.cursorPos] + "    " + self.text[self.cursorPos:]
                         self.cursorPos += 4
+                    
                 elif t == "\x18": # CTRL+X
                     pyperclip.copy(self.getSelection())
                     self.setSelection()
+                    self.saveHistory()
                 elif t == "\x03": # CTRL+C
                     pyperclip.copy(self.getSelection())
                 elif t == "\x16": # CTRL+V
@@ -408,19 +500,38 @@ class MultilineText(GraphicElement):
                     else:
                         self.text = self.text[0:self.cursorPos] + p + self.text[self.cursorPos:]
                         self.cursorPos += len(p)
+                    self.saveHistory()
+                elif t == "\x13": # CTRL+S
+                    ...
+                elif t == "\x01": # CTRL+A
+                    self.selection = [0, len(self.text)-1]
+                    self.refresh_selection()
+                elif t == "\x1a": # CTRL+Z / CTRL+SHIFT+Z
+                    if pygame.K_LSHIFT in engine.keyboard.keys.keys():
+                        self.redo()
+                    else:
+                        self.undo()
                 else:
+                    if t in " ":
+                        self.saveHistory()
                     if (self.selection[0] is not None) and (self.selection[1] is not None):
                         self.setSelection(t)
                     else:
                         self.text = self.text[0:self.cursorPos] + t + self.text[self.cursorPos:]
                         self.cursorPos += 1
+
+
                 self.focusCursor()
         self.updateText()
+
 
     def update(self, engine):
         pos = self.getPosition()
         screen = self.getScreen()
-        
+
+        if self.hovered and pygame.mouse.get_cursor() != pygame.SYSTEM_CURSOR_IBEAM: # pylint: disable=[no-member]
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_IBEAM) # pylint: disable=[no-member]
+
         if self.selection[0] is not None and self.selection[1] is not None and self.highlights:
             h = self.highlights[0]
             x, y = self._highlight_offset
@@ -431,7 +542,7 @@ class MultilineText(GraphicElement):
                 height += self.text_height
         
         if (time.time() - self.cursor_time) % 1 < 0.5 and self.selected:
-            self.surface.blit(self.cursor, [*self.scrolled + [*self.cursorLocation - [1, -4]]])
+            self.surface.blit(self.cursor, [*self.scrolled + [*self.cursorLocation - [1, 0]]])
         screen.blit(self.surface, [*pos])
         self.doTyping(engine)
         super().update(engine)

@@ -5,6 +5,7 @@ try:
 except ImportError:
     from Vector2 import Vector2
 
+import pygame
 class Mouse:
 
     def __init__(self):
@@ -58,8 +59,10 @@ class Mouse:
 
     def post_update(self, engine):
 
+        reset_mouse = True
         if self.hovering:
             self.hovering.hovered = True
+            reset_mouse = False
 
         if self.onLeftClick():
             if self.clicked:
@@ -70,6 +73,10 @@ class Mouse:
                     self.last_selected.selected = False
                 self.last_selected = None
 
+
+        if reset_mouse and pygame.mouse.get_cursor() != pygame.SYSTEM_CURSOR_ARROW: # pylint: disable=[no-member]
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW) # pylint: disable=[no-member]
+            
 
     def onLeftClick(self):
         return (self.left_button) and (not self.p_left_button)

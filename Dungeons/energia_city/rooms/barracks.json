@@ -1,0 +1,1 @@
+{"name": "Barracks", "interactions": [], "events": {"on_enter": {"#script": "energia_city/scripts/rooms/barracks/on_enter"}, "on_input": {"#script": "energia_city/scripts/rooms/barracks/on_input"}}}

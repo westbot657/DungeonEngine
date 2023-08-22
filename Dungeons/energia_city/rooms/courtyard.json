@@ -1,0 +1,1 @@
+{"name": "Courtyard", "interactions": [], "events": {"on_enter": {"#script": "energia_city/scripts/rooms/courtyard/on_enter"}, "on_input": {"#script": "energia_city/scripts/rooms/courtyard/on_input"}}}

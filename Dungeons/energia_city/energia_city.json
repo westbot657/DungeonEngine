@@ -1,7 +1,7 @@
 {
     "name": "Energia City",
     "version": 0.1,
-    "entry_point": "energia_city:rooms/center_street",
+    "entry_point": "energia_city:rooms/south_center_street",
     "events": {
         "on_enter": [
             {

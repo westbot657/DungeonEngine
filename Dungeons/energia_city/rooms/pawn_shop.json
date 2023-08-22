@@ -9,10 +9,10 @@
     ],
     "events": {
         "on_input": {
-            "#script": "energia_city/scripts/pawn_shop/on_input"
+            "#script": "energia_city/scripts/rooms/pawn_shop/on_input"
         },
         "on_enter": {
-            "#script": "energia_city/scripts/pawn_shop/on_enter"
+            "#script": "energia_city/scripts/rooms/pawn_shop/on_enter"
         }
     }
 }

@@ -2,10 +2,10 @@
     "name": "West Main Street",
     "events": {
         "on_enter": {
-            "#script": "energia_city/scripts/west_main_street/on_enter"
+            "#script": "energia_city/scripts/rooms/west_main_street/on_enter"
         },
         "on_input": {
-            "#script": "energia_city/scripts/west_main_street/on_input"
+            "#script": "energia_city/scripts/rooms/west_main_street/on_input"
         }
     },
     "interactions": [

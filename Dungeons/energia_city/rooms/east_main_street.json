@@ -5,10 +5,10 @@
     ],
     "events": {
         "on_input": {
-            "#script": "energia_city/scripts/"
+            "#script": "energia_city/scripts/rooms/east_main_street/on_input"
         },
         "on_enter": {
-            "#script": "energia_city/scripts/"
+            "#script": "energia_city/scripts/rooms/east_main_street/on_enter"
         }
     }
 }

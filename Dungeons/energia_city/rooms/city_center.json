@@ -34,10 +34,10 @@
     ],
     "events": {
         "on_input": {
-            "#script": "energia_city/scripts/city_center/on_input"
+            "#script": "energia_city/scripts/rooms/city_center/on_input"
         },
         "on_enter": {
-            "#script": "energia_city/scripts/city_center/on_enter"
+            "#script": "energia_city/scripts/rooms/city_center/on_enter"
         }
     }
 }

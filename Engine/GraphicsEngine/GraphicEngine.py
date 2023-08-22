@@ -189,10 +189,12 @@ class GraphicEngine(GraphicElement):
 PATH = "./Engine/GraphicsEngine/resources/"
 
 class Button(GraphicElement):
-    def __init__(self, position:Vector2, button_text:str):
+    def __init__(self, position:Vector2, button_text:str, text_size=40, animation_speed=5):
         self.position = position
         self.parent = None
-        self.text = GraphicElement.Text(Vector2(self.position.x, 0), button_text, size=40)
+        self.text_size = text_size
+        self.animation_speed = animation_speed
+        self.text = GraphicElement.Text(Vector2(self.position.x, 0), button_text, size=text_size)
         self.width, self.height = self.text.getSize() + [4, 4]
         
         self.bg = GraphicElement.Image(f"{PATH}dungeon_game_icon.png", Vector2(self.position.x, 0), 32)
@@ -244,7 +246,7 @@ class Button(GraphicElement):
         if self.bg.hovered:
             # print("hovered")
             if self.hover_tick < 255:
-                self.hover_tick = min(self.hover_tick+5, 255)
+                self.hover_tick = min(self.hover_tick+self.animation_speed, 255)
                 self.fill._img.set_alpha(self.hover_tick*0.75)
                 # self.fill.getFrame()
             self.frame._img.set_alpha(255)
@@ -252,7 +254,7 @@ class Button(GraphicElement):
             # print("not hovered")
             self.frame._img.set_alpha(0)
             if self.hover_tick > 0:
-                self.hover_tick = max(0, self.hover_tick-5)
+                self.hover_tick = max(0, self.hover_tick-self.animation_speed)
                 self.fill._img.set_alpha(self.hover_tick*0.75)
                 # self.fill.getFrame()
             
@@ -361,6 +363,8 @@ if __name__ == "__main__":
             obj.position.y = RESOLUTION[1]*1/4
             if obj.selected:
                 obj.setDraggable()
+                engine.mouse.held_obj = obj
+                obj.held = True
     
     # mtext = MultilineText(Vector2(RESOLUTION[0]/2, 0), open("./Engine/GraphicsEngine/GraphicEngine.py", "r+", encoding="utf-8").read(), True, text_size=20, background=[31, 31, 31], fixed_size=Vector2(RESOLUTION[0]/2, RESOLUTION[1]))
     # engine.addChild(mtext)
@@ -394,13 +398,13 @@ if __name__ == "__main__":
         input_history = MultilineText(Vector2(0, RESOLUTION[1]-(18*4)), "", False, text_size=18, fixed_size=Vector2(RESOLUTION[0], (18*3-4)), background=[24, 24, 24]).setHoverable()
         input_box = MultilineText(Vector2(0, RESOLUTION[1]-24), "", True, text_size=18, fixed_size=Vector2(RESOLUTION[0], 24), background=[24, 24, 24]).setHoverable()
         input_box.single_line = True
-        # clear_log = Button(Vector2(RESOLUTION[0]/2+10, 50), "Clear Logs")
-        # clear_log.setClickable()
-        # @clear_log.onClick()
-        # def clear_logs(engine):
-        #     debug_box.updateText("")
-        #     debug_box.cursorPos = 0
-        #     debug_box.focusCursor()
+        clear_log = Button(Vector2(RESOLUTION[0]/2-45, 15), "Clear Logs", 14, 50)
+        clear_log.setClickable()
+        @clear_log.onClick()
+        def clear_logs(engine):
+            debug_box.updateText("")
+            debug_box.cursorPos = 0
+            debug_box.focusCursor()
         
         @input_box.updater("sizing")
         def set_size(engine, obj, screen):
@@ -411,14 +415,14 @@ if __name__ == "__main__":
             input_history.fixed_size.setVal(RESOLUTION[0], (18*3-4))
             input_box.position.setVal(0, RESOLUTION[1]-24)
             input_box.fixed_size.setVal(RESOLUTION[0], 24)
-            # clear_log.position.setVal(RESOLUTION[0]/2+10, 50)
+            clear_log.position.setVal(RESOLUTION[0]/2-45, 15)
         
         
         engine.addChild(output_box)
         engine.addChild(debug_box)
         engine.addChild(input_history)
         engine.addChild(input_box)
-        # engine.addChild(clear_log)
+        engine.addChild(clear_log)
 
         class VisualIOHook:
             def __init__(self):
@@ -504,6 +508,10 @@ if __name__ == "__main__":
     else:
         test = MultilineText(Vector2(0, 0), open("./resources/tools/scripts/fishing_rod/on_use.ds", "r+", encoding="utf-8").read(), True, text_size=18, fixed_size=Vector2(*RESOLUTION), background=[31, 31, 31])
         
+        test2 = Button(Vector2(RESOLUTION[0]/2, RESOLUTION[1]/2), "\"A Button\"")
+        
+        
+        
         ec_highlighting = [
             [r"\b(if|elif|else|return|break|pass)\b", "\033[38;2;197;134;192m\\1\033[0m"],
             [r"\b(true|false|none|and|or)\b", "\033[38;2;86;156;214m\\1\033[0m"],
@@ -530,6 +538,12 @@ if __name__ == "__main__":
             obj._raw_text = t
 
         engine.addChild(test)
+        engine.addChild(test2)
+        
+        
+        @test2.updater("uhh")
+        def uhh(engine, obj, screen):
+            obj.position.setVal(0, 0)
 
 
 

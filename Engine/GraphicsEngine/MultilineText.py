@@ -25,7 +25,10 @@ def mround(number:float):
         return int(number)
     return int(number) + 1
 
-import pygame
+# import pygame
+
+# pygame.init()
+# pygame.font.init()
 
 class MultilineText(GraphicElement):
     pygame = None
@@ -140,7 +143,7 @@ class MultilineText(GraphicElement):
     def updateText(self, text:str|None=None, color:list|None=None, bg:list|None=None, antialias:bool|None=None, font:str|None=None, size:int|None=None, line_spacing:int|None=None, min_size:Vector2|None=None, max_size:Vector2|None=None, fixed_size:Vector2|None=None):
         self.font = font or self.font
         self.text_size = size or self.text_size
-        # self._raw_text = text if text is not None else self._raw_text
+        self._raw_text = text if text is not None else self._raw_text
         self.text = re.sub("\033\\[(?:\\d+;)*\\d+m", "", text) if text is not None else self.text
         self.antialias = antialias if antialias is not None else self.antialias
         self.text_color = color or self.text_color
@@ -166,13 +169,13 @@ class MultilineText(GraphicElement):
         color = self.text_color
 
         for line in lines:
-            a: pygame.Surface = self._font.render(
+            a: self.pygame.Surface = self._font.render(
                 line,
                 self.antialias,
                 color,
                 self.background
             )
-            surface = pygame.Surface(a.get_size(), pygame.SRCALPHA, 32)
+            surface = self.pygame.Surface(a.get_size(), self.pygame.SRCALPHA, 32)
             surface.blit(a, (0, 0))
             max_width = max(max_width, surface.get_width())
             height += surface.get_height() + self.line_spacing
@@ -362,9 +365,11 @@ class MultilineText(GraphicElement):
         self.refresh_selection()
 
     def doTyping(self, engine):
-        if self.selected:
+        if self.hovered:
             self.scrolled += engine.mouse.getScroll() * [120, 60]
             self.scrolled.clamp(*self.max_scroll * [-1, -1], 1, 0)
+        if self.selected:
+            
             for t in engine.keyboard.typing:
                 #print(f"key: {t}")
                 if t == "$↑":
@@ -446,7 +451,10 @@ class MultilineText(GraphicElement):
                         self.selection = [None, None]
                         self.refresh_selection()
                 elif t == "\b":
-                    _t = self.text[self.cursorPos-1]
+                    if len(self.text) >= 1:
+                        _t = self.text[self.cursorPos-1]
+                    else:
+                        _t = "_"
                     if (self.selection[0] is not None) and (self.selection[1] is not None):
                         self.setSelection()
                     elif self.cursorPos > 0:
@@ -455,7 +463,10 @@ class MultilineText(GraphicElement):
                     if _t in " \n":
                         self.saveHistory()
                 elif t == "\x7f": # delete
-                    _t = self.text[self.cursorPos]
+                    if len(self.text) >= 1:
+                        _t = self.text[self.cursorPos]
+                    else:
+                        _t = "_"
                     if (self.selection[0] is not None) and (self.selection[1] is not None):
                         self.setSelection()
                     elif self.cursorPos < len(self.text)-1:
@@ -474,7 +485,7 @@ class MultilineText(GraphicElement):
                             self.text = self.text[0:self.cursorPos] + "\n" + self.text[self.cursorPos:]
                             self.cursorPos += 1
                     if self.on_enter:
-                        self.on_enter(self)
+                        self.on_enter(engine, self)
                     
                 elif t == "\t":
                     self.saveHistory()
@@ -507,7 +518,7 @@ class MultilineText(GraphicElement):
                     self.selection = [0, len(self.text)-1]
                     self.refresh_selection()
                 elif t == "\x1a": # CTRL+Z / CTRL+SHIFT+Z
-                    if pygame.K_LSHIFT in engine.keyboard.keys.keys():
+                    if self.pygame.K_LSHIFT in engine.keyboard.keys.keys():
                         self.redo()
                     else:
                         self.undo()
@@ -529,8 +540,8 @@ class MultilineText(GraphicElement):
         pos = self.getPosition()
         screen = self.getScreen()
 
-        if self.hovered and pygame.mouse.get_cursor() != pygame.SYSTEM_CURSOR_IBEAM: # pylint: disable=[no-member]
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_IBEAM) # pylint: disable=[no-member]
+        if self.hovered and self.pygame.mouse.get_cursor() != self.pygame.SYSTEM_CURSOR_IBEAM: # pylint: disable=[no-member]
+            self.pygame.mouse.set_cursor(self.pygame.SYSTEM_CURSOR_IBEAM) # pylint: disable=[no-member]
 
         if self.selection[0] is not None and self.selection[1] is not None and self.highlights:
             h = self.highlights[0]

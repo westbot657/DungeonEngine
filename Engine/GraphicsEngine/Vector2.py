@@ -38,6 +38,10 @@ class Vector2:
             "y": self.y
         }
     
+    def setVal(self, x, y):
+        self.x = x
+        self.y = y
+    
     @staticmethod
     def min(vec1, vec2):
         return Vector2(min(vec1.x, vec2.x), min(vec1.y, vec2.y))

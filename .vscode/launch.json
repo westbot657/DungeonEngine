@@ -5,7 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Console Runner",
+            "name": "Graphic Engine",
+            "type": "python",
+            "request": "launch",
+            "program": "./Engine/GraphicsEngine/GraphicEngine.py",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Console Runner",
             "type": "python",
             "request": "launch",
             "program": "./Engine/ConsoleRunner.py",

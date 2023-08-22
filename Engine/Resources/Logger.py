@@ -26,6 +26,8 @@ class _Log:
         self.counting = False
         self.counted = 0
 
+        self.engine = None
+
     class _o_off:
         def __init__(self): pass
         def __getitem__(self, tag): return self
@@ -50,8 +52,10 @@ class _Log:
             else:
                 out += f"[{tag}]"
         out += f": \033[38;2;160;160;160m{sep.join(str(v) for v in values)}\033[0m"
-        
-        print(f"[{time.asctime()[11:19]}] " + out.strip())
+        if self.engine:
+            self.engine.sendOutput("log", f"[{time.asctime()[11:19]}] " + out.strip())
+        else:
+            print(f"[{time.asctime()[11:19]}] " + out.strip())
         self.tags.clear()
 
     def track(self, num_items, *tags):

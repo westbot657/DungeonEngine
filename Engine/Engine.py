@@ -65,6 +65,8 @@ class Engine:
         self._frame_start = 0
         self._frame_end = 0
         self.tps = []
+        
+        Log.engine = self
         #self.default_input_handler.send(None)
 
     def evaluateFunction(self, data:dict, function_memory:FunctionMemory=None, context_data:dict=None, local_variables:dict=None):
@@ -163,7 +165,6 @@ class Engine:
         if p := Player._loaded.get(player_id, None): return p
         if default is ...: raise EngineError(f"Player does not exist with id: '{player_id}'")
         return default
-
 
     def inputGetterWrapper(self, handler:Generator):
         _, player_id, text = yield

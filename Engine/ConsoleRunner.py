@@ -16,7 +16,7 @@ class ConsoleIOHook:
     def stop(self):
         self.running = False
 
-    def sendOutput(self, target: int | str, prompt: str):
+    def sendOutput(self, target:int|str, prompt:str):
         self.print_queue.append((target, prompt))
 
     def start(self):

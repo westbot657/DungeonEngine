@@ -34,7 +34,7 @@
     ],
     "events": {
         "on_input": {
-            "#script": "example_dungeon/scripts/grove_entrance"
+            "#script": "example_dungeon/scripts/grove_entrance/on_input"
         }
     }
 }

@@ -148,8 +148,8 @@ def t_NUMBER(t):
 
 def t_error(t):
     
-    print("Illegal character '%s'" % t.value[0])
-    print(t)
+    Log["ERROR"]["engine script"]("Illegal character '%s'" % t.value[0])
+    # print(t)
     t.lexer.skip(1)
 
 lexer = lex.lex()
@@ -703,10 +703,10 @@ def p_expression_comp(p):
 
 def p_error(p):
     if p:
-        print(f"Syntax error at '{p.value}' ({p.lineno}, {p.lexpos})")
+        Log["ERROR"]["engine script"](f"Syntax error at '{p.value}' ({p.lineno}, {p.lexpos})")
     else:
-        print("Syntax error at EOF")
-    print(p)
+        Log["ERROR"]["engine script"]("Syntax error at EOF")
+    # print(p)
 
 # Build the parser
 parser = yacc.yacc()

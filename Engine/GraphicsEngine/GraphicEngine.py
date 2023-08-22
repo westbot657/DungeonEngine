@@ -25,6 +25,8 @@ import re
 from subprocess import Popen
 
 pygame.init()
+pygame.font.init()
+pygame.display.init()
 
 
 RESOLUTION = [1920*.75, 1080*.75]
@@ -321,6 +323,7 @@ if __name__ == "__main__":
     launch_game = Button(Vector2(0, 0), "Launch Game")
     launch_editor = Button(Vector2(0, 0), "Launch Editor")
     logo._img.set_alpha(255)
+    logo.setClickable()
     
     engine.addChild(launch_game)
     engine.addChild(launch_editor)
@@ -350,9 +353,14 @@ if __name__ == "__main__":
         obj.position.y = (RESOLUTION[1]*2/3) - (size.y/2)
     @logo.updater("positioning")
     def position3(engine, obj, screen):
-        size = obj.getSize()
-        obj.position.x = (RESOLUTION[0]-size.x)/2
-        obj.position.y = RESOLUTION[1]*1/4
+        if obj.draggable:
+            pass
+        else:
+            size = obj.getSize()
+            obj.position.x = (RESOLUTION[0]-size.x)/2
+            obj.position.y = RESOLUTION[1]*1/4
+            if obj.selected:
+                obj.setDraggable()
     
     # mtext = MultilineText(Vector2(RESOLUTION[0]/2, 0), open("./Engine/GraphicsEngine/GraphicEngine.py", "r+", encoding="utf-8").read(), True, text_size=20, background=[31, 31, 31], fixed_size=Vector2(RESOLUTION[0]/2, RESOLUTION[1]))
     # engine.addChild(mtext)
@@ -380,13 +388,121 @@ if __name__ == "__main__":
     engine.removeChild(fade_box)
 
     if state == "game":
+        
+        output_box = MultilineText(Vector2(0, 0), "", False, text_size=15, fixed_size=Vector2(RESOLUTION[0]/2, RESOLUTION[1]-(18*4)), background=[31, 31, 31]).setHoverable()
+        debug_box = MultilineText(Vector2(RESOLUTION[0]/2, 0), "", False, text_size=12, fixed_size=Vector2(RESOLUTION[0]/2, RESOLUTION[1]-(18*4)), background=[31, 31, 31]).setHoverable()
+        input_history = MultilineText(Vector2(0, RESOLUTION[1]-(18*4)), "", False, text_size=18, fixed_size=Vector2(RESOLUTION[0], (18*3-4)), background=[24, 24, 24]).setHoverable()
+        input_box = MultilineText(Vector2(0, RESOLUTION[1]-24), "", True, text_size=18, fixed_size=Vector2(RESOLUTION[0], 24), background=[24, 24, 24]).setHoverable()
+        input_box.single_line = True
+        # clear_log = Button(Vector2(RESOLUTION[0]/2+10, 50), "Clear Logs")
+        # clear_log.setClickable()
+        # @clear_log.onClick()
+        # def clear_logs(engine):
+        #     debug_box.updateText("")
+        #     debug_box.cursorPos = 0
+        #     debug_box.focusCursor()
+        
+        @input_box.updater("sizing")
+        def set_size(engine, obj, screen):
+            output_box.fixed_size.setVal(RESOLUTION[0]/2, RESOLUTION[1]-(18*4))
+            debug_box.position.setVal(RESOLUTION[0]/2, 0)
+            debug_box.fixed_size.setVal(RESOLUTION[0]/2, RESOLUTION[1]-(18*4))
+            input_history.position.setVal(0, RESOLUTION[1]-(18*4))
+            input_history.fixed_size.setVal(RESOLUTION[0], (18*3-4))
+            input_box.position.setVal(0, RESOLUTION[1]-24)
+            input_box.fixed_size.setVal(RESOLUTION[0], 24)
+            # clear_log.position.setVal(RESOLUTION[0]/2+10, 50)
+        
+        
+        engine.addChild(output_box)
+        engine.addChild(debug_box)
+        engine.addChild(input_history)
+        engine.addChild(input_box)
+        # engine.addChild(clear_log)
+
+        class VisualIOHook:
+            def __init__(self):
+                self.print_queue = []
+                self.engine = None
+                self.running = False
+            
+            def init(self, engine):
+                self.engine = engine
+            
+            def stop(self):
+                self.running = False
+            
+            def sendOutput(self, target:int|str, text:str):
+                if target == "log":
+                    debug_box.updateText(debug_box._raw_text + f"{text}\n")
+                    if len(debug_box._raw_text.split("\n")) > 80:
+                        debug_box._raw_text = "\n".join([a for a in debug_box._raw_text.split("\n")[-80:] if a]) + "\n"
+                    debug_box.cursorPos = len(debug_box.text)-1 - debug_box.getColumn(len(debug_box.text)-1)
+                    debug_box.focusCursor()
+                else:
+                    output_box.updateText(output_box._raw_text + f"[{target}]:\n{text}\n")
+                    if len(output_box._raw_text.split("\n")) > 80:
+                        output_box._raw_text = "\n".join([a for a in output_box._raw_text.split("\n")[-80:] if a]) + "\n"
+                    output_box.cursorPos = len(output_box.text)-1 - output_box.getColumn(len(output_box.text)-1)
+                    output_box.focusCursor()
+                print(f"[->{target}]: {text}")
+            
+            def start(self):
+                self.running = True
+                        
+                        #print(f"[@game->{target}]: {text}")
+            
+            # def _input_loop(self):
+            #     while self.running:
+            #         text = input()
+            #         if m := re.search(r"(?P<targeter>\[(?P<player_id>\d+)\]: *)", text):
+            #             d = m.groupdict()
+            #             player_id = int(d["player_id"])
+            #             txt = text.replace(d["targeter"], "")
+            #             self.engine.handleInput(player_id, txt)
+
+        visual_hook = VisualIOHook()
+        
+        @input_box.onEnter()
+        def on_enter(engine, obj):
+            txt = obj.text
+            obj.text = ""
+            
+            if txt == "%clear logs":
+                debug_box.updateText("")
+                return
+            
+            input_history.text += f"\n{txt}"
+            if len(input_history.text.split("\n")) > 20:
+                input_history.text = "\n".join(input_history.text.split("\n")[-20:])
+            input_history.cursorPos = len(input_history.text)-1 - input_history.getColumn(len(input_history.text)-1)
+            input_history.focusCursor()
+            if m := re.search(r"(?P<targeter>\[(?P<player_id>\d+)\]: *)", txt):
+                d = m.groupdict()
+                player_id = int(d["player_id"])
+                txt = txt.replace(d["targeter"], "")
+                visual_hook.engine.handleInput(player_id, txt)
+
+            obj.selected = True
+            engine.mouse.last_selected = obj
+
+        sys.path.append("./")
+        sys.path.append("./Engine")
+        sys.path.append("./Engine/GraphicEngine")
+        
+        from Engine.Engine import Engine
+        game_engine = Engine(visual_hook)
+        game_engine.start()
+        visual_hook.start()
+
+        while visual_hook.running: time.sleep(1)
 
         engine.stop()
         pygame.quit()
-        p = Popen("py -3.10 ./Engine/ConsoleRunner.py", shell=True)
+        # p = Popen("py -3.10 ./Engine/ConsoleRunner.py", shell=True)
         sys.exit()
     else:
-        test = MultilineText(Vector2(0, 0), open("./resources/tools/scripts/fishing_rod/on_use.ds", "r+", encoding="utf-8").read(), True, text_size=14, fixed_size=Vector2(*RESOLUTION), background=[31, 31, 31])
+        test = MultilineText(Vector2(0, 0), open("./resources/tools/scripts/fishing_rod/on_use.ds", "r+", encoding="utf-8").read(), True, text_size=18, fixed_size=Vector2(*RESOLUTION), background=[31, 31, 31])
         
         ec_highlighting = [
             [r"\b(if|elif|else|return|break|pass)\b", "\033[38;2;197;134;192m\\1\033[0m"],
@@ -396,7 +512,7 @@ if __name__ == "__main__":
             [r"(\"(?:\\.|[^\"\\])*\")", "\033[38;2;206;145;120m\\1\033[0m"],
             [r"((?<!<)%|@[^:]*:)", "\033[38;2;79;193;255m\\1\033[0m"],
             [r"(\d+(?:\.\d+)?|\.\d+)", "\033[38;2;181;206;168m\\1\033[0m"],
-            [r"(<)([^#\$%][^>]*)(>)", "\\1\033[38;2;78;201;176m\\2\033[0m\\3"],
+            [r"(<)([^#\$%>][^>]*)(>)", "\\1\033[38;2;78;201;176m\\2\033[0m\\3"],
             [r"(<)(#[^>]*)(>)", "\\1\033[38;2;209;105;105m\\2\033[0m\\3"],
             [r"(<)(\$[^>]*)(>)", "\\1\033[38;2;220;220;170m\\2\033[0m\\3"],
             [r"(<)(%[^>]*)(>)", "\\1\033[38;2;79;193;255m\\2\033[0m\\3"],

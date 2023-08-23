@@ -1072,7 +1072,7 @@ class Engine_Player_GiveGameObject(LoaderFunction):
         game_object = function_memory.engine.loader.constructGameObject(
             function_memory,
             {
-                "type": f"{object_name.namespace}:abstract/{object_name.path.strip('/').rstrip('s')}",
+                "type": f"engine:abstract/{object_name.path.strip('/').rstrip('s')}",
                 "parent": object_name.full()
             }
         )
@@ -1985,7 +1985,8 @@ class Engine_Text_Format(LoaderFunction):
             return cls.format
         else: return None
     @staticmethod
-    def format(function_memory:FunctionMemory, text:str, **options):
+    def format(function_memory:FunctionMemory, text:str, options):
+        # print(options)
         return text.format(**options)
 
 class Engine_Text_Substring(LoaderFunction):

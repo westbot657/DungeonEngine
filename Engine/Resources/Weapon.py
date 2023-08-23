@@ -46,7 +46,13 @@ class Weapon(GameObject):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
 
     def getLocalVariables(self) -> dict:
-        d = {}
+        d = {
+            ".name": self.name,
+            ".damage": self.damage,
+            ".range": self.range,
+            ".durability": self.durability,
+            ".max_durability": self.max_durability
+        }
         return d
 
     def updateLocalVariables(self, locals: dict):

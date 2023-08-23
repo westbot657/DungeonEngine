@@ -22,6 +22,9 @@ import pygame
 import time
 import random
 import re
+
+import textwrap
+
 from subprocess import Popen
 
 pygame.init()
@@ -257,7 +260,6 @@ class Button(GraphicElement):
                 self.hover_tick = max(0, self.hover_tick-self.animation_speed)
                 self.fill._img.set_alpha(self.hover_tick*0.75)
                 # self.fill.getFrame()
-            
 
     def onClick(self):
         def wrapper(func):
@@ -398,7 +400,7 @@ if __name__ == "__main__":
         input_history = MultilineText(Vector2(0, RESOLUTION[1]-(18*4)), "", False, text_size=18, fixed_size=Vector2(RESOLUTION[0], (18*3-4)), background=[24, 24, 24]).setHoverable()
         input_box = MultilineText(Vector2(0, RESOLUTION[1]-24), "", True, text_size=18, fixed_size=Vector2(RESOLUTION[0], 24), background=[24, 24, 24]).setHoverable()
         input_box.single_line = True
-        clear_log = Button(Vector2(RESOLUTION[0]/2-45, 15), "Clear Logs", 14, 50)
+        clear_log = Button(Vector2(RESOLUTION[0]/2-45, 14), "Clear Logs", 14, 60)
         clear_log.setClickable()
         @clear_log.onClick()
         def clear_logs(engine):
@@ -415,7 +417,7 @@ if __name__ == "__main__":
             input_history.fixed_size.setVal(RESOLUTION[0], (18*3-4))
             input_box.position.setVal(0, RESOLUTION[1]-24)
             input_box.fixed_size.setVal(RESOLUTION[0], 24)
-            clear_log.position.setVal(RESOLUTION[0]/2-45, 15)
+            clear_log.position.setVal(RESOLUTION[0]/2-45, 14)
         
         
         engine.addChild(output_box)
@@ -429,6 +431,7 @@ if __name__ == "__main__":
                 self.print_queue = []
                 self.engine = None
                 self.running = False
+                self.h = 0
             
             def init(self, engine):
                 self.engine = engine
@@ -437,25 +440,50 @@ if __name__ == "__main__":
                 self.running = False
             
             def sendOutput(self, target:int|str, text:str):
-                if target == "log":
-                    debug_box.updateText(debug_box._raw_text + f"{text}\n")
-                    if len(debug_box._raw_text.split("\n")) > 80:
-                        debug_box._raw_text = "\n".join([a for a in debug_box._raw_text.split("\n")[-80:] if a]) + "\n"
-                    debug_box.cursorPos = len(debug_box.text)-1 - debug_box.getColumn(len(debug_box.text)-1)
-                    debug_box.focusCursor()
+                self.print_queue.append([target, text])
+                if self.h == 1:
+                    return
                 else:
-                    output_box.updateText(output_box._raw_text + f"[{target}]:\n{text}\n")
-                    if len(output_box._raw_text.split("\n")) > 80:
-                        output_box._raw_text = "\n".join([a for a in output_box._raw_text.split("\n")[-80:] if a]) + "\n"
-                    output_box.cursorPos = len(output_box.text)-1 - output_box.getColumn(len(output_box.text)-1)
-                    output_box.focusCursor()
-                print(f"[->{target}]: {text}")
+                    self.h = 1
+                    while self.print_queue:
+                        target, text = self.print_queue.pop(0)
+                        if target == "log":
+                            # debug_box.updateText(debug_box._raw_text + )
+                            # new = f"{text}\n"
+                            # raw = debug_box._raw_text
+                            # if len(raw.split("\n")) > 80:
+                            #     debug_box.updateText(("\n".join(raw.split("\n")[-80:] + new.split("\n"))).strip())
+                            # else:
+                            #     debug_box.updateText(raw + new)
+                            # debug_box.cursorPos = len(debug_box.text) - debug_box.getColumn(len(debug_box.text))
+                            # debug_box.focusCursor()
+                            pass
+                        else:
+                            # output_box.updateText(output_box._raw_text + f"[{target}]: {'='*100}\n{text}\n")
+                            n = "\n".join(["\n".join(textwrap.wrap(t, 80, drop_whitespace=False, replace_whitespace=False)) for t in text.split("\n")])
+                            new = f"\033[38;2;20;255;20m[{target}]: {'='*100}\033[0m\n{n}\n"
+                            
+                            new = re.sub(r"`([^`]*)`", "\033[38;2;255;127;0m\\1\033[0m", new)
+                            
+                            
+                            raw = output_box._raw_text
+                            if len(raw.split("\n")) > 80:
+                                output_box.updateText(("\n".join(raw.split("\n")[-78:] + new.split("\n"))).strip())
+                            else:
+                                output_box.updateText(raw + new)
+                            output_box.cursorPos = len(output_box.text) - output_box.getColumn(len(output_box.text))
+                            output_box.focusCursor()
+                        print(text)
+                    self.h = 0
             
             def start(self):
                 self.running = True
-                        
+                # o = Thread(target=self.output_loop)
+                # o.start()
                         #print(f"[@game->{target}]: {text}")
+                    
             
+        visual_hook = VisualIOHook()
             # def _input_loop(self):
             #     while self.running:
             #         text = input()
@@ -465,7 +493,7 @@ if __name__ == "__main__":
             #             txt = text.replace(d["targeter"], "")
             #             self.engine.handleInput(player_id, txt)
 
-        visual_hook = VisualIOHook()
+        
         
         @input_box.onEnter()
         def on_enter(engine, obj):

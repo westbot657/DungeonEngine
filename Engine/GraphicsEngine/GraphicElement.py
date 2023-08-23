@@ -78,6 +78,7 @@ class GraphicElement:
     def updater(self, _id):
         def wrapper(method):
             self._updaters.update({_id: method})
+            return method
         return wrapper
 
     def addChild(self, child):

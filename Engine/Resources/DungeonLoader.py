@@ -640,21 +640,21 @@ class DungeonLoader:
             weapon: Weapon
             if weapon.name.lower() == item_name.lower():
                 player.inventory.equip("engine:weapon", weapon)
-                function_memory.engine.sendOutput(player, f"You equipped '{item_name}'")
+                function_memory.engine.sendOutput(player, f"You equipped `{item_name}`")
                 break
         else:
             for armor in player.inventory.getOfType(Armor):
                 armor: Armor
                 if armor.name.lower() == item_name.lower():
                     player.inventory.equip("engine:armor", armor)
-                    function_memory.engine.sendOutput(player, f"You equipped '{item_name}'")
+                    function_memory.engine.sendOutput(player, f"You equipped `{item_name}`")
                     break
             else:
                 for tool in player.inventory.getOfType(Tool):
                     tool: Tool
                     if tool.name.lower() == item_name.lower():
                         player.inventory.equip("engine:tool", tool)
-                        function_memory.engine.sendOutput(player, f"You equipped '{item_name}'")
+                        function_memory.engine.sendOutput(player, f"You equipped `{item_name}`")
                         break
                 else:
                     function_memory.engine.sendOutput(player, f"You have no Weapon, Armor, or Tool called '{item_name}'")

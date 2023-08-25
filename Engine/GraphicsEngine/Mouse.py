@@ -74,7 +74,7 @@ class Mouse:
                 self.last_selected = None
 
 
-        if reset_mouse and pygame.mouse.get_cursor() != pygame.SYSTEM_CURSOR_ARROW: # pylint: disable=[no-member]
+        if reset_mouse and (pygame.mouse.get_cursor() != pygame.SYSTEM_CURSOR_ARROW): # pylint: disable=[no-member]
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW) # pylint: disable=[no-member]
             
 

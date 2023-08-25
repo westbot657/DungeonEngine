@@ -52,7 +52,7 @@ class GraphicEngine(GraphicElement):
         self.screen: pygame.Surface = None
         self.window_icon = window_icon
         self.window_title = window_title
-
+        self.thread = None
         self.running = False
         
         GraphicElement.init(self, pygame)
@@ -177,9 +177,12 @@ class GraphicEngine(GraphicElement):
         sys.exit()
 
     def start(self):
-        t = Thread(target=self._mainloop)
+        self.thread = Thread(target=self._mainloop)
         self.running = True
-        t.start()
+        self.thread.start()
+
+    def joinThread(self):
+        self.thread.join()
 
     def stop(self):
         self.running = False
@@ -527,7 +530,7 @@ if __name__ == "__main__":
         game_engine.start()
         visual_hook.start()
 
-        while visual_hook.running: time.sleep(1)
+        engine.joinThread()
 
         engine.stop()
         pygame.quit()
@@ -536,7 +539,7 @@ if __name__ == "__main__":
     else:
         test = MultilineText(Vector2(0, 0), open("./resources/tools/scripts/fishing_rod/on_use.ds", "r+", encoding="utf-8").read(), True, text_size=18, fixed_size=Vector2(*RESOLUTION), background=[31, 31, 31])
         
-        test2 = Button(Vector2(RESOLUTION[0]/2, RESOLUTION[1]/2), "\"A Button\"")
+        test2 = Button(Vector2(RESOLUTION[0]/2, RESOLUTION[1]/2), "\"A Button\"", animation_speed=50)
         
         
         
@@ -573,5 +576,5 @@ if __name__ == "__main__":
         def uhh(engine, obj, screen):
             obj.position.setVal(0, 0)
 
-
+        engine.joinThread()
 

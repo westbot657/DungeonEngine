@@ -181,6 +181,9 @@ class GraphicEngine(GraphicElement):
         self.running = True
         self.thread.start()
 
+    def run(self):
+        self._mainloop()
+
     def joinThread(self):
         self.thread.join()
 
@@ -269,9 +272,9 @@ class Button(GraphicElement):
             self.bg.onLeftClick = func
         return wrapper
 
-if __name__ == "__main__":
-    engine = GraphicEngine(f"{PATH}dungeon_game_icon.png", "Insert Dungeon Name Here")
-    engine.start()
+def sequence(engine):
+    
+    while not engine.running: time.sleep(0.1)
 
     title = GraphicElement.Text(Vector2(0, 0), "<Insert Dungeon Name Here>", [255, 255, 255], size=30)
     title.setPosition(Vector2((RESOLUTION[0]-title.getSize().x)/2, RESOLUTION[1]/4))
@@ -577,4 +580,11 @@ if __name__ == "__main__":
             obj.position.setVal(0, 0)
 
         engine.joinThread()
+
+
+engine = GraphicEngine(f"{PATH}dungeon_game_icon.png", "Insert Dungeon Name Here")
+
+t = Thread(target=sequence, args=[engine])
+t.start()
+engine.run()
 

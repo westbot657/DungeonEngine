@@ -15,7 +15,6 @@ from win32api import GetMonitorInfo, MonitorFromPoint
 from pygame._sdl2.video import Window
 
 
-
 class Color(list):
     def __init__(self, r, g, b, a=None):
         self.r = r
@@ -2540,7 +2539,7 @@ class Editor:
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME) # pylint: disable=no-member
 
         while self.running:
-            self.screen.fill((24, 24, 24))
+            self.screen.fill((31, 31, 31))
             self.previous_keys = self.keys.copy()
             self.previous_mouse = self.mouse
             self._hovered = False
@@ -2603,29 +2602,145 @@ class Editor:
 
 class GameApp(UIElement):
     
-    def __init__(self, code_editor):
+    class HealthBar(UIElement):
+        
+        def __init__(self, x, y, width, height, max_health, current_health, **options):
+            """
+            options:
+                background (tuple | list | Color): color of empty bar. Defaults to (90, 90, 90)
+                current_hp (tuple | list | Color): color of current health. Defaults to (20, 168, 0)
+                shadow_heal (tuple | list | Color): color of recently earned health. Defaults to (26, 218, 0)
+                shadow_damage (tuple | list | Color): color of recently lost health. Defaults to (210, 4, 4)
+                
+            """
+            self.x = x
+            self.y = y
+            self.width = width
+            self.height = height
+            self.max_health = max_health
+            self.current_health = self.previous_health = current_health
+            self.background = options.get("background", (90, 90, 90))
+            self.current = options.get("current_hp", (20, 168, 0))
+            self.shadow_heal = options.get("shadow_heal", (26, 218, 0))
+            self.shadow_damage = options.get("shadow_damage", (210, 4, 4))
+            
+            self.full_bar = Box(0, 0, width, height, self.background)
+            self.current_bar = Box(0, 0, (self.current_health/self.max_health)*width, height, self.current)
+            self.shadow_heal_bar = Box(0, 0, 0, height, self.shadow_heal)
+            self.shadow_damage_bar = Box(0, 0, 0, height, self.shadow_damage)
+            
+            self.shadow = ""
+    
+        def set_current_health(self, health):
+            if health < self.current_health:
+                health = max(0, health)
+                self.shadow_damage_bar.x = (health/self.max_health)*self.width
+                self.shadow_damage_bar.width = ((self.current_health/self.max_health)*self.width) - self.shadow_damage_bar.x
+                self.current_bar.width = (health/self.max_health)*self.width
+                self.shadow = "damage"
+                self.current_health = health
+                
+            elif health > self.current_health:
+                health = min(self.max_health, health)
+                self.shadow_heal_bar.x = (self.current_health/self.max_health)*self.width
+                self.current_bar.width = (health/self.max_health)*self.width
+                self.shadow_heal_bar.width =  self.current_bar.width - self.shadow_heal_bar.x
+                self.shadow = "heal"
+                self.current_health = health
+            else:
+                self.shadow = ""
+            
+        def _event(self, editor, X, Y):
+            pass
+    
+        def _update(self, editor, X, Y):
+            self.full_bar._update(editor, X+self.x, Y+self.y)
+            self.current_bar._update(editor, X+self.x, Y+self.y)
+
+            if self.shadow == "heal":
+                self.shadow_heal_bar._update(editor, X+self.x, Y+self.y)
+            elif self.shadow == "damage":
+                self.shadow_damage_bar._update(editor, X+self.x, Y+self.y)
+            
+    
+    def __init__(self, code_editor, editor):
         self.code_editor = code_editor
         self.children = []
         
-        self.input_box = None
-        self.input_history = None
+        self.main_hud = Box(52, editor.height-106, editor.width-57, 85, (24, 24, 24))
+        self.children.append(self.main_hud)
         
-        self.output_box = None
+        self.main_hud_line = Box(52, editor.height-107, editor.width-52, 1, (70, 70, 70))
+        self.children.append(self.main_hud_line)
+        
+        self.page = "IO"
+        # pages: IO, Inventory, Combat, Logs
+        
+        self.page_io_icons = (
+            Image(f"{PATH}/page_io_icon", 0, 0, 50, 51),
+            Image(f"{PATH}/page_io_icon_hovered", 0, 0, 50, 51),
+            Image(f"{PATH}/page_io_icon_selected", 0, 0, 50, 51)
+        )
+        self.page_io_tab = Button(editor.width-(50*4), editor.height-107, 50, 51, "", self.page_io_icons[0], hover_color=self.page_io_icons[1], click_color=self.page_io_icons[2])
+        self.children.append(self.page_io_tab)
         
         
+        # self.test = GameApp.HealthBar(100, 100, 100, 20, 67, 34)
+        # self.test.set_current_health(33)
+        # self.children.append(self.test)
         
+        # Display:
+        #
+        # General Info:
+        # output (game)
+        # output (logs)
+        # input
+        # input history
+        # player name
+        # player health
+        # player inventory
+        # player status effects
+        # player location
+        # 
+        # When in combat:
+        # enemy names and health
+        # other player's names (maybe health?)
+        # who's turn it is
+        # 
+        
+    def _update_layout(self, editor):
+        self.main_hud.y = editor.height-106
+        self.main_hud.width = editor.width-57
+        self.main_hud_line.y = editor.height-107
+        self.main_hud_line.width = editor.width - 52
+        
+    def _event(self, editor, X, Y):
+        self._update_layout(editor)
+        for child in self.children:
+            child._event(editor, X, Y)
+    
+    def _update(self, editor, X, Y):
+        for child in self.children:
+            child._update(editor, X, Y)
     
 class EditorApp(UIElement):
     
-    def __init__(self, code_editor):
+    def __init__(self, code_editor, editor):
         self.code_editor = code_editor
         self.children = []
 
+    def _event(self, editor, X, Y):
+        for child in self.children:
+            child._event(editor, X, Y)
+    
+    def _update(self, editor, X, Y):
+        for child in self.children:
+            child._update(editor, X, Y)
 
 
 class CodeEditor(UIElement):
     
-    def __init__(self, width, height):
+    def __init__(self, width, height, editor):
         self.resolution = [width, height]
         self.children = []
         self.hover_color = (50, 50, 50)
@@ -2762,6 +2877,9 @@ class CodeEditor(UIElement):
         self.minimize_button.on_left_click = self.minimize
         self.children.append(self.minimize_button)
 
+        self.game_app = GameApp(self, editor)
+        self.editor_app = EditorApp(self, editor)
+
         self._is_fullscreen = False
         self._fullscreen = Image(f"{PATH}/full_screen.png", 0, 0, 26, 20)
         self._fullscreen_hovered = Image(f"{PATH}/full_screen_hovered.png", 0, 0, 26, 20)
@@ -2879,6 +2997,11 @@ class CodeEditor(UIElement):
         # print(editor._focused_object)
         for child in self.children:
             child._update(editor, X, Y)
+            
+        if self.active_app == "game":
+            self.game_app._update(editor, X, Y)
+        elif self.active_app == "editor":
+            self.editor_app._update(editor, X, Y)
 
     def _update_layout(self, editor):
         
@@ -2972,26 +3095,31 @@ class CodeEditor(UIElement):
 
         for child in self.children:
             child._event(editor, X, Y)
+            
+        if self.active_app == "game":
+            self.game_app._event(editor, X, Y)
+        elif self.active_app == "editor":
+            self.editor_app._event(editor, X, Y)
 
 if __name__ == "__main__":
-    from threading import Thread
-    import traceback
+    # from threading import Thread
+    # import traceback
 
     editor = Editor()
     
-    def inp_thread():
-        while not editor.running: pass
-        while editor.running:
-            inp = input("> ")
-            if inp:
-                try:
-                    exec(inp)
-                except Exception as e:
-                    print("\n".join(traceback.format_exception(e)))
-    i = Thread(target=inp_thread)
-    i.start()
+    # def inp_thread():
+    #     while not editor.running: pass
+    #     while editor.running:
+    #         inp = input("> ")
+    #         if inp:
+    #             try:
+    #                 exec(inp)
+    #             except Exception as e:
+    #                 print("\n".join(traceback.format_exception(e)))
+    # i = Thread(target=inp_thread)
+    # i.start()
     
-    c = CodeEditor(editor.width, editor.height)
+    c = CodeEditor(editor.width, editor.height, editor)
 
     editor.layers[0] += [
         c

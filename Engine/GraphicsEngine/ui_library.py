@@ -2601,6 +2601,28 @@ class Editor:
 
             pygame.display.update()
 
+class GameApp(UIElement):
+    
+    def __init__(self, code_editor):
+        self.code_editor = code_editor
+        self.children = []
+        
+        self.input_box = None
+        self.input_history = None
+        
+        self.output_box = None
+        
+        
+        
+    
+class EditorApp(UIElement):
+    
+    def __init__(self, code_editor):
+        self.code_editor = code_editor
+        self.children = []
+
+
+
 class CodeEditor(UIElement):
     
     def __init__(self, width, height):
@@ -2755,9 +2777,6 @@ class CodeEditor(UIElement):
         self.close_button.on_left_click = self.close_window
         self.children.append(self.close_button)
 
-        
-
-
     def reset_app_selectors(self):
         self.app_game_selector.bg_color = self.app_game_selector._bg_color = self._app_game_icon
         self.app_game_selector.hover_color = self._app_game_icon_hovered
@@ -2780,7 +2799,6 @@ class CodeEditor(UIElement):
             self.app_editor_selector.bg_color = self.app_editor_selector._bg_color = self.app_editor_selector.hover_color = self._app_editor_icon_selected
         else:
             self.active_app = ""    
-
 
     def minimize(self, *_, **__):
         pygame.display.iconify()

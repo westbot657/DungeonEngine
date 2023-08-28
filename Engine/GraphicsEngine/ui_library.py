@@ -1,4 +1,4 @@
-# pylint: disable=[W,R,C,import-error,no-member]
+# pylint: disable=[W,R,C,import-error,no-member,no-name-in-module]
 import pygame
 #import PIL
 import time
@@ -2483,6 +2483,8 @@ class Editor:
         self._fake_editor = self
         self._focused_object = None
         self._hovered = False
+        self._hovering = None
+        
 
         self.unicodes = {
             pygame.K_UP: "$↑",
@@ -2538,7 +2540,7 @@ class Editor:
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME) # pylint: disable=no-member
 
         while self.running:
-            self.screen.fill((255, 255, 255))
+            self.screen.fill((24, 24, 24))
             self.previous_keys = self.keys.copy()
             self.previous_mouse = self.mouse
             self._hovered = False
@@ -2615,9 +2617,7 @@ class CodeEditor(UIElement):
         # Apps:
         # The Game
         # Text Editor
-        
         # Console
-        
         
         self.active_app = ""
         
@@ -2625,12 +2625,56 @@ class CodeEditor(UIElement):
         self.selected_drag = ""
         self.drag_offset = 0
         
+        self.app_bar = Box(5, 21, 45, height-42, (24, 24, 24))
+        self.children.append(self.app_bar)
+        
+        self.app_line = Box(50, 21, 1, height-42, (70, 70, 70))
+        self.children.append(self.app_line)
+        
+        self.bottom_drag = Box(5, height-5, width-10, 5, (24, 24, 24))
+        self.children.append(self.bottom_drag)
+
+        self.bottom_right_drag = Box(width-5, height-5, 5, 5, (24, 24, 24))
+        self.children.append(self.bottom_right_drag)
+        
+        self.bottom_left_drag = Box(0, height-5, 5, 5, (24, 24, 24))
+        self.children.append(self.bottom_left_drag)
+        
+        self.left_drag = Box(0, 20, 5, height-25, (24, 24, 24))
+        self.children.append(self.left_drag)
+        
+        self.right_drag = Box(width-5, 20, 5, height-25, (24, 24, 24))
+        self.children.append(self.right_drag)
+
+        self.top_bar_line = Box(0, 20, width, 1, (70, 70, 70))
+        self.children.append(self.top_bar_line)
+        
+        self.bottom_bar = Box(5, height-20, width-10, 15, (24, 24, 24))
+        self.children.append(self.bottom_bar)
+        
+        self.bottom_bar_line = Box(0, height-21, width, 1, (70, 70, 70))
+        self.children.append(self.bottom_bar_line)
+
+        self._app_game_icon = Image(f"{PATH}/dungeon_game_app_icon.png", 0, 0, 50, 50)
+        self._app_game_icon_hovered = Image(f"{PATH}/dungeon_game_app_icon_hovered.png", 0, 0, 50, 50)
+        self._app_game_icon_selected = Image(f"{PATH}/dungeon_game_app_icon_selected.png", 0, 0, 50, 50)
+        self.app_game_selector = Button(0, 22, 50, 50, "", self._app_game_icon, hover_color=self._app_game_icon_hovered, click_color=self._app_game_icon_selected)
+        self.app_game_selector.on_left_click = self.select_game_app
+        self.children.append(self.app_game_selector)
+        
+        self._app_editor_icon = Image(f"{PATH}/dungeon_editor_app_icon.png", 0, 0, 50, 50)
+        self._app_editor_icon_hovered = Image(f"{PATH}/dungeon_editor_app_icon_hovered.png", 0, 0, 50, 50)
+        self._app_editor_icon_selected = Image(f"{PATH}/dungeon_editor_app_icon_selected.png", 0, 0, 50, 50)
+        self.app_editor_selector = Button(0, 22+50, 50, 50, "", self._app_editor_icon, hover_color=self._app_editor_icon_hovered, click_color=self._app_editor_icon_selected)
+        self.app_editor_selector.on_left_click = self.select_editor_app
+        self.children.append(self.app_editor_selector)
+        
         self.top_bar = Box(0, 0, width, 20, Color(24, 24, 24))
         self.children.append(self.top_bar)
         
-        
         self.top_bar_icon = Image(f"{PATH}/dungeon_game_icon.png", 2, 2, 16, 16)
         self.children.append(self.top_bar_icon)
+        
         
         self.top_bar_file = ContextTree.new(
             20, 0, 40, 20, "File", [
@@ -2711,34 +2755,31 @@ class CodeEditor(UIElement):
         self.close_button.on_left_click = self.close_window
         self.children.append(self.close_button)
 
-        self.bottom_drag = Box(5, height-5, width-10, 5, (24, 24, 24))
-        self.children.append(self.bottom_drag)
-
-        self.bottom_right_drag = Box(width-5, height-5, 5, 5, (24, 24, 24))
-        self.children.append(self.bottom_right_drag)
         
-        self.bottom_left_drag = Box(0, height-5, 5, 5, (24, 24, 24))
-        self.children.append(self.bottom_left_drag)
-        
-        self.left_drag = Box(0, 20, 5, height-25, (24, 24, 24))
-        self.children.append(self.left_drag)
-        
-        self.right_drag = Box(width-5, 20, 5, height-25, (24, 24, 24))
-        self.children.append(self.right_drag)
-
-        self.top_bar_line = Box(0, 20, width, 1, (70, 70, 70))
-        self.children.append(self.top_bar_line)
-        
-        self.bottom_bar = Box(5, height-20, width-10, 15, (24, 24, 24))
-        self.children.append(self.bottom_bar)
-        
-        self.bottom_bar_line = Box(0, height-21, width, 1, (70, 70, 70))
-        self.children.append(self.bottom_bar_line)
-
-        self.app_bar = Box(5, 21, 45, height-42, (24, 24, 24))
-        self.children.append(self.app_bar)
 
 
+    def reset_app_selectors(self):
+        self.app_game_selector.bg_color = self.app_game_selector._bg_color = self._app_game_icon
+        self.app_game_selector.hover_color = self._app_game_icon_hovered
+        
+        self.app_editor_selector.bg_color = self.app_editor_selector._bg_color = self._app_editor_icon
+        self.app_editor_selector.hover_color = self._app_editor_icon_hovered
+        
+    def select_game_app(self, editor):
+        self.reset_app_selectors()
+        if self.active_app != "game":
+            self.active_app = "game"
+            self.app_game_selector.bg_color = self.app_game_selector._bg_color = self.app_game_selector.hover_color = self._app_game_icon_selected
+        else:
+            self.active_app = ""
+    
+    def select_editor_app(self, editor):
+        self.reset_app_selectors()
+        if self.active_app != "editor":
+            self.active_app = "editor"
+            self.app_editor_selector.bg_color = self.app_editor_selector._bg_color = self.app_editor_selector.hover_color = self._app_editor_icon_selected
+        else:
+            self.active_app = ""    
 
 
     def minimize(self, *_, **__):
@@ -2817,6 +2858,7 @@ class CodeEditor(UIElement):
         ...
 
     def _update(self, editor, X, Y):
+        # print(editor._focused_object)
         for child in self.children:
             child._update(editor, X, Y)
 
@@ -2834,7 +2876,7 @@ class CodeEditor(UIElement):
         self.bottom_bar.width = editor.width-10
         self.bottom_bar.y = editor.height-20
         
-        self.app_bar.height = editor.height - 42
+        self.app_bar.height = self.app_line.height = editor.height - 42
         
         self.minimize_button.x = editor.width - (26*3)
         self.fullscreen_toggle.x = editor.width - (26*2)
@@ -2933,79 +2975,9 @@ if __name__ == "__main__":
     
     c = CodeEditor(editor.width, editor.height)
 
-    # drag_box = Draggable(20, 20, 50, 50)
-    # drag_box.children.append(
-    #     Box(0, 0, 50, 50, (0, 127, 200))
-    # )
-    # editor.layers[0].append(drag_box)
-
-    # class Console(TextBox):
-    #     def on_enter(self, text:str):
-    #         try:
-    #             exec(text)
-    #         except Exception as e:
-    #             print("\n".join(traceback.format_exception(e)))
-    #         self.set_content()
-    #         self.focused = True
-
-    # c = NumberedTextArea(20, 20, 400, 400)
-
-    # c.editable.set_content("This is a test, using a long\npiece of text\nbecause yeah\n:D")
-
-    # b = Resizable(20, 20, 40, 40, (127, 200, 200), 40, 40)
-
-    # def pre_print(*args, **kwargs):
-    #     def idk(*_, **__):
-    #         print(*args, **kwargs)
-    #     return idk
-
-    # ctx_tree_opts = (100, 20, TEXT_COLOR, TEXT_BG_COLOR, (70, 70, 70), TEXT_SIZE, (50, 50, 50), (50, 50, 50))
-
-    # m = ContextTree.new(50, 50, 100, 20, [
-    #     {
-    #         "option 1": pre_print("Hello"),
-    #         "option 2": pre_print("World!")
-    #     },
-    #     ContextTree.Line(),
-    #     {
-    #         "option 3": ContextTree([
-    #             {
-    #                 "sub opt 3.1": pre_print("owo"),
-    #                 "sub opt 3.2": pre_print("idk")
-    #             }
-    #         ], *ctx_tree_opts)
-    #     }
-    # ], *ctx_tree_opts)
-
-
-    # # a = Animation(50, 50, sprite_sheet=f"{PATH}/gray_scale.png", sprite_width=1, sprite_height=1, fps=5, resize=(20, 20))
-
-    # t = Tabs(
-    #     0, 20, 800, 400,
-    #     tab_data={
-    #         "Text Editor": [c],
-    #         "Test": [b],
-    #         "context menu": [m]
-    #     },
-    #     tab_color_unselected=(20, 20, 20),
-    #     tab_color_hovered=(26, 26, 26),
-    #     tab_color_selected=(31, 31, 31),
-    #     tab_color_empty=(18, 18, 18),
-    #     tab_height=20,
-    #     content_bg_color=(31, 31, 31),
-    #     scrollable_tabs=True
-    # )
-
     editor.layers[0] += [
-        #MultilineText(0, 0, 400, 200, "h\nh\nh\nh\nh"),
-        c#t,#c,
-        #Console(2, 2, 200, "\"console\"")
+        c
     ]
-
-    # # editor.add_layer(2, a)
-
-    # #editor.add_layer(10, Console(2, 2, 400))
-
     editor.run()
 
 

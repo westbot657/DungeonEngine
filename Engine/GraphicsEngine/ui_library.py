@@ -79,7 +79,7 @@ PATH = "./Engine/GraphicsEngine/resources"
 FONT = f"{PATH}/JetBrainsMono-Regular.ttf"
 TEXT_SIZE = 14
 TEXT_COLOR = Color(190, 190, 190)
-TEXT_BG_COLOR = Color(31, 31, 31)
+TEXT_BG_COLOR = Color(24, 24, 24)
 TEXT_HIGHLIGHT = Color(0, 122, 204, 127)
 TAB_SIZE = 4
 CURSOR_BLINK_TIME = 50
@@ -2539,7 +2539,7 @@ class Editor:
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME) # pylint: disable=no-member
 
         while self.running:
-            self.screen.fill((31, 31, 31))
+            self.screen.fill((24, 24, 24))
             self.previous_keys = self.keys.copy()
             self.previous_mouse = self.mouse
             self._hovered = False
@@ -2667,22 +2667,64 @@ class GameApp(UIElement):
         self.code_editor = code_editor
         self.children = []
         
-        self.main_hud = Box(52, editor.height-106, editor.width-57, 85, (24, 24, 24))
+        self.main_hud = Box(51, editor.height-106, editor.width-57, 85, (24, 24, 24))
         self.children.append(self.main_hud)
         
-        self.main_hud_line = Box(52, editor.height-107, editor.width-52, 1, (70, 70, 70))
+        self.main_hud_line = Box(51, editor.height-107, editor.width-52, 1, (70, 70, 70))
         self.children.append(self.main_hud_line)
         
-        self.page = "IO"
+        self.page = "inv"
         # pages: IO, Inventory, Combat, Logs
         
-        self.page_io_icons = (
-            Image(f"{PATH}/page_io_icon", 0, 0, 50, 51),
-            Image(f"{PATH}/page_io_icon_hovered", 0, 0, 50, 51),
-            Image(f"{PATH}/page_io_icon_selected", 0, 0, 50, 51)
+        # self.page_io_icons = (
+        #     Image(f"{PATH}/page_io_icon", 0, 0, 50, 51),
+        #     Image(f"{PATH}/page_io_icon_hovered", 0, 0, 50, 51),
+        #     Image(f"{PATH}/page_io_icon_selected", 0, 0, 50, 51)
+        # )
+        # self.page_io_tab = Button(editor.width-(50*4), editor.height-107, 50, 51, "", self.page_io_icons[2], hover_color=self.page_io_icons[2], click_color=self.page_io_icons[2])
+        # self.children.append(self.page_io_tab)
+        
+        self.page_inv_icons = (
+            Image(f"{PATH}/page_inv_icon.png", 0, 0, 50, 51),
+            Image(f"{PATH}/page_inv_icon_hovered.png", 0, 0, 50, 51),
+            Image(f"{PATH}/page_inv_icon_selected.png", 0, 0, 50, 51)
         )
-        self.page_io_tab = Button(editor.width-(50*4), editor.height-107, 50, 51, "", self.page_io_icons[0], hover_color=self.page_io_icons[1], click_color=self.page_io_icons[2])
-        self.children.append(self.page_io_tab)
+        self.page_inv_tab = Button(editor.width-(50*3), editor.height-107, 50, 51, "", self.page_inv_icons[2], hover_color=self.page_inv_icons[2], click_color=self.page_inv_icons[2])
+        self.page_inv_tab.on_left_click = self.page_inv_onclick
+        self.children.append(self.page_inv_tab)
+        
+        self.page_combat_icons = (
+            Image(f"{PATH}/page_combat_icon.png", 0, 0, 50, 51),
+            Image(f"{PATH}/page_combat_icon_hovered.png", 0, 0, 50, 51),
+            Image(f"{PATH}/page_combat_icon_selected.png", 0, 0, 50, 51)
+        )
+        self.page_combat_tab = Button(editor.width-(50*2), editor.height-107, 50, 51, "", self.page_combat_icons[0], hover_color=self.page_combat_icons[1], click_color=self.page_combat_icons[2])
+        self.page_combat_tab.on_left_click = self.page_combat_onclick
+        self.children.append(self.page_combat_tab)
+        
+        self.page_log_icons = (
+            Image(f"{PATH}/page_log_icon.png", 0, 0, 50, 51),
+            Image(f"{PATH}/page_log_icon_hovered.png", 0, 0, 50, 51),
+            Image(f"{PATH}/page_log_icon_selected.png", 0, 0, 50, 51)
+        )
+        self.page_log_tab = Button(editor.width-(50), editor.height-107, 50, 51, "", self.page_log_icons[0], hover_color=self.page_log_icons[1], click_color=self.page_log_icons[2])
+        self.page_log_tab.on_left_click = self.page_log_onclick
+        self.children.append(self.page_log_tab)
+        
+        self.tab_buttons = (
+            ("inv", self.page_inv_tab, self.page_inv_icons),
+            ("combat", self.page_combat_tab, self.page_combat_icons),
+            ("log", self.page_log_tab, self.page_log_icons)
+        )
+        
+        self.page_seperator_line = Box(editor.width-451, 21, 1, editor.height-128, (70, 70, 70))
+        self.children.append(self.page_seperator_line)
+        
+        self.main_output = MultilineText(52, 22, editor.width-504, editor.height-130, "This is where the main output\nwill appear", text_bg_color=(31, 31, 31))
+        self.children.append(self.main_output)
+        
+        self.log_output = MultilineText(editor.width-449, 22, 450, editor.height-130, "Log output")
+        
         
         
         # self.test = GameApp.HealthBar(100, 100, 100, 20, 67, 34)
@@ -2707,21 +2749,68 @@ class GameApp(UIElement):
         # other player's names (maybe health?)
         # who's turn it is
         # 
+
+    def set_page(self, page:str):
+        for name, tab, icons in self.tab_buttons:
+            if page == name:
+                tab.bg_color = tab._bg_color = tab.hover_color = icons[2]
+            else:
+                tab.bg_color = tab._bg_color = icons[0]
+                tab.hover_color = icons[1]
+    
+    def page_inv_onclick(self, editor):
+        self.page = "inv"
+        self.set_page("inv")
+    
+    def page_combat_onclick(self, editor):
+        self.page = "combat"
+        self.set_page("combat")
         
+    def page_log_onclick(self, editor):
+        self.page = "log"
+        self.set_page("log")
+    
     def _update_layout(self, editor):
         self.main_hud.y = editor.height-106
         self.main_hud.width = editor.width-57
         self.main_hud_line.y = editor.height-107
         self.main_hud_line.width = editor.width - 52
         
+        self.main_output.min_width = editor.width - 504
+        self.main_output.min_height = editor.height - 130
+        
+        self.page_inv_tab.x = editor.width-(50*3)
+        self.page_inv_tab.y = editor.height-107
+        
+        self.page_combat_tab.x = editor.width-(50*2)
+        self.page_combat_tab.y = editor.height-107
+        
+        self.page_log_tab.x = editor.width-50
+        self.page_log_tab.y = editor.height-107
+        
+        self.page_seperator_line.x = editor.width - 451
+        self.page_seperator_line.height = editor.height - (23 + 105)
+        
+        # self.log_output = MultilineText(editor.width-449, 22, 450, editor.height-130, "Log output")
+        
+        self.log_output.x = editor.width-449
+        self.log_output.min_height = editor.height-130
+        
+        
     def _event(self, editor, X, Y):
         self._update_layout(editor)
         for child in self.children:
             child._event(editor, X, Y)
+            
+        if self.page == "log":
+            self.log_output._event(editor, X, Y)
     
     def _update(self, editor, X, Y):
         for child in self.children:
             child._update(editor, X, Y)
+            
+        if self.page == "log":
+            self.log_output._update(editor, X, Y)
     
 class EditorApp(UIElement):
     

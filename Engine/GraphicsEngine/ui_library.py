@@ -143,7 +143,7 @@ class Text(UIElement):
         self.text_size = text_size
         self.font = pygame.font.Font(FONT, text_size)
         self.surface = self.font.render(self.content, True, tuple(self.text_color))
-        self.width = self.surface.get_width()
+        self.width, self.height = self.surface.get_size()
 
     def _event(self, *_):
         if self.content != self._content:
@@ -154,7 +154,7 @@ class Text(UIElement):
     def _update(self, editor, X, Y):
         _x, _y = self.surface.get_size()
         if self.text_bg_color:
-            editor.screen.fill(self.text_bg_color, (X+self.x-1, Y+self.y-1, max(_x, self.min_width)+2, _y+2))
+            editor.screen.fill(tuple(self.text_bg_color), (X+self.x-1, Y+self.y-1, max(_x, self.min_width)+2, _y+2))
         editor.screen.blit(self.surface, (X+self.x, Y+self.y))
 
 class Image(UIElement):
@@ -2538,6 +2538,10 @@ class Editor:
         #pygame.init()
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME) # pylint: disable=no-member
 
+        pygame.display.set_icon(pygame.image.load(f"{PATH}/dungeon_game_icon.png"))
+        pygame.display.set_caption("Insert Dungeon Name Here")
+        
+
         while self.running:
             self.screen.fill((24, 24, 24))
             self.previous_keys = self.keys.copy()
@@ -2662,6 +2666,29 @@ class GameApp(UIElement):
             elif self.shadow == "damage":
                 self.shadow_damage_bar._update(editor, X+self.x, Y+self.y)
             
+    class EnemyCard(UIElement):
+        def __init__(self, name:str, max_hp, current_hp):
+            self.children = []
+            self.width = 400
+            self.height = 85
+            
+            self.background = Image(f"{PATH}/enemy_card.png", 0, 0, 400, 85)
+            
+            self.name_display = Text(10, 10, 1, name)
+            
+            self.health_bar = GameApp.HealthBar(290, 10, 100, 20, max_hp, current_hp)
+        
+            self.children.append(self.background)
+            self.children.append(self.name_display)
+            self.children.append(self.health_bar)
+        
+        def _update(self, editor, X, Y):
+            for child in self.children:
+                child._update(editor, X, Y)
+        
+        def _event(self, editor, X, Y):
+            for child in self.children:
+                child._event(editor, X, Y)
     
     def __init__(self, code_editor, editor):
         self.code_editor = code_editor
@@ -2725,7 +2752,9 @@ class GameApp(UIElement):
         
         self.log_output = MultilineText(editor.width-449, 22, 450, editor.height-130, "Log output")
         
-        
+        self.enemy_card_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130)
+        self.no_combat_text = Text(0, 0, 1, "You are not in combat", text_size=25)
+        self.in_combat = False
         
         # self.test = GameApp.HealthBar(100, 100, 100, 20, 67, 34)
         # self.test.set_current_health(33)
@@ -2793,8 +2822,12 @@ class GameApp(UIElement):
         
         # self.log_output = MultilineText(editor.width-449, 22, 450, editor.height-130, "Log output")
         
-        self.log_output.x = editor.width-449
-        self.log_output.min_height = editor.height-130
+        self.log_output.x = self.enemy_card_scrollable.x = editor.width-449
+        self.log_output.min_height = self.enemy_card_scrollable.height = editor.height-130
+        
+        self.no_combat_text.x = (editor.width-224)-(self.no_combat_text.width/2)
+        self.no_combat_text.y = self.log_output.y + (self.log_output.min_height/2) - (self.no_combat_text.height/2)
+        
         
         
     def _event(self, editor, X, Y):
@@ -2804,6 +2837,11 @@ class GameApp(UIElement):
             
         if self.page == "log":
             self.log_output._event(editor, X, Y)
+        elif self.page == "combat":
+            if self.in_combat:
+                self.enemy_card_scrollable._event(editor, X, Y)
+            else:
+                self.no_combat_text._event(editor, X, Y)
     
     def _update(self, editor, X, Y):
         for child in self.children:
@@ -2811,6 +2849,11 @@ class GameApp(UIElement):
             
         if self.page == "log":
             self.log_output._update(editor, X, Y)
+        elif self.page == "combat":
+            if self.in_combat:
+                self.enemy_card_scrollable._update(editor, X, Y)
+            else:
+                self.no_combat_text._update(editor, X, Y)
     
 class EditorApp(UIElement):
     

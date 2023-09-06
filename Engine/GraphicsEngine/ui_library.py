@@ -1,3 +1,6 @@
+# (C) Weston Day
+# pygame UI Library
+
 # pylint: disable=[W,R,C,import-error,no-member,no-name-in-module]
 import pygame
 #import PIL
@@ -2459,6 +2462,61 @@ class ContextTree(UIElement):
                 _x = self.parent.width if X + self.parent.width + self.width < editor.width else -t.width
                 t._event(editor, X + _x, Y + h)
 
+class DirectoryTree(UIElement):
+    
+    folds = {
+        "open": Image(f"{PATH}/folder_open.png", 0, 0, 20, 20),
+        "closed": Image(f"{PATH}/folder_closed.png", 0, 0, 20, 20)
+    }
+    file_icons = {
+        "default": Image(f"{PATH}/", 0, 0, 20, 20)
+    }
+    
+    
+    class Folder(UIElement):
+        def __init__(self, name, components):
+            self.name = name
+            self.components = components
+            self.collapsed = False
+            self.height = 20
+            self._height = 20
+            
+        
+        def _update(self, editor, X, Y):
+            ...
+        
+        def _event(self, editor, X, Y, x_offset=0):
+            if self.collapsed:
+                self.height = self._height
+            else:
+                y_offset = 0
+                for component in self.components:
+                    component: DirectoryTree.Folder | DirectoryTree.File
+
+    class File(UIElement):
+        def __init__(self, name, on_click, icon):
+            self.name = name
+            self.on_click = on_click
+            self.icon = icon
+
+    def __init__(self, x, y, name, components):
+        self.x = x
+        self.y = y
+        self.name = name
+        self.components = components
+        self.expanded = False
+        
+        self._height = 0
+        self.height = 0
+        
+        self.children = []
+        
+    def _update(self, editor, X, Y):
+        ...
+    
+    def _event(self, editor, X, Y):
+        ...
+
 class Editor:
     def __init__(self, width=1280, height=720) -> None:
         self.screen:pygame.Surface = None
@@ -2603,6 +2661,18 @@ class Editor:
             #self.screen.fill((255, 0, 0), (self.mouse_pos[0]-1, self.mouse_pos[1]-1, 3, 3))
 
             pygame.display.update()
+
+
+class DebugApp(UIElement):
+    def __init__(self, code_editor, editor):
+        ... # This is ambitious
+    
+    def _update(self, editor, X, Y):
+        ...
+    
+    def _event(self, editor, X, Y):
+        ...
+
 
 class GameApp(UIElement):
     
@@ -2854,12 +2924,15 @@ class GameApp(UIElement):
                 self.enemy_card_scrollable._update(editor, X, Y)
             else:
                 self.no_combat_text._update(editor, X, Y)
-    
+
+
+
 class EditorApp(UIElement):
     
     def __init__(self, code_editor, editor):
         self.code_editor = code_editor
         self.children = []
+        
 
     def _event(self, editor, X, Y):
         for child in self.children:
@@ -3258,4 +3331,30 @@ if __name__ == "__main__":
     ]
     editor.run()
 
+"""
+# │┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌
 
+Ideas:
+
+
+Combat Sequence Editor:
+╔════════════════════════════════════════════════╦════════════╗ 
+║ <combat_id>                                    ║ Enemy list ║ <- List of individual enemies used in combat
+╠════════════════════════════════════════════════╣            ║ may also contain randomizable elements (somehow, idk)
+║ Event 1 (usually spawn enemies + dialoug)      ║            ║ 
+╠════════════╦════════════╦══════════════════════╣            ║ 
+║ Trigger 2A ║ Trigger 2B ║ Trigger 2C           ║            ║ <- Tabs: Triggers A, B, or C may be triggered, Each leads to a
+║            ╙────────────╨──────────────────────╢            ║ unique chain of events. These branches may join back into a
+╟────────────────────────────────────────────────╢            ║ comman sequence at a later time, or continue seperate for the
+║ Event 2A-3                                     ║            ║ remainder of the combat sequence
+╟────────────────────────────────────────────────╢            ║ 
+║ Trigger 2A-4                                   ║            ║ 
+╟────────────────────────────────────────────────╢            ║ 
+║ Event 2A-5                                     ║            ║ 
+╟────────────────────────────────────────────────╢            ║ 
+║ ...                                            ║            ║ 
+╠════════════════════════════════════════════════╣            ║ <- end of sub-sequence 2A/2B/2C 
+║ ...                                            ║            ║ 
+╚════════════════════════════════════════════════╩════════════╝ <- end of combat sequence
+
+"""

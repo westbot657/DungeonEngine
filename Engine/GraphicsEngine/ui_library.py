@@ -112,13 +112,13 @@ PATH = "./Engine/GraphicsEngine/resources"
 
 FONT = f"{PATH}/JetBrainsMono-Regular.ttf"
 TEXT_SIZE = 14
-TEXT_COLOR = Color(190, 190, 190)
+TEXT_COLOR = Color(200, 200, 200)
 TEXT_BG_COLOR = Color(24, 24, 24)
 TEXT_HIGHLIGHT = Color(0, 122, 204, 127)
 TAB_SIZE = 4
 CURSOR_BLINK_TIME = 50
 CURSOR_COLOR = Color(190, 190, 190)
-SCROLL_MULTIPLIER = int(TEXT_SIZE*3)
+SCROLL_MULTIPLIER = int(15)
 
 pygame.init() # pylint: disable=no-member
 pygame.font.init()
@@ -1898,7 +1898,7 @@ class Scrollable:
             self.right_bound = options.get("right_bound", None)
             self.bottom_bound = options.get("bottom_bound", None)
             if self.left_bound is not None and self.right_bound is not None:
-                assert self.left_bound >= self.right_bound, "left bound must be larger than left bound (I know, it's wierd)"
+                assert self.left_bound >= self.right_bound, "left bound must be larger than right bound (I know, it's wierd)"
             if self.top_bound is not None and self.bottom_bound is not None:
                 assert self.top_bound >= self.bottom_bound, "top bound must be larger than bottom bound (I know, it's wierd)"
             self.mouse_pos = [0, 0]
@@ -2370,10 +2370,20 @@ class NumberedTextArea(UIElement):
         self.collapsable.aside.top_bound = 0
         self.collapsable.aside.right_bound = 0
 
+    def _update_layout(self, editor):
+        self.lines.height = self.editable.min_height = self.height
+        self.editable.min_width = self.width-75
+
+    def set_content(self, content:str):
+        self.editable.set_content(content)
+
     def _update(self, editor, X, Y):
         self.collapsable._update(editor, X, Y)
         
     def _event(self, editor, X, Y):
+        
+        self._update_layout(editor)
+        
         self.collapsable._event(editor, X, Y)
 
         if self.collapsable.main_area.hovered:
@@ -2533,17 +2543,17 @@ class DirectoryTree(UIElement):
             self.width = width
             self.components = components
             self.collapsed = collapsed
-            self.height = 14
-            self._height = 14
+            self.height = 15
+            self._height = 15
             
-            self.hitbox = Button(0, 0, width, 14)
+            self.hitbox = Button(0, 0, width, 15)
             self.fold_arrow = DirectoryTree.folds["closed" if collapsed else "open"]
-            self.label = Text(14, 0, width-14, name, text_size=12)
+            self.label = Text(14, -1, width-14, name, text_size=12, text_bg_color=None)
             
             self.hitbox.on_left_click = self._toggle
             
         def _toggle(self, editor):
-            print("toggle fold!")
+            # print("toggle fold!")
             self.collapsed = not self.collapsed
             self.fold_arrow = DirectoryTree.folds["closed" if self.collapsed else "open"]
         
@@ -2580,10 +2590,10 @@ class DirectoryTree(UIElement):
             self.width = width
             self.on_click = on_click
             self.icon = DirectoryTree.file_icons[icon]
-            self.height = 14
+            self.height = 15
             
-            self.hitbox = Button(0, 0, width, 14, "", (255, 0, 0))
-            self.label = Text(14, 0, width-14, name, text_size=12)
+            self.hitbox = Button(0, 0, width, 15, "", (255, 0, 0))
+            self.label = Text(14, -1, width-14, name, text_size=12, text_bg_color=None)
             
             self.hitbox.on_left_click = on_click
             
@@ -2630,11 +2640,12 @@ class DirectoryTree(UIElement):
         for name, comp in components.items():
             self.components.append(self.parse_components(name, comp, self))
         
-        self.surface = Scrollable(self.x, self.y, 225, editor.height-42, (24, 24, 24))
+        self.surface = Scrollable(self.x, self.y, 225, editor.height-42, (24, 24, 24), left_bound=0, top_bound = 0)
         self.children.append(self.surface)
         
         self.folder = DirectoryTree.Folder(self.name, width, self.components, self, False)
         self.surface.children.append(self.folder)
+        
         
     def _update(self, editor, X, Y):
         
@@ -3088,30 +3099,108 @@ class GameApp(UIElement):
             else:
                 self.no_combat_text._update(editor, X, Y)
 
+
+class FileEditor(UIElement):
+    
+    def __init__(self, x, y, width, height, file_location, file_name, editor):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.file_location = file_location
+        self.file_name = file_name
+        
+        with open(self.file_location, "r+", encoding="utf-8") as f:
+            self.contents = f.read()
+        
+        self.edit_area = NumberedTextArea(self.x, self.y, self.width, self.height)
+        
+        self.edit_area.set_content(self.contents)
+
+    def _update(self, editor, X, Y):
+        self.edit_area._update(editor, X, Y)
+    
+    def _event(self, editor, X, Y):
+        
+        self.edit_area.x = self.x
+        self.edit_area.y = self.y
+        self.edit_area.width = self.width
+        self.edit_area.height = self.height
+        
+        self.edit_area._event(editor, X, Y)
+
+
 class FileEditorSubApp(UIElement):
+    
+    def open_folder(self, folder_path, file_opener_getter, editor):
+        folder_name = folder_path.replace("\\", "/").rsplit("/", 1)[1]
+        tree = list(os.walk(folder_path))
+        # _, sub_folder, sub_files = tree.pop(0)
+        
+        
+        dir_tree = {
+            folder_name: {}
+        }
+        
+        # curr_branch = dir_tree[folder_name]
+        for path, sub_folders, files in tree:
+            path = path.replace("./", "").replace("\\", "/").split("/")
+            curr = dir_tree
+            for p in path:
+                curr = curr[p]
+            
+            for sub in sub_folders:
+                curr.update({sub: {}})
+            
+            for f in files:
+                curr.update({f: file_opener_getter(f"./{'/'.join(path)}/{f}", editor)})
+        
+        self.dir_tree = DirectoryTree(103, 21, folder_name.replace("./", "").rsplit("/", 1)[-1].upper(), dir_tree[folder_name], 225)
+            
+        
+    def file_opener_getter(self, file_path, editor):
+        
+        def open_file(*_, **__):
+            if file_path not in self.open_files:
+                new = {file_path: FileEditor(329, 36, editor.width-329, editor.height-57, file_path, file_path.rsplit("/", 1)[-1], editor)}
+                self.open_files.update(new)
+                self.file_tabs.add_tab(file_path.rsplit("/", 1)[-1], [new[file_path]])
+            self.focused_file = file_path
+            self.file_tabs.active_tab = file_path.rsplit("/", 1)[-1]
+        
+        return open_file
+    
     def __init__(self, code_editor, editor):
         self.code_editor = code_editor
         self.editor = editor
         self.children = []
+        self.dir_tree = None
+        self.open_files = {}
+        self.focused_file = None
         
-        self.dir_tree = DirectoryTree(103, 21, "Dungeons", {
-            "Sub Folder": {
-                "A File.ds": print,
-                "Another File.combat": print
-            },
-            "Sub Folder 2": {
-                "Sub Sub Folder": {},
-                "File.json": print
-            }
-        }, 100)
+        self.open_folder("./Dungeons", self.file_opener_getter, editor)
+        
         self.children.append(self.dir_tree)
+        
+        self.explorer_bar = Box(328, 21, 1, editor.height-42, (70, 70, 70))
+        self.children.append(self.explorer_bar)
+        
+        self.file_tabs = Tabs(329, 36, editor.width-329, 15, tab_data={}, tab_color_unselected=(24, 24, 24), tab_color_hovered=(31, 31, 31), tab_color_selected=(31, 31, 31), tab_color_empty=(24, 24, 24), tab_width=100)
+        self.children.append(self.file_tabs)
         
     def _update(self, editor, X, Y):
         
         for child in self.children:
             child._update(editor, X, Y)
         
+        # if self.focused_file:
+        #     self.open_files[self.focused_file]._update(editor, X, Y)
+            
+        
     def _event(self, editor, X, Y):
+
+        # if self.focused_file:
+        #     self.open_files[self.focused_file]._event(editor, X, Y)
         
         _c = self.children.copy()
         _c.reverse()

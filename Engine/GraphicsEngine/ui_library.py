@@ -2527,7 +2527,8 @@ class DirectoryTree(UIElement):
     
     
     class Folder(UIElement):
-        def __init__(self, name, width, components, collapsed:bool=True):
+        def __init__(self, name, width, components, parent, collapsed:bool=True):
+            self.parent = parent
             self.name = name
             self.width = width
             self.components = components
@@ -2574,7 +2575,8 @@ class DirectoryTree(UIElement):
                     self.height += component.height
 
     class File(UIElement):
-        def __init__(self, name, on_click, icon, width):
+        def __init__(self, name, on_click, icon, width, parent):
+            self.parent = parent
             self.name = name
             self.width = width
             self.on_click = on_click
@@ -2603,14 +2605,14 @@ class DirectoryTree(UIElement):
             return DirectoryTree.file_icons["json"]
         return DirectoryTree.file_icons["default"]
 
-    def parse_components(self, name, tree):
+    def parse_components(self, name, tree, parent):
         if isinstance(tree, dict):
             comps = []
             for k, v in tree.items():
-                comps.append(self.parse_components(k, v))
-            f = DirectoryTree.Folder(name, self.width, comps)
+                comps.append(self.parse_components(k, v, parent))
+            return DirectoryTree.Folder(name, self.width, comps, parent)
         else:
-            return DirectoryTree.File(name, tree, self._get_icon_for_file(name), self.width)
+            return DirectoryTree.File(name, tree, self._get_icon_for_file(name), self.width, parent)
                     
 
     def __init__(self, x, y, name, components:dict, width):
@@ -2619,21 +2621,38 @@ class DirectoryTree(UIElement):
         self.name = name
         self.expanded = False
         self.width = width
+        self.children = []
         
         self._height = 0
         self.height = 0
         
         self.components = []
         for name, comp in components.items():
-            self.components.append(self.parse_components(name, comp))
+            self.components.append(self.parse_components(name, comp, self))
         
-        self.folder = DirectoryTree.Folder(self.name, width, self.components, False)
+        self.surface = Scrollable(0, 0, 100, editor.height-42, (24, 24, 24))
+        self.children.append(self.surface)
+        
+        self.folder = DirectoryTree.Folder(self.name, width, self.components, self, False)
+        self.surface.children.append(self.folder)
         
     def _update(self, editor, X, Y):
-        self.folder._update(editor, X + self.x, Y + self.y)
+        
+        print("dir tree update!")
+        
+        self.surface._update(editor, X + self.x, Y + self.y)
+        
+        for child in self.children:
+            child._update(editor, X, Y)
     
     def _event(self, editor, X, Y):
-        self.folder._event(editor, X + self.x, Y + self.y)
+        
+        _c = self.children.copy()
+        _c.reverse()
+        for child in _c:
+            child._event(editor, X, Y)
+        
+        self.surface._event(editor, X + self.x, Y + self.y)
 
 class Editor:
     def __init__(self, width=1280, height=720) -> None:
@@ -3071,11 +3090,24 @@ class GameApp(UIElement):
 
 class FileEditorSubApp(UIElement):
     def __init__(self, code_editor, editor):
-        ...
+        self.code_editor = code_editor
+        self.editor = editor
+        self.children = []
+        
+        self.dir_tree = DirectoryTree(103, 21, "Dungeons", {}, 100)
+        self.children.append(self.dir_tree)
+        
     def _update(self, editor, X, Y):
-        ...
+        
+        for child in self.children:
+            child._update(editor, X, Y)
+        
     def _event(self, editor, X, Y):
-        ...
+        
+        _c = self.children.copy()
+        _c.reverse()
+        for child in _c:
+            child._event(editor, X, Y)
 
 class EditorApp(UIElement):
     

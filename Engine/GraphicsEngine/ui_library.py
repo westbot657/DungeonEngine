@@ -10,12 +10,43 @@ import re
 import os
 import sys
 import mouse
+import random
 #from io import BytesIO
 from enum import Enum, auto
 from ctypes import windll
 
+from pypresence import Presence
+
 from win32api import GetMonitorInfo, MonitorFromPoint
 from pygame._sdl2.video import Window
+
+
+client_id = "1149136139341541446"
+
+class fake_presence:
+    def __init__(self, *_, **__): pass
+    def update(self, *_, **__): pass
+    def connect(self, *_, **__): pass
+
+DO_RICH_PRESENCE = False
+
+if DO_RICH_PRESENCE:
+    RPC = Presence(client_id)
+else:
+    RPC = fake_presence()
+RPC.connect()
+
+RPCD = {
+    "details": "Testing <Insert Dungeon Name Here>",
+    "state": "debugging",
+    "start": time.time(),
+    "large_image": "dungeon_builder_icon",
+    "large_text": "<Insert Dungeon Name Here>"
+}
+
+RPC.update(
+    **RPCD
+)
 
 
 class Color(list):
@@ -427,9 +458,11 @@ class Animation(UIElement):
 
         self._hovered = self.hovered
         if editor.collides((editor.mouse_pos), (X+self.x, Y+self.y, self.sprite_width, self.sprite_height)):
-            self.hovered = editor._hovered = True
-            if not self._hovered:
-                self._on_hover(editor)
+            if editor._hovering is not None:
+                editor._hovering = self
+                self.hovered = editor._hovered = True
+                if not self._hovered:
+                    self._on_hover(editor)
         
         else:
             self.hovered = False
@@ -558,7 +591,9 @@ class TextBox(UIElement):
 
         #if max(editor.X, X + self.x) <= _x <= min(X + self.x + w, editor.Width) and max(editor.Y, Y + self.y) <= _y <= min(Y + self.y + h, editor.Height):
         if editor.collides((_x, _y), (X+self.x, Y+self.y, w, h)):
-            self.hovered = editor._hovered = True
+            if editor._hovering is not None:
+                editor._hovering = self
+                self.hovered = editor._hovered = True
         else:
             self.hovered = False
 
@@ -946,7 +981,9 @@ class MultilineTextBox(UIElement):
 
         #if max(editor.X, X + self.x) <= _x <= min(X + self.x + w, editor.Width) and max(editor.Y, Y + self.y) <= _y <= min(Y + self.y + h, editor.Height):
         if editor.collides((_x, _y), (X+self.x, Y+self.y, w, h)):
-            self.hovered = editor._hovered = True
+            if editor._hovering is not None:
+                self.hovered = editor._hovered = True
+                editor._hovering = self
         else:
             self.hovered = False
 
@@ -1208,7 +1245,9 @@ class Box(UIElement):
         _x, _y = editor.mouse_pos
         #if (max(editor.X, X + self.x) <= _x <= min(X + self.x + self.width, editor.Width) and max(editor.Y, Y + self.y) <= _y <= min(Y + self.y + self.height, editor.Height)):
         if editor.collides((_x, _y), (X+self.x, Y+self.y, self.width, self.height)):
-            self.hovered = editor._hovered = True
+            if editor._hovering is None:
+                self.hovered = editor._hovered = True
+                editor._hovering = self
         else:
             self.hovered = False
 
@@ -1261,7 +1300,9 @@ class Draggable(UIElement):
 
         #if max(editor.X, X + self.x) <= _x <= min(X + self.x + self.width, editor.Width) and max(editor.Y, Y + self.y) <= _y <= min(Y + self.y + self.height, editor.Height):
         if editor.collides((_x, _y), (X+self.x, Y+self.y, self.width, self.height)):
-            self.hovered = editor._hovered = True
+            if editor._hovering is None:
+                self.hovered = editor._hovered = True
+                editor._hovering = self
         else:
             self.hovered = False
 
@@ -1330,7 +1371,9 @@ class Resizable(Draggable):
 
         #if max(editor.X, X + self.x) <= _x <= min(X + self.x + self.width, editor.Width) and max(editor.Y, Y + self.y) <= _y <= min(Y + self.y + self.height, editor.Height):
         if editor.collides((_x, _y), (X+self.x, Y+self.y, self.width, self.height)):
-            self.hovered = editor._hovered = True
+            if editor._hovering is None:
+                self.hovered = editor._hovered = True
+                editor._hovering = self
         else:
             self.hovered = False
 
@@ -1440,19 +1483,21 @@ class Button(UIElement):
                 self.bg_color._event(self._mimic, X+self.x, Y+self.y)
         
         if editor.collides((_x, _y), (X+self.x, Y+self.y, self.width, self.height)):
-            self.hovered = editor._hovered = True
-            self.bg_color = self.hover_color
-            if not self._hovered:
-                self.on_hover(editor)
-            if editor.left_mouse_down():
-                self.bg_color = self.click_color
-                self.on_left_click(editor)
-                editor.cancel_mouse_event()
-                self.lheld = True
-            if editor.right_mouse_down():
-                self.on_right_click(editor)
-                editor.cancel_mouse_event()
-                self.rheld = True
+            if editor._hovering is None:
+                self.hovered = editor._hovered = True
+                editor._hovering = self
+                self.bg_color = self.hover_color
+                if not self._hovered:
+                    self.on_hover(editor)
+                if editor.left_mouse_down():
+                    self.bg_color = self.click_color
+                    self.on_left_click(editor)
+                    editor.cancel_mouse_event()
+                    self.lheld = True
+                if editor.right_mouse_down():
+                    self.on_right_click(editor)
+                    editor.cancel_mouse_event()
+                    self.rheld = True
         else:
             self.hovered = False
             self.bg_color = self._bg_color
@@ -1916,20 +1961,22 @@ class Scrollable:
             #print(f"Scrollable: {_y-self.y=} {_y-self.y==self.mouse_pos[1]=}")
 
             if editor.collides((_x, _y), (self.x, self.y, self.width, self.height)):
-                self.hovered = True
-                if editor.scroll is not None:
-                    if pygame.K_LSHIFT in editor.keys: # pylint: disable=no-member
-                        self.offsetX += editor.scroll * SCROLL_MULTIPLIER
-                        if self.left_bound is not None:
-                            self.offsetX = min(self.offsetX, self.left_bound)
-                        if self.right_bound is not None:
-                            self.offsetX = max(self.offsetX, self.right_bound)
-                    else:
-                        self.offsetY += editor.scroll * SCROLL_MULTIPLIER
-                        if self.top_bound is not None:
-                            self.offsetY = min(self.offsetY, self.top_bound)
-                        if self.bottom_bound is not None:
-                            self.offsetY = max(self.offsetY, self.bottom_bound)
+                if editor._hovering is None:
+                    editor._hovering = self
+                    self.hovered = True
+                    if editor.scroll is not None:
+                        if pygame.K_LSHIFT in editor.keys: # pylint: disable=no-member
+                            self.offsetX += editor.scroll * SCROLL_MULTIPLIER
+                            if self.left_bound is not None:
+                                self.offsetX = min(self.offsetX, self.left_bound)
+                            if self.right_bound is not None:
+                                self.offsetX = max(self.offsetX, self.right_bound)
+                        else:
+                            self.offsetY += editor.scroll * SCROLL_MULTIPLIER
+                            if self.top_bound is not None:
+                                self.offsetY = min(self.offsetY, self.top_bound)
+                            if self.bottom_bound is not None:
+                                self.offsetY = max(self.offsetY, self.bottom_bound)
             else:
                 self.hovered = False
 
@@ -2387,6 +2434,8 @@ class Tie(UIElement):
 
 class ContextTree(UIElement):
     
+    global_tree = None
+    
     class Line: pass
     
     @classmethod
@@ -2469,53 +2518,122 @@ class DirectoryTree(UIElement):
         "closed": Image(f"{PATH}/folder_closed.png", 0, 0, 20, 20)
     }
     file_icons = {
-        "default": Image(f"{PATH}/", 0, 0, 20, 20)
+        "default": Image(f"{PATH}/default_file_icon.png", 0, 0, 20, 20),
+        "dungeon_script": Image(f"{PATH}/ds_file_icon.png", 0, 0, 20, 20),
+        "combat": Image(f"{PATH}/combat_file_icon.png", 0, 0, 20, 20),
+        "json": Image(f"{PATH}/json_file_icon.png", 0, 0, 20, 20)
     }
+    file_icons["ds"] = file_icons["dungeon_script"]
     
     
     class Folder(UIElement):
-        def __init__(self, name, components):
+        def __init__(self, name, width, components, collapsed:bool=True):
             self.name = name
+            self.width = width
             self.components = components
-            self.collapsed = False
+            self.collapsed = collapsed
             self.height = 20
             self._height = 20
             
+            self.hitbox = Button(0, 0, width, 20)
+            self.fold_arrow = DirectoryTree.folds["closed" if collapsed else "open"]
+            self.label = Text(21, 1, width-22, name, text_size=18)
+            
+            self.hitbox.on_left_click = self._toggle
+            
+        def _toggle(self, editor):
+            self.collapsed = not self.collapsed
+            self.fold_arrow = DirectoryTree.folds["closed" if self.collapsed else "open"]
         
-        def _update(self, editor, X, Y):
-            ...
-        
-        def _event(self, editor, X, Y, x_offset=0):
+        def _update(self, editor, X, Y, x_offset=0):
+            self.fold_arrow._update(editor, X+x_offset, Y)
+            self.label._update(editor, X+x_offset, Y)
             if self.collapsed:
                 self.height = self._height
             else:
-                y_offset = 0
+                self.height = self._height
                 for component in self.components:
                     component: DirectoryTree.Folder | DirectoryTree.File
+                    component._update(editor, X, Y+self.height, x_offset+10)
+                    self.height += component.height
+        
+        def _event(self, editor, X, Y, x_offset=0):
+            
+            self.hitbox._event(editor, X, Y)
+            # self.fold_arrow._event(editor, X+x_offset, Y)
+            
+            if self.collapsed:
+                self.height = self._height
+            else:
+                self.height = self._height
+                components = self.components.copy()
+                components.reverse()
+                for component in components:
+                    component: DirectoryTree.Folder | DirectoryTree.File
+                    component._event(editor, X, Y+self.height, x_offset+10)
+                    self.height += component.height
 
     class File(UIElement):
-        def __init__(self, name, on_click, icon):
+        def __init__(self, name, on_click, icon, width):
             self.name = name
+            self.width = width
             self.on_click = on_click
-            self.icon = icon
+            self.icon = DirectoryTree.file_icons[icon]
+            self.height = 20
+            
+            self.hitbox = Button(0, 0, width, 20)
+            self.label = Text(21, 1, width-22, name, text_size=18)
+            
+            self.hitbox.on_left_click = on_click
+            
+        def _update(self, editor, X, Y, x_offset=0):
+            self.icon._update(editor, X+x_offset, Y)
+            self.label._update(editor, X+x_offset, Y)
+        
+        def _event(self, editor, X, Y, x_offset=0):
+            self.hitbox._event(editor, X, Y)
+            self.label.width
 
-    def __init__(self, x, y, name, components):
+    def _get_icon_for_file(self, file_name):
+        if file_name.endswith((".ds", ".dungeon_script")):
+            return DirectoryTree.file_icons["ds"]
+        elif file_name.endswith(".combat"):
+            return DirectoryTree.file_icons["combat"]
+        elif file_name.endswith(".json"):
+            return DirectoryTree.file_icons["json"]
+        return DirectoryTree.file_icons["default"]
+
+    def parse_components(self, name, tree):
+        if isinstance(tree, dict):
+            comps = []
+            for k, v in tree.items():
+                comps.append(self.parse_components(k, v))
+            f = DirectoryTree.Folder(name, self.width, comps)
+        else:
+            return DirectoryTree.File(name, tree, self._get_icon_for_file(name), self.width)
+                    
+
+    def __init__(self, x, y, name, components:dict, width):
         self.x = x
         self.y = y
         self.name = name
-        self.components = components
         self.expanded = False
+        self.width = width
         
         self._height = 0
         self.height = 0
         
-        self.children = []
+        self.components = []
+        for name, comp in components.items():
+            self.components.append(self.parse_components(name, comp))
+        
+        self.folder = DirectoryTree.Folder(self.name, width, self.components, False)
         
     def _update(self, editor, X, Y):
-        ...
+        self.folder._update(editor, X + self.x, Y + self.y)
     
     def _event(self, editor, X, Y):
-        ...
+        self.folder._event(editor, X + self.x, Y + self.y)
 
 class Editor:
     def __init__(self, width=1280, height=720) -> None:
@@ -2605,6 +2723,7 @@ class Editor:
             self.previous_keys = self.keys.copy()
             self.previous_mouse = self.mouse
             self._hovered = False
+            self._hovering = None
             self.mouse = list(pygame.mouse.get_pressed())
             self.mouse_pos = pygame.mouse.get_pos()
             # self.new_keys.clear()
@@ -2646,10 +2765,6 @@ class Editor:
             layers = [*self.layers.keys()]
             layers.sort()
 
-            for l in layers:
-                for i in self.layers[l]:
-                    i._update(self, 0, 0)
-
             _layers = layers.copy()
             _layers.reverse()
             for l in _layers:
@@ -2658,6 +2773,9 @@ class Editor:
                 for i in _l:
                     i._event(self, 0, 0)
 
+            for l in layers:
+                for i in self.layers[l]:
+                    i._update(self, 0, 0)
             #self.screen.fill((255, 0, 0), (self.mouse_pos[0]-1, self.mouse_pos[1]-1, 3, 3))
 
             pygame.display.update()
@@ -2859,14 +2977,40 @@ class GameApp(UIElement):
     
     def page_inv_onclick(self, editor):
         self.page = "inv"
+        RPCD["state"] = random.choice([
+            "Playing strategicaly (maybe? idk lmao)",
+            "Having Fun! (hopefully)",
+            "¯\_(ツ)_/¯",
+            "<Insert goofy message here>"
+        ])
+        RPC.update(**RPCD)
         self.set_page("inv")
     
     def page_combat_onclick(self, editor):
         self.page = "combat"
+        if self.in_combat:
+            RPCD["state"]=random.choice([
+                "Currently in combat! (don't distract me (or do, I don't care lol))",
+                "Fighting uhh...  something! (I might make it actually say what when combat actually works)"
+            ])
+            RPC.update(**RPCD)
+        else:
+            RPCD["state"]=random.choice([
+                "Staring at the combat page for no reason",
+                "\"I'm delirious and think I'm in combat!\" (This message was written by ADHD)",
+                "Pikachu! I choose you! (Pikachu isn't in this game (probably))"
+            ])
+            RPC.update(**RPCD)
         self.set_page("combat")
         
     def page_log_onclick(self, editor):
         self.page = "log"
+        RPCD["state"]=random.choice([
+            "Debugging",
+            "HACKING! (not really)",
+            "Analyzing the game logs to see what on earth is going on"
+        ])
+        RPC.update(**RPCD)
         self.set_page("log")
     
     def _update_layout(self, editor):
@@ -2898,11 +3042,11 @@ class GameApp(UIElement):
         self.no_combat_text.x = (editor.width-224)-(self.no_combat_text.width/2)
         self.no_combat_text.y = self.log_output.y + (self.log_output.min_height/2) - (self.no_combat_text.height/2)
         
-        
-        
     def _event(self, editor, X, Y):
         self._update_layout(editor)
-        for child in self.children:
+        _c = self.children.copy()
+        _c.reverse()
+        for child in _c:
             child._event(editor, X, Y)
             
         if self.page == "log":
@@ -2925,20 +3069,72 @@ class GameApp(UIElement):
             else:
                 self.no_combat_text._update(editor, X, Y)
 
-
+class FileEditorSubApp(UIElement):
+    def __init__(self, code_editor, editor):
+        ...
+    def _update(self, editor, X, Y):
+        ...
+    def _event(self, editor, X, Y):
+        ...
 
 class EditorApp(UIElement):
     
     def __init__(self, code_editor, editor):
         self.code_editor = code_editor
         self.children = []
+        self.sub_apps = []
         
+        self.sub_app_bar = Box(51, 21, 50, editor.height-42, (24, 24, 24))
+        self.children.append(self.sub_app_bar)
+        
+        self.sub_app_bar_line = Box(102, 21, 1, editor.height-42, (70, 70, 70))
+        self.children.append(self.sub_app_bar_line)
+        
+        self.file_editor_icons = [
+            Image(f"{PATH}/file_editor_sub_app.png", 0, 0, 50, 50),
+            Image(f"{PATH}/file_editor_sub_app_hovered.png", 0, 0, 50, 50),
+            Image(f"{PATH}/file_editor_sub_app_selected.png", 0, 0, 50, 50)
+        ]
+        self.file_editor_sub_app_button = Button(51, 21, 50, 50, "", self.file_editor_icons[2], hover_color=self.file_editor_icons[2], click_color=self.file_editor_icons[2])
+        self.file_editor_sub_app_button.on_left_click = self.click_file_editor
+        self.children.append(self.file_editor_sub_app_button)
+        self.sub_app_file_editor = FileEditorSubApp(code_editor, editor)
+        self.sub_apps.append((self.file_editor_sub_app_button, self.file_editor_icons))
+        self.active_app = self.sub_app_file_editor
+    
+    
+    def click_file_editor(self, *_, **__):
+        if self.active_app != self.sub_app_file_editor:
+            self._reset_sub_apps()
+            self.active_app = self.sub_app_file_editor
+            self.file_editor_sub_app_button._bg_color = self.file_editor_sub_app_button.bg_color = self.file_editor_sub_app_button.hover_color = self.file_editor_icons[2]
+        else:
+            self._reset_sub_apps()
+    
+    def _reset_sub_apps(self):
+        self.active_app = None
+        for button, icons in self.sub_apps:
+            button._bg_color = button.bg_color = icons[0]
+            button.hover_color = icons[1]
+
+    def _update_layout(self, editor):
+        self.sub_app_bar.height = self.sub_app_bar_line.height = editor.height - 42
 
     def _event(self, editor, X, Y):
-        for child in self.children:
+        
+        if self.active_app:
+            self.active_app._event(editor, X, Y)
+        
+        _c = self.children.copy()
+        _c.reverse()
+        for child in _c:
             child._event(editor, X, Y)
     
     def _update(self, editor, X, Y):
+        
+        if self.active_app:
+            self.active_app._update(editor, X, Y)
+        
         for child in self.children:
             child._update(editor, X, Y)
 
@@ -3111,19 +3307,28 @@ class CodeEditor(UIElement):
         self.reset_app_selectors()
         if self.active_app != "game":
             self.active_app = "game"
+            RPCD["details"] = "Playing <Insert Dungeon Name Here>"
+            RPC.update(**RPCD)
             self.app_game_selector.bg_color = self.app_game_selector._bg_color = self.app_game_selector.hover_color = self._app_game_icon_selected
         else:
+            RPCD["details"] = "Just staring at a blank screen..."
+            RPC.update(**RPCD)
             self.active_app = ""
     
     def select_editor_app(self, editor):
         self.reset_app_selectors()
         if self.active_app != "editor":
             self.active_app = "editor"
+            RPCD["details"] = "Editing a Dungeon"
+            RPC.update(**RPCD)
             self.app_editor_selector.bg_color = self.app_editor_selector._bg_color = self.app_editor_selector.hover_color = self._app_editor_icon_selected
         else:
-            self.active_app = ""    
+            RPCD["details"] = "Just staring at a blank screen..."
+            RPC.update(**RPCD)
+            self.active_app = ""
 
     def minimize(self, *_, **__):
+        # RPC.update(details="Made the window smol 4 some reason", state="¯\_(ツ)_/¯")
         pygame.display.iconify()
 
     def get_screen_pos(self, editor):
@@ -3200,13 +3405,14 @@ class CodeEditor(UIElement):
 
     def _update(self, editor, X, Y):
         # print(editor._focused_object)
-        for child in self.children:
-            child._update(editor, X, Y)
-            
+        
         if self.active_app == "game":
             self.game_app._update(editor, X, Y)
         elif self.active_app == "editor":
             self.editor_app._update(editor, X, Y)
+            
+        for child in self.children:
+            child._update(editor, X, Y)
 
     def _update_layout(self, editor):
         
@@ -3297,14 +3503,16 @@ class CodeEditor(UIElement):
 
         if (not editor.mouse[0]) and editor.previous_mouse[0]:
             self.selected_drag = ""
-
-        for child in self.children:
-            child._event(editor, X, Y)
             
         if self.active_app == "game":
             self.game_app._event(editor, X, Y)
         elif self.active_app == "editor":
             self.editor_app._event(editor, X, Y)
+            
+        _c = self.children.copy()
+        _c.reverse()
+        for child in _c:
+            child._event(editor, X, Y)
 
 if __name__ == "__main__":
     # from threading import Thread
@@ -3358,3 +3566,6 @@ Combat Sequence Editor:
 ╚════════════════════════════════════════════════╩════════════╝ <- end of combat sequence
 
 """
+
+
+

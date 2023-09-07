@@ -2514,14 +2514,14 @@ class ContextTree(UIElement):
 class DirectoryTree(UIElement):
     
     folds = {
-        "open": Image(f"{PATH}/folder_open.png", 0, 0, 20, 20),
-        "closed": Image(f"{PATH}/folder_closed.png", 0, 0, 20, 20)
+        "open": Image(f"{PATH}/folder_open.png", 0, 0, 14, 14),
+        "closed": Image(f"{PATH}/folder_closed.png", 0, 0, 14, 14)
     }
     file_icons = {
-        "default": Image(f"{PATH}/default_file_icon.png", 0, 0, 20, 20),
-        "dungeon_script": Image(f"{PATH}/ds_file_icon.png", 0, 0, 20, 20),
-        "combat": Image(f"{PATH}/combat_file_icon.png", 0, 0, 20, 20),
-        "json": Image(f"{PATH}/json_file_icon.png", 0, 0, 20, 20)
+        "default": Image(f"{PATH}/default_file_icon.png", 0, 0, 14, 14),
+        "dungeon_script": Image(f"{PATH}/ds_file_icon.png", 0, 0, 14, 14),
+        "combat": Image(f"{PATH}/combat_file_icon.png", 0, 0, 14, 14),
+        "json": Image(f"{PATH}/json_file_icon.png", 0, 0, 14, 14)
     }
     file_icons["ds"] = file_icons["dungeon_script"]
     
@@ -2533,16 +2533,17 @@ class DirectoryTree(UIElement):
             self.width = width
             self.components = components
             self.collapsed = collapsed
-            self.height = 20
-            self._height = 20
+            self.height = 14
+            self._height = 14
             
-            self.hitbox = Button(0, 0, width, 20)
+            self.hitbox = Button(0, 0, width, 14)
             self.fold_arrow = DirectoryTree.folds["closed" if collapsed else "open"]
-            self.label = Text(21, 1, width-22, name, text_size=18)
+            self.label = Text(14, 0, width-14, name, text_size=12)
             
             self.hitbox.on_left_click = self._toggle
             
         def _toggle(self, editor):
+            print("toggle fold!")
             self.collapsed = not self.collapsed
             self.fold_arrow = DirectoryTree.folds["closed" if self.collapsed else "open"]
         
@@ -2567,9 +2568,7 @@ class DirectoryTree(UIElement):
                 self.height = self._height
             else:
                 self.height = self._height
-                components = self.components.copy()
-                components.reverse()
-                for component in components:
+                for component in self.components:
                     component: DirectoryTree.Folder | DirectoryTree.File
                     component._event(editor, X, Y+self.height, x_offset+10)
                     self.height += component.height
@@ -2581,14 +2580,15 @@ class DirectoryTree(UIElement):
             self.width = width
             self.on_click = on_click
             self.icon = DirectoryTree.file_icons[icon]
-            self.height = 20
+            self.height = 14
             
-            self.hitbox = Button(0, 0, width, 20)
-            self.label = Text(21, 1, width-22, name, text_size=18)
+            self.hitbox = Button(0, 0, width, 14, "", (255, 0, 0))
+            self.label = Text(14, 0, width-14, name, text_size=12)
             
             self.hitbox.on_left_click = on_click
             
         def _update(self, editor, X, Y, x_offset=0):
+            # self.hitbox._update(editor, X, Y)
             self.icon._update(editor, X+x_offset, Y)
             self.label._update(editor, X+x_offset, Y)
         
@@ -2598,12 +2598,12 @@ class DirectoryTree(UIElement):
 
     def _get_icon_for_file(self, file_name):
         if file_name.endswith((".ds", ".dungeon_script")):
-            return DirectoryTree.file_icons["ds"]
+            return "ds"
         elif file_name.endswith(".combat"):
-            return DirectoryTree.file_icons["combat"]
+            return "combat"
         elif file_name.endswith(".json"):
-            return DirectoryTree.file_icons["json"]
-        return DirectoryTree.file_icons["default"]
+            return "json"
+        return "default"
 
     def parse_components(self, name, tree, parent):
         if isinstance(tree, dict):
@@ -2630,7 +2630,7 @@ class DirectoryTree(UIElement):
         for name, comp in components.items():
             self.components.append(self.parse_components(name, comp, self))
         
-        self.surface = Scrollable(0, 0, 100, editor.height-42, (24, 24, 24))
+        self.surface = Scrollable(self.x, self.y, 225, editor.height-42, (24, 24, 24))
         self.children.append(self.surface)
         
         self.folder = DirectoryTree.Folder(self.name, width, self.components, self, False)
@@ -2638,9 +2638,9 @@ class DirectoryTree(UIElement):
         
     def _update(self, editor, X, Y):
         
-        print("dir tree update!")
+        # print("dir tree update!")
         
-        self.surface._update(editor, X + self.x, Y + self.y)
+        # self.surface._update(editor, X, Y)
         
         for child in self.children:
             child._update(editor, X, Y)
@@ -2652,7 +2652,7 @@ class DirectoryTree(UIElement):
         for child in _c:
             child._event(editor, X, Y)
         
-        self.surface._event(editor, X + self.x, Y + self.y)
+        # self.surface._event(editor, X + self.x, Y + self.y)
 
 class Editor:
     def __init__(self, width=1280, height=720) -> None:
@@ -3094,7 +3094,16 @@ class FileEditorSubApp(UIElement):
         self.editor = editor
         self.children = []
         
-        self.dir_tree = DirectoryTree(103, 21, "Dungeons", {}, 100)
+        self.dir_tree = DirectoryTree(103, 21, "Dungeons", {
+            "Sub Folder": {
+                "A File.ds": print,
+                "Another File.combat": print
+            },
+            "Sub Folder 2": {
+                "Sub Sub Folder": {},
+                "File.json": print
+            }
+        }, 100)
         self.children.append(self.dir_tree)
         
     def _update(self, editor, X, Y):

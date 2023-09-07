@@ -978,10 +978,10 @@ class MultilineTextBox(UIElement):
     def _event(self, editor, X, Y):
         w, h = max(self.min_width, self._text_width), max(self.min_height, self._text_height)
         _x, _y = editor.mouse_pos
-
+        # print(X+self.x, Y+self.y, w, h, _x, _y)
         #if max(editor.X, X + self.x) <= _x <= min(X + self.x + w, editor.Width) and max(editor.Y, Y + self.y) <= _y <= min(Y + self.y + h, editor.Height):
         if editor.collides((_x, _y), (X+self.x, Y+self.y, w, h)):
-            if editor._hovering is not None:
+            if editor._hovering is None:
                 self.hovered = editor._hovered = True
                 editor._hovering = self
         else:
@@ -2808,6 +2808,7 @@ class Editor:
                     i._update(self, 0, 0)
             #self.screen.fill((255, 0, 0), (self.mouse_pos[0]-1, self.mouse_pos[1]-1, 3, 3))
 
+            print(self._hovering)
             pygame.display.update()
 
 
@@ -3113,7 +3114,7 @@ class FileEditor(UIElement):
         with open(self.file_location, "r+", encoding="utf-8") as f:
             self.contents = f.read()
         
-        self.edit_area = NumberedTextArea(self.x, self.y, self.width, self.height)
+        self.edit_area = MultilineTextBox(self.x, self.y, self.width, self.height)
         
         self.edit_area.set_content(self.contents)
 

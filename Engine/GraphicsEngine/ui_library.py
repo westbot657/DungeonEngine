@@ -1885,11 +1885,14 @@ class Tabs(UIElement):
                 self.tab_data.get(tab_name).append(c)
 
     def add_tab_children(self, tab_name:str, children:list|tuple):
+        print(f"ADD CHILDREN: '{tab_name}' <- {children}")
         if tab_name in self.tab_data.keys():
             if tab_name not in self.tab_children.keys():
                 self.tab_children.update({tab_name: []})
             for c in children:
                 self.tab_children[tab_name].append(c)
+        self.load_tabs()
+        print(f"ALL CHILDREN of '{tab_name}': {self.get_tab(tab_name).children}")
 
     def remove_content(self, tab_name:str, item):
         if tab_name in self.tab_data.keys():

@@ -118,7 +118,7 @@ TEXT_HIGHLIGHT = Color(0, 122, 204, 127)
 TAB_SIZE = 4
 CURSOR_BLINK_TIME = 50
 CURSOR_COLOR = Color(190, 190, 190)
-SCROLL_MULTIPLIER = int(15)
+SCROLL_MULTIPLIER = 15
 
 pygame.init() # pylint: disable=no-member
 pygame.font.init()
@@ -798,7 +798,7 @@ class MultilineTextBox(UIElement):
         self._cursor_tick = 0
         self._cursor_visible = False
         self._cursor_color = Color.color(cursor_color)
-        self._cursor_surface = pygame.Surface((1, text_size))
+        self._cursor_surface = pygame.Surface((1, text_size+2))
         self._cursor_surface.fill(tuple(self._cursor_color))
         self.surfaces = []
         self.focused = False
@@ -1255,8 +1255,10 @@ class Box(UIElement):
             child._event(editor, X + self.x, Y + self.y)
 
 class LayeredObjects(UIElement):
-    def __init__(self, layers:dict):
+    def __init__(self, layers:dict, x=0, y=0):
         self.layers = layers
+        self.x = x
+        self.y = y
 
     def _event(self, editor, X, Y):
         layers = [l for l in self.layers.keys()]
@@ -1266,14 +1268,14 @@ class LayeredObjects(UIElement):
             _l = self.layers[l]
             _l.reverse()
             for i in _l:
-                i._event(editor, X, Y)
+                i._event(editor, X+self.x, Y+self.y)
 
     def _update(self, editor, X, Y):
         layers = [l for l in self.layers.keys()]
         layers.sort()
         for l in layers:
             for i in self.layers[l]:
-                i._update(editor, X, Y)
+                i._update(editor, X+self.x, Y+self.y)
 
 class Draggable(UIElement):
     def __init__(self, x, y, width, height, lock_horizontal=False, lock_vertical=False, children=[]):
@@ -1452,7 +1454,12 @@ class Button(UIElement):
         #self.held = False
         self.text_size = text_size
         self.font = pygame.font.Font(FONT, text_size)
-        self.surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32) # pylint: disable=no-member
+        
+        r = self.font.render(self.text, True, tuple(self.text_color))
+        if self.width == -1:
+            self.width = r.get_width()
+        
+        self.surface = pygame.Surface((min(1, self.width), self.height), pygame.SRCALPHA, 32) # pylint: disable=no-member
         if self.bg_color:
             if isinstance(self.bg_color, (Image, Animation)):
                 self.bg_color.partial_update()
@@ -1463,13 +1470,17 @@ class Button(UIElement):
                 if len(self.bg_color) == 3:
                     self.bg_color = Color(*self.bg_color, 255)
                 self.surface.fill(self.bg_color)
-        self.surface.blit(self.font.render(self.text, True, tuple(self.text_color)), (1, 1))
+        self.surface.blit(r, (1, 1))
+        
         self._override = self._overrider(self)
         self._mimic = EditorMimic(None, self._override)
 
     def _event(self, editor, X, Y):
-        for child in self.children:
+        _c = self.children.copy()
+        _c.reverse()
+        for child in _c:
             child._event(editor, X+self.x+self._uoffx, Y+self.y+self._uoffy)
+        
         _x, _y = editor.mouse_pos
         self._hovered = self.hovered
         self._mimic._editor = editor
@@ -1517,8 +1528,6 @@ class Button(UIElement):
         #self.update(editor, X, Y)
 
     def _update(self, editor, X, Y):
-        for child in self.children:
-            child._update(editor, X+self.x+self._uoffx, Y+self.y+self._uoffy)
             
         self.surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32) # pylint: disable=no-member
         self._override.screen = self.surface
@@ -1539,6 +1548,9 @@ class Button(UIElement):
         self.pre_blit(editor, X, Y)
 
         editor.screen.blit(self.surface, (X+self.x, Y+self.y))
+        
+        for child in self.children:
+            child._update(editor, X+self.x+self._uoffx, Y+self.y+self._uoffy)
     
     def pre_blit(self, editor, X, Y): ... # pylint: disable=unused-argument
     def on_left_click(self, editor): ... # pylint: disable=unused-argument
@@ -1566,7 +1578,7 @@ class Tabs(UIElement):
 
     class _Tab(Button):
         def __init__(self, parent, x, y, width, height, location, text, tcu:tuple[int, int, int]|Image=TEXT_COLOR, tch:tuple[int, int, int]|Image=TEXT_COLOR, tcs:tuple[int, int, int]|Image=TEXT_COLOR, bgu:tuple[int, int, int]|Image=TEXT_BG_COLOR, bgh:tuple[int, int, int]|Image=TEXT_BG_COLOR, bgs:tuple[int, int, int]|Image=TEXT_BG_COLOR, text_size=TEXT_SIZE):
-            super().__init__(x, y, width, height, text, bgu, tcu, text_size)
+            super().__init__(x, y, width, height, text, bgu, tcu, text_size, bgh, bgs)
             self.tcu:tuple[int, int, int]|Image = tcu
             self.tch:tuple[int, int, int]|Image = tch
             self.tcs:tuple[int, int, int]|Image = tcs
@@ -1575,34 +1587,38 @@ class Tabs(UIElement):
             self.bgs:tuple[int, int, int]|Image = bgs
             self.location = location
             self.tabs_parent = parent
+            self.children = []
+            
+            print(self.children, id(self.children))
 
         def on_left_click(self, editor):
-            self.bg_color = self.bgs
-            self.text_color = self.tcs
-
             self.tabs_parent.active_tab = self.text
+            self.tabs_parent.reset_tab_colors()
         
-        def off_left_click(self, editor):
-            if self.hovered:
-                self.bg_color = self.bgh
-                self.text_color = self.tch
-            else:
-                self.bg_color = self.bgu
-                self.text_color = self.tcu
+        # def off_left_click(self, editor):
+        #     self.bg_color = self._bg_color = self.bgu
+        #     self.hover_color = self.bgh
+        #     self.text_color = self.tch
         
-        def on_hover(self, editor):
-            self.bg_color = self.bgh
-            self.text_color = self.tch
+        # def on_hover(self, editor):
+        #     self.bg_color = self.bgh
+        #     self.text_color = self.tch
 
-        def off_hover(self, editor):
-            self.bg_color = self.bgu
-            self.text_color = self.tcu
+        # def off_hover(self, editor):
+        #     self.bg_color = self.bgu
+        #     self.text_color = self.tcu
 
         def pre_blit(self, editor, X, Y):
             if self.location == Tabs.Style.LEFT:
                 self.surface = pygame.transform.rotate(self.surface, 90)
             elif self.location == Tabs.Style.RIGHT:
                 self.surface = pygame.transform.rotate(self.surface, -90)
+
+        def _event(self, editor, X, Y):
+            return super()._event(editor, X, Y)
+        
+        def _update(self, editor, X, Y):
+            return super()._update(editor, X, Y)
 
     def __init__(self, x:int, y:int, width:int, height:int, tab_style:Style=Style.TOP, tab_data:dict[str, list]=..., **options):
         """
@@ -1628,6 +1644,8 @@ class Tabs(UIElement):
         `tab_width`: int (default is 75 px)\n
 
         `scrollable_tabs`: bool (default is False)\n
+        
+        `tab_padding`: int how much space to put between tabs
         """
         if tab_data is ...: tab_data = {}
         self.x = x
@@ -1636,6 +1654,7 @@ class Tabs(UIElement):
         self.height = height
         self.tab_style = tab_style
         self.tab_data = tab_data
+        self.tab_children = options.get("tab_children", {})
         # self.tx = 0
         # self.ty = 0
         if tab_data:
@@ -1655,22 +1674,49 @@ class Tabs(UIElement):
              
         self.content_bg_color      : Color|tuple[int, int, int]|Image|None = Color.color(options.get("content_bg_color", None))
         
-        self.tab_buffer            : int                             = options.get("tab_buffer", 0)
-        self.tab_height            : int                             = options.get("tab_height", TEXT_SIZE + 2)
-        self.tab_width             : int                             = options.get("tab_width", 75)
+        self.tab_buffer            : int  = options.get("tab_buffer", 0)
+        self.tab_height            : int  = options.get("tab_height", TEXT_SIZE + 2)
+        self.tab_width             : int  = options.get("tab_width", 75)
 
-        self.scrollable_tabs       : bool                            = options.get("scrollable_tabs", False)
+        self.scrollable_tabs       : bool = options.get("scrollable_tabs", False)
+        
+        self.tab_padding           : int  = options.get("tab_padding", 0)
+        
         if self.scrollable_tabs:
             self._tabs_area = Scrollable(self.x, self.y, 1, 1, self.tab_color_empty, left_bound=0, top_bound=0)
         else:
             self._tab_objects = []
         self.load_tabs()
 
+    def reset_tab_colors(self):
+        if self.scrollable_tabs:
+            l = self._tabs_area.children
+        else:
+            l = self._tab_objects
+
+        for tab in l:
+            tab:Tabs._Tab
+            if tab.text == self.active_tab:
+                tab.bg_color = tab._bg_color = tab.hover_color = tab.bgs
+            else:
+                tab.bg_color = tab._bg_color = tab.bgu
+                tab.hover_color = tab.bgh
+
+    def get_tab(self, label):
+        if self.scrollable_tabs:
+            for c in self._tabs_area.children:
+                if c.text == label:
+                    return c
+        else:
+            for c in self._tab_objects:
+                if c.text == label:
+                    return c
+
     def load_tabs(self):
         if self.scrollable_tabs:
             self._tabs_area.children.clear()
         else:
-            self._tab_objects = []
+            self._tab_objects.clear()
 
         if self.tab_style == Tabs.Style.TOP:
             if self.scrollable_tabs:
@@ -1686,14 +1732,24 @@ class Tabs(UIElement):
                 x = self.tab_buffer
                 y = -self.tab_height
             for name in self.tab_data.keys():
-                t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.TOP, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
+                t = Tabs._Tab(
+                    self, x, y, self.tab_width, self.tab_height,
+                    Tabs.Style.TOP, name,
+                    self.text_color_unselected, self.text_color_hovered, self.text_color_selected,
+                    self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected
+                )
+                t.children = self.tab_children.get(name, list())
+                print("CHILDREN: ", t.children)
+                if self.active_tab == name:
+                    t.on_left_click(None)
+                
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
                     self._tabs_area.children.append(t)
-                    x += t.width + 1
+                    x += t.width + 1 + self.tab_padding
                 else:
                     self._tab_objects.append(t)
-                    x += self.tab_width + 1
+                    x += self.tab_width + 1 + self.tab_padding
             if self.scrollable_tabs:
                 self._tabs_area.right_bound = -x
         
@@ -1712,13 +1768,15 @@ class Tabs(UIElement):
                 y = -self.tab_height
             for name in self.tab_data.keys():
                 t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.TOP, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
+                t.children = self.tab_children.get(name, list())
+                print("CHILDREN: ", t.children)
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
                     self._tabs_area.children.append(t)
-                    x += t.width + 1
+                    x += t.width + 1 + self.tab_padding
                 else:
                     self._tab_objects.append(t)
-                    x += self.tab_width + 1
+                    x += self.tab_width + 1 + self.tab_padding
             if self.scrollable_tabs:
                 self._tabs_area.right_bound = -x
 
@@ -1737,13 +1795,15 @@ class Tabs(UIElement):
                 y = self.tab_buffer
             for name in self.tab_data.keys():
                 t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.LEFT, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
+                t.children = self.tab_children.get(name, list())
+                print("CHILDREN: ", t.children)
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
                     self._tabs_area.children.append(t)
-                    y += t.width + 1
+                    y += t.width + 1 + self.tab_padding
                 else:
                     self._tab_objects.append(t)
-                    y += self.tab_width + 1
+                    y += self.tab_width + 1 + self.tab_padding
             if self.scrollable_tabs:
                 self._tabs_area.bottom_bound = -y
 
@@ -1762,13 +1822,15 @@ class Tabs(UIElement):
                 y = self.tab_buffer
             for name in self.tab_data.keys():
                 t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.LEFT, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
+                t.children = self.tab_children.get(name, list())
+                print("CHILDREN: ", t.children)
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
                     self._tabs_area.children.append(t)
-                    y += t.width + 1
+                    y += t.width + 1 + self.tab_padding
                 else:
                     self._tab_objects.append(t)
-                    y += self.tab_width + 1
+                    y += self.tab_width + 1 + self.tab_padding
             if self.scrollable_tabs:
                 self._tabs_area.bottom_bound = -y
 
@@ -1788,15 +1850,17 @@ class Tabs(UIElement):
                 y = 0
             for name in self.tab_data.keys():
                 t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.MENU, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
+                t.children = self.tab_children.get(name, list())
+                print("CHILDREN: ", t.children)
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
                     mw = max(t.width, mw)
                     self._tabs_area.children.append(t)
                     #self._tabs_area.right_bound = min(self._tabs_area.right_bound, -t.width)
-                    y += self.tab_height
+                    y += self.tab_height + self.tab_padding
                 else:
                     self._tab_objects.append(t)
-                    y += self.tab_height
+                    y += self.tab_height + self.tab_padding
             if self.scrollable_tabs:
                 for tab in self._tabs_area.children:
                     tab.width = mw
@@ -1806,16 +1870,26 @@ class Tabs(UIElement):
 
         else:
             raise Exception(f"{self.tab_style} is not implemented yet")
+        
+        self.reset_tab_colors()
 
-    def add_tab(self, tab_name:str, contents:list=...):
+    def add_tab(self, tab_name:str, contents:list=..., children:list=[]):
         if contents is ...: contents = []
         self.tab_data[tab_name] = contents
+        self.tab_children[tab_name] = children
         self.load_tabs()
 
     def add_content(self, tab_name:str, contents:list|tuple):
-        contents = list(contents)
-        for c in contents:
-            self.tab_data.get(tab_name).append(c)
+        if tab_name in self.tab_data:
+            for c in contents:
+                self.tab_data.get(tab_name).append(c)
+
+    def add_tab_children(self, tab_name:str, children:list|tuple):
+        if tab_name in self.tab_data.keys():
+            if tab_name not in self.tab_children.keys():
+                self.tab_children.update({tab_name: []})
+            for c in children:
+                self.tab_children[tab_name].append(c)
 
     def remove_content(self, tab_name:str, item):
         if tab_name in self.tab_data.keys():
@@ -1830,7 +1904,11 @@ class Tabs(UIElement):
     def remove_tab(self, tab_name:str):
         if tab_name in self.tab_data.keys():
             self.tab_data.pop(tab_name)
+            self.active_tab = None
             self.load_tabs()
+
+        if tab_name in self.tab_children.keys():
+            self.tab_children.pop(tab_name)
 
     def get_active_tab(self):
         return self.active_tab
@@ -1892,6 +1970,7 @@ class Scrollable:
             self.children = options.get("children", [])
             self.offsetX = 0
             self.offsetY = 0
+            self.scroll_speed = options.get("scroll_speed", SCROLL_MULTIPLIER)
             self.hovered = False
             self.left_bound = options.get("left_bound", None)
             self.top_bound = options.get("top_bound", None)
@@ -1963,16 +2042,17 @@ class Scrollable:
             if editor.collides((_x, _y), (self.x, self.y, self.width, self.height)):
                 if editor._hovering is None:
                     editor._hovering = self
+                if editor._hovering or any([c.hovered for child in self.children if hasattr(c, "hovered")]):
                     self.hovered = True
                     if editor.scroll is not None:
                         if pygame.K_LSHIFT in editor.keys: # pylint: disable=no-member
-                            self.offsetX += editor.scroll * SCROLL_MULTIPLIER
+                            self.offsetX += editor.scroll * self.scroll_speed
                             if self.left_bound is not None:
                                 self.offsetX = min(self.offsetX, self.left_bound)
                             if self.right_bound is not None:
                                 self.offsetX = max(self.offsetX, self.right_bound)
                         else:
-                            self.offsetY += editor.scroll * SCROLL_MULTIPLIER
+                            self.offsetY += editor.scroll * self.scroll_speed
                             if self.top_bound is not None:
                                 self.offsetY = min(self.offsetY, self.top_bound)
                             if self.bottom_bound is not None:
@@ -2066,14 +2146,16 @@ class Collapsable:
             self.split_min = options.get("split_min", 1)
             self.split_draggable = options.get("split_draggable", True)
             self.split_visible = options.get("split_visible", True)
+            self.scroll_speed = options.get("scroll_speed", SCROLL_MULTIPLIER)
+            self.split_color = options.get("split_color", None) or (70, 70, 70)
 
             self.screen = pygame.Surface((self.width, self.height))
             self.mouse_pos = [0, 0]
 
             if self.split_type == Collapsable.SplitType.VERTICAL_LEFT:
-                self.main_area = Scrollable(0, 0, width - self.split_size, height)
+                self.main_area = Scrollable(0, 0, width - self.split_size, height, scroll_speed=self.scroll_speed)
                 self.main_area.children = main_content
-                self.aside = Scrollable(width - self.split_size, 0, self.split_size, height)
+                self.aside = Scrollable(width - self.split_size, 0, self.split_size, height, scroll_speed=self.scroll_speed)
                 self.aside.children = side_content
 
                 self.split = Draggable((width - self.split_size) - 2, 0, 4, height, lock_vertical=True)
@@ -2085,9 +2167,9 @@ class Collapsable:
                     self.split.x = width - 2
             
             elif self.split_type == Collapsable.SplitType.VERTICAL_RIGHT:
-                self.main_area = Scrollable(self.split_size, 0, width - self.split_size, height)
+                self.main_area = Scrollable(self.split_size, 0, width - self.split_size, height, scroll_speed=self.scroll_speed)
                 self.main_area.children = main_content
-                self.aside = Scrollable(0, 0, self.split_size, height)
+                self.aside = Scrollable(0, 0, self.split_size, height, scroll_speed=self.scroll_speed)
                 self.aside.children = side_content
 
                 self.split = Draggable(self.split_size - 2, 0, 4, height, lock_vertical=True)
@@ -2099,9 +2181,9 @@ class Collapsable:
                     self.split.x = -2
 
             elif self.split_type == Collapsable.SplitType.HORIZONTAL_TOP:
-                self.main_area = Scrollable(0, 0, width, height - self.split_size)
+                self.main_area = Scrollable(0, 0, width, height - self.split_size, scroll_speed=self.scroll_speed)
                 self.main_area.children = main_content
-                self.aside = Scrollable(0, height - self.split_size, width, self.split_size)
+                self.aside = Scrollable(0, height - self.split_size, width, self.split_size, scroll_speed=self.scroll_speed)
                 self.aside.children = side_content
 
                 self.split = Draggable(0, (height - self.split_size) - 2, width, 4, lock_horizontal=True)
@@ -2113,9 +2195,9 @@ class Collapsable:
                     self.split.y = height - 2
 
             elif self.split_type == Collapsable.SplitType.HORIZONTAL_BOTTOM:
-                self.main_area = Scrollable(0, self.split_size, width, height - self.split_size)
+                self.main_area = Scrollable(0, self.split_size, width, height - self.split_size, scroll_speed=self.scroll_speed)
                 self.main_area.children = main_content
-                self.aside = Scrollable(0, 0, width, self.split_size)
+                self.aside = Scrollable(0, 0, width, self.split_size, scroll_speed=self.scroll_speed)
                 self.aside.children = side_content
 
                 self.split = Draggable(0, self.split_size-2, width, 4, lock_horizontal=True)
@@ -2253,11 +2335,11 @@ class Collapsable:
 
             editor.screen.blit(self.screen, (X+self.x, Y+self.y))
             if self.split.hovered and self.split_draggable:
-                editor.screen.fill((0, 0, 0), (X+self.x+self.split.x, Y+self.y+self.split.y, self.split.width, self.split.height))
+                editor.screen.fill(self.split_color, (X+self.x+self.split.x, Y+self.y+self.split.y, self.split.width, self.split.height))
             elif self.split_type in [Collapsable.SplitType.VERTICAL_LEFT, Collapsable.SplitType.VERTICAL_RIGHT]:
-                editor.screen.fill((0, 0, 0), (X+self.x+self.split.x+2, Y+self.y+self.split.y, 1, self.split.height))
+                editor.screen.fill(self.split_color, (X+self.x+self.split.x+2, Y+self.y+self.split.y, 1, self.split.height))
             elif self.split_type in [Collapsable.SplitType.HORIZONTAL_TOP, Collapsable.SplitType.HORIZONTAL_BOTTOM]:
-                editor.screen.fill((0, 0, 0), (X+self.x+self.split.x, Y+self.y+self.split.y+2, self.split.width, 1))
+                editor.screen.fill(self.split_color, (X+self.x+self.split.x, Y+self.y+self.split.y+2, self.split.width, 1))
 
     def __init__(self, x:int, y:int, width:int, height:int, main_content:list=[], side_content:list=[], **options): # pylint: disable=dangerous-default-value
         """
@@ -2339,7 +2421,7 @@ class NumberedTextArea(UIElement):
         def __init__(self, lines:list):
             self.lines = lines
 
-    def __init__(self, x:int, y:int, width:int, height:int, text_color:Color|tuple|int=TEXT_COLOR, text_bg_color:Color|Image|Animation|tuple|int=TEXT_BG_COLOR):
+    def __init__(self, x:int, y:int, width:int, height:int, text_color:Color|tuple|int=TEXT_COLOR, text_bg_color:Color|Image|Animation|tuple|int=TEXT_BG_COLOR, scroll_speed=SCROLL_MULTIPLIER, split_color=None):
         assert width >= 200, "width must be 200 or more (sorry)"
         self.x = x
         self.y = y
@@ -2348,7 +2430,7 @@ class NumberedTextArea(UIElement):
         self.text_color = Color.color(text_color)
         self.text_bg_color = Color.color(text_bg_color)
         self.lines = MultilineText(0, 0, 75, self.height, f"{'1': >9}", self.text_color, self.text_bg_color)
-        self.editable = MultilineTextBox(5, 0, self.width-75, self.height, "", self.text_color, self.text_bg_color)
+        self.editable = MultilineTextBox(2, 0, self.width-75, self.height, "", self.text_color, self.text_bg_color)
 
         self.collapsable = Collapsable(
             self.x, self.y,
@@ -2361,7 +2443,9 @@ class NumberedTextArea(UIElement):
             ],
             split_type=Collapsable.SplitType.VERTICAL_RIGHT,
             split_draggable=False,
-            split_size=75
+            split_size=75,
+            scroll_speed = scroll_speed,
+            
         )
 
         self.collapsable.main_area.left_bound = 0
@@ -2623,7 +2707,6 @@ class DirectoryTree(UIElement):
             return DirectoryTree.Folder(name, self.width, comps, parent)
         else:
             return DirectoryTree.File(name, tree, self._get_icon_for_file(name), self.width, parent)
-                    
 
     def __init__(self, x, y, name, components:dict, width):
         self.x = x
@@ -2645,8 +2728,7 @@ class DirectoryTree(UIElement):
         
         self.folder = DirectoryTree.Folder(self.name, width, self.components, self, False)
         self.surface.children.append(self.folder)
-        
-        
+
     def _update(self, editor, X, Y):
         
         # print("dir tree update!")
@@ -2808,7 +2890,7 @@ class Editor:
                     i._update(self, 0, 0)
             #self.screen.fill((255, 0, 0), (self.mouse_pos[0]-1, self.mouse_pos[1]-1, 3, 3))
 
-            print(self._hovering)
+            # print(self._hovering)
             pygame.display.update()
 
 
@@ -3114,7 +3196,7 @@ class FileEditor(UIElement):
         with open(self.file_location, "r+", encoding="utf-8") as f:
             self.contents = f.read()
         
-        self.edit_area = MultilineTextBox(self.x, self.y, self.width, self.height)
+        self.edit_area = NumberedTextArea(self.x, self.y, self.width, self.height, text_bg_color=(31, 31, 31), scroll_speed=45)
         
         self.edit_area.set_content(self.contents)
 
@@ -3130,6 +3212,42 @@ class FileEditor(UIElement):
         
         self.edit_area._event(editor, X, Y)
 
+
+class Opener:
+    def __init__(self, sub_app, file_path, editor):
+        self.sub_app = sub_app
+        self.file_path = file_path
+        self.editor = editor
+    def __call__(s, *_, **__): # pylint: disable=no-self-argument
+        self = s.sub_app
+        editor = s.editor
+        file_path = s.file_path
+        
+        if file_path not in self.open_files.keys():
+            new = {file_path: FileEditor(329, 41, editor.width-329, editor.height-62, file_path, file_path.rsplit("/", 1)[-1], editor)}
+            self.open_files.update(new)
+            n = "  " + file_path.rsplit("/", 1)[-1] + "   "
+            self.file_tabs.add_tab(n, [new[file_path]])
+            
+            tab = self.file_tabs.get_tab(n)
+            
+            ico = LayeredObjects({"0": [
+                DirectoryTree.file_icons[DirectoryTree._get_icon_for_file(None, file_path)]
+            ]}, 4, 4)
+            close_button = Button(tab.width - 20, 1, 14, 14, "X", None)
+            close_button.on_left_click = self.tab_remover_getter(n)
+            
+            self.file_tabs.add_tab_children(n, (
+                ico,
+                close_button
+            ))
+            tab.children = [ico, close_button]
+            
+            print(tab, tab.children)
+            
+        self.file_tabs.active_tab = "  " + file_path.rsplit("/", 1)[-1] + "   "
+        self.file_tabs.reset_tab_colors()
+        self.focused_file = file_path
 
 class FileEditorSubApp(UIElement):
     
@@ -3158,18 +3276,22 @@ class FileEditorSubApp(UIElement):
         
         self.dir_tree = DirectoryTree(103, 21, folder_name.replace("./", "").rsplit("/", 1)[-1].upper(), dir_tree[folder_name], 225)
             
+    def tab_remover_getter(self, tab_name):
+        
+        def remove_tab(*_, **__):
+            self.file_tabs.remove_tab(tab_name)
+            for k, c in self.open_files.copy().items():
+                if c.file_name == tab_name.strip():
+                    self.open_files.pop(k)
+                    break
+            if self.focused_file == tab_name:
+                self.focused_file = None
+        
+        return remove_tab
         
     def file_opener_getter(self, file_path, editor):
         
-        def open_file(*_, **__):
-            if file_path not in self.open_files:
-                new = {file_path: FileEditor(329, 36, editor.width-329, editor.height-57, file_path, file_path.rsplit("/", 1)[-1], editor)}
-                self.open_files.update(new)
-                self.file_tabs.add_tab(file_path.rsplit("/", 1)[-1], [new[file_path]])
-            self.focused_file = file_path
-            self.file_tabs.active_tab = file_path.rsplit("/", 1)[-1]
-        
-        return open_file
+        return Opener(self, file_path, editor)
     
     def __init__(self, code_editor, editor):
         self.code_editor = code_editor
@@ -3186,7 +3308,13 @@ class FileEditorSubApp(UIElement):
         self.explorer_bar = Box(328, 21, 1, editor.height-42, (70, 70, 70))
         self.children.append(self.explorer_bar)
         
-        self.file_tabs = Tabs(329, 36, editor.width-329, 15, tab_data={}, tab_color_unselected=(24, 24, 24), tab_color_hovered=(31, 31, 31), tab_color_selected=(31, 31, 31), tab_color_empty=(24, 24, 24), tab_width=100)
+        self.file_tabs = Tabs(
+            329, 41, editor.width-329, 15, tab_data={},
+            tab_color_unselected=(24, 24, 24), tab_color_hovered=(31, 31, 31),
+            tab_color_selected=(31, 31, 31), tab_color_empty=(24, 24, 24),
+            tab_width=100, tab_height=20, scrollable_tabs=True,
+            tab_padding=0
+        )
         self.children.append(self.file_tabs)
         
     def _update(self, editor, X, Y):

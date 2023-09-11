@@ -1936,12 +1936,12 @@ class Tabs(UIElement):
             editor.screen.fill(tuple(self.content_bg_color), (X+self.x, Y+self.y, self.width, self.height))
 
         if self.scrollable_tabs:
+            self._tabs_area._update(editor, X, Y)
             for child in self._tabs_area.children:
                 if _c := self.tab_children.get(child.text, None):
                     for c in _c:
-                        print(f"child update: {c} @ ({child.x}, {child.y})")
-                        c._update(self._tabs_area, child.x, child.y)
-            self._tabs_area._update(editor, X, Y)
+                        # print(f"child update: {c} @ ({X+self.x+child.x}, {Y+self.y+child.y-self.tab_height})")
+                        c._update(editor, X+self.x+child.x, Y+self.y+child.y-self.tab_height)
         else:
             for tab in self._tab_objects:
                 tab:Tabs._Tab
@@ -1962,13 +1962,13 @@ class Tabs(UIElement):
             c._event(editor, X, Y)
 
         if self.scrollable_tabs:
-            print(f"tab children: {self.tab_children}")
+            # print(f"tab children: {self.tab_children}")
             for child in self._tabs_area.children:
-                print(child.text)
+                # print(child.text)
                 if _c := self.tab_children.get(child.text, None):
                     for c in _c:
-                        print(f"child event: {c} @ ({child.x}, {child.y})")
-                        c._event(self._tabs_area, child.x, child.y)
+                        # print(f"child event: {c} @ ({X+self.x+child.x}, {Y+self.y+child.y-self.tab_height})")
+                        c._event(editor, X+self.x+child.x, Y+self.y+child.y-self.tab_height)
             self._tabs_area._event(editor, X, Y)
         else:
             for tab in self._tab_objects:

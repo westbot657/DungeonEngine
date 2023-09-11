@@ -1936,11 +1936,12 @@ class Tabs(UIElement):
             editor.screen.fill(tuple(self.content_bg_color), (X+self.x, Y+self.y, self.width, self.height))
 
         if self.scrollable_tabs:
-            self._tabs_area._update(editor, X, Y)
             for child in self._tabs_area.children:
                 if _c := self.tab_children.get(child.text, None):
                     for c in _c:
-                        c._update(editor, child.x, child.y)
+                        print(f"child update: {c} @ ({child.x}, {child.y})")
+                        c._update(self._tabs_area, child.x, child.y)
+            self._tabs_area._update(editor, X, Y)
         else:
             for tab in self._tab_objects:
                 tab:Tabs._Tab
@@ -1966,7 +1967,8 @@ class Tabs(UIElement):
                 print(child.text)
                 if _c := self.tab_children.get(child.text, None):
                     for c in _c:
-                        c._event(editor, child.x, child.y)
+                        print(f"child event: {c} @ ({child.x}, {child.y})")
+                        c._event(self._tabs_area, child.x, child.y)
             self._tabs_area._event(editor, X, Y)
         else:
             for tab in self._tab_objects:
@@ -3327,7 +3329,7 @@ class FileEditorSubApp(UIElement):
         self.children.append(self.explorer_bar)
         
         self.file_tabs = Tabs(
-            329, 41, editor.width-329, 15, tab_data={},
+            329, 41, editor.width-329, 15,
             tab_color_unselected=(24, 24, 24), tab_color_hovered=(31, 31, 31),
             tab_color_selected=(31, 31, 31), tab_color_empty=(24, 24, 24),
             tab_width=100, tab_height=20, scrollable_tabs=True,
@@ -3343,7 +3345,6 @@ class FileEditorSubApp(UIElement):
         # if self.focused_file:
         #     self.open_files[self.focused_file]._update(editor, X, Y)
             
-        
     def _event(self, editor, X, Y):
 
         # if self.focused_file:

@@ -3202,6 +3202,8 @@ class GameApp(UIElement):
                 self.no_combat_text._update(editor, X, Y)
 
 
+# Dungeon Building Editors:
+
 class FileEditor(UIElement):
     
     def __init__(self, x, y, width, height, file_location, file_name, editor):
@@ -3230,6 +3232,38 @@ class FileEditor(UIElement):
         self.edit_area.height = self.height
         
         self.edit_area._event(editor, X, Y)
+
+# class ImageEditor(UIElement): # Text / Visual
+
+# class LootTableEditor(UIElement): # Visual
+
+# class GameObjectEditor(UIElement): # this may need to be split into dedicated editors for each item type
+
+# class StatusEffectEditor(UIElement): # Visual
+
+# class AttackEditor(UIElement): # Visual
+
+# class EnemyEditor(UIElement): # Visual
+
+# class CombatEditor(UIElement): # Text / Visual
+
+# class InteractableEditor(UIElement): # Visual
+
+# class RoomEditor(UIElement): # Visual
+
+# class DungeonEditor(UIElement): # Visual
+
+# class BlockCodeEditor(UIElement): # Visual # save this for last, it's a whole project on it's own
+
+
+# Debug Editors:
+
+# class PlayerEditor(UIElement):
+
+# class InventoryEditor(UIElement):
+
+
+
 
 
 class Opener:

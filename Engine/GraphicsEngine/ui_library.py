@@ -1885,13 +1885,13 @@ class Tabs(UIElement):
                 self.tab_data.get(tab_name).append(c)
 
     def add_tab_children(self, tab_name:str, children:list|tuple):
-        print(f"ADD CHILDREN: '{tab_name}' <- {children}")
+        # print(f"ADD CHILDREN: '{tab_name}' <- {children}")
         if tab_name in self.tab_data.keys():
             if tab_name not in self.tab_children.keys():
                 self.tab_children.update({tab_name: []})
             for c in children:
                 self.tab_children[tab_name].append(c)
-        print(f"ALL CHILDREN of '{tab_name}': {self.get_tab(tab_name).children}")
+        # print(f"ALL CHILDREN of '{tab_name}': {self.get_tab(tab_name).children}")
 
     def remove_content(self, tab_name:str, item):
         if tab_name in self.tab_data.keys():
@@ -3252,8 +3252,8 @@ class Opener:
             
             ico = LayeredObjects({"0": [
                 DirectoryTree.file_icons[DirectoryTree._get_icon_for_file(None, file_path)]
-            ]}, 4, 4)
-            close_button = Button(tab.width - 20, 1, 14, 14, "X", None)
+            ]}, 2, 4)
+            close_button = Button(tab.width - 15, 1, 14, 14, "X", None, text_size=12)
             close_button.on_left_click = self.tab_remover_getter(n)
             
             self.file_tabs.add_tab_children(n, (
@@ -3262,7 +3262,7 @@ class Opener:
             ))
             # tab.children = [ico, close_button]
             
-            print(tab, tab.children)
+            # print(tab, tab.children)
             
         self.file_tabs.active_tab = "  " + file_path.rsplit("/", 1)[-1] + "   "
         self.file_tabs.reset_tab_colors()

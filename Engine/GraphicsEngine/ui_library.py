@@ -1654,7 +1654,7 @@ class Tabs(UIElement):
         self.height = height
         self.tab_style = tab_style
         self.tab_data = tab_data
-        self.tab_children = options.get("tab_children", {})
+        self.tab_children = options.get("tab_children", None) or {}
         # self.tx = 0
         # self.ty = 0
         if tab_data:
@@ -1873,10 +1873,10 @@ class Tabs(UIElement):
         
         self.reset_tab_colors()
 
-    def add_tab(self, tab_name:str, contents:list=..., children:list=[]):
+    def add_tab(self, tab_name:str, contents:list=..., children:list=None):
         if contents is ...: contents = []
         self.tab_data[tab_name] = contents
-        self.tab_children[tab_name] = children
+        self.tab_children[tab_name] = children or []
         self.load_tabs()
 
     def add_content(self, tab_name:str, contents:list|tuple):
@@ -1957,7 +1957,6 @@ class Tabs(UIElement):
     def _event(self, editor, X, Y):
         content = self.tab_data.get(self.active_tab, [])
         
-        content.reverse()
         for c in content:
             c._event(editor, X, Y)
 
@@ -1965,7 +1964,7 @@ class Tabs(UIElement):
             # print(f"tab children: {self.tab_children}")
             for child in self._tabs_area.children:
                 # print(child.text)
-                if _c := self.tab_children.get(child.text, None):
+                if (_c := self.tab_children.get(child.text, None)) is not None:
                     for c in _c:
                         # print(f"child event: {c} @ ({X+self.x+child.x}, {Y+self.y+child.y-self.tab_height})")
                         c._event(editor, X+self.x+child.x, Y+self.y+child.y-self.tab_height)

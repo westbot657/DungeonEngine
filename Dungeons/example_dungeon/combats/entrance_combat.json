@@ -38,6 +38,13 @@
                 }
             ]
         },
-        "zombie1-1-health-check-3": {}
+        "zombie1-1-health-check-3": {
+            "functions": [
+                {
+                    "function": "engine:combat/message",
+                    "message": "test: zombie 1 has <= 3 health?"
+                }
+            ]
+        }
     }
 }

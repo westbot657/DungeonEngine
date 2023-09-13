@@ -806,7 +806,7 @@ class MultilineTextBox(UIElement):
         self._text_selection_start = None
         self._text_selection_end = None
         self._highlight_offset = [0, 0]
-        self._highlight = pygame.image.load(f"{PATH}/highlight.png")#pygame.Surface((1, 1), pygame.SRCALPHA, 32) # pylint: disable=no-member
+        self._highlight = pygame.image.load(f"{PATH}/highlight.png")#pygame.Surface((1, 1), pygame.SRCALPHA, 24) # pylint: disable=no-member
         self.highlights = []
         self._save = self._default_save_event
         self.set_content(content)
@@ -987,7 +987,6 @@ class MultilineTextBox(UIElement):
         else:
             self.hovered = False
 
-        
         if editor.left_mouse_down():
             if self.hovered:
                 #if self.focused:
@@ -2144,7 +2143,10 @@ class Collapsable:
         HORIZONTAL_BOTTOM = auto()
 
     class _Collapsable(UIElement):
-        def __init__(self, parent:UIElement, x:int, y:int, width:int, height:int, main_content:list=[], side_content:list=[], **options): # pylint: disable=dangerous-default-value
+        def __init__(self, parent:UIElement, x:int, y:int, width:int, height:int, main_content:list=None, side_content:list=None, **options): # pylint: disable=dangerous-default-value
+            
+            main_content = main_content or []
+            side_content = side_content or []
             
             self.parent = parent
             self.x = x
@@ -2473,9 +2475,13 @@ class NumberedTextArea(UIElement):
         self.collapsable.aside.top_bound = 0
         self.collapsable.aside.right_bound = 0
 
-    def _update_layout(self, editor):
-        self.lines.height = self.editable.min_height = self.height
+    def _update_layout(self):
+        # print(f"Numbered text area _update_layout!")
+        self.lines.min_height = self.editable.min_height = self.height
+        self.collapsable.height = self.collapsable.main_area.height = self.collapsable.aside.height = self.height-10
+        self.collapsable.width = self.width
         self.editable.min_width = self.width-75
+
 
     def set_content(self, content:str):
         self.editable.set_content(content)
@@ -2485,7 +2491,7 @@ class NumberedTextArea(UIElement):
         
     def _event(self, editor, X, Y):
         
-        self._update_layout(editor)
+        # self._update_layout(editor)
         
         self.collapsable._event(editor, X, Y)
 
@@ -2747,6 +2753,9 @@ class DirectoryTree(UIElement):
         
         self.folder = DirectoryTree.Folder(self.name, width, self.components, self, False)
         self.surface.children.append(self.folder)
+
+    def _update_layout(self, editor):
+        self.surface.height = editor.height-42
 
     def _update(self, editor, X, Y):
         
@@ -3221,10 +3230,18 @@ class FileEditor(UIElement):
         
         self.edit_area.set_content(self.contents)
 
+    def _update_layout(self, editor):
+        self.edit_area.width = self.width
+        self.edit_area.height = self.height
+        
+        self.edit_area._update_layout()
+
     def _update(self, editor, X, Y):
         self.edit_area._update(editor, X, Y)
     
     def _event(self, editor, X, Y):
+        
+        self._update_layout(FileEditorSubApp)
         
         self.edit_area.x = self.x
         self.edit_area.y = self.y
@@ -3233,11 +3250,20 @@ class FileEditor(UIElement):
         
         self.edit_area._event(editor, X, Y)
 
-# class ImageEditor(UIElement): # Text / Visual
+# class ImageEditor(UIElement): # Text / Visual # not very important, could just have it launch piskel
 
 # class LootTableEditor(UIElement): # Visual
 
-# class GameObjectEditor(UIElement): # this may need to be split into dedicated editors for each item type
+class GameObjectEditor(UIElement): # this may need to be split into dedicated editors for each item type
+    def __init__(self):
+        ...
+    
+    def _update(self, editor, X, Y):
+        ...
+    
+    def _event(self, editor, X, Y):
+        ...
+
 
 # class StatusEffectEditor(UIElement): # Visual
 
@@ -3370,6 +3396,25 @@ class FileEditorSubApp(UIElement):
         )
         self.children.append(self.file_tabs)
         
+    def _update_layout(self, editor):
+        self.explorer_bar.height = editor.height-42
+        self.file_tabs.width = editor.width-329
+        
+        self.dir_tree._update_layout(editor)
+        
+        # content = self.file_tabs.tab_data.get(self.file_tabs.active_tab, [])
+        
+        # for c in content:
+        #     if hasattr(c, "_update_layout"):
+        #         c._update_layout(editor)
+
+        if file_editor := self.file_tabs.tab_data.get(self.file_tabs.active_tab, [None])[0]:
+            file_editor.width = editor.width-329
+            file_editor.height = editor.height-42
+            file_editor._update_layout(editor)
+        
+
+        
     def _update(self, editor, X, Y):
         
         for child in self.children:
@@ -3380,6 +3425,8 @@ class FileEditorSubApp(UIElement):
             
     def _event(self, editor, X, Y):
 
+
+        # self._update_layout(editor)
         # if self.focused_file:
         #     self.open_files[self.focused_file]._event(editor, X, Y)
         
@@ -3430,8 +3477,12 @@ class EditorApp(UIElement):
 
     def _update_layout(self, editor):
         self.sub_app_bar.height = self.sub_app_bar_line.height = editor.height - 42
+        
+        self.sub_app_file_editor._update_layout(editor)
 
     def _event(self, editor, X, Y):
+        
+        self._update_layout(editor)
         
         if self.active_app:
             self.active_app._event(editor, X, Y)
@@ -3801,14 +3852,14 @@ class CodeEditor(UIElement):
 
         if self.selected_drag in ["bottom_drag", "bottom_right_drag", "bottom_left_drag"]:
             # print(rmy, rsy, rmy-rsy)
-            editor.height = max(100, rmy - rsy)
+            editor.height = max(405, rmy - rsy)
             self._update_layout(editor)
         if self.selected_drag in ["left_drag", "bottom_left_drag"]:
             editor.set_window_location(min (rmx, self.drag_offset[0]-100), self.drag_offset[1])
-            editor.width = max(100, self.drag_offset[0] - rmx)
+            editor.width = max(720, self.drag_offset[0] - rmx)
             self._update_layout(editor)
         if self.selected_drag in ["right_drag", "bottom_right_drag"]:
-            editor.width = max(100, rmx - rsx)
+            editor.width = max(720, rmx - rsx)
             self._update_layout(editor)
 
 
@@ -3875,6 +3926,15 @@ Combat Sequence Editor:
 ╠════════════════════════════════════════════════╣            ║ <- end of sub-sequence 2A/2B/2C 
 ║ ...                                            ║            ║ 
 ╚════════════════════════════════════════════════╩════════════╝ <- end of combat sequence
+
+
+Map Saving:
+
+rect: [center X, center Y, width, height, rotation]
+image: [center X, center Y, width, height, rotation], src: <file location>
+
+
+
 
 """
 

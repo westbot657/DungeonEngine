@@ -3,6 +3,8 @@
 $m1 = "You enter the Ancient Grove of the Shadow Ent.\nYou see a small pedestal"
 $m3 = ", an overgrown `door` with a faded emblem on it, and passages to the `left` and `right`"
 
+[engine:combat/start]("example_dungeon:combats/entrance_combat")
+
 if ([engine:player/has_game_object]("example_dungeon:weapons/ritual_staff")) {
     [engine:player/message](
         [engine:text/join](

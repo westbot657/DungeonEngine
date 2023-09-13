@@ -1,0 +1,19 @@
+{
+    "config": {},
+    "dungeons": {
+        "energia_city": {},
+        "example_dungeon": {},
+        "nonsense_dungeon": {},
+        "world": {}
+    },
+    "editor": {
+        "weapons": {},
+        "items": {},
+        "tools": {},
+        "armor": {},
+        "ammo": {},
+        "attacks": {},
+        "interactables": {},
+        "status_effects": {}
+    }
+}

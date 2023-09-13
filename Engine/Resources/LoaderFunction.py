@@ -180,7 +180,7 @@ class LoaderFunction:
         if call := cls.check(function_memory, data):
             return call(function_memory, **data)
         else:
-            print(f"Invalid arguments given to function: {cls.id.full()}")
+            print(f"Invalid arguments given to function: {cls.id.full()}: {data}")
 
 
 

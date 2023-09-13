@@ -2178,7 +2178,7 @@ class Engine_List_ForEach(LoaderFunction):
         match args:
             case {
                 "list": list()|dict(),
-                "run": dict()
+                "run": list()|dict()
             }:
                 return cls.for_each
             case _: return None
@@ -2192,7 +2192,7 @@ class Engine_List_ForEach(LoaderFunction):
             lst = function_memory.evaluateFunction(lst)
 
 
-        func: dict = args.get("run")
+        func: dict|list = args.get("run")
         for l in lst:
 
             ev = function_memory.generatorEvaluateFunction(l)

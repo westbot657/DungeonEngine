@@ -1738,7 +1738,7 @@ class Tabs(UIElement):
                     self.text_color_unselected, self.text_color_hovered, self.text_color_selected,
                     self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected
                 )
-                # t.children = self.tab_children.get(name, list())
+                t.children = self.tab_children.get(name, list())
                 print("CHILDREN: ", t.children)
                 if self.active_tab == name:
                     t.on_left_click(None)
@@ -1768,7 +1768,7 @@ class Tabs(UIElement):
                 y = -self.tab_height
             for name in self.tab_data.keys():
                 t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.TOP, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
-                # t.children = self.tab_children.get(name, list())
+                t.children = self.tab_children.get(name, list())
                 print("CHILDREN: ", t.children)
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
@@ -1795,7 +1795,7 @@ class Tabs(UIElement):
                 y = self.tab_buffer
             for name in self.tab_data.keys():
                 t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.LEFT, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
-                # t.children = self.tab_children.get(name, list())
+                t.children = self.tab_children.get(name, list())
                 print("CHILDREN: ", t.children)
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
@@ -1822,7 +1822,7 @@ class Tabs(UIElement):
                 y = self.tab_buffer
             for name in self.tab_data.keys():
                 t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.LEFT, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
-                # t.children = self.tab_children.get(name, list())
+                t.children = self.tab_children.get(name, list())
                 print("CHILDREN: ", t.children)
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
@@ -1850,7 +1850,7 @@ class Tabs(UIElement):
                 y = 0
             for name in self.tab_data.keys():
                 t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.MENU, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
-                # t.children = self.tab_children.get(name, list())
+                t.children = self.tab_children.get(name, list())
                 print("CHILDREN: ", t.children)
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
@@ -1937,18 +1937,18 @@ class Tabs(UIElement):
 
         if self.scrollable_tabs:
             self._tabs_area._update(editor, X, Y)
-            for child in self._tabs_area.children:
-                if _c := self.tab_children.get(child.text, None):
-                    for c in _c:
-                        # print(f"child update: {c} @ ({X+self.x+child.x}, {Y+self.y+child.y-self.tab_height})")
-                        c._update(editor, X+self.x+child.x, Y+self.y+child.y-self.tab_height)
+            # for child in self._tabs_area.children:
+            #     if _c := self.tab_children.get(child.text, None):
+            #         for c in _c:
+            #             # print(f"child update: {c} @ ({X+self.x+child.x}, {Y+self.y+child.y-self.tab_height})")
+            #             c._update(editor, X+self.x+child.x, Y+self.y+child.y-self.tab_height)
         else:
             for tab in self._tab_objects:
                 tab:Tabs._Tab
                 tab._update(editor, X+self.x, Y+self.y)
-                if _c := self.tab_children.get(tab.text, None):
-                    for c in _c:
-                        c._update(editor, X+self.x+tab.x, Y+self.x+tab.y)
+                # if _c := self.tab_children.get(tab.text, None):
+                #     for c in _c:
+                #         c._update(editor, X+self.x+tab.x, Y+self.x+tab.y)
         
         content = self.tab_data.get(self.active_tab, [])
         for c in content:
@@ -1962,19 +1962,19 @@ class Tabs(UIElement):
 
         if self.scrollable_tabs:
             # print(f"tab children: {self.tab_children}")
-            for child in self._tabs_area.children:
-                # print(child.text)
-                if (_c := self.tab_children.get(child.text, None)) is not None:
-                    for c in _c:
-                        # print(f"child event: {c} @ ({X+self.x+child.x}, {Y+self.y+child.y-self.tab_height})")
-                        c._event(editor, X+self.x+child.x, Y+self.y+child.y-self.tab_height)
+            # for child in self._tabs_area.children:
+            #     print(child.text)
+            #     if (_c := self.tab_children.get(child.text, None)) is not None:
+            #         for c in _c:
+            #             # print(f"child event: {c} @ ({X+self.x+child.x}, {Y+self.y+child.y-self.tab_height})")
+            #             c._event(editor, X+self.x+child.x, Y+self.y+child.y-self.tab_height)
             self._tabs_area._event(editor, X, Y)
         else:
             for tab in self._tab_objects:
                 tab:Tabs._Tab
-                if _c := self.tab_children.get(tab.text, None):
-                    for c in _c:
-                        c._event(editor, X+self.x+tab.x, Y+self.x+tab.y)
+                # if _c := self.tab_children.get(tab.text, None):
+                #     for c in _c:
+                #         c._event(editor, X+self.x+tab.x, Y+self.x+tab.y)
                 tab._event(editor, X+self.x, Y+self.y)
 
 class Scrollable:

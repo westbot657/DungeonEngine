@@ -1,7 +1,7 @@
+# pylint: disable=[W,R,C,import-error,no-member,no-name-in-module,too-many-lines]
 # (C) Weston Day
 # pygame UI Library
 
-# pylint: disable=[W,R,C,import-error,no-member,no-name-in-module]
 import pygame
 #import PIL
 import time

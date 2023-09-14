@@ -2478,8 +2478,8 @@ class NumberedTextArea(UIElement):
     def _update_layout(self):
         # print(f"Numbered text area _update_layout!")
         self.lines.min_height = self.editable.min_height = self.height
-        self.collapsable.height = self.collapsable.main_area.height = self.collapsable.aside.height = self.height-10
-        self.collapsable.width = self.width
+        self.collapsable.height = self.collapsable.main_area.height = self.collapsable.aside.height = self.height-20
+        self.collapsable.width = self.width-5
         self.editable.min_width = self.width-75
 
 
@@ -3412,8 +3412,6 @@ class FileEditorSubApp(UIElement):
             file_editor.width = editor.width-329
             file_editor.height = editor.height-42
             file_editor._update_layout(editor)
-        
-
         
     def _update(self, editor, X, Y):
         

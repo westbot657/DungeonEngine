@@ -3851,10 +3851,12 @@ class CodeEditor(UIElement):
         if self.selected_drag in ["bottom_drag", "bottom_right_drag", "bottom_left_drag"]:
             # print(rmy, rsy, rmy-rsy)
             editor.height = max(405, rmy - rsy)
+            # print(editor.height)
             self._update_layout(editor)
         if self.selected_drag in ["left_drag", "bottom_left_drag"]:
             editor.set_window_location(min (rmx, self.drag_offset[0]-100), self.drag_offset[1])
             editor.width = max(720, self.drag_offset[0] - rmx)
+            # print(editor.width)
             self._update_layout(editor)
         if self.selected_drag in ["right_drag", "bottom_right_drag"]:
             editor.width = max(720, rmx - rsx)

@@ -3866,15 +3866,15 @@ class CodeEditor(UIElement):
         if (not editor.mouse[0]) and editor.previous_mouse[0]:
             self.selected_drag = ""
             
-        if self.active_app == "game":
-            self.game_app._event(editor, X, Y)
-        elif self.active_app == "editor":
-            self.editor_app._event(editor, X, Y)
-            
         _c = self.children.copy()
         _c.reverse()
         for child in _c:
             child._event(editor, X, Y)
+            
+        if self.active_app == "game":
+            self.game_app._event(editor, X, Y)
+        elif self.active_app == "editor":
+            self.editor_app._event(editor, X, Y)
 
 if __name__ == "__main__":
     # from threading import Thread

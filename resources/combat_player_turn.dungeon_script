@@ -6,8 +6,9 @@
     @pattern: [engine:text/set_case] (<element.name>, "lower")
     #{
         // if so, player attacks the enemy
+        // [engine:debug/breakpoint]
         [engine:player/attack_enemy](<#player>, <element>)
-        break
+        // break
     }
 }
 

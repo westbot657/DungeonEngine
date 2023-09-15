@@ -47,13 +47,13 @@ class Enemy(Entity):
             def __init__(self):
                 super().__init__("Cancel Attack")
 
-    def __init__(self, abstract, name:str, max_health:int, health:int, attacks:list[Attack], location:Location, position:Position):
+    def __init__(self, abstract, name:str, max_health:int, health:int, attacks:list[Attack], location:Location, position:Position, uid=None):
         self.abstract = abstract
         self.name = name
         self.max_health = max_health
         self.health = health
         self.attacks = attacks
-        self.uid = None
+        self.uid = uid
         super().__init__(location, position)
         self.events: dict[str, dict] = {}
 
@@ -221,6 +221,7 @@ class Enemy(Entity):
         if current_trigger is None and self.combat is not None:
             current_trigger = self.combat.last_trigger
         print(f"Enemy.onEvent() called!  {event_name=} {current_trigger=}")
+        out = None
         for trigger in [current_trigger, "@global", "@required"]:
             if trigger in self.events:
                 if (event := self.events[trigger].get(event_name, None)):
@@ -237,7 +238,9 @@ class Enemy(Entity):
                         v = e.value or (v if not isinstance(v, _EngineOperation) else None)
 
                     self.postEvaluate(function_memory)
-                    return v
+                    if v:
+                        out = v
+        return out
 
     def _get_save(self, function_memory:FunctionMemory) -> dict:
         return {}

@@ -7,8 +7,8 @@
             "name": "Zombie 1",
             "events": {
                 "@start": {
-                    "on_damaged": {
-                        "#call": "$enemy_health_check",
+                    "on_attacked": {
+                        "#call": "$combat:enemy_health_check",
                         "parameters": {
                             "target_health": 3
                         }

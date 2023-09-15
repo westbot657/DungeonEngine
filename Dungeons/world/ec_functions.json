@@ -71,7 +71,7 @@
             "trigger": {
                 "function": "engine:text/join",
                 "text": [
-                    {"#ref": "#enemy.id"},
+                    {"#ref": "#enemy.uid"},
                     "health-check",
                     {"#ref": "target_health"}
                 ],

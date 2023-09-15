@@ -149,7 +149,7 @@ class Combat(FunctionalElement):
         
         for abstract_enemy in self.abstract_enemies:
             if abstract_enemy._id == enemy_id:
-                enemy = abstract_enemy.createInstance(function_memory, self.location.copy(), Map.getRandomEnemySpawnPosition(function_memory.engine.loader.getLocation(function_memory, self.location).map))
+                enemy = abstract_enemy.createInstance(function_memory, self.location.copy(), Map.getRandomEnemySpawnPosition(function_memory.engine.loader.getLocation(function_memory, self.location).map), uid=enemy_id)
                 self._enemies.update({enemy_id: enemy})
                 self.enemies.append(enemy)
                 enemy.combat = self
@@ -379,6 +379,7 @@ class Combat(FunctionalElement):
                     )
 
             case Combat.Operation.Trigger():
+                self.old_trigger = self.last_trigger
                 self.last_trigger = operation.event_name
 
             case Combat.Operation.Spawn():
@@ -476,11 +477,27 @@ class Combat(FunctionalElement):
                         print(e)
 
             if self.last_trigger is None:
-                self.last_trigger = "@start"
+                self.last_trigger = self.old_trigger = "@start"
                 if (start := self.sequence.get("@start", None)) is not None:
                     self.prepFunctionMemory(function_memory)
 
                     ev = function_memory.generatorEvaluateFunction(start)
+                    v = None
+                    try:
+                        v = ev.send(None)
+                        if isinstance(v, _EngineOperation):
+                            self.evaluateResult(v, 0)
+                    except StopIteration as e:
+                        if isinstance(e.value, _EngineOperation):
+                            self.evaluateResult(e.value, 0)
+                    ...
+
+            if self.old_trigger != self.last_trigger:
+                self.old_trigger = self.last_trigger
+                if (seq := self.sequence.get(self.last_trigger, None)) is not None:
+                    self.prepFunctionMemory(function_memory)
+
+                    ev = function_memory.generatorEvaluateFunction(seq)
                     v = None
                     try:
                         v = ev.send(None)

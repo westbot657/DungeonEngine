@@ -155,7 +155,8 @@ class AbstractEnemy:
             DynamicValue(override_values.get("health", self.getHealth())).getCachedOrNew(function_memory),
             self._assertListAttackType(function_memory, override_values.get("attacks", self.getAttacks())),
             location,
-            position
+            position,
+            override_values.get("uid", None)
         )
 
         enemy.setEvents(Util.deepCopy(self.events))

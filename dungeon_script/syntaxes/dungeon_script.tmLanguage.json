@@ -13,6 +13,10 @@
 			"include": "#strings"
 		},
 		{
+			"name": "compare.dungeon_script",
+			"match": "(==|<=|>=|!=|<<|>>)"
+		},
+		{
 			"include": "#keywords"
 		},
 		{
@@ -22,10 +26,6 @@
 		{
 			"name": "constant.value.dungeon_script",
 			"match": "\\b(true|false|none|not|and|or)\\b"
-		},
-		{
-			"name": "compare.dungeon_script",
-			"match": "(==|<=|>=|!=|<|>)"
 		},
 		{
 			"name": "operator.dungeon_script",

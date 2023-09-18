@@ -802,7 +802,7 @@ if __name__ == "__main__":
         while True:
 
             try:
-                engine_script = EngineScript(input("> "))
+                engine_script = EngineScript(input("file > "))
                 engine_script.compile()
 
                 print(json.dumps(engine_script.getScript(), indent=4))

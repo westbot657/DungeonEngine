@@ -1,24 +1,7 @@
 {
     "@required": {
         "on_attacked": {
-            "functions": [
-                {
-                    "function": "engine:log/debug",
-                    "tags": [
-                        "enemy",
-                        "required",
-                        "on_attacked"
-                    ],
-                    "message": "enemy take damage?"
-                },
-                {
-                    "function": "engine:enemy/damage",
-                    "amount": {"#ref": "#damage"}
-                },
-                {
-                    "function": "engine:combat/next_turn"
-                }
-            ]
+            "#script": "resources/scripts/enemy_required_on_attacked"
         }
     }
 }

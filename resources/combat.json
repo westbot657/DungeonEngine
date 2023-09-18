@@ -1,5 +1,5 @@
 {
     "on_player_turn_input": {
-        "#script": "./resources/combat_player_turn.dungeon_script"
+        "#script": "resources/scripts/combat_player_turn"
     }
 }

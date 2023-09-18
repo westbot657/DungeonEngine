@@ -1,0 +1,10 @@
+
+[engine:enemy/damage](<#damage>)
+
+[engine:combat/next_turn]
+
+if (<.health> <= 0) {
+    [engine:combat/despawn](<.uid>)
+}
+
+

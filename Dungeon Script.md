@@ -10,7 +10,7 @@ this is a language that compiles into the json format that the engine can unders
 
 
 ## Tokens
-```r
+```rust
 comments             : "//..."
 functions            : "[namespace:category/function]"
 variables            : "<local_variable>"
@@ -46,7 +46,7 @@ numbers              : "n"
 ```
 
 ## Syntax rules
-```r
+```rust
 atom : VARIABLE '=' expression
      | VARIABLE
      | '-' atom
@@ -144,5 +144,52 @@ else_branch : ELSE scope
 ## Documentation
 
 meh, I'll get to this at some point...  
+
+
+functions:
+```json
+
+[engine:player/message]("...") // this compiles to a function call, passing "..." as a parameter
+// Compiles to:
+// {
+//     "function": "engine:player/message",
+//     "message": "..."
+// }
+
+
+[engine:combat/next_turn] // this compiles to a function call with no parameters passed
+// Compiles to:
+// {
+//     "function": "engine:combat/next_turn"
+// }
+
+
+[engine:text/match](<#text>) // some functions support a branching syntax for better readability.
+@pattern: "(1|one)" # { // depending on the function, multiple branches may be called
+    pass
+}
+@pattern: "(2|two)" # {
+    pass
+}
+// Compiles to:
+// {
+//     "function": "engine:text/match",
+//     "text": {"#ref": "#text"},
+//     "matches": [
+//         {
+//             "pattern": "(1|one)",
+//             "run": {} // 'pass' compiles to nothing
+//         },
+//         {
+//             "pattern": (2|two),
+//             "run": {}
+//         }
+//     ]
+// }
+
+
+
+```
+
 
 

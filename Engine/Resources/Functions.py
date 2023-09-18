@@ -2457,7 +2457,10 @@ class Engine_Logic_Compare(LoaderFunction):
                                 res = yield a
                                 a = ev.send(res)
                         except StopIteration as e:
-                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                            if e.value is not None:
+                                a = e.value
+                            else:
+                                a = a if not isinstance(a, _EngineOperation) else None
                         
                         ev = cls._compare(function_memory, y)
                         b = None
@@ -2467,7 +2470,10 @@ class Engine_Logic_Compare(LoaderFunction):
                                 res = yield b
                                 b = ev.send(res)
                         except StopIteration as e:
-                            b = e.value or (b if not isinstance(b, _EngineOperation) else None)
+                            if e.value is not None:
+                                b = e.value
+                            else:
+                                b = b if not isinstance(b, _EngineOperation) else None
                         
 
                         if not (a == b):
@@ -2494,7 +2500,10 @@ class Engine_Logic_Compare(LoaderFunction):
                                 res = yield a
                                 a = ev.send(res)
                         except StopIteration as e:
-                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                            if e.value is not None:
+                                a = e.value
+                            else:
+                                a = a if not isinstance(a, _EngineOperation) else None
                         
                         ev = cls._compare(function_memory, y)
                         b = None
@@ -2504,7 +2513,10 @@ class Engine_Logic_Compare(LoaderFunction):
                                 res = yield b
                                 b = ev.send(res)
                         except StopIteration as e:
-                            b = e.value or (b if not isinstance(b, _EngineOperation) else None)
+                            if e.value is not None:
+                                b = e.value
+                            else:
+                                b = b if not isinstance(b, _EngineOperation) else None
                         
 
                         if not (a != b):
@@ -2531,7 +2543,10 @@ class Engine_Logic_Compare(LoaderFunction):
                                 res = yield a
                                 a = ev.send(res)
                         except StopIteration as e:
-                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                            if e.value is not None:
+                                a = e.value
+                            else:
+                                a = a if not isinstance(a, _EngineOperation) else None
                         
                         ev = cls._compare(function_memory, y)
                         b = None
@@ -2541,7 +2556,10 @@ class Engine_Logic_Compare(LoaderFunction):
                                 res = yield b
                                 b = ev.send(res)
                         except StopIteration as e:
-                            b = e.value or (b if not isinstance(b, _EngineOperation) else None)
+                            if e.value is not None:
+                                b = e.value
+                            else:
+                                b = b if not isinstance(b, _EngineOperation) else None
                         
 
                         if not (a < b):
@@ -2568,7 +2586,10 @@ class Engine_Logic_Compare(LoaderFunction):
                                 res = yield a
                                 a = ev.send(res)
                         except StopIteration as e:
-                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                            if e.value is not None:
+                                a = e.value
+                            else:
+                                a = a if not isinstance(a, _EngineOperation) else None
                         
                         ev = cls._compare(function_memory, y)
                         b = None
@@ -2578,7 +2599,11 @@ class Engine_Logic_Compare(LoaderFunction):
                                 res = yield b
                                 b = ev.send(res)
                         except StopIteration as e:
-                            b = e.value or (b if not isinstance(b, _EngineOperation) else None)
+                            if e.value is not None:
+                                b = e.value
+                            else:
+                                b = b if not isinstance(b, _EngineOperation) else None
+                            # b = e.value or (b if not isinstance(b, _EngineOperation) else None)
                         
 
                         if not (a <= b):
@@ -2604,7 +2629,10 @@ class Engine_Logic_Compare(LoaderFunction):
                                 res = yield a
                                 a = ev.send(res)
                         except StopIteration as e:
-                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                            if e.value is not None:
+                                a = e.value
+                            else:
+                                a = a if not isinstance(a, _EngineOperation) else None
                         
                         ev = cls._compare(function_memory, y)
                         b = None
@@ -2614,7 +2642,10 @@ class Engine_Logic_Compare(LoaderFunction):
                                 res = yield b
                                 b = ev.send(res)
                         except StopIteration as e:
-                            b = e.value or (b if not isinstance(b, _EngineOperation) else None)
+                            if e.value is not None:
+                                b = e.value
+                            else:
+                                b = b if not isinstance(b, _EngineOperation) else None
                         
 
                         if not (a > b):
@@ -2672,7 +2703,10 @@ class Engine_Logic_Compare(LoaderFunction):
                                 res = yield a
                                 a = ev.send(res)
                         except StopIteration as e:
-                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                            if e.value is not None:
+                                a = e.value
+                            else:
+                                a = a if not isinstance(a, _EngineOperation) else None
                         
 
                         if not a:
@@ -2692,7 +2726,10 @@ class Engine_Logic_Compare(LoaderFunction):
                                 res = yield a
                                 a = ev.send(res)
                         except StopIteration as e:
-                            a = e.value or (a if not isinstance(a, _EngineOperation) else None)
+                            if e.value is not None:
+                                a = e.value
+                            else:
+                                a = a if not isinstance(a, _EngineOperation) else None
                         
 
                         if a:
@@ -2710,8 +2747,10 @@ class Engine_Logic_Compare(LoaderFunction):
                             res = yield a
                             a = ev.send(res)
                     except StopIteration as e:
-                        a = e.value or (a if not isinstance(a, _EngineOperation) else None)
-                        
+                        if e.value is not None:
+                            a = e.value
+                        else:
+                            a = a if not isinstance(a, _EngineOperation) else None
 
                     return not a
                 case _:
@@ -2723,7 +2762,10 @@ class Engine_Logic_Compare(LoaderFunction):
                             res = yield v
                             v = ev.send(res)
                     except StopIteration as e:
-                        v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+                        if e.value is not None:
+                            v = e.value
+                        else:
+                            v = v if not isinstance(v, _EngineOperation) else None
                     return v
         else:
             return branch

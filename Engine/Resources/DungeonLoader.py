@@ -145,7 +145,10 @@ class DungeonLoader:
 
     def stopIterationEval(self, e_value, v):
         # or (isinstance(v, Combat.Operation._Operation)
-        return e_value or (v if not isinstance(v, _EngineOperation) else None)
+        if e_value is not None:
+            return e_value
+        else:
+            return v if not isinstance(v, _EngineOperation) else None
 
     def generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict):
         ev = self._generatorEvaluateFunction(function_memory, data)

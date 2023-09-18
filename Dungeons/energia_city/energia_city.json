@@ -12,5 +12,8 @@
         "on_input": {},
         "on_exit": {}
     },
-    "environment": {}
+    "environment": {},
+    "data": {
+        "occupied_inn_rooms": 29603
+    }
 }

@@ -578,6 +578,7 @@ def p_expression_binop(p):
              | atom '-' atom
              | atom '*' atom
              | atom '/' atom
+             | ato  '%' atom
              | atom'''
 
     if len(p) == 2:
@@ -604,6 +605,8 @@ def p_expression_binop(p):
         p[0] = {"multiply": [p[1], p[3]]}
     elif p[2] == '/':
         p[0] = {"divide": [p[1], p[3]]}
+    elif p[2] == "%":
+        p[0] = {"mod": [p[1], p[3]]}
 
     p[0].update({"function": "engine:math/solve"})
 

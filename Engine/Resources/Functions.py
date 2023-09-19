@@ -2089,9 +2089,11 @@ class Engine_Dict_ForEach(LoaderFunction):
 
     script_flags = {
         "required_args": 1,
-        "optional_args": 0,
+        "optional_args": 2,
         "args": {
             "dict": "required parameter",
+            "key_name": "optional parameter",
+            "value_name": "optional parameter",
             "run": "scope"
         }
     }
@@ -2121,6 +2123,9 @@ class Engine_Dict_ForEach(LoaderFunction):
         except StopIteration as e:
             v = e.value or (v if not isinstance(v, _EngineOperation) else None)
         dct = v
+        
+        key_name = args.get("key_name", "key")
+        value_name = args.get("value_name", "value")
 
         func: dict = args.get("run")
         for key, val in dct.items():
@@ -2137,8 +2142,8 @@ class Engine_Dict_ForEach(LoaderFunction):
             element = v
 
             function_memory.update({
-                "key": key,
-                "value": element
+                key_name: key,
+                value_name: element
             })
 
             ev = function_memory.generatorEvaluateFunction(Util.deepCopy(func))
@@ -2166,9 +2171,11 @@ class Engine_List_ForEach(LoaderFunction):
     pre_evaluate_args = False
 
     script_flags = {
-        "reuired_args": 1,
+        "required_args": 1,
+        "optional_args": 1,
         "args": {
             "list": "required parameter",
+            "element_name": "optional parameter",
             "run": "scope"
         }
     }
@@ -2191,6 +2198,7 @@ class Engine_List_ForEach(LoaderFunction):
         if isinstance(lst, dict):
             lst = function_memory.evaluateFunction(lst)
 
+        element_name = args.get("element_name", "element")
 
         func: dict|list = args.get("run")
         for l in lst:
@@ -2207,7 +2215,7 @@ class Engine_List_ForEach(LoaderFunction):
             element = v
 
             function_memory.update({
-                "element": element
+                element_name: element
             })
 
             ev = function_memory.generatorEvaluateFunction(Util.deepCopy(func))

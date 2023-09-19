@@ -242,6 +242,17 @@ class Enemy(Entity):
                         out = v
         return out
 
+    def __dict__(self):
+        return {
+            "%ENGINE:DATA-TYPE": "Enemy",
+            "name": self.name,
+            "max_health": self.max_health,
+            "health": self.health,
+            "attacks": self.attacks,
+            "uid": self.uid,
+            "events": self.events
+        }
+
     def _get_save(self, function_memory:FunctionMemory) -> dict:
         return {}
 

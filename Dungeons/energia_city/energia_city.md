@@ -22,7 +22,7 @@ room 15: x & (2^1)
 ## 1. Corrupt government
 
 - the corrupt people in the government do a really good job making it look like the corruption
-comes from 1 person (an advisor)
+    comes from 1 person (an advisor)
 - there should be a decent amount of exploring that leads you to think the advisor is corrupt.
 - VERY subtle details hint that the advisor is innocent
 - incredibly small detail that will lead to you finding out who the actualy corruption is,

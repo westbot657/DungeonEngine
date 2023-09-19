@@ -162,9 +162,22 @@ class Combat(FunctionalElement):
             ".current_turn": self.current_turn,
             ".turn": self.turn,
             ".last_trigger": self.last_trigger,
+            ".old_trigger": self.old_trigger,
             ".turn_order": self.turn_order
         }
         return d
+
+    def __dict__(self):
+        return {
+            "%ENGINE:DATA-TYPE": "Combat",
+            "enemies": self.enemies,
+            "players": self.players,
+            "current_turn": self.current_turn,
+            "turn": self.turn,
+            "last_trigger": self.last_trigger,
+            "old_trigger": self.old_trigger,
+            "turn_order": self.turn_order
+        }
 
     def updateLocalVariables(self, locals: dict):
         ...

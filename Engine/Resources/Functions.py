@@ -51,7 +51,7 @@ except ImportError:
 
 from typing import Any
 
-import random, math, re
+import random, math, re, json
 
 """
 functions:
@@ -2382,7 +2382,6 @@ class Engine_Control_RaiseError(LoaderFunction):
     def raise_error(function_memory:FunctionMemory, *details):
         raise FunctionCallError(*details)
 
-
 class Engine_Control_Call(LoaderFunction):
     id = Identifier("engine", "control/", "call")
     pre_evaluate_args = False
@@ -3190,6 +3189,24 @@ class Engine_Debug_Breakpoint(LoaderFunction):
     @staticmethod
     def debug(function_memory:FunctionMemory):
         breakpoint()
+
+class Engine_Debug_Memory(LoaderFunction):
+    id = Identifier("engine", "debug/", "memory")
+    
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        return cls.memory
+
+    @staticmethod
+    def memory(function_memory:FunctionMemory):
+        print(json.dumps(function_memory.getMemory(), indent=4, default=str))
+
 # ^ Debug ^ #
 
 

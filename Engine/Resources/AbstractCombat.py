@@ -58,7 +58,7 @@ class AbstractCombat:
                     identifier = Identifier("<combat>", "", "")
                     e = AbstractEnemy(identifier, enemy)
                     e.linkParent()
-                    identifier.path = id(self)
+                    identifier.path = f"{id(self)}/"
                     identifier.name = e.name
 
                     enemies.append(e)

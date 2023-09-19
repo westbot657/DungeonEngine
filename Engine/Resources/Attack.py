@@ -40,6 +40,16 @@ class Attack(FunctionalElement):
 
         return d
 
+    def __dict__(self):
+        return {
+            "%ENGINE:DATA-TYPE": "Attack",
+            "name": self.name,
+            "damage": self.damage,
+            "range": self.range,
+            "accuracy": self.accuracy,
+            "events": self.events
+        }
+
     def updateLocalVariables(self, locals: dict):
         ...
 

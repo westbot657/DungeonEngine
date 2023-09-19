@@ -63,6 +63,14 @@ class FunctionMemory:
         #print(f"#store: {data}")
         self.context_data.update(data)
 
+    def getMemory(self):
+        return {
+            "local variables": self.symbol_table,
+            "context variables": self.context_data,
+            "global constants": self.global_environment_variables,
+            # "functions": self.stored_functions
+        }
+
     def checkPredicate(self, predicate:dict):
         #Log["debug"]["function memory"]["check predicate"](f"predicate: {predicate}")
         for key, value in predicate.items():

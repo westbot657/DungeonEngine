@@ -2830,6 +2830,31 @@ class Engine_Math_Solve(LoaderFunction):
                     return d
                 
                 case {
+                    "binand": list()
+                }:
+                    dx = branch["binand"].copy()
+                    d = cls._solve(dx.pop(0))
+                    while dx:
+                        d &= cls._solve(dx.pop(0))
+                    return d
+                case {
+                    "binor": list()
+                }:
+                    dx = branch["binor"].copy()
+                    d = cls._solve(dx.pop(0))
+                    while dx:
+                        d |= cls._solve(dx.pop(0))
+                    return d
+                case {
+                    "binxor": list()
+                }:
+                    dx = branch["binxor"].copy()
+                    d = cls._solve(dx.pop(0))
+                    while dx:
+                        d ^= cls._solve(dx.pop(0))
+                    return d
+                
+                case {
                     "max": list()
                 }:
                     return max([cls._solve(m) for m in branch["max"]])

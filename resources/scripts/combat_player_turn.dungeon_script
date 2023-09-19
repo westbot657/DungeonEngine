@@ -1,5 +1,5 @@
 
-[engine:debug/memory] // <- probably the most useful function I've added so far
+// [engine:debug/memory] // <- probably the most useful function I've added so far
 
 [engine:list/for_each] (<.enemies>) // iterate through each enemy
 {
@@ -9,7 +9,7 @@
         // if so, player attacks the enemy
         // [engine:debug/breakpoint]
         [engine:text/match]([engine:text/replace_pattern] (" +", " ", [engine:text/set_case] (<#text>, "lower")), "search")
-        @pattern: "(attack|fight|stab|shoot|hit)" # {
+        @pattern: "(attack|fight|stab|shoot|hit|hurt)" # {
             [engine:player/attack_enemy](<#player>, <element>)
             // break
         }

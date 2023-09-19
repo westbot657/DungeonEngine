@@ -97,6 +97,10 @@ class Dungeon(FunctionalElement):
                         _data.update({key: function_memory.rebuildData(value)})
                     self.data = _data
 
+            if (rooms := data.get("rooms", None)) is not None:
+                for room in self.rooms.values():
+                    room._load_from(function_memory, rooms)
+
 
     def saveData(self, function_memory:FunctionMemory):
         filename = f"./Engine/save_data/{self.abstract.identifier.name}.json"

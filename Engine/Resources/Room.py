@@ -158,7 +158,16 @@ class Room(FunctionalElement):
             
             function_memory.evaluateFunction(on_load)
 
-
+    def _load_from(self, function_memory:FunctionMemory, rooms:dict):
+        if (data := rooms.get(self.location.full(), None)) is not None:
+            if (name := data.get("name", None)) is not None:
+                self.name = name
+            if (environment_data := data.get("environment", None)) is not None:
+                self.environment._load_from(function_memory, environment_data)
+            if (interaction_data := data.get("interactions", None)) is not None:
+                for interaction in self.interactions:
+                    interaction._load_from(interaction_data)
+            
     def _get_save(self, function_memory:FunctionMemory):
         dat = {}
         if self.name != self.abstract.name:

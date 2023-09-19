@@ -56,6 +56,9 @@ class Environment:
         elif isinstance(other, dict):
             return self.stats == other
 
+    def _load_from(self, function_memory, stats):
+        self.stats = stats
+
     def _get_save(self, function_memory):
         return self.stats
 

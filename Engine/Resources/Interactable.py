@@ -68,6 +68,15 @@ class Interactable(FunctionalElement):
             self.postEvaluate(function_memory)
             return v
 
+    def _load_from(self, function_memory:FunctionMemory, interaction_data:dict):
+        if (i_data := interaction_data.get(self.name, None)) is not None:
+            if (fields := i_data.get("fields", None)) is not None:
+                for name, val in fields.items():
+                    self.field_values.update({name: val})
+            if (data := i_data.get("data", None)) is not None:
+                for name, val in data:
+                    self.data.update({name: val})
+
     def _get_save(self, function_memory:FunctionMemory):
         abstract_fields = self.abstract.fields
 

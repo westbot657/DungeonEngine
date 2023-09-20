@@ -105,6 +105,20 @@
         [engine:player/message](<element>)
     }
 
+    // function call with tags
+    [engine:text/match](<some_text>)
+    @pattern: "some *regex" # {
+        pass
+    }
+    @pattern: "something else" # {
+        pass
+    }
+    @pattern: [engine:text/join]("a", "b", "c", seperator=", ") # { // the "#" is used to avoid ambiguity on whether the following scope is part of [engine:text/join], or the tag's scope
+        pass
+    }
+    @pattern: "..." # {
+        pass
+    }
 
 }
 

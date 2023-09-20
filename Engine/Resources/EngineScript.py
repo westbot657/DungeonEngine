@@ -63,7 +63,6 @@ def find_column(input, token):
     line_start = input.rfind('\n', 0, token.lexpos) + 1
     return (token.lexpos - line_start) + 1
 
-
 def t_BOOLEAN(t):
     r"(true|false)"
     t.value = t.value == "true"
@@ -71,7 +70,11 @@ def t_BOOLEAN(t):
 
 def t_STRING(t):
     r"(\"(\\.|[^\"\\])*\"|\'(\\.|[^\'\\])*\')"
-    t.value = t.value[1:-1]
+    
+    if not t.value.startswith(("\"", "'")):
+        t.value = t.value[2:-1]
+    else:
+        t.value = t.value[1:-1]
 
     matches = list(re.finditer(r"\\.", t.value))
     matches.reverse()
@@ -190,6 +193,8 @@ def p_statement_assign(p):
     else:
         if p[1].startswith("<$"):
             p[0] = {"#call": p[1][1:-1]}
+        elif p[1].startswith("</$"):
+            p[0] = {"#ref": p[1][2:-1]}
         else:
             p[0] = {"#ref": p[1][1:-1]}
 
@@ -441,8 +446,12 @@ def p_tag_list(p):
         p[0] = [d]
 
 def p_scope(p):
-    "scope : '{' expressions '}'"
-    p[0] = {"scope": p[2]}
+    """scope : '{' expressions '}'
+             | '{' '}'"""
+    if len(p) == 3:
+        p[0] = None
+    else:
+        p[0] = {"scope": p[2]}
 
 def p_statements(p):
     """expressions : statement expressions

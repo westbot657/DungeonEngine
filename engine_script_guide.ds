@@ -1,0 +1,113 @@
+
+// this is a guide on how engine script works
+
+
+
+
+// macro assignment
+// note: macros are evaluated at compile time, and should NOT be used as variables.
+
+// good ways to assign a macro:
+{
+    $macro1 = "Long piece of text that will be used in multiple places, and storing it as a macro is more efficient than a variable, which has to be evaluated during runtime"
+
+    pass
+
+    // macro1 is accessed elsewhere within this scope, but never re-assigned
+
+}
+
+// bad ways to assign a macro:
+{
+    if (pass) {
+        $macro1 = "some piece of text"
+        // A
+    } else {
+        $macro1 = "some other piece of text"
+    }
+
+    pass
+
+    // macro1 is accessed later, however it will always have the value: "some other piece of text"
+    // however, if macro1 is accessed at "A", it will have the value "some piece of text"
+}
+
+// functions:
+{
+    [engine:player/message]("some message to send to the player") // 
+}
+
+
+// variable assignment and reference:
+
+{
+    // normal variables:
+    <my_variable> = "some string"
+    <var2> = 2
+
+    // global variables:
+    // note: there are certain globals that will be pre-defined depending on the context of a script
+    <#global1> = "they're just like normal variables"
+    
+    <#player> // this is a pre-defined variable, used in almost every script if not all of them.
+    // This is how you reference the player, for instance, in a script that runs when the player gives input, or enters or exits a room
+    <#player.name> // more complex variables (classes, basically) have attributes
+
+    // constants:
+    <%text/pattern/yes> // this stores a regular expression, used to check for some form of "yes" in text
+    // constants cannot be assigned to
+
+    // functions:
+    <$some_function> = { // note: functions, once defined, can be called from any script
+        [engine:player/message](<#msg>) // note that <#msg> has never been defined, it is intended to be defined before this function is called, as parameters cannot be passed to script-defined functions
+
+    }
+
+
+    <#msg> = "some text to send to the player"
+    <$some_function> // this calls the function, even though it looks like it simply references it
+    </$some_function> // use this to reference the function's code, rather than calling the function
+    
+}
+
+
+// if statements:
+{
+    if (<x> == 5) {
+        // valid comparisons are:
+        // << : less than
+        // >> : greater than
+        // <= : less or equal to
+        // >= : greater or equal to
+        // == : equal to
+        // != : not equal to
+        pass
+    } elif (<x> >> 5) {
+        pass
+    } else {
+        pass 
+    }
+}
+
+// functions:
+{
+
+    // function call with no parameters:
+    [engine:control/break]
+    // or
+    [engine:control/break]()
+
+    // function call with parameters:
+    [engine:player/message]("Hello!")
+
+    // function call with code scope:
+    [engine:list/for_each](<some_list>, "element") {
+        [engine:player/message](<element>)
+    }
+
+
+}
+
+
+
+

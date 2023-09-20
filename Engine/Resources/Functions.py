@@ -174,6 +174,7 @@ class Engine_$1(LoaderFunction):
 ### XXX Engine Tool XXX####
 ####XXX#############XXX####
 
+
 class Engine_Tool_CancelUse(LoaderFunction):
     id = Identifier("engine", "tool/", "cancel_use")
 
@@ -305,6 +306,7 @@ class Engine_Tool_SetName(LoaderFunction):
 ####XXX###############XXX####
 ### XXX Engine Weapon XXX ###
 ####XXX###############XXX####
+
 
 class Engine_Weapon_GetDurability(LoaderFunction):
     id = Identifier("engine", "weapon/", "GetDurability")
@@ -443,6 +445,7 @@ class Engine_Weapon_GetParentType(LoaderFunction):
 ### XXX Engine Armor XXX ###
 ####XXX##############XXX####
 
+
 class Engine_Armor_GetDurability(LoaderFunction):
     id = Identifier("engine", "armor/", "get_durability")
     return_type = int
@@ -548,6 +551,7 @@ class Engine_Armor_SetDamageReduction(LoaderFunction):
 ### XXX Engine Ammo XXX ###
 ####XXX#############XXX####
 
+
 class Engine_Ammo_GetCount(LoaderFunction):
     id = Identifier("engine", "ammo/", "get_count")
     return_type = int
@@ -637,6 +641,7 @@ class Engine_Ammo_GetBonusDamage(LoaderFunction):
 ####XXX#####################XXX####
 ### XXX Engine StatusEffect XXX ###
 ####XXX#####################XXX####
+
 
 class Engine_StatusEffect_GetLevel(LoaderFunction):
     id = Identifier("engine", "status_effect/", "get_level")
@@ -803,11 +808,13 @@ class Engine_Item_GetMaxCount(LoaderFunction):
         match args:
             case {}: ...
             case _: return None
+
 # ^ Item ^ #
 
 ####XXX###############XXX####
 ### XXX Engine Player XXX ###
 ####XXX###############XXX####
+
 
 class Engine_Player_Message(LoaderFunction):
     id = Identifier("engine", "player/", "message")
@@ -1187,7 +1194,6 @@ class Engine_Player_HasGameObject(LoaderFunction):
 
         return player.inventory.containsGameObject(object_identifier)
 
-
 class Engine_Player_RemoveItem(LoaderFunction):
     id = Identifier("engine", "player/", "remove_item")
 
@@ -1431,6 +1437,7 @@ class Engine_Player_ForceMiss(LoaderFunction):
 ### XXX Engine Enemy XXX ###
 ####XXX##############XXX####
 
+
 class Engine_Enemy_AttackPlayer(LoaderFunction):
     id = Identifier("engine", "enemy/", "attack_player")
     pre_evaluator = True
@@ -1641,6 +1648,7 @@ class Engine_Enemy_SetMaxHealth(LoaderFunction):
 ### XXX Engine Location XXX ###
 ####XXX#################XXX####
 
+
 class Engine_Location_Exists(LoaderFunction):
     id = Identifier("engine", "location/", "exists")
     return_type = bool
@@ -1674,6 +1682,7 @@ class Engine_Location_Exists(LoaderFunction):
 ####XXX###############XXX####
 ### XXX Engine Random XXX ###
 ####XXX###############XXX####
+
 
 class Engine_Random_Uniform(LoaderFunction): # TODO: split random range into it's own function
     id = Identifier("engine", "random/", "uniform")
@@ -1802,6 +1811,7 @@ class Engine_Random_Choice(LoaderFunction):
 ####XXX#############XXX####
 ### XXX Engine Text XXX ###
 ####XXX#############XXX####
+
 
 class Engine_Text_Join(LoaderFunction):
     id = Identifier("engine", "text/", "join")
@@ -2083,6 +2093,7 @@ class Engine_Text_SetCase(LoaderFunction):
 ### XXX Engine Dict XXX ###
 ####XXX#############XXX####
 
+
 class Engine_Dict_ForEach(LoaderFunction):
     id = Identifier("engine", "dict/", "for_each")
     pre_evaluate_args = False
@@ -2161,10 +2172,10 @@ class Engine_Dict_ForEach(LoaderFunction):
 
 # ^ Dict ^ #
 
-
 ####XXX#############XXX####
 ### XXX Engine List XXX ###
 ####XXX#############XXX####
+
 
 class Engine_List_ForEach(LoaderFunction):
     id = Identifier("engine", "list/", "for_each")
@@ -2286,34 +2297,12 @@ class Engine_List_Append(LoaderFunction):
         ls = kwargs.get("list")
         elements = kwargs.get("elements")
 
-# class Engine_List_Builder(LoaderFunction):
-#     id = Identifier("engine", "list/", "builder")
-
-#     script_flags = {
-#         "required_args": 0,
-#         "optional_args": 0,
-#         "args": {}
-#     }
-    
-#     @classmethod
-#     def check(cls, function_memory:FunctionMemory, args:dict):
-#         match args:
-#             case {
-#                 "list": list()
-#             }: return cls.list_builder
-#             case _: return None
-
-#     @staticmethod
-#     def list_builder(function_memory:FunctionMemory, **kwargs):
-#         _list = kwargs.get("list")
-#         return _list # idk if this will work the way I think it will...
-
-
 # ^ List ^ #
 
 ####XXX################XXX####
 ### XXX Engine Control XXX ###
 ####XXX################XXX####
+
 
 class Engine_Control_Break(LoaderFunction):
     id = Identifier("engine", "control/", "break")
@@ -2427,10 +2416,10 @@ class Engine_Control_Call(LoaderFunction):
 
 # ^ Control ^ #
 
-
 ####XXX##############XXX####
 ### XXX Engine Logic XXX ###
 ####XXX##############XXX####
+
 
 class Engine_Logic_Compare(LoaderFunction):
     id = Identifier("engine", "logic/", "compare")
@@ -2783,6 +2772,7 @@ class Engine_Logic_Compare(LoaderFunction):
 ### XXX Engine Math XXX ###
 ####XXX#############XXX####
 
+
 class Engine_Math_Solve(LoaderFunction):
     id = Identifier("engine", "math/", "solve")
     return_type = [int, float]
@@ -2884,6 +2874,7 @@ class Engine_Math_Solve(LoaderFunction):
 ### XXX Engine Interaction XXX ###
 ####XXX####################XXX####
 
+
 class Engine_Interaction_Interact(LoaderFunction):
     id = Identifier("engine", "interaction/", "interact")
 
@@ -2916,6 +2907,7 @@ class Engine_Interaction_Interact(LoaderFunction):
 ####XXX###############XXX####
 ### XXX Engine Combat XXX ###
 ####XXX###############XXX####
+
 
 class Engine_Combat_Start(LoaderFunction):
     id = Identifier("engine", "combat/", "start")
@@ -3126,6 +3118,7 @@ class Engine_Combat_Message(LoaderFunction):
 ### XXX Engine Variable XXX ###
 ####XXX#################XXX####
 
+
 class Engine_Variable_IsDefined(LoaderFunction):
     id = Identifier("engine", "variable/", "is_defined")
     
@@ -3154,10 +3147,10 @@ class Engine_Variable_IsDefined(LoaderFunction):
 
 # ^ Variable ^ #
 
-
 ####XXX##############XXX####
 ### XXX Engine Debug XXX ###
 ####XXX##############XXX####
+
 
 class Engine_Log_Debug(LoaderFunction):
     id = Identifier("engine", "log/", "debug")

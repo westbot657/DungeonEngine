@@ -81,6 +81,9 @@
         // >= : greater or equal to
         // == : equal to
         // != : not equal to
+        // and
+        // or
+        // not
         pass
     } elif (<x> >> 5) {
         pass

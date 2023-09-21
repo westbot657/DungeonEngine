@@ -321,7 +321,7 @@ def p_function_call(p):
                         found = True
                         parameters["*args"][args_name].append(value)
                     else:
-                        state = "kwargs"
+                        state = "args"
                         for n, v in parameters["kwargs"].items():
                             if v is ...:
                                 parameters["kwargs"][n] = value

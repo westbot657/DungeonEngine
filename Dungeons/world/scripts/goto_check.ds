@@ -1,0 +1,19 @@
+
+
+[engine:text/match](<text>)
+@pattern: "go to (?P<dungeon_name>.*)" # {
+    <dungeon_name> = [engine:text/set_case](<dungeon_name>, "lower")
+
+    [engine:dict/for_each](<%dungeons>, "key", "value") {
+
+        if (
+            (<dungeon_name> == [engine:text/set_case](<value.name>, "lower"))
+            or
+            (<dungeon_name> == [engine:text/set_case](<key>, "lower"))
+        ) {
+            [engine:player/set_location](<value.entry_point.location>)
+            break
+        }
+
+    }
+}

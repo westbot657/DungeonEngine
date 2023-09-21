@@ -1,0 +1,5 @@
+{
+    "$room_occupied": {
+        "#script": "energia_city/ec_functions/room_occupied"
+    }
+}

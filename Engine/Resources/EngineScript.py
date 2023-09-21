@@ -32,7 +32,7 @@ tokens = (
     "FUNCTION", "VARIABLE", "NUMBER", "STRING", "BOOLEAN",
     "TAG", "WORD", "RETURN", "BREAK", "CONTINUE", "MIN", "MAX",
     "IF", "ELSEIF", "ELSE", "AND", "OR", "EE", "NE", "GT", "GE",
-    "LT", "LE", "NOT", "MACRO", "PASS"
+    "LT", "LE", "NOT", "MACRO", "PASS", "POW"
 )
 
 literals = [
@@ -41,6 +41,7 @@ literals = [
     "|", "^"
 ]
 
+t_POW = r"\*\*"
 t_ignore = " \t;~`"
 
 t_ignore_comment = r"\/\/.*"
@@ -592,6 +593,7 @@ def p_expression_binop(p):
              | atom '&' atom
              | atom '|' atom
              | atom '^' atom
+             | atom POW atom
              | atom'''
 
     if len(p) == 2:
@@ -626,6 +628,8 @@ def p_expression_binop(p):
         p[0] = {"binor": [p[1], p[3]]}
     elif p[2] == "^":
         p[0] = {"binxor": [p[1], p[3]]}
+    elif p[2] == "**":
+        p[0] = {"pow": [p[1], p[3]]}
     
 
     p[0].update({"function": "engine:math/solve"})

@@ -2807,7 +2807,14 @@ class Engine_Math_Solve(LoaderFunction):
                     while mx:
                         m *= cls._solve(mx.pop(0))
                     return m
-                
+                case {
+                    "pow": list()
+                }:
+                    mx = branch["pow"].copy()
+                    m = cls._solve(mx.pop(0))
+                    while mx:
+                        m **= cls._solve(mx.pop(0))
+                    return m
                 case {
                     "divide": list()
                 }:

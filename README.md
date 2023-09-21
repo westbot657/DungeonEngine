@@ -8,18 +8,16 @@
 6. If you have issues, there's an issues feature here on github, but to be fair, idk how it works, so yeah.
 7. This Engine is still under development, don't expect much to work
 
-# tutorial (until I make an actual tutorial)
+# tutorial (until I make an actual tutorial in-game)
 1. once the game has fully loaded, type `[0]: engine:new-player <id> <max_health> <name>`
   - note:
-    - id may not be 0
-    - max_health will eventually be removed once I find a good default
-    - name can contain spaces if surrounded by quotes (ex: "Example name idk")
+    - \<id> may not be 0
+    - \<max_health> will eventually be removed once I find a good default (try 20 for now if you're unsure)
+    - \<name> can contain spaces if surrounded by quotes (ex: "Example name idk")
 2. this will create a new player (whaaAAA????)
 3. now when you intend to type text as your player, start each message with `[<player_id>]: ` (including the trailing space)
 4. `[0]: ...` is reserved for running commands
 5. more coming soon
-
-
 
 
 # Dungeon Building  
@@ -27,7 +25,7 @@
 Note: This is going to be a VERY long, detailed, guide to creating a dungeon and all it's components  
 ---
 [File Structure](#file-structure)  
-[Dungeons](#dungeons) | [Rooms](#rooms) | [Interactions](#interactions)    
+[Dungeons](#dungeons) | [Rooms](#rooms) | [Interactions](#interactions)  
 [Weapons](#weapons) | [Ammo](#ammo) | [Armor](#armor)  
 [Items](#items) | [Tools](#tools)  
 [StatusEffects](#status-effects)  
@@ -37,21 +35,27 @@ Note: This is going to be a VERY long, detailed, guide to creating a dungeon and
 [Dungeon Script](./Dungeon%20Script.md)  
 [Engine Code](#engine-code)  
 
+Here's a handy tool to help you get started with dungeon building:  
+[Dungeon Generation Tool](./Tools/room_generator.py)
+
 ## File Structure
 ```file_tree
 Dungeons/
-|- <dungeon_id>
-|  |- resources/
-|  |  |- ammo/
-|  |  |- armor/
-|  |  |- enemies/
-|  |  |- items/
-|  |  |- tools/
-|  |  \- weapons/
-|  |- combats/
-|  |- rooms/
-|  |- <dungeon_id>.json
-|  \- ec_functions.json
+├─ <dungeon_id>/
+│  ├─ resources/
+│  │  ├─ ammo/
+│  │  ├─ armor/
+│  │  ├─ enemies/
+│  │  ├─ items/
+│  │  ├─ tools/
+│  │  └─ weapons/
+│  ├─ scripts/
+│  │  ├─ rooms/
+│  │  └─ <dungeon_id>/
+│  ├─ rooms/
+│  ├─ combats/
+│  ├─ <dungeon_id>.json
+│  └─ ec_functions.json
 :
 ```
 
@@ -187,7 +191,14 @@ note:
 `boot engine code` is evaluated on dungeon load up. This means the functions you can use in it are limited  
 `engine code` is evaluated as needed during runtime, it is not evaluated on load up.  
 
+to use a dungeon script instead of writing engine code, reference the script with:
+`{"#script": "path/to/script"}`
+the path doesn't have to be absolute, nor does it require you to write the ds/dungeon_script extension in the file name, however, make sure the path cant be mistaken for another script file. (The compiler will look in every dungeon folder, until it finds something that matches the path) 
 
+ie: referencing `scripts/rooms/room1/on_enter`
+may match `your_dungeon/scripts/rooms/room1/on_enter.ds`
+or `my_dungeon/script/rooms/room1/on_enter.ds`
+so it is recommended that you have your dungeon namespace present in the path somewhere
 
 
 

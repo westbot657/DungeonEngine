@@ -1,5 +1,18 @@
 # pylint: disable=[W,R,C]
 
+# README:
+# run this file to help automate dungeon setup.
+# 
+# this code will help you set up your dungeon
+# folder, and will generate json and ds files
+# for you.
+# 
+# If your dungeon folder already exists, this code
+# will assist in adding rooms to the dungeon
+# 
+
+
+
 import json
 import os
 

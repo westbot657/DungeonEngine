@@ -1,0 +1,18 @@
+
+
+<combat> = [engine:combat/get]("shadow_grove:combats/right_tunnel_combat")
+
+// [engine:combat/start](<combat>)
+
+[engine:text/match]([engine:text/set_case](<#text>, "lower"))
+@pattern: "entrance" # {
+    [engine:interaction/interact](".entrance")
+},
+@pattern: "shrine" # {
+    [engine:interaction/interact](".shrine")
+},
+@pattern: "fruit" # {
+    if (<combat.complete>) {
+        [engine:interaction/interact](".red_fruit")
+    }
+}

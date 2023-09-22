@@ -1,0 +1,19 @@
+
+
+[engine:text/match]([engine:text/set_case](<#text>, "lower"))
+@pattern: "left" # {
+    [engine:interaction/interact](".left_tunnel")
+}
+@pattern: "right" # {
+    [engine:interaction/interact](".right_tunnel")
+}
+@pattern: "door" # {
+    [engine:interaction/interact](".boss_room_door")
+}
+@pattern: "dagger" # {
+    [engine:interaction/interact](".ritual_dagger")
+}
+@pattern: "armor" # {
+    [engine:interaction/interact](".armor")
+}
+

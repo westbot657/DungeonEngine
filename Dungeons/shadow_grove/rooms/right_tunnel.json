@@ -1,0 +1,28 @@
+{
+    "name": "Right Tunnel",
+    "interactions": [
+        {
+            "type": "engine:interactable/loot",
+            "id": "red_fruit",
+            "loot": "shadow_grove:items/red_fruit"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "entrance",
+            "target": "shadow_grove:grove_entrance",
+            "travel_message": "You move into the grove's entrance."
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "shrine",
+            "target": "shadow_grove:shrine",
+            "travel_message": "You move into the dark shrine."
+            
+        }
+    ],
+    "events": {
+        "on_enter": {
+            "#script": "shadow_grove/scripts/rooms/right_tunnel/on_enter"
+        }
+    }
+}

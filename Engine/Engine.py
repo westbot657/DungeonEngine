@@ -262,6 +262,11 @@ class Engine:
                 mover.send(None)
                 self.tasks.append(mover)
 
+            case EngineOperation.KillPlayer():
+                player = result.player
+
+                
+
             case EngineOperation.Restart():
                 gen = self.input_queue[player_id][0]
                 self.input_queue[player_id][1] = gen

@@ -1,0 +1,17 @@
+$m1 = "the tunnel is an overgrown passage leading from the `entrance` to the `shrine`. Held into the wall is an old skeleton wearing pit of rotted armor"
+
+
+if (not <.rus.picked_up>) {
+    [engine:player/message](
+        [engine:text/join](
+            $m1, ".", 
+            seperator=""
+        )
+    )
+} else {
+    [engine:player/message](
+        [engine:text/join](
+            $m1, "and clutching a rusted `sword`."
+        )
+    )
+}

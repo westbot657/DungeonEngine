@@ -1,0 +1,39 @@
+{
+    "name": "Dark Srine",
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "left_tunnel",
+            "target": "shadow_grove:left_tunnel",
+            "travel_message": "You move into the left tunnel."
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "right_tunnel",
+            "target": "shadow_grove:right_tunnel",
+            "travel_message": "You move into the right tunnel."
+        },
+        {
+            "type": "engine:interactable/door",
+            "id": "boss_room_door",
+            "target": "shadow_grove:boss_room",
+            "open_message": "this door leads to the Shadow Ent's Lair, are you ready to enter?",
+            "travel_message": "You move into the Shadow Ent's Lair."
+        },
+        {
+            "type": "engine:interactable/loot",
+            "id": "ritual_dagger",
+            "loot": "shadow_grove:weapons/ritual_dagger"
+        },
+        {
+            "type": "engine:interactable/loot",
+            "id": "bark_armor",
+            "loot": "shadow_grove:armor/bark_armor"
+        }
+    ],
+    "events": {
+        "on_input": {
+            "#script": "shadow_grove/scripts/rooms/grove_entrance/on_input"
+        }
+    }
+}

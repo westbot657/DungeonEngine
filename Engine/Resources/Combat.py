@@ -33,6 +33,7 @@ import random, re, json
 
 
 class Combat(FunctionalElement):
+    _combats = {}
 
     with open("./resources/combat.json", "r+", encoding="utf-8") as f:
         _combat_config = json.load(f)
@@ -109,6 +110,11 @@ class Combat(FunctionalElement):
                 super().__init__("HandlePlayerLeave")
                 self.player = player
 
+        class _HandlePlayerDeath(_Operation):
+            def __init__(self, player:Player):
+                super().__init__("HandlePlayerDeath")
+                self.player = player
+
         class _NextTurn(_Operation):
             def __init__(self):
                 super().__init__("NextTurn")
@@ -122,6 +128,14 @@ class Combat(FunctionalElement):
         
         def __repr__(self):
             return f"Combat.Task:[{self.task}]"
+
+    def __new__(cls, abstract, enemies, sequence, data):
+        if abstract in cls._combats.keys():
+            return cls._combats[abstract]
+        else:
+            self = super().__new__(cls)
+            self.__init__(abstract, enemies, sequence, data)
+            cls._combats.update({abstract: self})
 
     def __init__(self, abstract, enemies:list[Enemy], sequence:dict, data:dict):
         self.abstract = abstract
@@ -303,6 +317,15 @@ class Combat(FunctionalElement):
                 if i <= self.current_turn:
                     self.current_turn -= 1
                 self.turn = self.turn_order[self.current_turn]
+
+            case Combat.Operation._HandlePlayerDeath():
+                i = self.turn_order.index(operation.player)
+                self.turn_order.remove(operation.player)
+                if i <= self.current_turn:
+                    self.current_turn -= 1
+                self.turn = self.turn_order[self.current_turn]
+
+
 
             case Combat.Operation._HandleInput():
                 text = operation.text

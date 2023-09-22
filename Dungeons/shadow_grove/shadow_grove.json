@@ -1,10 +1,10 @@
 {
     "name": "Example Dungeon",
     "version": 0.1,
-    "entry_point": "example_dungeon:rooms/grove_entrance",
+    "entry_point": "shadow_grove:rooms/grove_entrance",
     "events": {
         "on_enter": {
-            "#script": "example_dungeon/scripts/example_dungeon/on_enter"
+            "#script": "shadow_grove/scripts/shadow_grove/on_enter"
         }
     },
     "data": {

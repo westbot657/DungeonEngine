@@ -23,6 +23,9 @@
     "events": {
         "on_enter": {
             "#script": "shadow_grove/scripts/rooms/right_tunnel/on_enter"
+        },
+        "on_input": {
+            "#script": "shadow_grove/scripts/rooms/right_tunnel/on_input"
         }
     }
 }

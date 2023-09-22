@@ -2114,7 +2114,7 @@ class Engine_Dict_ForEach(LoaderFunction):
         match args:
             case {
                 "dict": dict(),
-                "run": dict()
+                "run": dict()|list()
             }:
                 return cls.for_each
             case _: return None

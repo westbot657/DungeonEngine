@@ -2,7 +2,7 @@
 $m1 = "You see a small pedestal"
 $m3 = ", and an overgrown `door` with a faded emblem on it, and passages to the `left` and `right`"
 
-if <.ritual_staff.picked_up>) {
+if (<.ritual_staff.picked_up>) {
     [engine:player/message](
         [engine:text/join](
             $m1, $m3, seperator=""

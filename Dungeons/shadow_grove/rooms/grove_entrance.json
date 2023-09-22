@@ -33,6 +33,9 @@
         }
     ],
     "events": {
+        "on_enter": {
+            "#script": "shadow_grove/scripts/rooms/grove_entrance/on_enter"
+        },
         "on_input": {
             "#script": "shadow_grove/scripts/rooms/grove_entrance/on_input"
         }

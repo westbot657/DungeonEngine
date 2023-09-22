@@ -1,5 +1,5 @@
 {
-    "name": "Example Dungeon",
+    "name": "Shadow Grove",
     "version": 0.1,
     "entry_point": "shadow_grove:rooms/grove_entrance",
     "events": {

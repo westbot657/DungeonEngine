@@ -1,10 +1,14 @@
 
 
+// [engine:debug/memory]
+
 [engine:text/match](<text>)
 @pattern: "go to (?P<dungeon_name>.*)" # {
     <dungeon_name> = [engine:text/set_case](<dungeon_name>, "lower")
 
     [engine:dict/for_each](<%dungeons>, "key", "value") {
+
+        // [engine:log/debug]([engine:text/join](<key>, <value.name>), "goto check")
 
         if (
             (<dungeon_name> == [engine:text/set_case](<value.name>, "lower"))

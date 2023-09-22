@@ -1,0 +1,57 @@
+[
+    {
+        "id": 1,
+        "name": "Weston",
+        "max_health": 20,
+        "health": 20,
+        "location": "world:rooms/start",
+        "position": [
+            0,
+            0
+        ],
+        "inventory": [
+            {
+                "type": "engine:armor",
+                "parent": "engine:armor/leather_armor",
+                "durability": 15,
+                "equipped": true
+            },
+            {
+                "type": "engine:armor",
+                "parent": "engine:armor/leather_armor",
+                "name": "Batman T-shirt"
+            },
+            {
+                "type": "engine:item",
+                "parent": "engine:items/stick",
+                "data": {},
+                "count": 35
+            },
+            {
+                "type": "engine:weapon",
+                "parent": "engine:weapons/sword",
+                "name": "Rusty Sword",
+                "durability": 23,
+                "equipped": true
+            },
+            {
+                "type": "engine:tool",
+                "parent": "engine:tools/fishing_rod",
+                "data": {}
+            },
+            {
+                "type": "engine:tool",
+                "parent": "engine:tools/test_tool",
+                "data": {},
+                "equipped": true
+            }
+        ],
+        "status_effects": [],
+        "in_combat": false,
+        "text_pattern_categories": [
+            "global",
+            "common",
+            "dungeon"
+        ]
+    }
+]

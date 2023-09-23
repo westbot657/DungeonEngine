@@ -20,14 +20,14 @@ if (<.ritual_dagger.picked_up> and <.bark_armor.picked_up>) {
 } elif ((not <.ritual_dagger.picked_up>) and <.bark_armor.picked_up>) {
     [engine:player/message](
         [engine:text/join](
-            $m1, " with an old ritual `dagger` laying on it laying on it", $m2,
+            $m1, " with an old ritual `dagger` laying on it", $m2,
             seperator=""
         )
     )
 } else {
     [engine:player/message](
         [engine:text/join](
-            $m1, " with an old ritual `dagger` and an old suit of bark armor laying on it laying on it", $m2,
+            $m1, " with an old ritual `dagger` and an old suit of bark `armor` laying on it", $m2,
             seperator=""
         )
     )

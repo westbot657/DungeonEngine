@@ -1,19 +1,5 @@
 
 
-occupied_inn_rooms:
-0b000000000000000
-^ This represents all 15 rooms, if a digit is 1, then the corresponding room is occupied
-
-default:
-0b111001110100011
-occupied: 1, 2, 3, 6, 7, 8, 10, 14, 15
-unoccupied: 4, 5, 9, 11, 12, 13
-
-room  1: x & (2^15)
-room  2: x & (2^14)
-...
-room 14: x & (2^2)
-room 15: x & (2^1)
 
 
 # Kiera's storyline ideas:

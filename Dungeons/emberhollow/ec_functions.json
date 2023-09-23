@@ -1,5 +1,2 @@
 {
-    "$room_occupied": {
-        "#script": "emberhollow/ec_functions/room_occupied"
-    }
 }

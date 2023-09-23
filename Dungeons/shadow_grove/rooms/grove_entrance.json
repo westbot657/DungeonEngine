@@ -4,19 +4,19 @@
         {
             "type": "engine:interactable/passage",
             "id": "left_tunnel",
-            "target": "shadow_grove:left_tunnel",
+            "target": "shadow_grove:rooms/left_tunnel",
             "travel_message": "You move into the left tunnel."
         },
         {
             "type": "engine:interactable/passage",
             "id": "right_tunnel",
-            "target": "shadow_grove:right_tunnel",
+            "target": "shadow_grove:rooms/right_tunnel",
             "travel_message": "You move into the right tunnel."
         },
         {
             "type": "engine:interactable/door",
             "id": "boss_room_door",
-            "target": "shadow_grove:boss_room",
+            "target": "shadow_grove:rooms/boss_room",
             "lock_message": "You pull at the door but the vines hold it fast against your efforts.",
             "locked": true
         },

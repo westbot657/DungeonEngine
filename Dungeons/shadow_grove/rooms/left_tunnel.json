@@ -9,13 +9,13 @@
         {
             "type": "engine:interactable/passage",
             "id": "entrance",
-            "target": "shadow_grove:grove_entrance",
+            "target": "shadow_grove:rooms/grove_entrance",
             "travel_message": "You move into the grove's entrance."
         },
         {
             "type": "engine:interactable/passage",
             "id": "shrine",
-            "target": "shadow_grove:shrine",
+            "target": "shadow_grove:rooms/shrine",
             "travel_message": "You move into the dark shrine."
             
         }

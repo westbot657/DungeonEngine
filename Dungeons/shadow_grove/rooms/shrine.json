@@ -4,19 +4,19 @@
         {
             "type": "engine:interactable/passage",
             "id": "left_tunnel",
-            "target": "shadow_grove:left_tunnel",
+            "target": "shadow_grove:rooms/left_tunnel",
             "travel_message": "You move into the left tunnel."
         },
         {
             "type": "engine:interactable/passage",
             "id": "right_tunnel",
-            "target": "shadow_grove:right_tunnel",
+            "target": "shadow_grove:rooms/right_tunnel",
             "travel_message": "You move into the right tunnel."
         },
         {
             "type": "engine:interactable/door",
             "id": "boss_room_door",
-            "target": "shadow_grove:boss_room",
+            "target": "shadow_grove:rooms/boss_room",
             "open_message": "this door leads to the Shadow Ent's Lair, are you ready to enter?",
             "travel_message": "You move into the Shadow Ent's Lair."
         },
@@ -33,10 +33,10 @@
     ],
     "events": {
         "on_input": {
-            "#script": "shadow_grove/scripts/rooms/grove_entrance/on_input"
+            "#script": "shadow_grove/scripts/rooms/shrine/on_input"
         },
         "on_enter": {
-            "#script": "shadow_grove/scripts/rooms/grove_entrance/on_enter"
+            "#script": "shadow_grove/scripts/rooms/shrine/on_enter"
         }
     }
 }

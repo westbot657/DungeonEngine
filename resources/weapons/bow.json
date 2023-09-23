@@ -3,5 +3,5 @@
     "damage": 3,
     "range": 20,
     "max_durability": 30,
-    "ammo_type": "engine:arrow"
+    "ammo_type": "engine:ammo/arrow"
 }

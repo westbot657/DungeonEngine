@@ -341,12 +341,12 @@ class Combat(FunctionalElement):
                     v = res.send(None)
                     if isinstance(v, _EngineOperation):
                         #ret = yield v
-                        function_memory.engine.evaluateResult(function_memory.engine._default_input_handler, res, v, player.discord_id, text)
+                        function_memory.engine.evaluateResult(function_memory.engine._default_input_handler, res, v, player.uuid, text)
                         #v = res.send(ret)
                 except StopIteration as e:
                     if isinstance(e.value, _EngineOperation):
-                        self.evaluateResult(e.value, player.discord_id)
-                        # function_memory.engine.evaluateResult(function_memory.engine._default_input_handler, function_memory.engine.default_input_handler, e.value, player.discord_id, text)
+                        self.evaluateResult(e.value, player.uuid)
+                        # function_memory.engine.evaluateResult(function_memory.engine._default_input_handler, function_memory.engine.default_input_handler, e.value, player.uuid, text)
 
                 if self.turn == player:
                     ...
@@ -373,12 +373,12 @@ class Combat(FunctionalElement):
                     try:
                         v = ev.send(None)
                         while isinstance(v, _EngineOperation):
-                            res = yield (player.discord_id, v)
+                            res = yield (player.uuid, v)
                             v = None
                             v = ev.send(res)
                     except StopIteration as e:
                         if isinstance(e.value, _EngineOperation):
-                            res = yield (player.discord_id, e.value)
+                            res = yield (player.uuid, e.value)
                         else:
                             v = e.value or v
                             
@@ -395,12 +395,12 @@ class Combat(FunctionalElement):
                 try:
                     v = ev.send(None)
                     while isinstance(v, _EngineOperation):
-                        res = yield (player.discord_id, v)
+                        res = yield (player.uuid, v)
                         v = None
                         v = ev.send(res)
                 except StopIteration as e:
                     if isinstance(e.value, _EngineOperation):
-                        res = yield (player.discord_id, e.value)
+                        res = yield (player.uuid, e.value)
                     else:
                         v = e.value or v # idk why i'm doing this
                 

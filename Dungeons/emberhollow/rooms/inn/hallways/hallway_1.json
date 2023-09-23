@@ -1,0 +1,14 @@
+{
+    "name": "Hallway 1",
+    "interactions": [
+
+    ],
+    "events": {
+        "on_input": {
+            "#script": "emberhollow/scripts/inn/hallways/hallway_1/on_input"
+        },
+        "on_enter": {
+            "#script": "emberhollow/scripts/inn/hallways/hallway_1/on_enter"
+        }
+    }
+}

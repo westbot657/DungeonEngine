@@ -1,8 +1,0 @@
-
-
-if (not <#player.last_location> == "energia_city:rooms/storage_room") {
-    [engine:player/message](
-""
-    )
-}
-

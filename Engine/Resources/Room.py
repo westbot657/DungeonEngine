@@ -60,7 +60,7 @@ class Room(FunctionalElement):
 
     def onEnter(self, function_memory:FunctionMemory, player:Player):
         player.location.setLocation(self.location)
-        self.players_in_room.append(player.discord_id)
+        self.players_in_room.append(player.uuid)
         if (on_enter := self.events.get("on_enter", None)) is not None:
             self.prepFunctionMemory(function_memory)
             function_memory.addContextData({
@@ -82,7 +82,7 @@ class Room(FunctionalElement):
 
         i = self._input_handler(function_memory)
         i.send(None)
-        function_memory.engine.setInputHandler(player.discord_id, i, self._input_handler)
+        function_memory.engine.setInputHandler(player.uuid, i, self._input_handler)
         
         return EngineOperation.Continue()
 
@@ -105,8 +105,8 @@ class Room(FunctionalElement):
             engine, player_id, text = yield EngineOperation.Continue()
 
     def onExit(self, function_memory:FunctionMemory, player:Player):
-        if player.discord_id in self.players_in_room:
-            self.players_in_room.remove(player.discord_id)
+        if player.uuid in self.players_in_room:
+            self.players_in_room.remove(player.uuid)
 
         player.last_location = self.location.copy()
 

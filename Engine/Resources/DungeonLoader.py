@@ -616,7 +616,7 @@ class DungeonLoader:
             case Player():
                 return {
                     "%ENGINE:DATA-TYPE%": "Player",
-                    "id": obj.discord_id
+                    "id": obj.uuid
                 }
             case Position():
                 return {

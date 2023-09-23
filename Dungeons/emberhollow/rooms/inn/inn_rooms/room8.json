@@ -1,0 +1,14 @@
+{
+    "name": "Room 8",
+    "interactions": [
+
+    ],
+    "events": {
+        "on_input": {
+            "#script": "emberhollow/scripts/rooms/"
+        },
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/"
+        }
+    }
+}

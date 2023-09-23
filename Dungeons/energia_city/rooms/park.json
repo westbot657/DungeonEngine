@@ -1,1 +1,0 @@
-{"name": "Park", "interactions": [], "events": {"on_enter": {"#script": "energia_city/scripts/rooms/park/on_enter"}, "on_input": {"#script": "energia_city/scripts/rooms/park/on_input"}}}

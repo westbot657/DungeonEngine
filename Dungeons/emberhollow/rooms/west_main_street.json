@@ -1,0 +1,14 @@
+{
+    "name": "West Main Street",
+    "events": {
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/west_main_street/on_enter"
+        },
+        "on_input": {
+            "#script": "emberhollow/scripts/rooms/west_main_street/on_input"
+        }
+    },
+    "interactions": [
+    ],
+    "environment": {}
+}

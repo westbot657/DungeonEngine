@@ -191,11 +191,11 @@ class Engine:
         try:
             v = ev.send(None)
             while isinstance(v, _EngineOperation):
-                res = yield (handler_getter, handler, v, player.discord_id, "")
+                res = yield (handler_getter, handler, v, player.uuid, "")
                 v = ev.send(res)
         except StopIteration as e:
             if isinstance(e.value, _EngineOperation):
-                res = yield (handler_getter, handler, e.value, player.discord_id, "")
+                res = yield (handler_getter, handler, e.value, player.uuid, "")
 
         if old_room.location.dungeon != new_room.location.dungeon:
             old_dungeon = self.loader.getLocation(self._function_memory, f"dungeon:{old_room.location.dungeon}")
@@ -206,33 +206,33 @@ class Engine:
             try:
                 v = ev.send(None)
                 while isinstance(v, _EngineOperation):
-                    res = yield (handler_getter, handler, v, player.discord_id, "")
+                    res = yield (handler_getter, handler, v, player.uuid, "")
                     v = ev.send(res)
             except StopIteration as e:
                 if isinstance(e.value, _EngineOperation):
-                    res = yield (handler_getter, handler, e.value, player.discord_id, "")
+                    res = yield (handler_getter, handler, e.value, player.uuid, "")
 
             ev = new_dungeon.onEnter(function_memory, player, False)
             v = None
             try:
                 v = ev.send(None)
                 while isinstance(v, _EngineOperation):
-                    res = yield (handler_getter, handler, v, player.discord_id, "")
+                    res = yield (handler_getter, handler, v, player.uuid, "")
                     v = ev.send(res)
             except StopIteration as e:
                 if isinstance(e.value, _EngineOperation):
-                    res = yield (handler_getter, handler, e.value, player.discord_id, "")
+                    res = yield (handler_getter, handler, e.value, player.uuid, "")
         
         ev = new_room.onEnter(function_memory, player)
         v = None
         try:
             v = ev.send(None)
             while isinstance(v, _EngineOperation):
-                res = yield (handler_getter, handler, v, player.discord_id, "")
+                res = yield (handler_getter, handler, v, player.uuid, "")
                 v = ev.send(res)
         except StopIteration as e:
             if isinstance(e.value, _EngineOperation):
-                res = yield (handler_getter, handler, e.value, player.discord_id, "")
+                res = yield (handler_getter, handler, e.value, player.uuid, "")
 
     def evaluateResult(self, handler_getter:Callable, handler:Generator, result:_EngineOperation, player_id:int, text:str):
         Log["debug"]["engine"]["evaluate-result"](f"result:{result}  id:{player_id} text:'{text}'")
@@ -265,7 +265,7 @@ class Engine:
             case EngineOperation.KillPlayer():
                 player = result.player
 
-                
+                self.players.pop(player.uuid)
 
             case EngineOperation.Restart():
                 gen = self.input_queue[player_id][0]
@@ -306,7 +306,7 @@ class Engine:
         self.loadGame()
 
         for player in self.players.values():
-            self.evaluateResult(self._default_input_handler, self.default_input_handler, EngineOperation.MovePlayer(player, player.location), player.discord_id, "")
+            self.evaluateResult(self._default_input_handler, self.default_input_handler, EngineOperation.MovePlayer(player, player.location), player.uuid, "")
 
         while self.thread_running:
 
@@ -372,7 +372,7 @@ class Engine:
 
                     if player.in_combat:
                         player._combat.onInput(player, text)
-                        self.input_queue[player.discord_id][2] = ""
+                        self.input_queue[player.uuid][2] = ""
                         continue
 
                     res = TextPattern.handleInput(self._function_memory, player, text, player._text_pattern_categories)

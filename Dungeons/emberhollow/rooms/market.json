@@ -1,0 +1,14 @@
+{
+    "name": "Market",
+    "interactions": [
+
+    ],
+    "events": {
+        "on_input": {
+            "#script": "emberhollow/scripts/rooms/market/on_input"
+        },
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/market/on_enter"
+        }
+    }
+}

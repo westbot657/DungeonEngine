@@ -1,1 +1,0 @@
-{"name": "Armory", "interactions": [], "events": {"on_enter": {"#script": "emberhollow/scripts/rooms/armory/on_enter"}, "on_input": {"#script": "emberhollow/scripts/rooms/armory/on_input"}}}

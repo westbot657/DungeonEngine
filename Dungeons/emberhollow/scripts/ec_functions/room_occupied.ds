@@ -1,9 +1,0 @@
-
-[engine:debug/memory]
-
-if (<.occupied_inn_rooms> & (2 ** <room_number>)) {
-    return true
-} else {
-    return false
-}
-

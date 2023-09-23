@@ -1,1 +1,0 @@
-{"name": "Courtyard", "interactions": [], "events": {"on_enter": {"#script": "emberhollow/scripts/rooms/courtyard/on_enter"}, "on_input": {"#script": "emberhollow/scripts/rooms/courtyard/on_input"}}}

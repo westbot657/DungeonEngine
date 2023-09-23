@@ -1,8 +1,0 @@
-
-
-if (not <#player.last_location> == "emberhollow:rooms/storage_room") {
-    [engine:player/message](
-""
-    )
-}
-

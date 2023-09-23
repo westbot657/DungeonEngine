@@ -1,1 +1,0 @@
-{"name": "Barracks", "interactions": [], "events": {"on_enter": {"#script": "emberhollow/scripts/rooms/barracks/on_enter"}, "on_input": {"#script": "emberhollow/scripts/rooms/barracks/on_input"}}}

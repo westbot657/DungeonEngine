@@ -1,1 +1,0 @@
-{"name": "Guard House", "interactions": [], "events": {"on_enter": {"#script": "emberhollow/scripts/rooms/guard_house/on_enter"}, "on_input": {"#script": "emberhollow/scripts/rooms/guard_house/on_input"}}}

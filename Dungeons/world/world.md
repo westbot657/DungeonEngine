@@ -32,7 +32,7 @@ so after a long enough exposure to an element, a dragon's breath weapon will cha
 - Fostrite - Ice breath
 - Droitium - Fire breath
 - Vetrum - Lightning breath
-- Keflian - not really a breath weapon, but the dragon can attract or repulse metals at will
+- Keflian - not really a breath weapon, but the dragon can attract or repulse metals at will within a specific range
 
 
 # Locations

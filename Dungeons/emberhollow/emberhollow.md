@@ -1,4 +1,19 @@
 
+# Emberhollow
+- Mining town on the coast
+
+- produce lots of weapons and armor, along with lots of stone that is used for construction.
+- local wizard will occasionally buy a collection of weapons/armor, enchant them, and re-sell them for more
+- over seas trade with other places
+- export weapons, armor, stone, copper, iron, steel, gold, some magic items
+- import lumber, fabrics, some food stuff
+- heavy fortifications facing inland - the city is sufficiently equipped to fend off a dragon
+- the island was a home for dragons ages ago. most have died off, their time on the island left it full of riches (hence the mining)
+- some dragons remain, ancient and powerful.
+
+
+
+
 
 
 

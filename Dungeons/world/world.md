@@ -20,7 +20,7 @@ Ethereal elements:
 - Krianor - The compound of Vetrum and Keflian. When this compound is in contact with Astreatium, it acts as a battery with Astreatium being ground,
             and Krianor being positive.
 
-- Shadestone - stone that emmits darkness. makes light sources look dim.
+- Shadestone - stone that emmits darkness. makes nearby light sources look dim.
 
 
 Dragons don't *need* to breath, meaning they can travel through space, but their breath weapon relies on an atmosphere
@@ -51,11 +51,11 @@ Orbit
 - Binary star system
 │             ♦ - Kaar
 │               ♦ - Atrect
-│                 
-│                 
-│                 
-│                 
-│                 
+│              
+│              
+│              
+│              
+│              
 │              • - Egion
 │              
 │              
@@ -104,6 +104,7 @@ Orbit
   - ...
 
 - Alura:
+  - Inter-planetary trade center
   Dungeons:
   - ...
 
@@ -124,12 +125,15 @@ Orbit
 - Jaded Wilds
 - The Shadow Forest
 
+
 ## Rurus territories
 - Eastern Flats
 - The Ethereal Tundra
 - Grim Wilds
 - Frozen Dessert
 - Sandy Wilds
+
+
 
 ## The Ethereal plane
 a realm outside of reality, in sleep, one can vaguely see whispers of this place
@@ -202,6 +206,12 @@ It is dangerous for your mind to travel through this portal, while it does work,
 ┼ Trade opens between Erus and Rucury/Rurus                           │                                                                       │
 │                                                                     │                                                                       │
 ┼ Humans start to learn sorcery                                       │                                                                       │
+│                                                                     │                                                                       │
+│                                                                     │                                                                       │
+│                                                                     │                                                                       │
+│                                                                     │                                                                       │
+│                                                                     │                                                                       │
+│                                                                     │                                                                       │
 │                                                                     │                                                                       │
 │                                                                     │                                                                       │
 │                                                                     │                                                                       │

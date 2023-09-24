@@ -1,14 +1,9 @@
 {
     "name": "Emberhollow",
-    "version": 0.1,
+    "version": 1,
     "entry_point": "emberhollow:rooms/south_center_street",
     "events": {
-        "on_enter": [
-            {
-                "function": "engine:player/message",
-                "message": "You have entered Emberhollow"
-            }
-        ],
+        "on_enter": {},
         "on_input": {},
         "on_exit": {}
     },

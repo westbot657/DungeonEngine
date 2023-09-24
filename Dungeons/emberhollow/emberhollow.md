@@ -2,7 +2,7 @@
 
 
 
-# Kiera's storyline ideas:
+# Kiera's storyline ideas
 
 ## 1. Corrupt government
 

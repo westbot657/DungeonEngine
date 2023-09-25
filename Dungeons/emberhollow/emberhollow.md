@@ -13,12 +13,13 @@
 
 
 sub-dungeons:
-- emberhollow_the_mines
+- the_mines_of_emberhollow
+
+neighbor-dungeons:
+- Shadow Grove
 
 
-
-
-# Kiera's storyline ideas
+# Kiera's storyline idea(s)
 
 ## 1. Corrupt government
 

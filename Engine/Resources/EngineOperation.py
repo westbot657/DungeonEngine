@@ -37,6 +37,10 @@ class EngineOperation:
             self.player = player
             self.target_location = target_location
 
+    class KillPlayer(_EngineOperation):
+        def __init__(self, player):
+            self.player = player
+
     class Restart(_EngineOperation):
         """
         yield/return this to restart the entire interaction

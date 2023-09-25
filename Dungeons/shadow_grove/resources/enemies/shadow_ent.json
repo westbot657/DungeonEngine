@@ -1,0 +1,11 @@
+{
+    "name": "Shadow Ent",
+    "max_health": 25,
+    "attacks": [
+        "shadow_grove:attacks/natures_wrath",
+        {
+            "parent": "shadow_grove:attacks/vine_whip",
+            "name": "Branch Thrash"
+        }
+    ]
+}

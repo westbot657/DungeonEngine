@@ -1,0 +1,7 @@
+{
+    "name": "Ritual Dagger",
+    "damage": 3,
+    "durability": 20,
+    "range": 1,
+    "max_durability": 30
+}

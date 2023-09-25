@@ -1,0 +1,7 @@
+{
+    "name": "Rusted Sword",
+    "damage": 4,
+    "durability": 4,
+    "range": 4,
+    "max_durability": 7
+}

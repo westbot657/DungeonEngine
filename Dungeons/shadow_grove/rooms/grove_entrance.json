@@ -1,0 +1,43 @@
+{
+    "name": "Grove Entrance",
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "left_tunnel",
+            "target": "shadow_grove:rooms/left_tunnel",
+            "travel_message": "You move into the left tunnel."
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "right_tunnel",
+            "target": "shadow_grove:rooms/right_tunnel",
+            "travel_message": "You move into the right tunnel."
+        },
+        {
+            "type": "engine:interactable/door",
+            "id": "boss_room_door",
+            "target": "shadow_grove:rooms/boss_room",
+            "lock_message": "You pull at the door but the vines hold it fast against your efforts.",
+            "locked": true
+        },
+        {
+            "type": "engine:interactable/loot",
+            "id": "ritual_staff",
+            "loot": "shadow_grove:weapons/ritual_staff"
+        },
+        {
+            "type": "engine:interactable/door",
+            "id": "exit",
+            "target": "world:rooms/start",
+            "travel_message": "You emerge from the dark and overgrown grove."
+        }
+    ],
+    "events": {
+        "on_enter": {
+            "#script": "shadow_grove/scripts/rooms/grove_entrance/on_enter"
+        },
+        "on_input": {
+            "#script": "shadow_grove/scripts/rooms/grove_entrance/on_input"
+        }
+    }
+}

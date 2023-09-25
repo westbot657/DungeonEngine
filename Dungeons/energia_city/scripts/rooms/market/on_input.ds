@@ -1,8 +1,0 @@
-
-[engine:text/match](<#text>)
-@pattern: "(leave|exit|east)" # {
-    [engine:interaction/interact](".east_main_street")
-}
-@pattern: "storage" # {
-    [engine:interaction/interact](".storage_room")
-}

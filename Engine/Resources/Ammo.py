@@ -33,7 +33,12 @@ class Ammo(GameObject):
         return f"{self.name} {self.count}/{self.max_count}"
 
     def getLocalVariables(self) -> dict:
-        return {}
+        return {
+            ".name": self.name,
+            ".bonus_damage": self.bonus_damage,
+            ".max_count": self.max_count,
+            ".count": self.count
+        }
 
     def updateLocalVariables(self, locals: dict):
         ...
@@ -47,17 +52,17 @@ class Ammo(GameObject):
     def postEvaluate(self, function_memory:FunctionMemory):
         self.updateLocalVariables(function_memory.symbol_table)
 
-    # on_load: when ammo is loaded into a weapon
-    def onLoad(self, function_memory:FunctionMemory):
-        ...
+    # # on_load: when ammo is loaded into a weapon
+    # def onLoad(self, function_memory:FunctionMemory):
+    #     ...
 
-    # on_unload: when ammo is unloaded from a weapon
-    def onUnload(self, function_memory:FunctionMemory):
-        ...
+    # # on_unload: when ammo is unloaded from a weapon
+    # def onUnload(self, function_memory:FunctionMemory):
+    #     ...
     
-    # when weapon is used to fire ammo
-    def onFire(self, function_memory:FunctionMemory):
-        ...
+    # # when weapon is used to fire ammo
+    # def onFire(self, function_memory:FunctionMemory):
+    #     ...
 
     def onHit(self, function_memory:FunctionMemory):
         ...

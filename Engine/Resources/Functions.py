@@ -2114,7 +2114,7 @@ class Engine_Dict_ForEach(LoaderFunction):
         match args:
             case {
                 "dict": dict(),
-                "run": dict()
+                "run": dict()|list()
             }:
                 return cls.for_each
             case _: return None
@@ -2932,7 +2932,7 @@ class Engine_Combat_Start(LoaderFunction):
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
             case {
-                "combat": str()|dict()
+                "combat": str()
             }: return cls.start
             case _: return None
     @staticmethod
@@ -2942,17 +2942,35 @@ class Engine_Combat_Start(LoaderFunction):
                 AbstractCombat.getCombat(function_memory, combat),
                 function_memory.ref("#player")
             )
-        elif isinstance(combat, dict): # inline combat
 
-            identifier = Identifier("engine", "inline_combat/", "")
+class Engine_Combat_Get(LoaderFunction):
+    id = Identifier("engine", "combat/", "get")
+    pre_evaluate_args = False
 
-            abstract: AbstractCombat = AbstractCombat(identifier, combat)
-            identifier.name = f"combat_{id(abstract)}"
-
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "combat": "required parameter"
+        }
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "combat": str()|dict()
+            }: return cls.get
+            case _: return None
+    @staticmethod
+    def get(function_memory:FunctionMemory, combat:str|dict):
+        if isinstance(combat, str): # reference external combat file
             yield EngineOperation.StartCombat(
-                abstract.createInstance(function_memory),
+                AbstractCombat.getCombat(function_memory, combat),
                 function_memory.ref("#player")
             )
+
+
 
 class Engine_Combat_Trigger(LoaderFunction):
     id = Identifier("engine", "combat/", "trigger")

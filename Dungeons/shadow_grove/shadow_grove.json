@@ -1,0 +1,13 @@
+{
+    "name": "Shadow Grove",
+    "version": 0.1,
+    "entry_point": "shadow_grove:rooms/grove_entrance",
+    "events": {
+        "on_enter": {
+            "#script": "shadow_grove/scripts/shadow_grove/on_enter"
+        }
+    },
+    "data": {
+        "boss_defeated": false
+    }
+}

@@ -59,8 +59,8 @@ class Player(Entity):
             def __init__(self):
                 super().__init__("Force Miss")
 
-    def __init__(self, discord_id:int, name:str, max_health:int, health:int, inventory:Inventory, location:Location, position:Position, _text_pattern_categories:list[str], in_combat:bool):
-        self.discord_id = discord_id
+    def __init__(self, uuid:int, name:str, max_health:int, health:int, inventory:Inventory, location:Location, position:Position, _text_pattern_categories:list[str], in_combat:bool):
+        self.uuid = uuid
         self.name = name
         self.max_health = max_health
         self.health = health
@@ -76,9 +76,9 @@ class Player(Entity):
         self.last_location = location.copy()
 
     @classmethod
-    def newPlayer(cls, function_memory:FunctionMemory, discord_id:int, name:str, max_health:int):
+    def newPlayer(cls, function_memory:FunctionMemory, uuid:int, name:str, max_health:int):
         new_player = cls(
-            discord_id,
+            uuid,
             name,
             max_health, max_health,
             Inventory(function_memory, []),
@@ -88,12 +88,12 @@ class Player(Entity):
             False
         )
 
-        cls._loaded.update({discord_id: new_player})
+        cls._loaded.update({uuid: new_player})
         return new_player
 
     def getLocalVariables(self):
         d = {
-            ".uid": self.discord_id,
+            ".uid": self.uuid,
             ".name": self.name,
             ".max_health": self.max_health,
             ".health": self.health,
@@ -161,7 +161,7 @@ class Player(Entity):
 
     def _get_save(self, function_memory):
         data = {
-            "id": self.discord_id,
+            "id": self.uuid,
             "name": self.name,
             "max_health": self.max_health,
             "health": self.health,
@@ -272,7 +272,8 @@ class Player(Entity):
 
         Inventory._default_equips = {
             "engine:weapon": engine.loader.abstract_weapons["engine:weapons/unnarmed_strike"],
-            "engine:armor": engine.loader.abstract_armor["engine:armor/common_clothes"]
+            "engine:armor": engine.loader.abstract_armor["engine:armor/common_clothes"],
+            "engine:ammo": engine.loader.abstract_ammo["engine:ammo/none"]
         }
 
         Log["loadup"]["player"]("Loading Player Data...")
@@ -306,7 +307,7 @@ class Player(Entity):
     def __dict__(self):
         return {
             "%ENGINE:DATA-TYPE": "Player",
-            "id": self.discord_id,
+            "id": self.uuid,
             "name": self.name,
             "health": self.health,
             "max_health": self.max_health,

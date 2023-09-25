@@ -1,8 +1,8 @@
 {
     "config": {},
     "dungeons": {
-        "energia_city": {},
-        "example_dungeon": {},
+        "emberhollow": {},
+        "shadow_grove": {},
         "nonsense_dungeon": {},
         "world": {}
     },

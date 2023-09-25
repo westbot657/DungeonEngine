@@ -450,7 +450,7 @@ def p_scope(p):
     """scope : '{' expressions '}'
              | '{' '}'"""
     if len(p) == 3:
-        p[0] = None
+        p[0] = {"scope": {"functions": []}}
     else:
         p[0] = {"scope": p[2]}
 

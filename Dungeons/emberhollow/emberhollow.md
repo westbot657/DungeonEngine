@@ -64,3 +64,72 @@ the slow-burn plot twist:
 │ │ - He will have a grudge against you, and in the future, may make life incredibly difficult.
 
 
+
+1. What Essential services and NPC's are needed?
+
+2. What features build on the story and lore for your world?
+
+3. How do we make this feel like a vibrant and believable place?
+
+where's the inn?
+where to buy equipment?
+- blacksmiths may only make nails, tools, etc, not high-end weapons
+- use population to determine max costs for stuff
+
+place to sell loot?
+
+who's in charge?
+
+where to gather information?
+- inn, markets, etc...
+
+who has magical powers?
+where to get healing?
+towns will not have very strong spell casters. (<= 3rd level dnd)
+
+- can't have too many adventurous people (recruitment issues)
+
+- problems in town? (see [above](#kieras-storyline-ideas))
+- mini sub adventures
+
+other questions for myself:
+name of the town? Emberhollow
+what is the population? ~100-200 (with NPC's for almost all of them...)
+where do people live? (~5 people per house)
+where do food and water come from?
+what kind of foods and drinks are sold?
+defences?
+culture & religion?
+major resource? mining and fishing
+landmarks and special locations? The Keslite Forge, The Dragon keep, experimental telecomms base, secondary space control base
+
+scale to city size:
+
+multiple places to get the same things (based on preferences)
+
+Where do you go to eat here?  vs  What's a good place to eat nearby?
+
+City is like multiple towns/districts with more specifics
+
+think about specialized districts
+what districts are there?
+what do they have in them?
+
+types of districts:
+- market district
+- old town district - where the city started
+- military/castle district
+- docks/ocean district
+- industrial district
+- the sewers
+- temple district
+- nobles district - avoid the docks and industrial districts
+- entertainment district
+- the slums
+- residential districts
+- etc...
+
+
+why are the players here?
+
+

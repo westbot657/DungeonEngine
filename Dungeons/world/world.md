@@ -35,6 +35,17 @@ so after a long enough exposure to an element, a dragon's breath weapon will cha
 - Keflian - not really a breath weapon, but the dragon can attract or repulse metals at will within a specific range
 - Shadestone - Breath a heavy, dark smoke.
 
+breaths can also mix if a dragon is irradiated by multiple elements simultaneously.
+special mixes:
+- Escian & Sapryx - based on the dragons mood, can bring someone to near-death or increase their strength
+- Fostrite & Droitium - Breath spews lava
+- Escian & Droitium - Creates an exceptionally bright flame that spreads with little effort
+- Sapryx & Droitium - Fire withers rather than burns
+- Escian & Fostrite - Water breath
+- Sapryx & Fostrite - Acid breath
+
+
+
 
 # Locations
 

@@ -37,7 +37,7 @@ so after a long enough exposure to an element, a dragon's breath weapon will cha
 
 # Locations
 
-## Planets
+## Planets of the Kaar-Atrectal System of the Etheral Galaxy
 - Egion - rocky wasteland planet - Astreatium core
 - Ocruenus - Ocean planet
 - Erus - Ocean and land planet - Keflian and Escian Core

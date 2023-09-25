@@ -13,7 +13,7 @@
 
 
 sub-dungeons:
-- the_mines_of_emberhollow
+- The Mines Of Emberhollow
 
 neighbor-dungeons:
 - Shadow Grove

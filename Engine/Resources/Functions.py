@@ -3119,6 +3119,53 @@ class Engine_Combat_Message(LoaderFunction):
         combat: Combat = function_memory.ref("#combat")
         combat.addTask(Combat.Operation.Message(kwargs.get("message"), *players))
 
+class Engine_Combat_KillPlayer(LoaderFunction):
+    id = Identifier("engine", "combat/", "kill_player")
+    
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "player": "required parameter"
+        }
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "player": str()|Player()
+            }: return cls.kill_player
+            case _: return None
+    
+    @staticmethod
+    def kill_player(function_memory:FunctionMemory, player:str|Player):
+        ...
+    
+class Engine_Combat_RemovePlayer(LoaderFunction):
+    id = Identifier("engine", "combat/", "remove_player")
+    
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "player": "required parameter"
+        }
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "player": str()|Player()
+            }: return cls.remove_player
+            case _: return None
+    
+    @staticmethod
+    def remove_player(function_memory:FunctionMemory, player:str|Player):
+        ...
+    
+
 # ^ Combat ^ #
 
 ####XXX#################XXX####

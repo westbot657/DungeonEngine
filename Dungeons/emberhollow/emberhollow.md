@@ -8,7 +8,7 @@
 - export weapons, armor, stone, copper, iron, steel, gold, some magic items
 - import lumber, fabrics, some food stuff
 - heavy fortifications facing inland - the city is sufficiently equipped to fend off a dragon
-- the island was a home for dragons ages ago. most have died off, their time on the island left it full of riches (hence the mining)
+- the island was a home for dragons ages ago. most have died off, their time on the island left it full of riches (hence the mining) (there's also a lot of dwarves)
 - some dragons remain, ancient and powerful.
 
 

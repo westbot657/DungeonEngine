@@ -12,7 +12,8 @@
 - some dragons remain, ancient and powerful.
 
 
-
+sub-dungeons:
+- emberhollow_the_mines
 
 
 

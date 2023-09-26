@@ -1,0 +1,13 @@
+// send the player to a random spawn location!
+
+
+// [engine:sound/play]("./resources/sounds/.wav")
+
+
+
+
+// <spawn> = [engine:random/choice](<.spawn_points>)
+
+// [engine:player/set_location](<spawn>)
+
+

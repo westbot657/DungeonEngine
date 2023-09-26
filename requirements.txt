@@ -2,3 +2,4 @@ pygame
 pyperclip
 mouse
 pypresence
+simpleaudio

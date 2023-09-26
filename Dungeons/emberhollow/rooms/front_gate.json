@@ -1,0 +1,11 @@
+{
+    "name": "Front Gate",
+    "events": {
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/front_gate/on_enter"
+        },
+        "on_input": {
+            "#script": "emberhollow/scripts/rooms/front_gate/on_input"
+        }
+    }
+}

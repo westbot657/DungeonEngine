@@ -2,5 +2,10 @@
     "name": "World",
     "version": 1,
     "entry_point": "world:rooms/start",
-    "environment": {}
+    "environment": {},
+    "data": {
+        "spawn_points": [
+            
+        ]
+    }
 }

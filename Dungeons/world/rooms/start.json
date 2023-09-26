@@ -5,6 +5,9 @@
         
     ],
     "events": {
+        "on_enter": {
+            "#script": "world/scripts/rooms/start/on_enter.ds"
+        },
         "on_input": {
             "#call": "$goto_check",
             "parameters": {

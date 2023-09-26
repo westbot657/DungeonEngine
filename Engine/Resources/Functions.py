@@ -3288,6 +3288,7 @@ class Engine_Debug_Memory(LoaderFunction):
 ### XXX Engine Time XXX ###
 ####XXX#############XXX####
 
+
 class Engine_Time_Get(LoaderFunction):
     id = Identifier("engine", "time/", "get")
     
@@ -3304,8 +3305,35 @@ class Engine_Time_Get(LoaderFunction):
     def get(function_memory:FunctionMemory):
         return Time(time.time())
 
-
 # ^ Time ^ #
 
+####XXX##############XXX####
+### XXX Engine Sound XXX ###
+####XXX##############XXX####
+
+
+class Engine_Sound_Play(LoaderFunction):
+    id = Identifier("engine", "sound/", "play")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "sound": "required parameter"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "sound": str()
+            }: return cls.send_message
+            case _: return None
+    @staticmethod
+    def send_message(function_memory:FunctionMemory, sound:str):
+        function_memory.engine.sendOutput(1, sound)
+
+# ^ Sound ^ #
 
 

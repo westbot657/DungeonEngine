@@ -1,7 +1,10 @@
 # pylint: disable=[W,R,C,import-error]
 
 from threading import Thread
-import re
+import re, os, sys
+
+import simpleaudio as sa
+
 
 
 class ConsoleIOHook:
@@ -30,7 +33,18 @@ class ConsoleIOHook:
         while self.running:
             while self.print_queue:
                 target, text = self.print_queue.pop(0)
-                print(f"[@game->{target}]: {text}")
+                
+                if target == 0:
+                    print(f"[engine]: {text}")
+                if target == 1:
+                    print(f"[sound]: {text}")
+                    
+                    if os.path.exists(text):
+                        sa.WaveObject.from_wave_file(text).play()
+                    
+                else:
+                    print(f"[@game->{target}]: {text}")
+                
 
     def _input_loop(self):
         while self.running:

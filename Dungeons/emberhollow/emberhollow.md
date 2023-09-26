@@ -96,9 +96,9 @@ other questions for myself:
 name of the town? Emberhollow
 what is the population? ~100-200 (with NPC's for almost all of them...)
 where do people live? (~5 people per house)
-where do food and water come from?
-what kind of foods and drinks are sold?
-defences?
+where do food and water come from? The ocean
+what kind of foods and drinks are sold? Fish, bread
+defences? castle wall
 culture & religion?
 major resource? mining and fishing
 landmarks and special locations? The Keslite Forge, The Dragon keep, experimental telecomms base, secondary space control base

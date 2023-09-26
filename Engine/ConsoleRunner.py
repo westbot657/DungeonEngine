@@ -5,6 +5,7 @@ import re, os, sys
 
 import simpleaudio as sa
 
+from Engine import Engine
 
 
 class ConsoleIOHook:
@@ -57,7 +58,7 @@ class ConsoleIOHook:
 
 
 if __name__ == "__main__":
-    from Engine import Engine
+    # from Engine import Engine
     console_hook = ConsoleIOHook()
     game_engine = Engine(console_hook)  # pylint: disable=[not-callable]
     game_engine.start()

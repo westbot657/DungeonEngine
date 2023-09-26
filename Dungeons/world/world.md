@@ -156,6 +156,9 @@ It is dangerous for your mind to travel through this portal, while it does work,
 
 
 # Timeline
+
+(if this looks like a jumbled mess, zoom out or make the window wider)
+
 .
 . A powerful man from the ethereal plane dreamwalks to reality (this is a common thing to do)
 . he then tries to create a psychic link to himself (this has never been done before, nor will be done again)

@@ -24,6 +24,7 @@ try:
     from .Interactable import Interactable
     from .Util import Util
     from .Location import Location
+    from .Time import Time
 except ImportError:
     from LoaderFunction import LoaderFunction
     from Identifier import Identifier
@@ -48,10 +49,11 @@ except ImportError:
     from Interactable import Interactable
     from Util import Util
     from Location import Location
+    from Time import Time
 
 from typing import Any
 
-import random, math, re, json
+import random, math, re, json, time
 
 """
 functions:
@@ -3282,6 +3284,28 @@ class Engine_Debug_Memory(LoaderFunction):
 
 # ^ Debug ^ #
 
+####XXX#############XXX####
+### XXX Engine Time XXX ###
+####XXX#############XXX####
+
+class Engine_Time_Get(LoaderFunction):
+    id = Identifier("engine", "time/", "get")
+    
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 0,
+        "args": {}
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        return cls.get
+    @staticmethod
+    def get(function_memory:FunctionMemory):
+        return Time(time.time())
+
+
+# ^ Time ^ #
 
 
 

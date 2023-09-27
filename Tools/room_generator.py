@@ -175,20 +175,46 @@ def generate():
 
     if input("Generate room connections? (y/n)").lower().startswith("y"):
         while True:
-            code = "[engine:text/match]([engine:text/set_case](<#text>, \"lower\"))\n"
             start = input("enter room id to add passages/doors from: ")
             
             # check that start room exists
+            
+            if not os.path.exists(f"./Dungeons/{dungeon_namespace}/rooms/{start}.json"):
+                print("That room does not exist!")
+                continue
+            
+            if not os.path.exists(f"./Dungeons/{dungeon_namespace}/scripts/rooms/{start}/on_input.ds"):
+                os.mkdir(f"./Dungeons/{dungeon_namespace}/scripts/rooms/{start}/")
+                open(f"./Dungeons/{dungeon_namespace}/scripts/rooms/{start}/on_input.ds", "w+", encoding="utf-8").close()
+            
+            
+            
+            
             ends = []
             print("enter connection room ids (each on a new line, enter a blank line to stop):")
-            print("examples:\n> door <dungeon>:rooms/<room>\n> passage <dungeon>:rooms/<room>\n")
+            print("examples:\n> door <room>\n> passage /<room>\n")
+            
             while (i := input(">")):
                 
                 t, name = i.split(" ")
                 
                 # check that `i` exists
                 
-                ends.append(i)
+                if not os.path.exists(f"./Dungeons/{dungeon_namespace}/rooms/{name}.json"):
+                    print("That room does not exist!")
+                    continue
+                
+                if t not in ["passage", "door"]:
+                    print("Invalid connection type")
+                    continue
+                
+                ends.append((i, t))
+            
+            
+            code = ["[engine:text/match]([engine:text/set_case](<#text>, \"lower\"), \"search\")\n"]
+            
+            with open(f"./Dungeons/{dungeon_namespace}/rooms/{start}.json", "r+", encoding="utf-8") as f:
+                
             
             
 

@@ -17,11 +17,13 @@ except ImportError:
 
 from typing import Any
 
-import glob, json
+import glob, json, sys, os
+
 
 
 class FunctionMemory:
     #_instance = None
+    
 
     with open(f"./resources/engine.json", "r+", encoding="utf-8") as f:
         _config: dict = json.load(f)

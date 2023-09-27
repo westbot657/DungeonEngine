@@ -31,10 +31,10 @@ class Util:
     #     out = sep.join([str(v) for v in values])
 
     #     if hasattr(player, "user_id"):
-    #         print(f"[@game->{player.user_id}]: {out}".replace("&", "&amp;").replace("\n", "&new;").encode("utf-8"), end=end)
+    #         print(f"[>>{player.user_id}]: {out}".replace("&", "&amp;").replace("\n", "&new;").encode("utf-8"), end=end)
 
     #     else:
-    #         print(f"[@game]: {player}{sep}{out}".replace("&", "&amp;").replace("\n", "&new;").encode("utf-8"), end=end)
+    #         print(f"[>>]: {player}{sep}{out}".replace("&", "&amp;").replace("\n", "&new;").encode("utf-8"), end=end)
 
     @staticmethod
     def generator_started(gen:Generator):

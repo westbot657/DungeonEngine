@@ -456,7 +456,8 @@ def p_scope(p):
 
 def p_statements(p):
     """expressions : statement expressions
-                   | statement"""
+                   | statement
+                   | """
     if len(p) == 3:
         if p[1] and p[2]["functions"]:
             p[0] = {
@@ -473,10 +474,12 @@ def p_statements(p):
         elif (not p[1]) and (not p[2]["functions"]):
             raise Exception("uhhhh...")
             # this shouldn't be possible...
-    else:
+    elif len(p) == 2:
         p[0] = {
             "functions": [p[1]]
         }
+    else:
+        p[0] = {}
 
 def p_parameters(p):
     """parameters : '(' param_element ')'
@@ -732,7 +735,8 @@ def p_error(p):
     if p:
         Log["ERROR"]["engine script"](f"Syntax error at '{p.value}' ({p.lineno}, {p.lexpos})")
     else:
-        Log["ERROR"]["engine script"]("Syntax error at EOF")
+        return {}
+        # Log["ERROR"]["engine script"]("Syntax error at EOF")
     # print(p)
 
 # Build the parser

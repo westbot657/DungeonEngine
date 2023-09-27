@@ -199,7 +199,7 @@ class Player(Entity):
         ev = weapon.onAttack(function_memory, enemy, acc)
         v = None
         hit = None
-        print("player.attackEnemy() called!")
+        Log["debug"]["player"]("player.attackEnemy() called!")
         try:
             v = ev.send(None)
             while isinstance(v, (_EngineOperation, Player.Operation._Operation)):
@@ -214,7 +214,7 @@ class Player(Entity):
             if isinstance(e.value, Player.Operation.CancelAttack):
                 ev.close()
                 return v
-            print(f"Player attack: {e.value=}  {v=}")
+            Log["debug"]["player"](f"Player attack: {e.value=}  {v=}")
             return e.value or v
 
     def onAttacked(self, function_memory:FunctionMemory, attacker, damage:int):
@@ -277,7 +277,7 @@ class Player(Entity):
         }
 
         Log["loadup"]["player"]("Loading Player Data...")
-        with open("Engine/save_data/players.json", "r+", encoding="utf-8") as f:
+        with open("./save_data/players.json", "r+", encoding="utf-8") as f:
             data_list: list[dict] = json.load(f)
         
         for data in data_list:
@@ -337,7 +337,7 @@ class Player(Entity):
 
             data.append(save_data)
 
-        with open("Engine/save_data/players.json", "w+", encoding="utf-8") as f:
+        with open("./save_data/players.json", "w+", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
 
 

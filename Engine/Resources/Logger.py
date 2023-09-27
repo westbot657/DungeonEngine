@@ -25,8 +25,12 @@ class _Log:
         self.data = []
         self.counting = False
         self.counted = 0
+        self.enabled = True
 
         self.engine = None
+
+    def toggle(self):
+        self.enabled = not self.enabled
 
     class _o_off:
         def __init__(self): pass
@@ -38,6 +42,8 @@ class _Log:
         self.tags = []
     
     def __getitem__(self, tag):
+        if not self.enabled:
+            return _Log._off
         if tag in self._disabled_tags and not tag in self._tag_whitelist:
             self.tags.clear()
             return _Log._off

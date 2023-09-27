@@ -3280,7 +3280,7 @@ class Engine_Debug_Memory(LoaderFunction):
 
     @staticmethod
     def memory(function_memory:FunctionMemory):
-        print(json.dumps(function_memory.getMemory(), indent=4, default=str))
+        Log["debug"]["memory"](json.dumps(function_memory.getMemory(), indent=4, default=str))
 
 # ^ Debug ^ #
 

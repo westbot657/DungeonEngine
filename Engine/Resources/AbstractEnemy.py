@@ -190,7 +190,7 @@ class AbstractEnemy:
             self.getHealth()
             self.getAttacks()
         except InvalidObjectError as err:
-            print(f"Failed to load enemy: {self.identifier}  {err}")
+            Log["loadup"]["abstract"]["enemy"](f"Failed to load enemy: {self.identifier}  {err}")
         
         AbstractEnemy._link_parents.clear()
 

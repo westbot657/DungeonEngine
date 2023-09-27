@@ -112,12 +112,16 @@ class PlyLogger(object):
         self.f = f
 
     def debug(self, msg, *args, **kwargs):
-        self.f.write((msg % args) + '\n')
+        try:
+            self.f.write((msg % args) + '\n')
+        except: pass
 
     info = debug
 
     def warning(self, msg, *args, **kwargs):
-        self.f.write('WARNING: ' + (msg % args) + '\n')
+        try:
+            self.f.write('WARNING: ' + (msg % args) + '\n')
+        except: pass
 
     def error(self, msg, *args, **kwargs):
         self.f.write('ERROR: ' + (msg % args) + '\n')
@@ -3310,6 +3314,8 @@ def yacc(method='LALR', debug=yaccdebug, module=None, tabmodule=tab_module, star
         if debug:
             try:
                 debuglog = PlyLogger(open(os.path.join(outputdir, debugfile), 'w'))
+            except FileNotFoundError:
+                debuglog = NullLogger()
             except IOError as e:
                 errorlog.warning("Couldn't open %r. %s" % (debugfile, e))
                 debuglog = NullLogger()

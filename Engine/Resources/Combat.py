@@ -247,7 +247,7 @@ class Combat(FunctionalElement):
             v = e.value or v
 
     def enemyAttackPlayer(self, enemy:Enemy, player:Player):
-        print("\n\n\nENEMY ATTACK PLAYER!!\n\n")
+        Log["debug"]["enemy"]("ENEMY ATTACK PLAYER!!")
         self.function_memory.update({
             "damage": 0
         })
@@ -330,7 +330,7 @@ class Combat(FunctionalElement):
             case Combat.Operation._HandleInput():
                 text = operation.text
                 player = operation.player
-                print(f"combat recieved input '{text}' from {player}")
+                Log["debug"]["combat"]["handle operation"](f"combat recieved input '{text}' from {player}")
 
                 Log["debug"]["INFO"](f"Combat data:  turn={self.turn}")
                 
@@ -419,7 +419,7 @@ class Combat(FunctionalElement):
                 self.last_trigger = operation.event_name
 
             case Combat.Operation.Spawn():
-                print("dungeon spawn enemies?")
+                Log["debug"]["combat"]["handle operation"]("dungeon spawn enemies?")
                 if operation.priority == Combat.JoinPriority.NEXT:
                     i = 0
                     for enemy_id in operation.enemies:

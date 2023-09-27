@@ -2,15 +2,19 @@
 from Resources.Logger import Log
 
 Log._tag_colors = {
-    "loadup": "\033[38;2;10;200;80m",
-    "player": "\033[38;2;10;40;180m",
-    "loader": "\033[38;2;200;200;10m",
-    "ERROR": "\033[38;2;255;0;0m",
-    "abstract": "\033[38;2;100;100;100m",
-    "object": "\033[38;2;200;200;200m",
-    "inventory": "\033[38;2;0;100;100m",
-    "dungeon": "\033[38;2;0;180;30m",
-    "evaluate-result": "\033[38;2;255;0;0m"
+    "loadup": "\u001b[38;2;10;200;80m",
+    "player": "\u001b[38;2;10;40;180m",
+    "loader": "\u001b[38;2;200;200;10m",
+    "ERROR": "\u001b[38;2;255;0;0m",
+    "WARNING": "\u001b[38;2;255;127;0m",
+    "abstract": "\u001b[38;2;100;100;100m",
+    "object": "\u001b[38;2;200;200;200m",
+    "inventory": "\u001b[38;2;0;100;100m",
+    "dungeon": "\u001b[38;2;0;180;30m",
+    "evaluate-result": "\u001b[38;2;255;0;0m",
+    "engine script": "\u001b[38;2;127;255;10m",
+    "debug": "\u001b[38;2;10;110;10m",
+    "engine": "\u001b[38;2;255;215;0m"
 }
 
 from Resources.AbstractAmmo         import AbstractAmmo, Ammo
@@ -28,7 +32,7 @@ from Resources.DungeonLoader        import DungeonLoader
 from Resources.FunctionMemory       import FunctionMemory
 from Resources.TextPattern          import TextPattern
 from Resources.EngineOperation      import EngineOperation, _EngineOperation, OpType
-from Resources.EngineErrors         import EngineError, EngineBreak
+from Resources.EngineErrors         import EngineError, EngineBreak, UnknownPlayerError
 from Resources.Util                 import Util
 from Resources.ConsoleCommands      import ConsoleCommand # import the base class through the file that adds sub classes
 from Resources.Position             import Position
@@ -288,7 +292,7 @@ class Engine:
                 if player_id in self.input_queue:
                     self.input_queue[player_id][2] = ""
             # case Combat.Operation._Operation():
-            #     print(f"\033[38;2;255;0;0mEngine got Combat Operation: {result}\0")
+            #     print(f"\u001b[38;2;255;0;0mEngine got Combat Operation: {result}\0")
 
             case _:
                 raise EngineError("Unknown Operation")
@@ -316,7 +320,7 @@ class Engine:
                 self.tps = len(self._frame_times)/sum(self._frame_times)
             self._frame_start = time.time()
 
-            #print(f"\033[0F\033[30G{self.tps}\r")
+            #print(f"\u001b[0F\u001b[30G{self.tps}\r")
 
             if not self.running:
                 # Pause Menu thingy?
@@ -366,8 +370,13 @@ class Engine:
                         self.input_queue.update({0: [self._default_input_handler, self.default_input_handler, ""]})
                         ConsoleCommand.handle_input(self._function_memory, text)
                     continue
+                try:
+                    player: Player = Player.getPlayer(player_id)
+                except Exception as e:
+                    self.sendOutput(0, "\n".join(e.args))
+                    self.input_queue.pop(player_id)
+                    continue
 
-                player: Player = Player.getPlayer(player_id)
                 if text:
 
                     if player.in_combat:

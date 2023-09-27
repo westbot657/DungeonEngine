@@ -4,10 +4,12 @@ try:
     from .EngineErrors import FunctionCallError, ParseError, IdentifierError
     from .Identifier import Identifier
     from .GameObject import GameObject
+    from .Logger import Log
 except ImportError:
     from EngineErrors import FunctionCallError, ParseError, IdentifierError
     from Identifier import Identifier
     from GameObject import GameObject
+    from Logger import Log
 
 import json, re
 
@@ -202,7 +204,7 @@ class ConsoleCommand:
 
         if command := cls._commands.get(cmd, None):
             #try:
-            print(f"Running command {command}")
+            Log["console command"](f"Running command {command}")
             command._run(function_memory, text)
             #except Exception as e:
             #    print(e, e.args)

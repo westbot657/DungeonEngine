@@ -2994,7 +2994,7 @@ class GameApp(UIElement):
                 self.shadow_heal_bar._update(editor, X+self.x, Y+self.y)
             elif self.shadow == "damage":
                 self.shadow_damage_bar._update(editor, X+self.x, Y+self.y)
-            
+
     class EnemyCard(UIElement):
         def __init__(self, name:str, max_hp, current_hp):
             self.children = []

@@ -76,7 +76,7 @@ class Dungeon(FunctionalElement):
         self.updateLocalVariables(function_memory.symbol_table)
 
     def loadData(self, function_memory:FunctionMemory):
-        filename = f"./Engine/save_data/{self.abstract.identifier.name}.json"
+        filename = f"./save_data/{self.abstract.identifier.name}.json"
 
         if os.path.exists(filename):
             with open(filename, "r+", encoding="utf-8") as f:
@@ -103,7 +103,7 @@ class Dungeon(FunctionalElement):
 
 
     def saveData(self, function_memory:FunctionMemory):
-        filename = f"./Engine/save_data/{self.abstract.identifier.name}.json"
+        filename = f"./save_data/{self.abstract.identifier.name}.json"
         data = {}
         _dat = self.abstract._get_save(function_memory)
         dat = {}

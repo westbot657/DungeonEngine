@@ -10,6 +10,7 @@ try:
     from .Util import Util
     from .AbstractAttack import AbstractAttack, Attack
     from .EngineOperation import _EngineOperation
+    from .Logger import Log
 except:
     from Entity import Entity
     from Identifier import Identifier
@@ -20,6 +21,7 @@ except:
     from Util import Util
     from AbstractAttack import AbstractAttack, Attack
     from EngineOperation import _EngineOperation
+    from Logger import Log
 
 import json, random
 
@@ -214,13 +216,13 @@ class Enemy(Entity):
     
     def kill(self, function_memory:FunctionMemory):
         # uhhh....
-        print("<insert enemy death here>")
+        Log["debug"]["enemy"]("<insert enemy death here>")
         ...
 
     def onEvent(self, function_memory:FunctionMemory, current_trigger:str, event_name:str):
         if current_trigger is None and self.combat is not None:
             current_trigger = self.combat.last_trigger
-        print(f"Enemy.onEvent() called!  {event_name=} {current_trigger=}")
+        Log["debug"]["enemy"](f"Enemy.onEvent() called!  {event_name=} {current_trigger=}")
         out = None
         for trigger in [current_trigger, "@global", "@required"]:
             if trigger in self.events:

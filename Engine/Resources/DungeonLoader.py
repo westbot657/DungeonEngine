@@ -241,7 +241,7 @@ class DungeonLoader:
                             v = self.stopIterationEval(e.value, v)
                         res = v
                     elif isinstance(r, Combat.Operation._Operation):
-                        print(f"\033[38;2;255;0;0mCOMBAT TASK FROM FUNCTION!\033[0m")
+                        # print(f"\033[38;2;255;0;0mCOMBAT TASK FROM FUNCTION!\033[0m")
                         yield r
                         return
                     else:

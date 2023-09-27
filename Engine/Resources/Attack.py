@@ -5,11 +5,13 @@ try:
     from .FunctionalElement import FunctionalElement
     from .DynamicValue import DynamicValue
     from .EngineOperation import _EngineOperation
+    from .Logger import Log
 except ImportError:
     from FunctionMemory import FunctionMemory
     from FunctionalElement import FunctionalElement
     from DynamicValue import DynamicValue
     from EngineOperation import _EngineOperation
+    from Logger import Log
 
 import random
 
@@ -69,7 +71,7 @@ class Attack(FunctionalElement):
         return f"{self.name}  {self.damage.quickDisplay(function_memory)}dmg {self.range}ft {self.accuracy}% accuracy"
 
     def onAttack(self, function_memory:FunctionMemory, target, acc=None):
-        print("\n\nAttack.onAttack() called!\n\n")
+        Log["debug"]["attack"]["on attack"]("Attack.onAttack() called!")
         if acc is None:
             acc = random.randint(1, 100)
         if (on_attack := self.events.get("on_attack", None)) is not None:
@@ -114,8 +116,8 @@ class Attack(FunctionalElement):
         return v
 
     def onHit(self, function_memory:FunctionMemory, target):
-        print("\n\nattack hit!\n\n")
-        print(self.damage)
+        Log["debug"]["attack"]["on hit"]("attack hit!")
+        Log["debug"]["attack"]["on hit"](self.damage)
         damage = self.damage.getNew(function_memory)
 
         function_memory.update({
@@ -144,7 +146,7 @@ class Attack(FunctionalElement):
         return damage
 
     def onMiss(self, function_memory:FunctionMemory, target):
-        print("\n\nattack missed!\n\n")
+        Log["debug"]["attack"]["on miss"]("\n\nattack missed!\n\n")
 
         if (on_miss := self.events.get("on_miss", None)) is not None:
             self.prepFunctionMemory(function_memory)

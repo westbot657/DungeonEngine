@@ -2,10 +2,51 @@
 
 from threading import Thread
 import re, os, sys
-
+# from colorama import AnsiToWin32
 import simpleaudio as sa
 
+# import glob
+
+# if getattr(sys, 'frozen', False):
+#     # If the application is run as a bundle, the PyInstaller bootloader
+#     # extends the sys module by a flag frozen=True and sets the app 
+#     # path into variable _MEIPASS'.
+#     application_path = sys._MEIPASS
+# else:
+#     application_path = os.path.dirname(os.path.abspath(__file__))
+
+
+# sys.path.append(application_path)
+# print(f"PATH: {application_path} {sys.path}")
+
 from Engine import Engine
+
+
+os.system('') # this fixes console ansi colors for some reason
+
+
+
+# if not os.path.exists("./Dungeons/"):
+
+#     os.mkdir("./Dungeons/")
+#     os.mkdir("./Dungeons/world/")
+
+#     x = glob.glob("./DungeonSource/**/*", recursive=True)
+
+#     for f in x:
+#         bits = f.replace("\\", "/").replace("DungeonSource", "Dungeons").split("/")[0:-1]
+#         p = bits.pop(0) + "/"
+
+#         for b in bits:
+#             p += b + "/"
+#             if not os.path.exists(p):
+#                 os.mkdir(p)
+        
+#         with open(f, "r", encoding="utf-8") as file:
+#             t = file.read()
+        
+#         with open(f.replace("DungeonSource", "Dungeons"), "w", encoding="utf-8") as file:
+#             file.write(t)
 
 
 class ConsoleIOHook:
@@ -43,9 +84,12 @@ class ConsoleIOHook:
                     if os.path.exists(text):
                         sa.WaveObject.from_wave_file(text).play()
                     
+                elif target == "log":
+                    print(f"[{target}]: {text}")
+
                 else:
-                    print(f"[@game->{target}]: {text}")
-                
+                    print(f"\n\033[38;2;0;0;0m\033[48;2;0;255;0m[>>{target}]\033[0m: \033[38;2;200;200;230m{text}\033[0m")
+
 
     def _input_loop(self):
         while self.running:

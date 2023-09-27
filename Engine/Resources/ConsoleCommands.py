@@ -6,12 +6,14 @@ try:
     from .Player import Player
     from .Inventory import Inventory
     from .FunctionMemory import FunctionMemory
+    from .Logger import Log
 except ImportError:
     from ConsoleCommand import ConsoleCommand
     from Identifier import Identifier
     from Player import Player
     from Inventory import Inventory
     from FunctionMemory import FunctionMemory
+    from Logger import Log
 
 @ConsoleCommand(
     Identifier("engine", "", "save-game"),
@@ -58,5 +60,10 @@ def engine_giveGameObject(function_memory:FunctionMemory, target, objectType, ga
     ...
 
 
-
+@ConsoleCommand(
+    Identifier("engine", "", "toggle_log"),
+    {}
+)
+def engine_toggle_log(function_memory:FunctionMemory):
+    Log.toggle()
 

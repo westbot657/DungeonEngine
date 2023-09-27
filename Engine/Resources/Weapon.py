@@ -7,6 +7,7 @@ try:
     from .Util import Util
     from .FunctionMemory import FunctionMemory
     from .EngineOperation import _EngineOperation
+    from .Logger import Log
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
@@ -14,6 +15,7 @@ except ImportError:
     from Util import Util
     from FunctionMemory import FunctionMemory
     from EngineOperation import _EngineOperation
+    from Logger import Log
 
 import random
 
@@ -73,7 +75,7 @@ class Weapon(GameObject):
 
         damage = self.damage.getNew(function_memory)
 
-        print("weapon.onAttack() called!")
+        Log["debug"]["weapon"]("weapon.onAttack() called!")
         if on_attack := self.events.get("on_attack", None):
             self.prepFunctionMemory(function_memory)
             function_memory.update({
@@ -93,7 +95,7 @@ class Weapon(GameObject):
             damage = int(function_memory.ref("damage"))
             acc = int(function_memory.ref("accuracy"))
             self.postEvaluate(function_memory)
-        print(f"Weapon onAttack: damage:{damage}  accuracy:{acc}  target:{target}")
+        Log["debug"]["weapon"](f"Weapon onAttack: damage:{damage}  accuracy:{acc}  target:{target}")
 
         function_memory.addContextData({"#damage": damage})
         ev = target.onEvent(function_memory, None, "on_attacked")

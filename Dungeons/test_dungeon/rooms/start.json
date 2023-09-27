@@ -1,0 +1,25 @@
+{
+    "name": "Start",
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "room1_passage",
+            "target": "test_dungeon:rooms/room1",
+            "travel_message": "You go to room 1"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "room2_passage",
+            "target": "test_dungeon:rooms/room2",
+            "travel_message": "You go to room 2"
+        }
+    ],
+    "events": {
+        "on_enter": {
+            "#script": "test_dungeon/scripts/rooms/start/on_enter"
+        },
+        "on_input": {
+            "#script": "test_dungeon/scripts/rooms/start/on_input"
+        }
+    }
+}

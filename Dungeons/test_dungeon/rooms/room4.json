@@ -1,0 +1,25 @@
+{
+    "name": "Room 4",
+    "interactions": [
+        {
+            "type": "engine:interactable/door",
+            "id": "room1_door",
+            "target": "test_dungeon:rooms/room1",
+            "travel_message": "you enter room 1"
+        },
+        {
+            "type": "engine:interactable/door",
+            "id": "room2_door",
+            "target": "test_dungeon:rooms/room2",
+            "travel_message": "you enter room 2"
+        }
+    ],
+    "events": {
+        "on_enter": {
+            "#script": "test_dungeon/scripts/rooms/room4/on_enter"
+        },
+        "on_input": {
+            "#script": "test_dungeon/scripts/rooms/room4/on_input"
+        }
+    }
+}

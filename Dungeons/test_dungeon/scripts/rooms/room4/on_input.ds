@@ -1,0 +1,13 @@
+// Room 4 on_input script
+
+
+// generated interaction code:
+[engine:text/match]([engine:text/set_case](<#text>, "lower"), "search")
+@pattern: "1" # {
+    [engine:interaction/interact](".room1_door")
+}
+@pattern: "2" # {
+    [engine:interaction/interact](".room2_door")
+}
+
+

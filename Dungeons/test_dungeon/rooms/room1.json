@@ -1,0 +1,31 @@
+{
+    "name": "Room 1",
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "start_passage",
+            "target": "test_dungeon:rooms/start",
+            "travel_message": "you go back to the start"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "room3_passage",
+            "target": "test_dungeon:rooms/room3",
+            "travel_message": "you go to room 3"
+        },
+        {
+            "type": "engine:interactable/door",
+            "id": "room4_door",
+            "target": "test_dungeon:rooms/room4",
+            "travel_message": "you enter room 4"
+        }
+    ],
+    "events": {
+        "on_enter": {
+            "#script": "test_dungeon/scripts/rooms/room1/on_enter"
+        },
+        "on_input": {
+            "#script": "test_dungeon/scripts/rooms/room1/on_input"
+        }
+    }
+}

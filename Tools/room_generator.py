@@ -20,10 +20,10 @@ def generate():
     dungeon_namespace = input("enter dungeon folder name: ")
     
     if not os.path.exists(f"./Dungeons/{dungeon_namespace}"):
-        act = input("File does not exist\ncreate|cancel: ")
+        act = input("Dungeon does not exist.\ncreate|cancel: ")
         if act == "cancel":
             return
-        elif act == "continue":
+        elif act == "create":
             os.mkdir(f"./Dungeons/{dungeon_namespace}/")
             os.mkdir(f"./Dungeons/{dungeon_namespace}/rooms/")
             os.mkdir(f"./Dungeons/{dungeon_namespace}/scripts/")
@@ -78,7 +78,7 @@ def generate():
             }
             
             with open(f"./Dungeons/{dungeon_namespace}/{dungeon_namespace}.json", "w+", encoding="utf-8") as f:
-                json.dump(dungeon_config, f)
+                json.dump(dungeon_config, f, indent=4)
             
             os.mkdir(f"./Dungeons/{dungeon_namespace}/scripts/rooms/{entry_room}/")
             
@@ -86,7 +86,10 @@ def generate():
             
             events = {}
             if input("add dungeon on_enter event? (y/n): ").lower().startswith("y"):
-                os.mkdir(f"./Dungeons/{dungeon_namespace}/scripts/rooms/{entry_room}/")
+                try:
+                    os.mkdir(f"./Dungeons/{dungeon_namespace}/scripts/rooms/{entry_room}/")
+                except FileExistsError:
+                    pass
                 events.update({
                     "on_enter": {
                         "#script": f"{dungeon_namespace}/scripts/rooms/{entry_room}/on_enter"
@@ -118,12 +121,12 @@ def generate():
                 with open(f"./Dungeons/{dungeon_namespace}/scripts/rooms/{entry_room}/on_exit.ds", "w+", encoding="utf-8") as f:
                     f.write(f"// {entry_room_name} on_exit script")
             
-            with open(f"./Dungeons/{dungeon_namespace}/rooms/{entry_room}.json") as f:
+            with open(f"./Dungeons/{dungeon_namespace}/rooms/{entry_room}.json", "w+", encoding="utf-8") as f:
                 json.dump({
                     "name": entry_room_name,
                     "interactions": [],
                     "events": events
-                }, f)
+                }, f, indent=4)
 
     if input("add more rooms? (y/n): ").lower().startswith("y"):
         while True:
@@ -173,7 +176,7 @@ def generate():
                     "events": events
                 }, f)
 
-    if input("Generate room connections? (y/n)").lower().startswith("y"):
+    if input("Generate room connections? (y/n): ").lower().startswith("y"):
         while True:
             start = input("enter room id to add passages/doors from (type EXIT to stop): ")
             
@@ -222,7 +225,7 @@ def generate():
                     print("Invalid connection type")
                     continue
                 
-                ends.append((i, t))
+                ends.append((name, t))
             
             
             code = ["[engine:text/match]([engine:text/set_case](<#text>, \"lower\"), \"search\")"]
@@ -248,13 +251,13 @@ def generate():
                 ]
 
                 
-                if y := ("travel message? : "):
+                if y := input("travel message? : "):
                     x.update({
                         "travel_message": y
                     })
             
             with open(f"./Dungeons/{dungeon_namespace}/rooms/{start}.json", "w+", encoding="utf-8") as f:
-                json.dump(room_data, f)
+                json.dump(room_data, f, indent=4)
             
             with open(f"./Dungeons/{dungeon_namespace}/scripts/rooms/{start}/on_input.ds", "r+", encoding="utf-8") as f:
                 t = f.read()

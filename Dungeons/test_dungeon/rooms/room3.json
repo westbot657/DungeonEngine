@@ -1,0 +1,19 @@
+{
+    "name": "Room 3",
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "room1_passage",
+            "target": "test_dungeon:rooms/room1",
+            "travel_message": "you go back to room 1"
+        }
+    ],
+    "events": {
+        "on_enter": {
+            "#script": "test_dungeon/scripts/rooms/room3/on_enter"
+        },
+        "on_input": {
+            "#script": "test_dungeon/scripts/rooms/room3/on_input"
+        }
+    }
+}

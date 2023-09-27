@@ -39,7 +39,7 @@ import json, os
 
 class Dungeon(FunctionalElement):
 
-    def __init__(self, abstract, name:str, version:int|float|str, environment:Environment, entry_point:Location, events:list, data:dict|None, rooms:dict[str, Room]):
+    def __init__(self, abstract, name:str, version:int|float|str, environment:Environment, entry_point:Location, events:list, data:dict|None, rooms:dict[str, Room], recovery_location:Location|None):
         self.abstract = abstract
         self.name = name
         self.version = version
@@ -48,6 +48,7 @@ class Dungeon(FunctionalElement):
         self.events = events
         self.data = data
         self.rooms = rooms
+        self.recovery_location = recovery_location
 
         self.map: Map = None
 
@@ -56,6 +57,7 @@ class Dungeon(FunctionalElement):
             ".name": self.name,
             ".enviornment": self.environment,
             ".entry_point": self.entry_point,
+            ".recovery_location": self.recovery_location
         }
         for key, value in self.data.items():
             d.update({f".{key}": value})
@@ -214,7 +216,10 @@ class Dungeon(FunctionalElement):
         player._text_pattern_categoris = ["global", "common", "world"]
         if (on_exit := self.events.get("on_exit", None)) is not None:
             self.prepFunctionMemory(function_memory)
-
+            function_memory.addContextData({
+                "#player": player
+            })
+            
             ev = function_memory.generatorEvaluateFunction(on_exit)
             v = None
             try:

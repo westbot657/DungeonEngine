@@ -127,7 +127,10 @@ def generate():
 
     if input("add more rooms? (y/n): ").lower().startswith("y"):
         while True:
-            room_namespace = input("enter room id: ")
+            room_namespace = input("enter room id (or EXIT to stop): ")
+            
+            if room_namespace == "EXIT":
+                break
             room_name = input("enter room display name: ")
             events = {}
             
@@ -169,6 +172,25 @@ def generate():
                     "interactions": [],
                     "events": events
                 }, f)
+
+    if input("Generate room connections? (y/n)").lower().startswith("y"):
+        while True:
+            code = "[engine:text/match]([engine:text/set_case](<#text>, \"lower\"))\n"
+            start = input("enter room id to add passages/doors from: ")
+            
+            # check that start room exists
+            ends = []
+            print("enter connection room ids (each on a new line, enter a blank line to stop):")
+            print("examples:\n> door <dungeon>:rooms/<room>\n> passage <dungeon>:rooms/<room>\n")
+            while (i := input(">")):
+                
+                t, name = i.split(" ")
+                
+                # check that `i` exists
+                
+                ends.append(i)
+            
+            
 
 
 generate()

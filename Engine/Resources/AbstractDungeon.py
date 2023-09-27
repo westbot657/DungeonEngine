@@ -49,6 +49,7 @@ class AbstractDungeon:
         self.entry_point: Location = Location.fromString(data.get("entry_point", None))
         self.events: dict|None = data.get("events", {})
         self.data: dict = data.get("data", {})
+        self.recovery_location: Location|None = Location.fromString(l) if (l := data.get("recovery_location", None)) is not None else None
 
         if map := data.get("map", None): self.map = Map(map)
         else: self.map = None
@@ -68,7 +69,8 @@ class AbstractDungeon:
             self.entry_point,
             self.events,
             Util.deepCopy(self.data),
-            self.createRooms(function_memory)
+            self.createRooms(function_memory),
+            self.recovery_location
         )
         dungeon.map = self.map
         AbstractDungeon._dungeon_instances.append(dungeon)

@@ -1,15 +1,17 @@
 # pylint: disable=[W,R,C,import-error]
 
 try:
-    from .EngineErrors import FunctionCallError, ParseError, IdentifierError
+    from .EngineErrors import FunctionCallError, ParseError, IdentifierError, UnknownPlayerError
     from .Identifier import Identifier
     from .GameObject import GameObject
     from .Logger import Log
+    from .Player import Player
 except ImportError:
-    from EngineErrors import FunctionCallError, ParseError, IdentifierError
+    from EngineErrors import FunctionCallError, ParseError, IdentifierError, UnknownPlayerError
     from Identifier import Identifier
     from GameObject import GameObject
     from Logger import Log
+    from Player import Player
 
 import json, re
 
@@ -146,6 +148,12 @@ class ConsoleCommand:
                                             s = s[0:col].strip()
                                         else:
                                             raise e
+                        case "engine:Player":
+                            n, other = text.split(" ", 1)
+                            try:
+                                return Player.getPlayer(n)
+                            except UnknownPlayerError:
+                                pass
                         case "engine:Ammo":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_ammo.get(n, None):
@@ -172,8 +180,6 @@ class ConsoleCommand:
                                 return a
                         case "engine:GameObjectType":
                             n, other = text.split(" ", 1)
-                            
-
 
                         case _:
                             raise FunctionCallError(f"unrecognized value type: '{tp}'")

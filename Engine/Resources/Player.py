@@ -82,7 +82,7 @@ class Player(Entity):
             name,
             max_health, max_health,
             Inventory(function_memory, []),
-            Location("engine", "rooms/", "start"),
+            Location("world", "rooms/", "start"),
             Position(0, 0),
             function_memory.engine._player_input_categories,
             False
@@ -265,6 +265,10 @@ class Player(Entity):
     def getPlayer(cls, player_id):
         if player_id in cls._loaded:
             return cls._loaded.get(player_id)
+        for player in cls._loaded:
+            player:Player
+            if player.name == player_id:
+                return player
         raise UnknownPlayerError(player_id)
 
     @classmethod

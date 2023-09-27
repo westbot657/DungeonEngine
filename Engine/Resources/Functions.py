@@ -1058,10 +1058,11 @@ class Engine_Player_GiveGameObject(LoaderFunction):
 
     script_flags = {
         "required_args": 1,
-        "optional_args": 1,
+        "optional_args": 2,
         "args": {
             "object": "required parameter",
-            "count": "optional parameter"
+            "count": "optional parameter",
+            "player": "optional parameter"
         }
     }
     
@@ -1091,7 +1092,10 @@ class Engine_Player_GiveGameObject(LoaderFunction):
             game_object: Ammo|Item
             game_object.count = min(max(0, count), game_object.max_count)
         
-        player: Player = function_memory.ref("#player")
+        if "player" in kwargs:
+            player: Player = Player.getPlayer(kwargs["player"])
+        else:
+            player: Player = function_memory.ref("#player")
         player.inventory.addObject(game_object)
 
         return game_object

@@ -27,7 +27,7 @@ def engine_saveGame(function_memory:FunctionMemory):
     {
         "player_id: engine:int": {
             "max_health: engine:int": {
-                "name: enigne:str": None
+                "name: engine:str": None
             }
         }
     }
@@ -61,7 +61,7 @@ def engine_giveGameObject(function_memory:FunctionMemory, target, objectType, ga
 
 
 @ConsoleCommand(
-    Identifier("engine", "", "toggle_log"),
+    Identifier("engine", "", "toggle-log"),
     {}
 )
 def engine_toggle_log(function_memory:FunctionMemory):

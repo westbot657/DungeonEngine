@@ -510,7 +510,7 @@ class Combat(FunctionalElement):
                             if isinstance(e.value, _EngineOperation):
                                 function_memory.engine.evaluateResult(function_memory.engine._default_input_handler, function_memory.engine.default_input_handler, e.value, player_id, "")
                     except CombatError as e:
-                        print(e)
+                        Log["ERROR"]["combat"](e)
 
             if self.last_trigger is None:
                 self.last_trigger = self.old_trigger = "@start"

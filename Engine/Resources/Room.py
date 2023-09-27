@@ -10,6 +10,7 @@ try:
     from .Location import Location
     from .Environment import Environment
     from .Map import Map
+    from .Logger import Log
 except ImportError:
     from FunctionalElement import FunctionalElement
     from DynamicValue import DynamicValue
@@ -20,6 +21,7 @@ except ImportError:
     from Location import Location
     from Environment import Environment
     from Map import Map
+    from Logger import Log
 
 class Room(FunctionalElement):
     def __init__(self, abstract, location:Location, name:str, events:dict, interactions:list[Interactable], environment:Environment):
@@ -91,7 +93,7 @@ class Room(FunctionalElement):
         while player_id in self.players_in_room:
 
             if (player := engine.players.get(player_id, None)) is not None:
-                print("room received input!")
+                Log["debug"]["room"]("room received input!")
                 ev = self.onInput(function_memory, player, text)
                 v = None
                 try:

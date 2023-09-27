@@ -339,7 +339,7 @@ class Engine:
                         except EngineError as e:
                             print(e)
                 except StopIteration as e:
-                    print(f"Task completed: {task}  {v=}  {e.value=}")
+                    Log["debug"]["engine"](f"Task completed: {task}  {v=}  {e.value=}")
 
             for combat in self.combats:
                 ops: dict = combat.tick.send(None)
@@ -353,9 +353,9 @@ class Engine:
                                 op, player_id, ""
                             )
                         except EngineError as e:
-                            print(e)
+                            Log["ERROR"]["engine"](e)
                     else:
-                        print(f"\n\ncombat returned non-engine operation??\n\n")
+                        Log["WARNING"]["engine"](f"\combat returned non-engine operation??")
 
             # check inputs
             for player_id in [k for k in self.input_queue.copy().keys()]:
@@ -406,7 +406,7 @@ class Engine:
                             try:
                                 self.evaluateResult(handler_getter, response_handler, result, player_id, text)
                             except EngineError as e:
-                                print(e)
+                                Log["ERROR"]["engine"](e)
                             continue
                         try:
                             result = response_handler.send((self, player_id, text))
@@ -416,7 +416,7 @@ class Engine:
                             try:
                                 self.evaluateResult(handler_getter, response_handler, result, player_id, text)
                             except EngineError as e:
-                                print(e)
+                                Log["ERROR"]["engine"](e)
                             continue
                             
                         except StopIteration as e:
@@ -427,7 +427,7 @@ class Engine:
                             try:
                                 self.evaluateResult(handler_getter, response_handler, result, player_id, text)
                             except EngineError as e:
-                                print(e)
+                                Log["ERROR"]["engine"](e)
                             continue
 
                     elif isinstance(response_handler, Callable):
@@ -440,7 +440,7 @@ class Engine:
                         try:
                             self.evaluateResult(handler_getter, response_handler, result, player_id, text)
                         except EngineError as e:
-                            print(e)
+                            Log["ERROR"]["engine"](e)
                         continue
 
             # do other engine stuff

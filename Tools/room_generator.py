@@ -175,8 +175,12 @@ def generate():
 
     if input("Generate room connections? (y/n)").lower().startswith("y"):
         while True:
-            start = input("enter room id to add passages/doors from: ")
+            start = input("enter room id to add passages/doors from (type EXIT to stop): ")
             
+
+            if start == "EXIT":
+                break
+
             # check that start room exists
             
             if not os.path.exists(f"./Dungeons/{dungeon_namespace}/rooms/{start}.json"):
@@ -203,6 +207,16 @@ def generate():
                 if not os.path.exists(f"./Dungeons/{dungeon_namespace}/rooms/{name}.json"):
                     print("That room does not exist!")
                     continue
+
+                if t == "remove":
+                    x = 0
+                    for _, _t in ends.copy():
+                        if _t == name:
+                            ends.pop(x)
+                            print(f"removed {_t}")
+                            break
+                        x += 1
+                    continue
                 
                 if t not in ["passage", "door"]:
                     print("Invalid connection type")
@@ -211,11 +225,42 @@ def generate():
                 ends.append((i, t))
             
             
-            code = ["[engine:text/match]([engine:text/set_case](<#text>, \"lower\"), \"search\")\n"]
+            code = ["[engine:text/match]([engine:text/set_case](<#text>, \"lower\"), \"search\")"]
             
             with open(f"./Dungeons/{dungeon_namespace}/rooms/{start}.json", "r+", encoding="utf-8") as f:
-                
+                room_data: dict = json.load(f)
             
+            for room_id, conn_type in ends:
+                if "interactions" not in room_data:
+                    room_data.update({"interactions": []})
+                room_data["interactions"].append(x := {
+                    "type": f"engine:interactable/{conn_type}",
+                    "id": f"{room_id.replace('/', '_')}_{conn_type}",
+                    "target": f"{dungeon_namespace}:rooms/{room_id}"
+                })
+
+                print(f"{start} -> {room_id} ({conn_type})")
+
+                code += [
+                    f"@pattern: \"{input('input text to interact : ')}\" # {{",
+                    f"    [engine:interaction/interact](\".{room_id.replace('/', '_')}_{conn_type}\")",
+                    "}"
+                ]
+
+                
+                if y := ("travel message? : "):
+                    x.update({
+                        "travel_message": y
+                    })
+            
+            with open(f"./Dungeons/{dungeon_namespace}/rooms/{start}.json", "w+", encoding="utf-8") as f:
+                json.dump(room_data, f)
+            
+            with open(f"./Dungeons/{dungeon_namespace}/scripts/rooms/{start}/on_input.ds", "r+", encoding="utf-8") as f:
+                t = f.read()
+
+            with open(f"./Dungeons/{dungeon_namespace}/scripts/rooms/{start}/on_input.ds", "w+", encoding="utf-8") as f:
+                f.write(t + f"\n\n\n// generated interaction code:\n" + "\n".join(code) + "\n\n\n")
             
 
 

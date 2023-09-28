@@ -82,7 +82,7 @@ class Dungeon(FunctionalElement):
 
         if os.path.exists(filename):
             with open(filename, "r+", encoding="utf-8") as f:
-                data = json.load(f)
+                data: dict[str, dict] = json.load(f)
             
             if (dungeon := data.get("dungeon", None)) is not None:
                 if (name := dungeon.get("name", None)) is not None:
@@ -93,6 +93,8 @@ class Dungeon(FunctionalElement):
                     self.environment = Environment(environemt)
                 if (entry_point := dungeon.get("entry_point", None)) is not None:
                     self.entry_point = Location.fromString(entry_point)
+                if (recovery_location := dungeon.get("recovery_location", None)) is not None:
+                    self.recovery_location = Location.fromString(recovery_location)
                 if (data := dungeon.get("data", None)) is not None:
                     _data = {}
                     for key, value in data:
@@ -107,8 +109,8 @@ class Dungeon(FunctionalElement):
     def saveData(self, function_memory:FunctionMemory):
         filename = f"./save_data/{self.abstract.identifier.name}.json"
         data = {}
-        _dat = self.abstract._get_save(function_memory)
-        dat = {}
+        _dat: dict = self.abstract._get_save(function_memory)
+        dat: dict = {}
         # for val_name, abstract_val in _dat.items():
         #     current_val = getattr(self, val_name)
         #     if current_val != abstract_val:
@@ -129,6 +131,10 @@ class Dungeon(FunctionalElement):
         if (entry_point := _dat.get("entry_point", None)) is not None:
             if self.entry_point.full() != entry_point:
                 dat.update({"entry_point": self.entry_point})
+        
+        if (recovery_location := _dat.get("recovery_location", None)) is not None:
+            if self.recovery_location.full() != recovery_location:
+                dat.update({"recovery_location": self.recovery_location})
         
         if (_data := _dat.get("data", None)) is not None:
             _data_save = {}

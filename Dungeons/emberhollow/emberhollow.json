@@ -3,12 +3,14 @@
     "version": 1,
     "entry_point": "emberhollow:rooms/front_gate",
     "events": {
-        "on_enter": {},
+        "on_enter": {
+            "#script": "emberhollow/scripts/emberhollow/on_enter"
+        },
         "on_input": {},
         "on_exit": {}
     },
     "environment": {},
     "data": {
-        
+        "dungeon_stage": "start"
     }
 }

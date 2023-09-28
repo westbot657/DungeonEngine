@@ -129,17 +129,21 @@
 			]
 		},
 		"strings": {
-			"name": "string.dungeon_script",
-			"begin": "\"",
-			"end": "\"",
 			"patterns": [
 				{
-					"name": "constant.character.escape.dungeon_script",
-					"match": "\\\\."
-				},
-				{
-					"name": "constant.character.escape.dungeon_script",
-					"match": "`[^`]*`"
+					"name": "string.dungeon_script",
+					"begin": "(?<![foil])\"",
+					"end": "\"",
+					"patterns": [
+						{
+							"name": "constant.character.escape.dungeon_script",
+							"match": "\\\\."
+						},
+						{
+							"name": "constant.character.escape.dungeon_script",
+							"match": "`[^`]*`"
+						}
+					]
 				}
 			]
 		},

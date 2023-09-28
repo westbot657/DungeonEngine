@@ -14,7 +14,7 @@
     "languages": [{
       "id": "dungeon_script",
       "aliases": ["ds"],
-      "extensions": [".dungeon_script", ".ds"],
+      "extensions": [".dungeon_script", ".ds", ".dse"],
       "configuration": "./language-configuration.json"
     }],
     "grammars": [{

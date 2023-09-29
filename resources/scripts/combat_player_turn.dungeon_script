@@ -3,20 +3,18 @@
 
 [engine:list/for_each] (<.enemies>, "enemy") // iterate through each enemy
 {
-    // check if the enemy's name is in the player input
-    [engine:text/match] ([engine:text/replace_pattern] (" +", " ", [engine:text/set_case] (<#text>, "lower")), "search")
-    @pattern: [engine:text/set_case] (<enemy.name>, "lower") # {
-        // if so, player attacks the enemy
-        // [engine:debug/breakpoint]
-        [engine:text/match]([engine:text/replace_pattern] (" +", " ", [engine:text/set_case] (<#text>, "lower")), "search")
-        @pattern: "(attack|fight|stab|shoot|hit|hurt)" # {
-            [engine:player/attack_enemy](<#player>, <enemy>)
-            // break
+    if ([engine:list/contains](<.turn_order>, <enemy>)) {
+        // check if the enemy's name is in the player input
+        [engine:text/match] ([engine:text/replace_pattern] (" +", " ", [engine:text/set_case] (<#text>, "lower")), "search")
+        @pattern: [engine:text/set_case] (<enemy.name>, "lower") # {
+            // if so, player attacks the enemy
+            // [engine:debug/breakpoint]
+            [engine:text/match]([engine:text/replace_pattern] (" +", " ", [engine:text/set_case] (<#text>, "lower")), "search")
+            @pattern: "(attack|fight|stab|shoot|hit|hurt)" # {
+                [engine:player/attack_enemy](<#player>, <enemy>)
+                // break
+            }
         }
-
-
     }
-
-
 }
 

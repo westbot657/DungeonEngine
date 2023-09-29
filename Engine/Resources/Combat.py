@@ -129,21 +129,23 @@ class Combat(FunctionalElement):
         def __repr__(self):
             return f"Combat.Task:[{self.task}]"
 
-    def __new__(cls, abstract, enemies, sequence, data):
+    def __new__(cls, abstract, enemies, sequence, data, respawn_point):
         if abstract in cls._combats.keys():
             return cls._combats[abstract]
         else:
             self = super().__new__(cls)
-            self.__init__(abstract, enemies, sequence, data)
+            self.__init__(abstract, enemies, sequence, data, respawn_point)
             cls._combats.update({abstract: self})
+            return self
 
-    def __init__(self, abstract, enemies:list[Enemy], sequence:dict, data:dict):
+    def __init__(self, abstract, enemies:list[Enemy], sequence:dict, data:dict, respawn_point:Location):
         self.abstract = abstract
         self.location: Location = None
         self.abstract_enemies: list[AbstractEnemy] = enemies
         self.enemies = []
         self.sequence: dict = sequence
         self.data: dict = data
+        self.respawn_point = respawn_point
         self.players: list[Player] = []
         self.turn_order: list[Player|Enemy] = []
         self.current_turn: int = 0
@@ -154,7 +156,7 @@ class Combat(FunctionalElement):
         self.input_requests = [] # may not need?
         self.function_memory = None
         self.combat_config = Util.deepCopy(self._combat_config)
-
+        self.active = True
         self._enemies = {}
 
     def getEnemy(self, function_memory:FunctionMemory, enemy_id:str):
@@ -322,11 +324,26 @@ class Combat(FunctionalElement):
                 player = operation.player
                 i = self.turn_order.index(player)
                 self.turn_order.remove(player)
+
+                if player in self.players:
+                    self.players.remove(player)
+
+                player._combat = None
+                player.in_combat = False
+
                 if i <= self.current_turn:
                     self.current_turn -= 1
                 self.turn = self.turn_order[self.current_turn]
 
-                yield (player.uuid, EngineOperation.KillPlayer(player))
+                yield (player.uuid, EngineOperation.KillPlayer(player, self.respawn_point))
+                Log["debug"]["combat"](f"Player `{player}` died. respawned at `{self.respawn_point}`")
+
+                if len(self.players) == 0:
+                    self.turn = None
+                    self.turn_order.clear()
+                    self.active = False
+                    Log["debug"]["combat"]("Combat ended. Players lost")
+
 
             case Combat.Operation._HandleInput():
                 text = operation.text
@@ -456,7 +473,18 @@ class Combat(FunctionalElement):
                         if i <= self.current_turn:
                             self.current_turn -= 1
                 
-                self.turn = self.turn_order[self.current_turn]
+                if all(isinstance(a, Player) for a in self.turn_order):
+                    Log["debug"]["combat"]("Combat ended. Players win!")
+                    self.active = False
+                    for player in self.players:
+                        player.in_combat = False
+                        player._combat = None
+                    
+                    self.players.clear()
+                    self.turn_order.clear()
+                    self.turn = 0
+                else:
+                    self.turn = self.turn_order[self.current_turn]
 
             case Combat.Operation.Message():
                 Log["debug"]["combat"]["message"](operation.message)
@@ -487,7 +515,7 @@ class Combat(FunctionalElement):
         self.function_memory = function_memory
         #result = yield {}
         result = None
-        while True:
+        while self.active:
             # if result == None:
             #     result = yield {}
             #     continue

@@ -1,11 +1,11 @@
 
 
 <item> = [engine:player/give_game_object](
-    "engine:weapons/sword",
-    data=%{
-        "name": "Excaliber",
-        "description": "A weird sword you created by hacking"
-    }
+    "engine:weapons/sword"//,
+    //data=%{
+    //    "name": "Excaliber",
+    //    "description": "A weird sword you created by hacking"
+    //}
 )
 
 

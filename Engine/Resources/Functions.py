@@ -2334,6 +2334,30 @@ class Engine_List_Append(LoaderFunction):
         ls = kwargs.get("list")
         elements = kwargs.get("elements")
 
+class Engine_List_Contains(LoaderFunction):
+    id = Identifier("engine", "list/", "contains")
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "list": "required parameter",
+            "element": "required parameter"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if ("list" in args) and ("element" in args):
+            return cls.contains
+        return None
+
+    @staticmethod
+    def contains(function_memory:FunctionMemory, **kwargs):
+        ls: list = kwargs.get("list")
+        element = kwargs.get("element")
+        return (element in ls)
+
 # ^ List ^ #
 
 ####XXX################XXX####

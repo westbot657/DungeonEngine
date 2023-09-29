@@ -240,6 +240,33 @@ class Dungeon(FunctionalElement):
             self.postEvaluate(function_memory)
 
     
+    def onDeath(self, function_memory:FunctionMemory, player:Player):
+        # if player.uuid in self.players_in_room:
+            # self.players_in_room.remove(player.uuid)
+        
+        # player.last_location = self.location.copy()
+
+        player._text_pattern_categoris = ["global", "common", "world"]
+
+
+        if (on_death := self.events.get("on_death", None)) is not None:
+            self.prepFunctionMemory(function_memory)
+            function_memory.addContextData({
+                "#player": player
+            })
+
+            ev = function_memory.generatorEvaluateFunction(on_death)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            res = v
+
+            self.postEvaluate(function_memory)
 
 
 

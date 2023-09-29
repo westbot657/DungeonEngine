@@ -4,7 +4,5 @@
     "interactions": [],
     "entry_point": "test_dungeon:rooms/start",
     "events": {},
-    "data": {
-        "hide_goto": true
-    }
+    "data": {}
 }

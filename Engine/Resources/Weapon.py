@@ -43,7 +43,7 @@ class Weapon(GameObject):
         return f"+{self.damage.quickDisplay(function_memory)}dmg {self.range}ft"
 
     def fullStats(self, function_memory:FunctionMemory, is_equipped=False):
-        return f"{self.name} +{self.damage.fullDisplay(function_memory)}dmg {self.range}ft" + (f" \"{self.description}\"" if self.description else "") + " {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [EQUIPPED]" if is_equipped else "")
+        return f"{self.name} +{self.damage.fullDisplay(function_memory)}dmg {self.range}ft" + (f" \"{self.description}\"" if self.description else "") + f" {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [EQUIPPED]" if is_equipped else "")
 
     def quickStats(self, function_memory:FunctionMemory):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"

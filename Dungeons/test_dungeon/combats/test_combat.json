@@ -1,0 +1,65 @@
+{
+    "respawn_point": "test_dungeon:rooms/start",
+    "data": {
+        "zombie1-dead": false,
+        "zombie2-dead": false
+    },
+    "enemies": [
+        {
+            "parent": "engine:enemies/zombie",
+            "id": "zombie1-1",
+            "name": "Zombie 1",
+            "events": {
+                "@start": {
+                    "on_attacked": {
+                        "functions": [
+                            {
+                                "#call": "$combat:enemy_health_check",
+                                "parameters": {
+                                    "target_health": 3
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "parent": "engine:enemies/zombie",
+            "id": "zombie1-2",
+            "name": "Zombie 2"
+        }
+    ],
+    "sequence": {
+        "@start": {
+            "functions": [
+                {
+                    "function": "engine:combat/message",
+                    "message": "You walk in to a room. There are 2 zombies! they see you and slowly walk over to you..."
+                },
+                {
+                    "function": "engine:combat/spawn",
+                    "enemies": [
+                        "zombie1-1",
+                        "zombie1-2"
+                    ]
+                }
+            ]
+        },
+        "zombie1-1-health-check-3": {
+            "functions": [
+                {
+                    "function": "engine:combat/message",
+                    "message": "test: zombie 1 has <= 3 health?"
+                },
+                {
+                    "function": "engine:combat/trigger",
+                    "trigger": "next"
+                }
+            ]
+        },
+        "next": {
+            "functions": []
+        }
+    }
+}

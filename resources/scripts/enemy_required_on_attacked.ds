@@ -1,10 +1,22 @@
 
 [engine:enemy/damage](<#damage>)
 
-[engine:combat/next_turn]
-
 if (<.health> <= 0) {
     [engine:combat/despawn](<.uid>)
 }
 
+[engine:player/message](
+    [engine:text/join](
+        "You attack `",
+        <#enemy.name>,
+        "`, dealing ",
+        <#damage>,
+        " damage!",
+        seperator=""
+    )
+)
 
+[engine:combat/next_turn]
+
+
+// [engine:debug/memory]

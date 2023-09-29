@@ -33,6 +33,7 @@ class AbstractCombat:
 
         self.enemies: list = data.get("enemies", [])
         self.sequence: dict = data.get("sequence", {})
+        self.respawn_point: Location = Location.fromString(data.get("respawn_point"))
         self.data: dict = data.get("data", {})
 
     def getEnemies(self, function_memory:FunctionMemory) -> list[AbstractEnemy]:
@@ -70,7 +71,8 @@ class AbstractCombat:
         combat = Combat(self,
             self.getEnemies(function_memory),
             Util.deepCopy(self.sequence),
-            Util.deepCopy(self.data)
+            Util.deepCopy(self.data),
+            self.respawn_point
         )
 
         combat.location = function_memory.ref("#room").location.copy()

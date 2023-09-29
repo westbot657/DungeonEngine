@@ -39,7 +39,7 @@ class Armor(GameObject):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
 
     def fullStats(self, function_memory:FunctionMemory, is_equipped=False):
-        return f"{self.name} +{self.damage_reduction.fullDisplay(function_memory)}def" + (f" \"{self.description}\"" if self.description else "") + " {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [WEARING]" if is_equipped else "")
+        return f"{self.name} +{self.damage_reduction.fullDisplay(function_memory)}def" + (f" \"{self.description}\"" if self.description else "") + f" {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [WEARING]" if is_equipped else "")
 
     def getLocalVariables(self) -> dict:
         d = {

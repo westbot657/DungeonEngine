@@ -184,13 +184,16 @@ class Engine:
         else:
             return EngineOperation.Success(v)
 
-    def _move_player(self, function_memory:FunctionMemory, player:Player, target_location:Location, handler_getter:Callable, handler:Generator):
+    def _move_player(self, function_memory:FunctionMemory, player:Player, target_location:Location, handler_getter:Callable, handler:Generator, is_death=False):
         old_room = self.loader.getLocation(self._function_memory, player.location)
         new_room = self.loader.getLocation(self._function_memory, target_location)
 
         yield
 
-        ev = old_room.onExit(function_memory, player)
+        if is_death:
+            ev = old_room.onDeath(function_memory, player)
+        else:
+            ev = old_room.onExit(function_memory, player)
         v = None
         try:
             v = ev.send(None)
@@ -205,7 +208,10 @@ class Engine:
             old_dungeon = self.loader.getLocation(self._function_memory, f"dungeon:{old_room.location.dungeon}")
             new_dungeon = self.loader.getLocation(self._function_memory, f"dungeon:{new_room.location.dungeon}")
 
-            ev = old_dungeon.onExit(function_memory, player)
+            if is_death:
+                ev = old_dungeon.onDeath(function_memory, player)
+            else:
+                ev = old_dungeon.onExit(function_memory, player)
             v = None
             try:
                 v = ev.send(None)

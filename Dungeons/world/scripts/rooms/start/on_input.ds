@@ -1,8 +1,6 @@
 
 
-// [engine:debug/memory]
-
-[engine:text/match](<text>)
+[engine:text/match](<#text>)
 @pattern: "go to (?P<dungeon_name>.*)" # {
     <dungeon_name> = [engine:text/set_case](<dungeon_name>, "lower")
 
@@ -11,9 +9,11 @@
         // [engine:log/debug]([engine:text/join](<key>, <value.name>), "goto check")
 
         if (
-            (<dungeon_name> == [engine:text/set_case](<value.name>, "lower"))
+            ((<dungeon_name> == [engine:text/set_case](<value.name>, "lower"))
             or
-            (<dungeon_name> == [engine:text/set_case](<key>, "lower"))
+            (<dungeon_name> == [engine:text/set_case](<key>, "lower")))
+
+            and (not <value.hide_goto>) // TODO: make this work
         ) {
             [engine:player/set_location](<value.entry_point.location>)
             break
@@ -21,3 +21,5 @@
 
     }
 }
+
+

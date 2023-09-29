@@ -65,6 +65,8 @@ the slow-burn plot twist:
 
 
 
+# City creation notes
+
 1. What Essential services and NPC's are needed?
 
 2. What features build on the story and lore for your world?

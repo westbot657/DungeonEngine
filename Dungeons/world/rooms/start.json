@@ -6,13 +6,10 @@
     ],
     "events": {
         "on_enter": {
-            "#script": "world/scripts/rooms/start/on_enter.ds"
+            "#script": "world/scripts/rooms/start/on_enter"
         },
         "on_input": {
-            "#call": "$goto_check",
-            "parameters": {
-                "text": {"#ref": "#text"}
-            }
+            "#script": "world/scripts/rooms/start/on_input"
         }
     }
 }

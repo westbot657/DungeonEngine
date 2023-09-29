@@ -108,7 +108,7 @@ class AbstractDungeon:
             "version": self.version,
             "environment": self.environment,
             "entry_point": self.entry_point._get_save(function_memory),
-            #"events": self.events,
+            "recovery_location": self.recovery_location._get_save(function_memory),
             "data": self.data
         }
 

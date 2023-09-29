@@ -890,6 +890,35 @@ class Engine_Player_GetTag(LoaderFunction):
         player: Player = function_memory.ref("#player")
         return player.dungeon_data.get(tag, None)
 
+class Engine_Player_InitTag(LoaderFunction):
+    id = Identifier("engine", "player/", "init_tag")
+    
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "tag": "required parameter",
+            "value": "required parameter"
+        }
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "tag": str(),
+                "value": str()|bool()|int()|float()
+            }: return cls.init_tag
+            case _: return None
+    
+    @staticmethod
+    def init_tag(function_memory:FunctionMemory, tag:str, value:int|float|bool|str):
+        player: Player = function_memory.ref("#player")
+        if tag not in player.dungeon_data:
+            player.dungeon_data.update({
+                tag: value
+            })
+
 class Engine_Player_ClearTag(LoaderFunction):
     id = Identifier("engine", "player/", "clear_tag")
 

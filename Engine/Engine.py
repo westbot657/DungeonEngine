@@ -347,21 +347,24 @@ class Engine:
                 except StopIteration as e:
                     Log["debug"]["engine"](f"Task completed: {task}  {v=}  {e.value=}")
 
-            for combat in self.combats:
-                ops: dict = combat.tick.send(None)
+            for combat in self.combats.copy():
+                try:
+                    ops: dict = combat.tick.send(None)
 
-                for player_id, op in ops.items():
-                    if isinstance(op, _EngineOperation):
-                        try:
-                            self.evaluateResult(
-                                self._handler_getter_wrapper(combat.onInput),
-                                combat.onInput,
-                                op, player_id, ""
-                            )
-                        except EngineError as e:
-                            Log["ERROR"]["engine"](e)
-                    else:
-                        Log["WARNING"]["engine"](f"\combat returned non-engine operation??")
+                    for player_id, op in ops.items():
+                        if isinstance(op, _EngineOperation):
+                            try:
+                                self.evaluateResult(
+                                    self._handler_getter_wrapper(combat.onInput),
+                                    combat.onInput,
+                                    op, player_id, ""
+                                )
+                            except EngineError as e:
+                                Log["ERROR"]["engine"](e)
+                        else:
+                            Log["WARNING"]["engine"](f"\combat returned non-engine operation??")
+                except StopIteration:
+                    self.combats.remove(combat)
 
             # check inputs
             for player_id in [k for k in self.input_queue.copy().keys()]:

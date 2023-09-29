@@ -337,12 +337,18 @@ class Combat(FunctionalElement):
 
                 yield (player.uuid, EngineOperation.KillPlayer(player, self.respawn_point))
                 Log["debug"]["combat"](f"Player `{player}` died. respawned at `{self.respawn_point}`")
+                self.scheduled_tasks.append(
+                    Combat.Task(Combat.Operation.Message(f"`{player}` died."), 0)
+                )
 
                 if len(self.players) == 0:
                     self.turn = None
                     self.turn_order.clear()
                     self.active = False
                     Log["debug"]["combat"]("Combat ended. Players lost")
+                    self.scheduled_tasks.append(
+                        Combat.Task(Combat.Operation.Message("Combat Ended. Players lost", player), 0)
+                    )
 
 
             case Combat.Operation._HandleInput():
@@ -405,32 +411,33 @@ class Combat(FunctionalElement):
                     # TODO: text matching for when it's not a player's turn
 
             case Combat.Operation._EnemyAttack():
-                enemy = operation.enemy
-                player = operation.target
+                if self.turn_order:
+                    enemy = operation.enemy
+                    player = operation.target
 
-                ev = self.enemyAttackPlayer(enemy, player)
-                v = None
-                try:
-                    v = ev.send(None)
-                    while isinstance(v, _EngineOperation):
-                        res = yield (player.uuid, v)
-                        v = None
-                        v = ev.send(res)
-                except StopIteration as e:
-                    if isinstance(e.value, _EngineOperation):
-                        res = yield (player.uuid, e.value)
-                    else:
-                        v = e.value or v # idk why i'm doing this
-                
-                self.current_turn += 1
-                if self.current_turn >= len(self.turn_order):
-                    self.current_turn = 0
-                self.turn = self.turn_order[self.current_turn]
+                    ev = self.enemyAttackPlayer(enemy, player)
+                    v = None
+                    try:
+                        v = ev.send(None)
+                        while isinstance(v, _EngineOperation):
+                            res = yield (player.uuid, v)
+                            v = None
+                            v = ev.send(res)
+                    except StopIteration as e:
+                        if isinstance(e.value, _EngineOperation):
+                            res = yield (player.uuid, e.value)
+                        else:
+                            v = e.value or v # idk why i'm doing this
+                    
+                    self.current_turn += 1
+                    if self.current_turn >= len(self.turn_order):
+                        self.current_turn = 0
+                    self.turn = self.turn_order[self.current_turn]
 
-                if isinstance(self.turn, Enemy):
-                    self.scheduled_tasks.append(
-                        Combat.Task(Combat.Operation._EnemyAttack(self.turn, random.choice(self.players)), 10000)
-                    )
+                    if isinstance(self.turn, Enemy):
+                        self.scheduled_tasks.append(
+                            Combat.Task(Combat.Operation._EnemyAttack(self.turn, random.choice(self.players)), 10000)
+                        )
 
             case Combat.Operation.Trigger():
                 self.old_trigger = self.last_trigger
@@ -475,7 +482,10 @@ class Combat(FunctionalElement):
                 
                 if all(isinstance(a, Player) for a in self.turn_order):
                     Log["debug"]["combat"]("Combat ended. Players win!")
-                    self.active = False
+                    self.scheduled_tasks.append(
+                        Combat.Task(Combat.Operation.Message("Combat Ended. Players win!", *self.players), 0)
+                    )
+                    
                     for player in self.players:
                         player.in_combat = False
                         player._combat = None
@@ -540,6 +550,11 @@ class Combat(FunctionalElement):
                                 function_memory.engine.evaluateResult(function_memory.engine._default_input_handler, function_memory.engine.default_input_handler, e.value, player_id, "")
                     except CombatError as e:
                         Log["ERROR"]["combat"](e)
+
+            if len(self.turn_order) == 0:
+                if self.scheduled_tasks:
+                    continue
+                self.active = False
 
             if self.last_trigger is None:
                 self.last_trigger = self.old_trigger = "@start"

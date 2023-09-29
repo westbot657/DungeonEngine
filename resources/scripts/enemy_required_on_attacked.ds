@@ -1,8 +1,9 @@
 
 [engine:enemy/damage](<#damage>)
 
-if (<.health> <= 0) {
-    [engine:combat/despawn](<.uid>)
+
+if (<#enemy.health> <= 0) {
+    [engine:combat/kill_enemy](<.uid>)
 }
 
 [engine:player/message](

@@ -209,10 +209,15 @@ class Enemy(Entity):
     
     def damage(self, function_memory:FunctionMemory, amount:int):
         self.health -= amount
+        # function_memory.update({
+        #     ".health": self.health
+        # })
     
     def heal(self, function_memory:FunctionMemory, amount:int):
         self.health = min(self.max_health, self.health + amount)
-        ...
+        # function_memory.update({
+        #     ".health": self.health
+        # })
     
     def kill(self, function_memory:FunctionMemory):
         # uhhh....

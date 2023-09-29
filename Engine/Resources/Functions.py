@@ -3172,6 +3172,30 @@ class Engine_Combat_Despawn(LoaderFunction):
         elif (enemies := kwargs.get("enemies", None)):
             combat.addTask(Combat.Operation.Despawn(enemies))
 
+class Engine_Combat_KillEnemy(LoaderFunction):
+    id = Identifier("engine", "combat/", "kill_enemy")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": -1,
+        "args": {
+            "enemies": "*parameters"
+        }
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if ("enemy" in args) or ("enemies" in args):
+            return cls.despawn
+        return None
+    @staticmethod
+    def despawn(function_memory:FunctionMemory, **kwargs):
+        combat: Combat = function_memory.ref("#combat")
+        if (enemy := kwargs.get("enemy", None)):
+            combat.addTask(Combat.Operation.Despawn([enemy]), 0)
+        elif (enemies := kwargs.get("enemies", None)):
+            combat.addTask(Combat.Operation.Despawn(enemies), 0)
+
 class Engine_Combat_Message(LoaderFunction):
     id = Identifier("engine", "combat/", "message")
 

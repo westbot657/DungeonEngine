@@ -36,6 +36,7 @@ class AbstractItem(AbstractGameObject):
             AbstractItem._link_parents.append((self, data["parent"]))
 
         self.name: str = data.get("name", None)
+        self.description: str|None = data.get("description", None)
         self.max_count: int = data.get("max_count", None)
         self.count: int = data.get("count", self.max_count)
         self.data: dict = data.get("data", {})
@@ -56,6 +57,16 @@ class AbstractItem(AbstractGameObject):
         if n is not None:
             return n
         raise InvalidObjectError(f"Item has no name! ({self.identifier})")
+
+    def getDescription(self) -> str:
+        if self.description is None:
+            n = self.parent.getDescription() if self.parent else None
+        else:
+            n = self.description
+        if n is not None:
+            return n
+        return ""
+        # raise InvalidObjectError(f"Item has no name! ({self.identifier})")
 
     def getMaxCount(self) -> int:
         if self.max_count is None:
@@ -99,6 +110,7 @@ class AbstractItem(AbstractGameObject):
         else:
             return Item(self,
                 override_values.get("name", self.getName()),
+                override_values.get("description", self.getDescription()),
                 int(override_values.get("max_count", self.getMaxCount())),
                 int(DynamicValue(override_values.get("count", self.getCount())).getCachedOrNew(function_memory)),
                 override_values.get("data", self.getData()),

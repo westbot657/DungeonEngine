@@ -34,6 +34,7 @@ class AbstractArmor(AbstractGameObject):
             AbstractArmor._link_parents.append((self, data["parent"]))
         
         self.name: str = data.get("name", None)
+        self.description: str|None = data.get("description", None)
         self.max_durability: int = data.get("max_durability", None)
         self.durability: int = data.get("durability", self.max_durability)
         self.damage_reduction: int = data.get("damage_reduction", None)
@@ -53,6 +54,11 @@ class AbstractArmor(AbstractGameObject):
         if n is not None:
             return n
         raise InvalidObjectError(f"Armor has no name! ({self.identifier})")
+    
+    def getDescription(self) -> str:
+        n = self.description or (self.parent.getDescription() if self.parent else None)
+        if n is not None: return n
+        return ""
     
     def getMaxDurability(self) -> int:
         if self.max_durability is None:
@@ -88,6 +94,7 @@ class AbstractArmor(AbstractGameObject):
         else:
             return Armor(self,
                 override_values.get("name", self.getName()),
+                override_values.get("description", self.getDescription()),
                 DynamicValue(override_values.get("damage_reduction", self.getDamageReduction())),
                 override_values.get("max_durability", self.getMaxDurability()),
                 DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(function_memory),

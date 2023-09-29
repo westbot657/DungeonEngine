@@ -14,9 +14,10 @@ except ImportError:
 
 class Ammo(GameObject):
     identifier = Identifier("engine", "object/", "ammo")
-    def __init__(self, abstract, name:str, bonus_damage:DynamicValue, max_count:int, count:int=None):
+    def __init__(self, abstract, name:str, description:str, bonus_damage:DynamicValue, max_count:int, count:int=None):
         self.abstract = abstract
         self.name = name
+        self.description = description
         self.bonus_damage = bonus_damage
         self.max_count = max_count
         self.count = count or max_count # this will make None and 0 set the amount to max (0 is included so that you can't have a stack of no ammo)
@@ -27,7 +28,7 @@ class Ammo(GameObject):
         return f"Ammo {self.name}: bonus-damage:{self.bonus_damage} max-count:{self.max_count}"
 
     def fullStats(self, function_memory:FunctionMemory, is_equipped=False):
-        return f"{self.name} +{self.bonus_damage.fullDisplay(function_memory)}dmg {self.count}/{self.max_count}"
+        return f"{self.name} +{self.bonus_damage.fullDisplay(function_memory)}dmg {self.count}/{self.max_count}" + (f" \"{self.description}\"" if self.description else "")
 
     def quickStats(self, function_memory:FunctionMemory):
         return f"{self.name} {self.count}/{self.max_count}"
@@ -35,6 +36,7 @@ class Ammo(GameObject):
     def getLocalVariables(self) -> dict:
         return {
             ".name": self.name,
+            ".description": self.description,
             ".bonus_damage": self.bonus_damage,
             ".max_count": self.max_count,
             ".count": self.count
@@ -78,6 +80,8 @@ class Ammo(GameObject):
 
         if self.name != self.abstract.getName():
             d.update({"name": self.name})
+        if self.description != self.abstract.getDescription():
+            d.update({"description": self.description})
         if self.bonus_damage != self.abstract.getBonusDamage():
             d.update({"bonus_damage": self.bonus_damage})
         if self.max_count != self.abstract.getMaxCount():

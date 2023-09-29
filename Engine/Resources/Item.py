@@ -20,9 +20,10 @@ from enum import Enum, auto
 class Item(GameObject):
 
     identifier = Identifier("engine", "object/", "item")
-    def __init__(self, abstract, name:str, max_count:int, count:int, data:dict|None, events:dict):
+    def __init__(self, abstract, name:str, description:str, max_count:int, count:int, data:dict|None, events:dict):
         self.abstract = abstract
         self.name = name
+        self.description = description
         self.max_count = max_count
         self.count = count
         self.data = data
@@ -37,7 +38,7 @@ class Item(GameObject):
         return f"Item {self.name}: max_count:{self.max_count} count:{self.count} data:{self.data}"
 
     def fullStats(self, function_memory:FunctionMemory, _):
-        return f"{self.name}  {self.count}/{self.max_count}"
+        return f"{self.name}  {self.count}/{self.max_count}" + (f" \"{self.description}\"" if self.description else "")
 
     def quickStats(self, function_memory:FunctionMemory):
         return f"{self.name}  {self.count}/{self.max_count}"
@@ -45,6 +46,7 @@ class Item(GameObject):
     def getLocalVariables(self) -> dict:
         d = {
             ".name": self.name,
+            ".description": self.description,
             ".max_count": self.max_count,
             ".count": self.count
         }
@@ -122,6 +124,8 @@ class Item(GameObject):
 
         if self.name != self.abstract.getName():
             d.update({"name": self.name})
+        if self.description != self.abstract.getDescription():
+            d.update({"description": self.description})
         if self.max_count != self.abstract.getMaxCount():
             d.update({"max_count": self.max_count})
         if self.count != self.abstract.getCount():

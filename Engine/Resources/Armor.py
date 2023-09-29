@@ -21,9 +21,10 @@ from typing import Generator
 
 class Armor(GameObject):
     identifier = Identifier("engine", "object/", "armor")
-    def __init__(self, abstract, name:str, damage_reduction:DynamicValue, max_durability:int, durability:int, events:dict):
+    def __init__(self, abstract, name:str, description:str, damage_reduction:DynamicValue, max_durability:int, durability:int, events:dict):
         self.abstract = abstract
         self.name = name
+        self.description = description
         self.damage_reduction = damage_reduction
         self.max_durability = max_durability
         self.durability = durability
@@ -38,11 +39,12 @@ class Armor(GameObject):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
 
     def fullStats(self, function_memory:FunctionMemory, is_equipped=False):
-        return f"{self.name} +{self.damage_reduction.fullDisplay(function_memory)}def {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [WEARING]" if is_equipped else "")
+        return f"{self.name} +{self.damage_reduction.fullDisplay(function_memory)}def" + (f" \"{self.description}\"" if self.description else "") + " {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [WEARING]" if is_equipped else "")
 
     def getLocalVariables(self) -> dict:
         d = {
             ".name": self.name,
+            ".description": self.description,
             ".damage_reduction": self.damage_reduction,
             ".max_durability": self.max_durability,
             ".durability": self.durability
@@ -206,6 +208,8 @@ class Armor(GameObject):
 
         if self.name != self.abstract.getName():
             d.update({"name": self.name})
+        if self.description != self.abstract.getDescription():
+            d.update({"description": self.description})
         if self.damage_reduction != self.abstract.getDamageReduction():
             d.update({"damage_reduction": self.damage_reduction})
         if self.max_durability != self.abstract.getMaxDurability():

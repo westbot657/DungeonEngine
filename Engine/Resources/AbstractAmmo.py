@@ -33,6 +33,7 @@ class AbstractAmmo(AbstractGameObject):
             AbstractAmmo._link_parents.append((self, data["parent"]))
     
         self.name: str|None = data.get("name", None)
+        self.description: str|None = data.get("description", None)
         self.bonus_damage: int|None = data.get("bonus_damage", None)
         self.max_count: int|None = data.get("max_count", None)
         self.count: int|None = data.get("count", self.max_count)
@@ -47,6 +48,12 @@ class AbstractAmmo(AbstractGameObject):
         n = self.name or (self.parent.getName() if self.parent else None)
         if n is not None: return n
         raise InvalidObjectError(f"Ammo has no name! ({self.identifier})")
+    
+    def getDescription(self):
+        n = self.description or (self.parent.getDescription() if self.parent else None)
+        if n is not None: return n
+        return ""
+        # raise InvalidObjectError(f"Ammo has no name! ({self.identifier})")
     
     def getBonusDamage(self):
         if self.bonus_damage is None:
@@ -82,6 +89,7 @@ class AbstractAmmo(AbstractGameObject):
         else:
             return Ammo(self,
                 override_values.get("name", self.getName()),
+                override_values.get("description", self.getDescription()),
                 DynamicValue(override_values.get("bonus_damage", self.getBonusDamage())),
                 override_values.get("max_count", self.getMaxCount()),
                 DynamicValue(override_values.get("count", self.getCount())).getCachedOrNew(function_memory)

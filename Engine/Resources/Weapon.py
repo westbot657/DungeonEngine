@@ -21,9 +21,10 @@ import random
 
 class Weapon(GameObject):
     identifier = Identifier("engine", "object/", "weapon")
-    def __init__(self, abstract, name:str, damage:DynamicValue, range:int, max_durability:int, durability:int, ammo_type, events:dict):
+    def __init__(self, abstract, name:str, description:str, damage:DynamicValue, range:int, max_durability:int, durability:int, ammo_type, events:dict):
         self.abstract = abstract
         self.name = name
+        self.description = description
         self.damage = damage
         self.range = range
         self.durability = durability
@@ -42,7 +43,7 @@ class Weapon(GameObject):
         return f"+{self.damage.quickDisplay(function_memory)}dmg {self.range}ft"
 
     def fullStats(self, function_memory:FunctionMemory, is_equipped=False):
-        return f"{self.name} +{self.damage.fullDisplay(function_memory)}dmg {self.range}ft {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [EQUIPPED]" if is_equipped else "")
+        return f"{self.name} +{self.damage.fullDisplay(function_memory)}dmg {self.range}ft" + (f" \"{self.description}\"" if self.description else "") + " {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [EQUIPPED]" if is_equipped else "")
 
     def quickStats(self, function_memory:FunctionMemory):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
@@ -50,6 +51,7 @@ class Weapon(GameObject):
     def getLocalVariables(self) -> dict:
         d = {
             ".name": self.name,
+            ".description": self.description,
             ".damage": self.damage,
             ".range": self.range,
             ".durability": self.durability,
@@ -212,6 +214,8 @@ class Weapon(GameObject):
 
         if self.name != self.abstract.getName():
             d.update({"name": self.name})
+        if self.description != self.abstract.getDescription():
+            d.update({"description": self.description})
         if self.damage != self.abstract.getDamage():
             d.update({"damage": self.damage.raw_data})
         if self.range != self.abstract.getRange():

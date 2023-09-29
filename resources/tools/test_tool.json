@@ -1,12 +1,10 @@
 {
     "name": "Debug Tool",
+    "description": "gives you something...",
     "max_durability": -1,
     "events": {
-        "on_use": [
-            {
-                "function": "engine:player/set_location",
-                "location": "world:rooms/start"
-            }
-        ]
+        "on_use": {
+            "#script": "resources/tools/test_tool/on_use"
+        }
     }
 }

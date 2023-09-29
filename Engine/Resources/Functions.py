@@ -1107,13 +1107,15 @@ class Engine_Player_GiveGameObject(LoaderFunction):
     def giveObject(cls, function_memory:FunctionMemory, **kwargs):
         object_name = Identifier.fromString(kwargs.get("object"))
         count = int(kwargs.get("count", 1))
+        
+        data = kwargs.get("data", {})
 
         game_object = function_memory.engine.loader.constructGameObject(
             function_memory,
-            {
+            data.update({
                 "type": f"engine:abstract/{object_name.path.strip('/').rstrip('s')}",
                 "parent": object_name.full()
-            }
+            })
         )
 
 

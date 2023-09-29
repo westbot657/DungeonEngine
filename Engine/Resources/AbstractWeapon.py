@@ -55,6 +55,7 @@ class AbstractWeapon(AbstractGameObject):
             AbstractWeapon._link_parents.append((self, data["parent"]))
 
         self.name: str|None = data.get("name", None)
+        self.description: str|None = data.get("description", None)
         self.damage: int|dict|None = data.get("damage", None)
         self.range: int|dict|None = data.get("range", None)
         self.max_durability: int|None = data.get("max_durability", None)
@@ -74,6 +75,13 @@ class AbstractWeapon(AbstractGameObject):
         n = self.name or (self.parent.getName() if self.parent else None)
         if n is not None: return n
         raise InvalidObjectError(f"Weapon has no name! ({self.identifier})")
+    
+    def getDescription(self) -> str:
+        n = self.description or (self.parent.getDescription() if self.parent else None)
+        if n is not None: return n
+        return ""
+        # raise InvalidObjectError(f"Weapon has no description! ({self.identifier})")
+        
     
     def getDamage(self) -> int|dict:
         if self.damage is None:
@@ -140,6 +148,7 @@ class AbstractWeapon(AbstractGameObject):
         else:
             return Weapon(self,
                 override_values.get("name", self.getName()),
+                override_values.get("description", self.getDescription()),
                 DynamicValue(override_values.get("damage", self.getDamage())),
                 DynamicValue(override_values.get("range", self.getRange())).getCachedOrNew(function_memory),
                 override_values.get("max_durability", self.getMaxDurability()),
@@ -187,6 +196,7 @@ class AbstractWeapon(AbstractGameObject):
                 continue
             try:
                 o.getName()
+                # o.getDescription()
                 o.getRange()
                 o.getDamage()
                 o.getMaxDurability()

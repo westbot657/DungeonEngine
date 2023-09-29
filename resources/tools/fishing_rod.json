@@ -1,5 +1,6 @@
 {
     "name": "Fishing Rod",
+    "description": "A fancy stick used to bring fish into existence when near water",
     "max_durability": 100,
     "events": {
         "on_use": {

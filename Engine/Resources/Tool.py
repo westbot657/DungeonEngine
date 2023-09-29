@@ -23,9 +23,10 @@ class Tool(GameObject):
         CANCEL_USE = auto()
 
     identifier = Identifier("engine", "object/", "tool")
-    def __init__(self, abstract, name:str, durability:int, max_durability:int, events:dict, data:dict):
+    def __init__(self, abstract, name:str, description:str, durability:int, max_durability:int, events:dict, data:dict):
         self.abstract = abstract
         self.name = name
+        self.description = description
         self.durability = durability
         self.max_durability = max_durability
         self.events = events
@@ -39,6 +40,7 @@ class Tool(GameObject):
     def getLocalVariables(self):
         d = {
             ".name": self.name,
+            ".description": self.description,
             ".durability": self.durability,
             ".max_durability": self.max_durability,
         }
@@ -52,6 +54,10 @@ class Tool(GameObject):
         if n := locals.get(".name", None):
             if isinstance(n, str) and n.strip() != self.name:
                 self.name = n.strip()
+        
+        if (n := locals.get(".description", None)) is not None:
+            if isinstance(n, str) and n.strip() != self.description:
+                self.description = n.strip()
         
         if (m := locals.get(".max_durability", None)) is not None:
             if isinstance(m, int):
@@ -240,7 +246,7 @@ class Tool(GameObject):
         return f"Tool: {self.name} {self.durability}/{self.max_durability}"
 
     def fullStats(self, function_memory:FunctionMemory, is_equipped=False):
-        return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [EQUIPPED]" if is_equipped else "")
+        return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}" + (f" \"{self.description}\"" if self.description else "") + (" [EQUIPPED]" if is_equipped else "")
 
     def quickStats(self, function_memory:FunctionMemory):
         return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
@@ -254,6 +260,8 @@ class Tool(GameObject):
 
         if self.name != self.abstract.getName():
             d.update({"name": self.name})
+        if self.description != self.abstract.getDescription():
+            d.update({"description": self.description})
         if self.max_durability != self.abstract.getMaxDurability():
             d.update({"max_durability": self.max_durability})
         if self.durability != self.abstract.getDurability():

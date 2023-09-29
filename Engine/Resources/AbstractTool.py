@@ -31,6 +31,7 @@ class AbstractTool(AbstractGameObject):
         self.parent: AbstractTool|None = None
 
         self.name: str|None = data.get("name", None)
+        self.description: str|None = data.get("description", None)
         self.max_durability: int|None = data.get("max_durability", None)
         self.durability: int|None = data.get("durability", self.max_durability)
         self.events: dict|None = data.get("events", None)
@@ -48,6 +49,12 @@ class AbstractTool(AbstractGameObject):
         n = self.name or (self.parent.getName() if self.parent else None)
         if n is not None: return n
         raise InvalidObjectError(f"Tool has no name! ({self.identifier})")
+
+    def getDescription(self):
+        n = self.description or (self.parent.getDescription() if self.parent else None)
+        if n is not None: return n
+        return ""
+        # raise InvalidObjectError(f"Tool has no name! ({self.identifier})")
 
     def getMaxDurability(self):
         if self.max_durability is None:
@@ -100,6 +107,7 @@ class AbstractTool(AbstractGameObject):
         else:
             return Tool(self,
                 override_values.get("name", self.getName()),
+                override_values.get("description", self.getDescription()),
                 DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(function_memory),
                 override_values.get("max_durability", self.getMaxDurability()),
                 self.getEvents(),

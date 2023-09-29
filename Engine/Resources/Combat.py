@@ -338,7 +338,7 @@ class Combat(FunctionalElement):
                 yield (player.uuid, EngineOperation.KillPlayer(player, self.respawn_point))
                 Log["debug"]["combat"](f"Player `{player}` died. respawned at `{self.respawn_point}`")
                 self.scheduled_tasks.append(
-                    Combat.Task(Combat.Operation.Message(f"`{player}` died."), 0)
+                    Combat.Task(Combat.Operation.Message(self.data.get("player_death_message", "`{player}` died.").format(player=player)), 0)
                 )
 
                 if len(self.players) == 0:
@@ -347,7 +347,7 @@ class Combat(FunctionalElement):
                     self.active = False
                     Log["debug"]["combat"]("Combat ended. Players lost")
                     self.scheduled_tasks.append(
-                        Combat.Task(Combat.Operation.Message("Combat Ended. Players lost", player), 0)
+                        Combat.Task(Combat.Operation.Message(self.data.get("player_lose_message", "Combat Ended. Players lost"), player), 0)
                     )
 
 
@@ -483,7 +483,7 @@ class Combat(FunctionalElement):
                 if all(isinstance(a, Player) for a in self.turn_order):
                     Log["debug"]["combat"]("Combat ended. Players win!")
                     self.scheduled_tasks.append(
-                        Combat.Task(Combat.Operation.Message("Combat Ended. Players win!", *self.players), 0)
+                        Combat.Task(Combat.Operation.Message(self.data.get("player_win_message", "Combat Ended. Players win!"), *self.players), 0)
                     )
                     
                     for player in self.players:

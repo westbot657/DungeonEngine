@@ -319,13 +319,14 @@ class Combat(FunctionalElement):
                 self.turn = self.turn_order[self.current_turn]
 
             case Combat.Operation._HandlePlayerDeath():
-                i = self.turn_order.index(operation.player)
-                self.turn_order.remove(operation.player)
+                player = operation.player
+                i = self.turn_order.index(player)
+                self.turn_order.remove(player)
                 if i <= self.current_turn:
                     self.current_turn -= 1
                 self.turn = self.turn_order[self.current_turn]
 
-
+                yield (player.uuid, EngineOperation.KillPlayer(player))
 
             case Combat.Operation._HandleInput():
                 text = operation.text

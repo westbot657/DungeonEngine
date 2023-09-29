@@ -174,7 +174,7 @@ def generate():
                     "name": room_name,
                     "interactions": [],
                     "events": events
-                }, f)
+                }, f, indent=4)
 
     if input("Generate room connections? (y/n): ").lower().startswith("y"):
         while True:

@@ -153,13 +153,16 @@ class FunctionMemory:
 
     def ref(self, name:str):
         #print(f"#ref: {self.context_data}")
-
+        optional = False
         if name.startswith("%"):
             if name in self.global_environment_variables:
                 return self.global_environment_variables[name]
             raise MemoryError(f"Global environment variable not defined: '{name}'")
 
         elif name.startswith("#"):
+            if "?" in name:
+                name = name.replace("?", "")
+                optional = True
             if "." in name:
                 props = [(f".{prop}" if not prop.startswith("#") else prop) for prop in name.split(".")]
                 prop = props.pop(0)
@@ -168,14 +171,25 @@ class FunctionMemory:
 
             if name in self.context_data:
                 return self.context_data[name]
+            
+            if optional:
+                return None
             raise MemoryError(f"Local context variable not defined: '{name}'")
 
         else:
             props = [f".{prop}" if prop else "." for prop in name.split(".")]
             prop = props.pop(0)[1:]
             if prop == "": prop = props.pop(0)
+            
+            if "?" in prop:
+                prop = prop.replace("?", "")
+                optional = True
+            
             if prop in self.symbol_table:
                 return self._getProperty(self.symbol_table[prop], props)
+
+            if optional:
+                return None
 
             raise MemoryError(f"Variable referenced before assignment: '{name}'")
 
@@ -186,13 +200,21 @@ class FunctionMemory:
         #     raise MemoryError(f"Variable referenced before assignment: '{name}'")
 
     def _getProperty(self, obj, propertyTree:list):
+        optional = False
         while propertyTree:
             if isinstance(obj, FunctionalElement):
                 obj_props = obj.getLocalVariables()
                 curr = propertyTree.pop(0)
+                
+                if "?" in curr:
+                    curr = curr.replace("?", "")
+                    optional = True
+                
                 if curr in obj_props:
                     obj = obj_props[curr]
                 else:
+                    if optional:
+                        return None
                     raise MemoryError(f"Variable '{obj}' has no property '{curr}'")
             else:
                 break

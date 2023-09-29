@@ -1,1 +1,10 @@
-{"name": "Test Dungeon", "version": 1, "interactions": [], "entry_point": "test_dungeon:rooms/start", "events": {}}
+{
+    "name": "Test Dungeon",
+    "version": 1,
+    "interactions": [],
+    "entry_point": "test_dungeon:rooms/start",
+    "events": {},
+    "data": {
+        "hide_goto": true
+    }
+}

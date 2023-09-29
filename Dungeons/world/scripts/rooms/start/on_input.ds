@@ -13,7 +13,7 @@
             or
             (<dungeon_name> == [engine:text/set_case](<key>, "lower")))
 
-            and (not <value.hide_goto>) // TODO: make this work
+            and (not <value.hide_goto?>) // the "?" means that the engine will return null instead of raise an error
         ) {
             [engine:player/set_location](<value.entry_point.location>)
             break

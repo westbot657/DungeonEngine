@@ -1,6 +1,10 @@
 {
     "name": "Sword",
-    "damage": 3,
+    "damage": {
+        "function": "engine:random/range",
+        "min": 2,
+        "max": 4
+    },
     "range": 2,
     "max_durability": 30
 }

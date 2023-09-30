@@ -92,6 +92,12 @@ class Inventory(FunctionalElement):
             if c.identifier == game_object:
                 return True
         return False
+    
+    def getOfAbstractType(self, abstract_type:AbstractGameObject):
+        for c in self.contents:
+            if c.abstract.inherets_from(abstract_type):
+                return c
+        return None
 
     def isEquipped(self, gameObject:GameObject):
         return gameObject in self.equips.values()

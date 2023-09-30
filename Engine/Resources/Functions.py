@@ -173,7 +173,7 @@ class Engine_$1(LoaderFunction):
 """
 
 ####XXX#############XXX####
-### XXX Engine Tool XXX####
+### XXX Engine Tool XXX ###
 ####XXX#############XXX####
 
 
@@ -1721,7 +1721,7 @@ class Engine_Location_Exists(LoaderFunction):
 ####XXX###############XXX####
 
 
-class Engine_Random_Uniform(LoaderFunction): # TODO: split random range into it's own function
+class Engine_Random_Uniform(LoaderFunction):
     id = Identifier("engine", "random/", "uniform")
     pre_evaluate_args = False
 
@@ -1738,17 +1738,10 @@ class Engine_Random_Uniform(LoaderFunction): # TODO: split random range into it'
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
             case {
-                "min": int(),
-                "max": int()
-            }: return cls.rand_range
-            case {
                 "rolls": int(),
                 "pool": list()
             }: return cls.uniform_list
             case _: return None
-    @staticmethod
-    def rand_range(function_memory:FunctionMemory, min:int, max:int):
-        return random.randint(min, max)
     @staticmethod
     def uniform_list(function_memory:FunctionMemory, rolls:int, pool:list, roll_size:int=1):
         if roll_size > len(pool): raise FunctionError(f"Cannot pull more elements from list than are available")
@@ -1760,6 +1753,39 @@ class Engine_Random_Uniform(LoaderFunction): # TODO: split random range into it'
                 _pool.remove(p)
                 result.append(p)
         return result
+
+
+class Engine_Random_Range(LoaderFunction):
+    id = Identifier("engine", "random/", "range")
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "min": "required parameter",
+            "max": "required parameter"
+        }
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "min": int(),
+                "max": int()
+            }: return cls.rand_range
+            case _: return None
+    @staticmethod
+    def rand_range(function_memory:FunctionMemory, min:int, max:int):
+        return random.randint(min, max)
+
+    @classmethod
+    def getFullDisplay(self, function_memory: FunctionMemory, data: dict) -> str:
+        return f"[{data['min']}-{data['max']}]"
+
+    @classmethod
+    def getQuickDisplay(self, function_memory: FunctionMemory, data: dict) -> str:
+        return f"[{data['min']}-{data['max']}]"
 
 class Engine_Random_Weighted(LoaderFunction):
     id = Identifier("engine", "random/", "weighted")

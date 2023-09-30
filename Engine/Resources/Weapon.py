@@ -8,6 +8,7 @@ try:
     from .FunctionMemory import FunctionMemory
     from .EngineOperation import _EngineOperation
     from .Logger import Log
+    from .AbstractAmmo import AbstractAmmo, Ammo
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
@@ -16,6 +17,7 @@ except ImportError:
     from FunctionMemory import FunctionMemory
     from EngineOperation import _EngineOperation
     from Logger import Log
+    from AbstractAmmo import AbstractAmmo, Ammo
 
 import random
 
@@ -55,7 +57,8 @@ class Weapon(GameObject):
             ".damage": self.damage,
             ".range": self.range,
             ".durability": self.durability,
-            ".max_durability": self.max_durability
+            ".max_durability": self.max_durability,
+            ".ammo_type": self.ammo_type.getName()
         }
         return d
 
@@ -73,9 +76,28 @@ class Weapon(GameObject):
         
     def onAttack(self, function_memory:FunctionMemory, target, acc:int=None):
 
+        player = self.owner
+
+        damage = 0
+
+        if self.ammo_type is not AbstractAmmo._loaded["engine:ammo/none"]:
+            if (ammo := player.inventory.getOfAbstractType(self.ammo_type)) is not None:
+                ammo: Ammo
+                damage += ammo.bonus_damage.getNew(function_memory)
+                ammo.count -= 1
+
+                if ammo.count <= 0:
+                    player.inventory.removeObject(ammo)
+                    function_memory.engine.sendOutput(player, f"You used your last `{self.ammo_type.getName()}`")
+
+
+            else:
+                function_memory.engine.sendOutput(player, f"You don't have any `{self.ammo_type.getName()}s`")
+                return
+
         if acc is None: acc = random.randint(1, 100)
 
-        damage = self.damage.getNew(function_memory)
+        damage += self.damage.getNew(function_memory)
 
         Log["debug"]["weapon"]("weapon.onAttack() called!")
         if on_attack := self.events.get("on_attack", None):
@@ -109,6 +131,13 @@ class Weapon(GameObject):
                 v = ev.send(res)
         except StopIteration as e:
             v = function_memory.engine.loader.stopIterationEval(e.value, v)
+
+        if self.max_durability > 0:
+            self.durability -= 1
+
+            if self.durability <= 0:
+                function_memory.engine.sendOutput(player, f"Your `{self.name}` broke!")
+                player.inventory.removeObject(self)
 
     def onDamage(self, function_memory:FunctionMemory):
         if on_damage := self.events.get("on_damage", None):

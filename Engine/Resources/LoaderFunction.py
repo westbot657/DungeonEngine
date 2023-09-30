@@ -133,11 +133,12 @@ class LoaderFunction:
 
         return str(data)
 
-
+    @classmethod
     def getFullDisplay(self, function_memory:FunctionMemory, data:dict) -> str:
         # overridden by functions
         return f"{self.id.full()} {data}"
     
+    @classmethod
     def getQuickDisplay(self, function_memory:FunctionMemory, data:dict) -> str:
         # overridden by functions
         return f"{self.id.full()} ..."

@@ -31,8 +31,19 @@
                 "type": "engine:weapon",
                 "parent": "engine:weapons/sword",
                 "name": "Rusty Sword",
-                "durability": 23,
+                "durability": 23
+            },
+            {
+                "type": "engine:weapon",
+                "parent": "engine:weapons/bow",
+                "name": "Pew Pew!!",
+                "durability": 28,
                 "equipped": true
+            },
+            {
+                "type": "engine:ammo",
+                "parent": "engine:ammo/arrow",
+                "count": 13
             },
             {
                 "type": "engine:tool",

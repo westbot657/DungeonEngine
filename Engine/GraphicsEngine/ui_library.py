@@ -3355,33 +3355,6 @@ class FileEditor(UIElement):
 
     def json_colors(self, text:str) -> str:
 
-        # repls = {
-        #     "keys": [],
-        #     "vals": []
-        # }
-
-        # r = 0
-        # text = text.replace("•", "••")
-
-        # strs = re.findall(r"(\"(?:\\.|[^\"\\])*\"):", text)
-
-        # for s in strs:
-        #     text = text.replace(s, "•◘", 1)
-        #     repls["keys"].append("\033[38;2;156;220;254m"+re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;156;220;254m", s)+"\033[0m")
-        # vals = re.findall(r"(\"(?:\\.|[^\"\\])*\")", text)
-        # for v in vals:
-        #     text = text.replace(v, "•○", 1)
-        #     repls["vals"].append("\033[38;2;206;145;120m"+re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", v)+"\033[0m")
-
-        # text = re.sub(r"(\d+(?:\.\d+)?)", "\033[38;2;181;206;168m\\1\033[0m", text)
-        # text = re.sub(r"(true|false|null)", "\033[38;2;86;156;214m\\1\033[0m", text)
-        
-        # for k in repls["keys"]:
-        #     text = text.replace("•◘", k, 1)
-        
-        # for v in repls["vals"]:
-        #     text = text.replace("•○", v, 1)
-
         def repl(match:re.Match) -> str:
             t = match.group()
 
@@ -3400,16 +3373,8 @@ class FileEditor(UIElement):
 
         return re.sub(r"((?:\"(?:\\.|[^\"\\])*\":)|(?:\"(?:\\.|[^\"\\])*\")|\d+(\.\d+)?|\b(true|false|null)\b)", repl, text)
 
-        # return text.replace("••", "•")
     
     def ds_colors(self, text:str) -> str:
-
-        # for pattern, repl in {
-        #     r"(//.*)": "\033[38;2;106;153;85m\\1\033[0m",
-        #     r"((?<!\/)\/\*(?:\*[^/]|[^*])+\*\/)": "\033[38;2;106;153;85m\\1\033[0m",
-        #     r"(\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')": "\033[38;2;206;145;120m\\1\033[0m"
-        # }.items():
-        #     text = re.sub(pattern, repl, text)
 
         def repl(match:re.Match) -> str:
             t = match.group()
@@ -3449,10 +3414,8 @@ class FileEditor(UIElement):
             else:
                 return t
             
-        text = re.sub(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*|(?:\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')|\[[^:]+:[^\]]+\]|<=|>=|<<|>>|==|!=|<[^>]+>|@[^:]+:|\$[a-zA-Z_0-9]+|\d+(?:\.\d+)?|\b(and|if|or|not|elif|else|not|return|break|pass)\b|#|%)", repl, text)
+        return re.sub(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*|(?:\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')|\[[^:]+:[^\]]+\]|<=|>=|<<|>>|==|!=|<[^>]+>|@[^:]+:|\$[a-zA-Z_0-9]+|\d+(?:\.\d+)?|\b(and|if|or|not|elif|else|not|return|break|pass)\b|#|%)", repl, text)
 
-
-        return text
 
     def md_colors(self, text:str) -> str:
 

@@ -809,9 +809,22 @@ class MultilineTextBox(UIElement):
         self._highlight = pygame.image.load(f"{PATH}/highlight.png")#pygame.Surface((1, 1), pygame.SRCALPHA, 24) # pylint: disable=no-member
         self.highlights = []
         self._save = self._default_save_event
+
+        self._history = [content]
+        self._future = []
+
         self.set_content(content)
 
         self._width, self._height = self.font.render("_", True, (0, 0, 0)).get_size()
+
+    def save_to_history(self):
+        ...
+    def undo(self):
+        ...
+    def redo(self):
+        ...
+    def save_to_future(self): # this one might not be needed
+        ...
 
     def on_save(self, function):
         """Decorator for a function
@@ -3288,6 +3301,8 @@ class FileEditor(UIElement):
         
         self.edit_area.set_content(self.contents)
 
+        # TODO: finish undo/redo then add file saving!
+
         match file_name.rsplit(".", 1)[-1]:
             case "json":
                 self.edit_area.editable.color_text = self.json_colors
@@ -3297,39 +3312,59 @@ class FileEditor(UIElement):
                 self.edit_area.editable.color_text = self.md_colors
         self.edit_area.editable.refresh_surfaces()
 
+    def save_file(self, text_box:MultilineTextBox, content:str, selection:Selection|None, cursorPos:Cursor):
+        with open(self.file_location, "w+", encoding="utf-8") as f:
+            f.write(content)
+
 
     def json_colors(self, text:str) -> str:
 
-        repls = {
-            "keys": [],
-            "vals": []
-        }
+        # repls = {
+        #     "keys": [],
+        #     "vals": []
+        # }
 
-        r = 0
-        text = text.replace("•", "••")
+        # r = 0
+        # text = text.replace("•", "••")
 
-        strs = re.findall(r"(\"(?:\\.|[^\"\\])*\"):", text)
+        # strs = re.findall(r"(\"(?:\\.|[^\"\\])*\"):", text)
 
-        for s in strs:
-            text = text.replace(s, "•◘", 1)
-            repls["keys"].append("\033[38;2;156;220;254m"+re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;156;220;254m", s)+"\033[0m")
+        # for s in strs:
+        #     text = text.replace(s, "•◘", 1)
+        #     repls["keys"].append("\033[38;2;156;220;254m"+re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;156;220;254m", s)+"\033[0m")
+        # vals = re.findall(r"(\"(?:\\.|[^\"\\])*\")", text)
+        # for v in vals:
+        #     text = text.replace(v, "•○", 1)
+        #     repls["vals"].append("\033[38;2;206;145;120m"+re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", v)+"\033[0m")
+
+        # text = re.sub(r"(\d+(?:\.\d+)?)", "\033[38;2;181;206;168m\\1\033[0m", text)
+        # text = re.sub(r"(true|false|null)", "\033[38;2;86;156;214m\\1\033[0m", text)
         
-        vals = re.findall(r"(\"(?:\\.|[^\"\\])*\")", text)
-        for v in vals:
-            text = text.replace(v, "•○", 1)
-            repls["vals"].append("\033[38;2;206;145;120m"+re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", v)+"\033[0m")
-
-        text = re.sub(r"(\d+(?:\.\d+)?)", "\033[38;2;181;206;168m\\1\033[0m", text)
-        text = re.sub(r"(true|false|null)", "\033[38;2;86;156;214m\\1\033[0m", text)
+        # for k in repls["keys"]:
+        #     text = text.replace("•◘", k, 1)
         
-        for k in repls["keys"]:
-            text = text.replace("•◘", k, 1)
-        
-        for v in repls["vals"]:
-            text = text.replace("•○", v, 1)
+        # for v in repls["vals"]:
+        #     text = text.replace("•○", v, 1)
 
+        def repl(match:re.Match) -> str:
+            t = match.group()
 
-        return text.replace("••", "•")
+            if (m := re.match(r"(\"(?:\\.|[^\"\\])*\":)", t)): # "...":
+                t = re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;156;220;254m", m.group())
+                return f"\033[38;2;156;220;254m{t[0:-1]}\033[0m:"
+            elif (m := re.match(r"(\"(?:\\.|[^\"\\])*\")", t)): # "..."
+                t = re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", m.group())
+                return f"\033[38;2;206;145;120m{t}\033[0m"
+            elif (m := re.match(r"\b(true|false|null)\b", t)): # keywords - and/or/not/...
+                return f"\033[38;2;86;156;214m{m.group()}\033[0m"
+            elif (m := re.match(r"\d+(?:\.\d+)?", t)):
+                return f"\033[38;2;181;206;168m{m.group()}\033[0m"
+            else:
+                return t
+
+        return re.sub(r"((?:\"(?:\\.|[^\"\\])*\":)|(?:\"(?:\\.|[^\"\\])*\")|\d+(\.\d+)?|\b(true|false|null)\b)", repl, text)
+
+        # return text.replace("••", "•")
     
     def ds_colors(self, text:str) -> str:
 
@@ -3373,10 +3408,12 @@ class FileEditor(UIElement):
                 return f"\033[38;2;197;134;192m{m.group()}\033[0m"
             elif (m := re.match(r"\b(true|false|none|not|and|or)\b", t)): # keywords - and/or/not/...
                 return f"\033[38;2;86;156;214m{m.group()}\033[0m"
+            elif (m := re.match(r"\d+(?:\.\d+)?", t)):
+                return f"\033[38;2;181;206;168m{m.group()}\033[0m"
             else:
-                return match.group()
+                return t
             
-        text = re.sub(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*|(?:\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')|\[[^:]+:[^\]]+\]|<[^>]+>|@[^:]+:|\$[a-zA-Z_0-9]+|\b(and|if|or|not|elif|else|not|return|break|pass)\b|#|%)", repl, text)
+        text = re.sub(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*|(?:\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')|\[[^:]+:[^\]]+\]|<[^>]+>|@[^:]+:|\$[a-zA-Z_0-9]+|\d+(?:\.\d+)?|\b(and|if|or|not|elif|else|not|return|break|pass)\b|#|%)", repl, text)
 
 
         return text

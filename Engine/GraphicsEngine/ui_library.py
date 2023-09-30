@@ -4071,15 +4071,20 @@ class CodeEditor(UIElement):
 class IOHook:
     def __init__(self):
         self.engine = None
+        self.running = False
     
     def init(self, engine):
         self.engine = engine
 
-    def start(self):
+    def sendOutput(self, target, text):
         ...
+
+    def start(self):
+        self.running = True
     
     def stop(self):
-        ...
+        self.running = False
+        
 
 if __name__ == "__main__":
     # from threading import Thread

@@ -53,6 +53,7 @@ class Armor(GameObject):
         return d
 
     def updateLocalVariables(self, locals: dict):
+        ...
         if n := locals.get(".name", None):
             if isinstance(n, str) and n.strip() != self.name:
                 self.name = n.strip()
@@ -62,8 +63,8 @@ class Armor(GameObject):
                 self.description = n.strip()
         
         if n := locals.get(".durability", None):
-            if isinstance(n, int) and n.strip() != self.durability:
-                self.durability = n.strip()
+            if isinstance(n, int) and n != self.durability:
+                self.durability = n
     
     def prepFunctionMemory(self, function_memory:FunctionMemory):
         function_memory.addContextData({
@@ -72,7 +73,7 @@ class Armor(GameObject):
         function_memory.update(self.getLocalVariables())
 
     def postEvaluate(self, function_memory:FunctionMemory):
-        self.updateLocalVariables(function_memory.symbol_table)
+        ... # self.updateLocalVariables(function_memory.symbol_table)
 
     def onEquip(self, function_memory:FunctionMemory):
         if on_equip := self.events.get("on_equip", None):

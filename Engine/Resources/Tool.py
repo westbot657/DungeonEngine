@@ -80,7 +80,7 @@ class Tool(GameObject):
         function_memory.update(self.getLocalVariables())
 
     def postEvaluate(self, function_memory:FunctionMemory):
-        self.updateLocalVariables(function_memory, function_memory.symbol_table)
+        ... # self.updateLocalVariables(function_memory, function_memory.symbol_table)
 
     def onUse(self, function_memory:FunctionMemory):
         if on_use := self.events.get("on_use", None):

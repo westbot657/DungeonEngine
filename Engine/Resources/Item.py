@@ -57,6 +57,7 @@ class Item(GameObject):
         return d
 
     def updateLocalVariables(self, locals: dict):
+        ...
         if n := locals.get(".name", None):
             if isinstance(n, str) and n.strip() != self.name:
                 self.name = n.strip()
@@ -66,8 +67,8 @@ class Item(GameObject):
                 self.description = n.strip()
 
         if n := locals.get(".count", None):
-            if isinstance(n, int) and n.strip() != self.count:
-                self.count = n.strip()
+            if isinstance(n, int) and n != self.count:
+                self.count = n
 
     def prepFunctionMemory(self, function_memory:FunctionMemory):
         function_memory.addContextData({
@@ -76,7 +77,7 @@ class Item(GameObject):
         function_memory.update(self.getLocalVariables())
     
     def postEvaluate(self, function_memory:FunctionMemory):
-        self.updateLocalVariables(function_memory.symbol_table)
+        ... # self.updateLocalVariables(function_memory.symbol_table)
 
     def onUse(self, function_memory:FunctionMemory):
 

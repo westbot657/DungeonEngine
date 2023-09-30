@@ -111,8 +111,40 @@ class FunctionMemory:
         if name.startswith("$"):
             FunctionMemory.stored_functions.update({name: value})
         else:
+            if "." in name:
+                props = [(f".{prop}" if not prop.startswith("#") else prop) for prop in name.split(".")]
+                # print(f"PROPS: {props}")
+                prop = props.pop(0)
+                if prop in self.context_data:
+                    return self._setProperty(self.context_data[prop], props, value)
+
+                elif prop.replace(".", "") in self.symbol_table:
+                    return self._setProperty(self.symbol_table[prop.replace(".", "")], props, value)
+                
             self.symbol_table.update({name: value})
     
+    def _setProperty(self, obj, propertyTree:list, value):
+        # print(f"setProperty: {obj} {propertyTree} {value}")
+        while propertyTree:
+            if isinstance(obj, FunctionalElement):
+                obj_props = obj.getLocalVariables()
+                curr = propertyTree.pop(0)
+                # print(f"{obj_props} {curr}")
+                if curr in obj_props:
+                    if len(propertyTree) == 0:
+                        # print(obj_props, curr, value)
+                        obj_props.update({
+                            curr: value
+                        })
+                        obj.updateLocalVariables(obj_props)
+                    
+                    obj = obj_props[curr]
+                else:
+                    raise MemoryError(f"Variable '{obj}' has no property '{curr}'")
+            else:
+                break
+        return obj
+
     def call(self, name:str):
         if name.startswith("$"):
             func = FunctionMemory.stored_functions.get(name, None)

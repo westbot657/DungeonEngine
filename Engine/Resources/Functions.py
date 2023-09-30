@@ -831,14 +831,11 @@ class Engine_Player_Message(LoaderFunction):
 
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case {
-                "message": str()
-            }: return cls.send_message
-            case _: return None
+        if "message" in args: return cls.send_message
+        return None
     @staticmethod
     def send_message(function_memory:FunctionMemory, message:str):
-        function_memory.engine.sendOutput(function_memory.ref("#player"), message)
+        function_memory.engine.sendOutput(function_memory.ref("#player"), str(message))
 
 class Engine_Player_SetTag(LoaderFunction):
     id = Identifier("engine", "player/", "set_tag")

@@ -4,7 +4,7 @@ from threading import Thread
 import re, os, sys
 # from colorama import AnsiToWin32
 import simpleaudio as sa
-
+import imp
 # import glob
 
 # if getattr(sys, 'frozen', False):
@@ -49,9 +49,10 @@ os.system('') # this fixes console ansi colors for some reason
 #             file.write(t)
 
 try:
-    from IOHook import IOHook
+    _IOHook = imp.load_source("IOHook", "./IOHook.py")
+    IOHook = _IOHook.IOHook
 
-except ImportError:
+except ImportError as e:
     class IOHook:
         def __init__(self):
             self.print_queue = []

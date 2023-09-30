@@ -8,6 +8,8 @@ import re
 
 # You can modify this class to change how/where the game sends output.
 
+print("USING CUSTOM HOOK")
+
 class IOHook:
     def __init__(self):
         self.print_queue = []

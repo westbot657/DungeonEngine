@@ -141,7 +141,7 @@ class Engine:
             self.input_queue[player_id][2] = text
 
     def setInputHandler(self, player_id, handler, handler_getter):
-        print(f"Setting input handler for player {player_id}: {handler}")
+        Log["debug"]["engine"](f"Setting input handler for player {player_id}: {handler}")
         self.input_queue.update({player_id: [handler_getter, handler, ""]})
 
     def resetInputHandler(self, player_id):

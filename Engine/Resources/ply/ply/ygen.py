@@ -65,7 +65,7 @@ def main():
     with open(os.path.join(dirname, 'yacc.py'), 'w') as f:
         f.writelines(lines)
 
-    print('Updated yacc.py')
+    # print('Updated yacc.py')
 
 if __name__ == '__main__':
     main()

@@ -3334,6 +3334,7 @@ class FileEditor(UIElement):
         self.edit_area = NumberedTextArea(self.x, self.y, self.width, self.height, text_bg_color=(31, 31, 31), scroll_speed=45)
         
         self.edit_area.set_content(self.contents)
+        self.edit_area.editable.save_history()
 
         # TODO: finish undo/redo then add file saving!
 

@@ -57,7 +57,17 @@ class Item(GameObject):
         return d
 
     def updateLocalVariables(self, locals: dict):
-        ...
+        if n := locals.get(".name", None):
+            if isinstance(n, str) and n.strip() != self.name:
+                self.name = n.strip()
+        
+        if n := locals.get(".description", None):
+            if isinstance(n, str) and n.strip() != self.description:
+                self.description = n.strip()
+
+        if n := locals.get(".count", None):
+            if isinstance(n, int) and n.strip() != self.count:
+                self.count = n.strip()
 
     def prepFunctionMemory(self, function_memory:FunctionMemory):
         function_memory.addContextData({

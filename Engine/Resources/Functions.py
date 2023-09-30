@@ -1110,12 +1110,14 @@ class Engine_Player_GiveGameObject(LoaderFunction):
         
         data = kwargs.get("data", {})
 
-        game_object = function_memory.engine.loader.constructGameObject(
-            function_memory,
-            data.update({
+        data.update({
                 "type": f"engine:abstract/{object_name.path.strip('/').rstrip('s')}",
                 "parent": object_name.full()
             })
+
+        game_object = function_memory.engine.loader.constructGameObject(
+            function_memory,
+            data
         )
 
 

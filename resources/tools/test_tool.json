@@ -4,7 +4,7 @@
     "max_durability": -1,
     "events": {
         "on_use": {
-            "#script": "resources/tools/test_tool/on_use"
+            "#script": "resources/tools/scripts/test_tool/on_use"
         }
     }
 }

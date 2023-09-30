@@ -2881,8 +2881,9 @@ class DirectoryTree(UIElement):
         # self.surface._event(editor, X + self.x, Y + self.y)
 
 class Editor:
-    def __init__(self, width=1280, height=720) -> None:
+    def __init__(self, engine, width=1280, height=720) -> None:
         self.screen:pygame.Surface = None
+        self.engine = engine
         # self.window = Window.from_display_module()
         self.previous_mouse = [False, False, False]
         self.mouse = [False, False, False]
@@ -3340,9 +3341,9 @@ class FileEditor(UIElement):
         # TODO: finish undo/redo then add file saving!
 
         match file_name.rsplit(".", 1)[-1]:
-            case "json":
+            case "json"|"piskel":
                 self.edit_area.editable.color_text = self.json_colors
-            case "ds"|"dungeon_script":
+            case "ds"|"dungeon_script"|"dse":
                 self.edit_area.editable.color_text = self.ds_colors
             case "md":
                 self.edit_area.editable.color_text = self.md_colors
@@ -4067,11 +4068,30 @@ class CodeEditor(UIElement):
         elif self.active_app == "editor":
             self.editor_app._event(editor, X, Y)
 
+class IOHook:
+    def __init__(self):
+        self.engine = None
+    
+    def init(self, engine):
+        self.engine = engine
+
+    def start(self):
+        ...
+    
+    def stop(self):
+        ...
+
 if __name__ == "__main__":
     # from threading import Thread
     # import traceback
 
-    editor = Editor()
+    from Engine.Engine import Engine
+
+    io_hook = IOHook()
+
+    engine = Engine(io_hook)
+
+    editor = Editor(engine)
     
     # def inp_thread():
     #     while not editor.running: pass

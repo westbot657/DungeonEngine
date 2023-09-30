@@ -110,7 +110,7 @@ class Color(list):
 
 PATH = "./Engine/GraphicsEngine/resources"
 
-FONT = f"{PATH}/JetBrainsMono-Regular.ttf"
+FONT = f"{PATH}/PTMono-Regular.ttf" # PTMono-Regular has correct lineup for │ and ┼!
 TEXT_SIZE = 14
 TEXT_COLOR = Color(200, 200, 200)
 TEXT_BG_COLOR = Color(24, 24, 24)
@@ -811,6 +811,8 @@ class MultilineTextBox(UIElement):
         self._save = self._default_save_event
         self.set_content(content)
 
+        self._width, self._height = self.font.render("_", True, (0, 0, 0)).get_size()
+
     def on_save(self, function):
         """Decorator for a function
         
@@ -885,7 +887,7 @@ class MultilineTextBox(UIElement):
             gc = max(s.col, e.col)
 
             lines = self.get_lines()[ll:gl+1]
-            print(lines[-1], len(lines[-1]))
+            # print(lines[-1], len(lines[-1]))
             lines[-1] = lines[-1][0:gc]
             lines[0] = lines[0][lc:]
             return "\n".join(lines)
@@ -926,15 +928,67 @@ class MultilineTextBox(UIElement):
             self.cursor_location.col = min(self.cursor_location.col, len(self._lines[self.cursor_location.line])-1)
         self.refresh_surfaces()
 
-    def refresh_surfaces(self):
+    def _refresh_surfaces(self):
         self.surfaces.clear()
         self._text_width = 0
         self._text_height = 0
         for line in self.get_lines():
-            s = self.font.render(line or " ", True, tuple(self.text_color))
+            s = self.font.render(line or " ", True, (0, 0, 0))
+            s = pygame.Surface(s.get_size(), pygame.SRCALPHA)
+            # s.fill(tuple(self.text_bg_color))
             self.surfaces.append(s)
             self._text_width = max(self._text_width, s.get_width())
             self._text_height += s.get_height()
+
+    def color_text(self, text:str) -> str:
+        return text #re.sub(r"(#.*)", "\033[38;2;106;153;85m\\1\033[0m", text)
+
+    def format_text(self, text:str, default_color:Color|list|tuple) -> list[tuple[Color|list|tuple, str]]:
+
+        col = default_color
+
+        raw = re.split("(\033\\[(?:\\d+;?)+m|\n)", self.color_text(text))
+        data = []
+        curr_line = []
+
+        for r in raw:
+            # print(f"{r!r}")
+            if m := re.match(r"\033\[38;2;(?P<R>\d+);(?P<G>\d+);(?P<B>\d+)m", r):
+                # print("is color")
+                d = m.groupdict()
+                col = (int(d["R"]), int(d["G"]), int(d["B"]))
+            elif r == "\033[0m":
+                # print("is color reset")
+                col = default_color
+            elif r == "\n":
+                data.append(curr_line)
+                curr_line = []
+            else:
+                curr_line.append((col, r))
+        
+        if curr_line:
+            data.append(curr_line)
+                
+
+        return data #[[(default_color, l)] for l in text.split("\n")]
+
+    def refresh_surfaces(self):
+        self._refresh_surfaces()
+        data = self.format_text("\n".join(self.get_lines()), self.text_color)
+
+        for line, surface in zip(data, self.surfaces):
+            x = 0
+            for col, segment in line:
+
+                s = self.font.render(segment, True, tuple(col))
+                surface.blit(s, (x, 0))
+                x += s.get_width()
+
+
+
+
+    def format_content(self, content):
+        return content
 
     def _update(self, editor, X, Y):
         h = 0
@@ -956,13 +1010,13 @@ class MultilineTextBox(UIElement):
             if l == self.cursor_location.line and self._cursor_visible:
                 _h = self.font.render(self.get_lines()[self.cursor_location.line][0:self.cursor_location.col], True, (0, 0, 0)) # This is not shown on screen, only used to get width
                 editor.screen.blit(self._cursor_surface, (X+self.x+_h.get_width(), Y+self.y+h+2))
-            h += s.get_height()
+            h += self._height#s.get_height()
             l += 1
 
         if self._text_selection_start and self._text_selection_end and self.highlights:
-            letter = self.font.render("_", True, (0, 0, 0)) # This is not shown on screen, only used to get width
+            # letter = self.font.render("_", True, (0, 0, 0)) # This is not shown on screen, only used to get width
             #w = letter.get_width()# - 1
-            _h = letter.get_height()
+            _h = self._height # letter.get_height()
             h = self.highlights[0]
             _x, _y = self._highlight_offset
             #print(f"highlight at: {X+self.x+_x}, {Y+self.y+_y}  mouse: {editor.mouse_pos} {h.get_size()}")
@@ -1588,7 +1642,7 @@ class Tabs(UIElement):
             self.tabs_parent = parent
             self.children = []
             
-            print(self.children, id(self.children))
+            # print(self.children, id(self.children))
 
         def on_left_click(self, editor):
             self.tabs_parent.active_tab = self.text
@@ -1738,7 +1792,7 @@ class Tabs(UIElement):
                     self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected
                 )
                 t.children = self.tab_children.get(name, list())
-                print("CHILDREN: ", t.children)
+                # print("CHILDREN: ", t.children)
                 if self.active_tab == name:
                     t.on_left_click(None)
                 
@@ -1768,7 +1822,7 @@ class Tabs(UIElement):
             for name in self.tab_data.keys():
                 t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.TOP, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
                 t.children = self.tab_children.get(name, list())
-                print("CHILDREN: ", t.children)
+                # print("CHILDREN: ", t.children)
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
                     self._tabs_area.children.append(t)
@@ -1795,7 +1849,7 @@ class Tabs(UIElement):
             for name in self.tab_data.keys():
                 t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.LEFT, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
                 t.children = self.tab_children.get(name, list())
-                print("CHILDREN: ", t.children)
+                # print("CHILDREN: ", t.children)
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
                     self._tabs_area.children.append(t)
@@ -1822,7 +1876,7 @@ class Tabs(UIElement):
             for name in self.tab_data.keys():
                 t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.LEFT, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
                 t.children = self.tab_children.get(name, list())
-                print("CHILDREN: ", t.children)
+                # print("CHILDREN: ", t.children)
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
                     self._tabs_area.children.append(t)
@@ -1850,7 +1904,7 @@ class Tabs(UIElement):
             for name in self.tab_data.keys():
                 t = Tabs._Tab(self, x, y, self.tab_width, self.tab_height, Tabs.Style.MENU, name, self.text_color_unselected, self.text_color_hovered, self.text_color_selected, self.tab_color_unselected, self.tab_color_hovered, self.tab_color_selected)
                 t.children = self.tab_children.get(name, list())
-                print("CHILDREN: ", t.children)
+                # print("CHILDREN: ", t.children)
                 if self.scrollable_tabs:
                     t.width = t.font.render(t.text, True, (0, 0, 0)).get_width()
                     mw = max(t.width, mw)
@@ -2259,6 +2313,7 @@ class Collapsable:
                 self.main_area.width = (self.split.x + 2) # +2 to split so that it's based on the center of the split
                 self.aside.x = (self.split.x + 2)
                 self.aside.width = self.width - (self.split.x + 2)
+                self.split.height = self.height
 
                 if (not self.split.held) and (self.width - (self.split.x + 2) < self.split_min):
                     self.main_area.width = self.width
@@ -2280,6 +2335,7 @@ class Collapsable:
                 self.main_area.x = (self.split.x + 2)
                 self.main_area.width = self.width - (self.split.x + 2)
                 self.aside.width = (self.split.x + 2)
+                self.split.height = self.height
 
                 if (not self.split.held) and ((self.split.x + 2) < self.split_min):
                     self.split.x = -2
@@ -2300,6 +2356,7 @@ class Collapsable:
                 self.main_area.height = (self.split.y + 2)
                 self.aside.y = (self.split.y + 2)
                 self.aside.height = self.height - (self.split.y + 2)
+                self.split.width = self.width
 
                 if (not self.split.held) and (self.height - (self.split.y + 2) < self.split_min):
                     self.split.y = -2
@@ -2321,6 +2378,7 @@ class Collapsable:
                 self.aside.height = (self.split.y + 2)
                 self.main_area.y = (self.split.y + 2)
                 self.main_area.height = self.height - (self.split.y + 2)
+                self.split.width = self.width
 
                 if (not self.split.held) and ((self.split.y + 2) < self.split_min):
                     self.split.y = self.height - 2
@@ -3230,6 +3288,106 @@ class FileEditor(UIElement):
         
         self.edit_area.set_content(self.contents)
 
+        match file_name.rsplit(".", 1)[-1]:
+            case "json":
+                self.edit_area.editable.color_text = self.json_colors
+            case "ds"|"dungeon_script":
+                self.edit_area.editable.color_text = self.ds_colors
+            case "md":
+                self.edit_area.editable.color_text = self.md_colors
+        self.edit_area.editable.refresh_surfaces()
+
+
+    def json_colors(self, text:str) -> str:
+
+        repls = {
+            "keys": [],
+            "vals": []
+        }
+
+        r = 0
+        text = text.replace("•", "••")
+
+        strs = re.findall(r"(\"(?:\\.|[^\"\\])*\"):", text)
+
+        for s in strs:
+            text = text.replace(s, "•◘", 1)
+            repls["keys"].append("\033[38;2;156;220;254m"+re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;156;220;254m", s)+"\033[0m")
+        
+        vals = re.findall(r"(\"(?:\\.|[^\"\\])*\")", text)
+        for v in vals:
+            text = text.replace(v, "•○", 1)
+            repls["vals"].append("\033[38;2;206;145;120m"+re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", v)+"\033[0m")
+
+        text = re.sub(r"(\d+(?:\.\d+)?)", "\033[38;2;181;206;168m\\1\033[0m", text)
+        text = re.sub(r"(true|false|null)", "\033[38;2;86;156;214m\\1\033[0m", text)
+        
+        for k in repls["keys"]:
+            text = text.replace("•◘", k, 1)
+        
+        for v in repls["vals"]:
+            text = text.replace("•○", v, 1)
+
+
+        return text.replace("••", "•")
+    
+    def ds_colors(self, text:str) -> str:
+
+        # for pattern, repl in {
+        #     r"(//.*)": "\033[38;2;106;153;85m\\1\033[0m",
+        #     r"((?<!\/)\/\*(?:\*[^/]|[^*])+\*\/)": "\033[38;2;106;153;85m\\1\033[0m",
+        #     r"(\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')": "\033[38;2;206;145;120m\\1\033[0m"
+        # }.items():
+        #     text = re.sub(pattern, repl, text)
+
+        def repl(match:re.Match) -> str:
+            t = match.group()
+
+            if (m := re.match(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*)", t)): # /* */ # //
+                return f"\033[38;2;106;153;85m{m.group()}\033[0m"
+            elif (m := re.match(r"(\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')", t)): # "..." # '...'
+                t = re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", m.group())
+                return f"\033[38;2;206;145;120m{t}\033[0m"
+            elif (m := re.match(r"\[([^:]+:)((?:[^/\]]+/)*)([^\]]+)\]", t)): # [engine:combat/start]
+                ns, g, f = m.groups()
+                return f"[\033[38;2;86;156;214m{ns}\033[38;2;156;220;254m{g}\033[38;2;220;220;170m{f}\033[0m]"
+            elif (m := re.match(r"<([^>]+)>", t)): # <variables>
+                t = m.groups()[0]
+
+                if t.startswith("#"):
+                    v = re.sub(r"([./])", "\033[0m\\1\033[38;2;209;105;105m", t)
+                    return f"<\033[38;2;209;105;105m{v}\033[0m>"
+                elif t.startswith("%"):
+                    v = re.sub(r"([./])", "\033[0m\\1\033[38;2;79;193;255m", t)
+                    return f"<\033[38;2;79;193;255m{v}\033[0m>"
+                elif t.startswith("$"):
+                    v = re.sub(r"([./])", "\033[0m\\1\033[38;2;220;220;170m", t)
+                    return f"<\033[38;2;220;220;170m{v}\033[0m>"
+                else:
+                    v = re.sub(r"([./])", "\033[0m\\1\033[38;2;78;201;176m", t)
+                    return f"<\033[38;2;78;201;176m{v}\033[0m>"
+                
+            elif (m := re.match(r"(@[^:]*:|#|%|\$[a-zA-Z_][a-zA-Z0-9_]*)", t)): # @tags:
+                return f"\033[38;2;79;193;255m{m.group()}\033[0m"
+            elif (m := re.match(r"\b(if|elif|else|break|return|pass)\b", t)): # keywords - if/elif/else/...
+                return f"\033[38;2;197;134;192m{m.group()}\033[0m"
+            elif (m := re.match(r"\b(true|false|none|not|and|or)\b", t)): # keywords - and/or/not/...
+                return f"\033[38;2;86;156;214m{m.group()}\033[0m"
+            else:
+                return match.group()
+            
+        text = re.sub(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*|(?:\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')|\[[^:]+:[^\]]+\]|<[^>]+>|@[^:]+:|\$[a-zA-Z_0-9]+|\b(and|if|or|not|elif|else|not|return|break|pass)\b|#|%)", repl, text)
+
+
+        return text
+
+    def md_colors(self, text:str) -> str:
+
+        text = re.sub(r"(?<=\n)( *#{1,6}.*)", "\033[38;2;86;156;214m\\1\033[0m", text)
+        text = re.sub(r"(?<=\n)( *-(?!-))", "\033[38;2;103;150;230m\\1\033[0m", text)
+
+        return text
+
     def _update_layout(self, editor):
         self.edit_area.width = self.width
         self.edit_area.height = self.height
@@ -3287,9 +3445,6 @@ class GameObjectEditor(UIElement): # this may need to be split into dedicated ed
 # class PlayerEditor(UIElement):
 
 # class InventoryEditor(UIElement):
-
-
-
 
 
 class Opener:

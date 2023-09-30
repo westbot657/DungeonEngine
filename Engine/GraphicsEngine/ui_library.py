@@ -810,21 +810,34 @@ class MultilineTextBox(UIElement):
         self.highlights = []
         self._save = self._default_save_event
 
-        self._history = [content]
-        self._future = []
-
         self.set_content(content)
+
+        self._history: list = []
+        self._future: list = []
+
+        self._history_triggers = " \n:.,/;'\"[]{}-=_+<>?|\\~`!@#$%^&*()"
 
         self._width, self._height = self.font.render("_", True, (0, 0, 0)).get_size()
 
-    def save_to_history(self):
-        ...
+    def save_history(self):
+        content = self.get_content()
+        if self._history:
+            if self._history[0] != content:
+                self._history.insert(0, content)
+                self._future.clear()
+        else:
+            self._history.insert(0, content)
+            self._future.clear()
     def undo(self):
-        ...
+        if len(self._history) > 1:
+            self.set_content(p := self._history.pop(0))
+            self._future.insert(0, p)
+        elif len(self._history) == 1:
+            self.set_content(self._history[0])
     def redo(self):
-        ...
-    def save_to_future(self): # this one might not be needed
-        ...
+        if self._future:
+            self.set_content(p := self._future.pop(0))
+            self._history.insert(0, p)
 
     def on_save(self, function):
         """Decorator for a function
@@ -1178,6 +1191,7 @@ class MultilineTextBox(UIElement):
                     self.cursor_location.line += 1
                     self.cursor_location.col = 0
                     self._lines.insert(self.cursor_location.line, txt)
+                    self.save_history()
                 elif key == "\t":
                     pre = "".join(self._lines[self.cursor_location.line][0:self.cursor_location.col])
                     if pre.strip() == "":
@@ -1192,33 +1206,48 @@ class MultilineTextBox(UIElement):
                         self.set_selection("")
                     else:
                         if self.cursor_location.col > 0:
+                            c = self._lines[self.cursor_location.line][self.cursor_location.col-1]
                             txt = self._lines[self.cursor_location.line][0:self.cursor_location.col-1] + \
                                 self._lines[self.cursor_location.line][self.cursor_location.col:]
                             self._lines[self.cursor_location.line] = txt
                             self.cursor_location.col -= 1
+                            if c in self._history_triggers:
+                                self.save_history()
                         elif self.cursor_location.line > 0:
                             self.cursor_location.col = len(self._lines[self.cursor_location.line-1])
                             self._lines[self.cursor_location.line-1] += self._lines.pop(self.cursor_location.line)
                             self.cursor_location.line -= 1
+                            self.save_history()
+                    
                 elif key == "\x7f": # delete
                     if self._text_selection_start and self._text_selection_end:
                         self.set_selection("")
                     else:
                         if self.cursor_location.col < len(self._lines[self.cursor_location.line]):
+                            c = self._lines[self.cursor_location.line][self.cursor_location.col]
                             txt = self._lines[self.cursor_location.line][0:self.cursor_location.col] + \
                                 self._lines[self.cursor_location.line][self.cursor_location.col+1:]
                             self._lines[self.cursor_location.line] = txt
                             # self.cursor_location.col -= 1
+                            if c in self._history_triggers:
+                                self.save_history()
                         elif self.cursor_location.line < len(self._lines)-1:
                             # self.cursor_location.col = len(self._lines[self.cursor_location.line-1])
                             self._lines[self.cursor_location.line] += self._lines.pop(self.cursor_location.line+1)
                             # self.cursor_location.line -= 1
+                            self.save_history()
                 elif key == "\x1a": # CTRL+Z
-                    ...
+                    if pygame.K_LSHIFT in editor.keys:
+                        self.redo()
+                    else:
+                        if not self._future:
+                            self.save_history()
+                        self.undo()
                 elif key == "\x18": # CTRL+X
                     if (self._text_selection_start is not None) and (self._text_selection_end is not None):
                         pyperclip.copy(self.get_selection())
                         self.set_selection("")
+                        self.save_history()
                 elif key == "\x03": # CTRL+C
                     if (self._text_selection_start is not None) and (self._text_selection_end is not None):
                         pyperclip.copy(self.get_selection())
@@ -1229,6 +1258,7 @@ class MultilineTextBox(UIElement):
                         self._lines[self.cursor_location.line].insert(self.cursor_location.col, noline)
                         self.refresh_lines()
                         self.cursor_location.col += len(noline)
+                        self.save_history()
                         continue
                     l = _l.split("\n")
                     l0 = l[0]
@@ -1247,6 +1277,7 @@ class MultilineTextBox(UIElement):
                             self._lines[self.cursor_location.line].insert(0, l[-1])
                     self.refresh_lines()
                     self.cursor_location.col += len(l[-1])
+                    self.save_history()
                 elif key == "\x01": # CTRL+A
                     self._text_selection_start = Cursor(0, 0)
                     self._text_selection_end = Cursor(len(self._lines)-1, len(self._lines[-1]))
@@ -1262,9 +1293,12 @@ class MultilineTextBox(UIElement):
                             self.get_index(self._text_selection_end)
                         )
                     self._save(self, content, selection, cursor)
+                    self.save_history()
                 else:
                     self._lines[self.cursor_location.line].insert(self.cursor_location.col, key)
                     self.cursor_location.col += 1
+                    if key in self._history_triggers:
+                        self.save_history()
             if self._text_selection_start == self._text_selection_end and self._text_selection_start != None:
                 self._text_selection_start = self._text_selection_end = None
 

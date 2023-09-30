@@ -3,9 +3,5 @@
     "version": 1,
     "entry_point": "world:rooms/start",
     "environment": {},
-    "data": {
-        "spawn_points": [
-            
-        ]
-    }
+    "data": {}
 }

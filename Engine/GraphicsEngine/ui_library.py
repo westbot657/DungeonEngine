@@ -3335,6 +3335,7 @@ class FileEditor(UIElement):
         
         self.edit_area.set_content(self.contents)
         self.edit_area.editable.save_history()
+        self.edit_area.editable.on_save(self.save_file)
 
         # TODO: finish undo/redo then add file saving!
 

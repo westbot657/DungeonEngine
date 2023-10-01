@@ -4,7 +4,10 @@ from threading import Thread
 import re, os, sys
 # from colorama import AnsiToWin32
 import simpleaudio as sa
-import imp
+import warnings
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    import imp
 # import glob
 
 # if getattr(sys, 'frozen', False):

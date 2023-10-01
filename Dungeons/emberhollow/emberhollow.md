@@ -135,3 +135,235 @@ types of districts:
 why are the players here?
 
 
+
+Roads (29 (residential) + 30 (commercial) + 14 (docks) = 73):
+Residential:
+- ...
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+Commercial:
+- ...
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+Docks/Slums:
+- ...
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+- 
+
+
+Houses (58 (residential) + 31 (slums) = 89):
+Residential:
+1. ...
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. 
+13. 
+14. 
+15. 
+16. 
+17. 
+18. 
+19. 
+20. 
+21. 
+22. 
+23. 
+24. 
+25. 
+26. 
+27. 
+28. 
+29. 
+30. 
+31. 
+32. 
+33. 
+34. 
+35. 
+36. 
+37. 
+38. 
+39. 
+40. 
+41. 
+42. 
+43. 
+44. 
+45. 
+46. 
+47. 
+48. 
+49. 
+50. 
+51. 
+52. 
+53. 
+54. 
+55. 
+56. 
+57. 
+58. 
+
+Slums:
+1. ...
+2. 
+3. 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+10. 
+11. 
+12. 
+13. 
+14. 
+15. 
+16. 
+17. 
+18. 
+19. 
+20. 
+21. 
+22. 
+23. 
+24. 
+25. 
+26. 
+27. 
+28. 
+29. 
+30. 
+31. 
+
+Residential Shops:
+- __'s Bakery
+- __'s Pottery Shop
+- __'s Travel Magic Tricks
+- __'s Travel goodies
+- __'s Trinket Shop
+
+
+Commercial/Public buildings (25):
+- The Inn
+- Butcher's Shop
+- Post office
+- Animal Shelter
+- Museum
+- School
+- Library
+- General Boating Supply Shop
+- Private Detective
+- food place ----- need better name
+- Fresh foods Market
+- Blacksmith workshop
+- Armory
+- Magic Item Shop
+- Pawn Shop (Retail) ----- need better name
+- Bar
+- Theater
+- Carpentry Shop
+- Mason's workshop
+- Corner Tavern
+- Church/Temple
+- Fish Market
+- Ship Repair Shop
+- Fishing equipment shop
+- Seaside Inn
+
+Government buildings (11):
+- Town Hall
+- Law Enforcement
+- Jail
+- Emergency Reserves
+- Secondary Space Command Center
+- Water Refinery
+- Mining Shack
+- Keslite Forge
+- Telecomms Laboratory
+- Lighthouse
+- law enforcement for the docks
+
+Other "buildings":
+- Wizard's Dragon Keep
+- Telecomms Dragon Perch
+- hidden courtyard 1
+- hidden courtyard 2
+
+
+
+
+

@@ -15,7 +15,11 @@ import random
 from enum import Enum, auto
 from ctypes import windll, WINFUNCTYPE, POINTER
 from ctypes.wintypes import BOOL, HWND, RECT
-import imp
+
+import warnings
+with warnings.catch_warnings():
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    import imp
 from pypresence import Presence
 
 from win32api import GetMonitorInfo, MonitorFromPoint
@@ -1011,9 +1015,6 @@ class MultilineTextBox(UIElement):
                 surface.blit(s, (x, 0))
                 x += s.get_width()
 
-
-
-
     def format_content(self, content):
         return content
 
@@ -1184,8 +1185,7 @@ class MultilineTextBox(UIElement):
                 elif key in "\n\r":
                     if self.single_line:
                         continue
-                    if (self._text_selection_start is not None) and (self._text_selection_end is not None):
-                        self.cursor_location = self._text_selection_start.copy()
+                    if self.get_selection():
                         self.set_selection("")
                     txt = self._lines[self.cursor_location.line][self.cursor_location.col:]
                     self._lines[self.cursor_location.line] = self._lines[self.cursor_location.line][0:self.cursor_location.col]
@@ -1203,7 +1203,7 @@ class MultilineTextBox(UIElement):
                     self.refresh_lines()
                     self.cursor_location.col += len(add)
                 elif key == "\b":
-                    if self._text_selection_start and self._text_selection_end:
+                    if self.get_selection():
                         self.set_selection("")
                     else:
                         if self.cursor_location.col > 0:
@@ -1221,7 +1221,7 @@ class MultilineTextBox(UIElement):
                             self.save_history()
                     
                 elif key == "\x7f": # delete
-                    if self._text_selection_start and self._text_selection_end:
+                    if self.get_selection():
                         self.set_selection("")
                     else:
                         if self.cursor_location.col < len(self._lines[self.cursor_location.line]):
@@ -1253,6 +1253,8 @@ class MultilineTextBox(UIElement):
                     if (self._text_selection_start is not None) and (self._text_selection_end is not None):
                         pyperclip.copy(self.get_selection())
                 elif key == "\x16": # CTRL+V
+                    if self.get_selection():
+                        self.set_selection("")
                     _l = pyperclip.paste()
                     if self.single_line:
                         noline = re.sub("\n+", " ", _l)
@@ -1296,6 +1298,8 @@ class MultilineTextBox(UIElement):
                     self._save(self, content, selection, cursor)
                     self.save_history()
                 else:
+                    if self.get_selection():
+                        self.set_selection("")
                     self._lines[self.cursor_location.line].insert(self.cursor_location.col, key)
                     self.cursor_location.col += 1
                     if key in self._history_triggers:
@@ -2970,7 +2974,7 @@ class Editor:
             self.previous_mouse = self.mouse
             self._hovered = False
             self._hovering = None
-            self.mouse = list(pygame.mouse.get_pressed())
+            self.mouse = list(a and b for a, b in zip(pygame.mouse.get_pressed(), [mouse.is_pressed(mouse.LEFT), mouse.is_pressed(mouse.MIDDLE), mouse.is_pressed(mouse.RIGHT)]))
             self.mouse_pos = pygame.mouse.get_pos()
             # print(f"mouse: {self.mouse_pos}")
             # self.new_keys.clear()
@@ -3005,8 +3009,8 @@ class Editor:
 
             nt = time.time()
             for key, t in self.unicode.items():
-                if (nt - t) > 0.8:
-                    if int(((nt - t) * 1000) % 10) == 0:
+                if (nt - t) > 0.2:
+                    if int(((nt - t) * 1000) % 5) == 0:
                         self.typing.append(key)
 
             layers = [*self.layers.keys()]
@@ -3200,6 +3204,12 @@ class GameApp(UIElement):
         self.no_combat_text = Text(0, 0, 1, "You are not in combat", text_size=25)
         self.in_combat = False
         
+        self.buttons_left_bar = Box(editor.width-502, 21, 1, 50, (70, 70, 70))
+        self.buttons_bottom_bar = Box(editor.width-501, 71, 51, 1, (70, 70, 70))
+        self.children.append(self.buttons_left_bar)
+        self.children.append(self.buttons_bottom_bar)
+        
+
         self.play_pause = Button(editor.width-501, 21, 50, 50, "", self.play_pause_buttons[0], hover_color=self.play_pause_buttons[1])
         self.children.append(self.play_pause)
         # self.test = GameApp.HealthBar(100, 100, 100, 20, 67, 34)
@@ -3296,6 +3306,10 @@ class GameApp(UIElement):
         
         self.log_output.x = self.enemy_card_scrollable.x = editor.width-449
         self.log_output.min_height = self.enemy_card_scrollable.height = editor.height-130
+
+        self.play_pause.x = (editor.width-501)
+
+        self.buttons_left_bar.x = self.buttons_bottom_bar.x = editor.width-502
         
         self.no_combat_text.x = (editor.width-224)-(self.no_combat_text.width/2)
         self.no_combat_text.y = self.log_output.y + (self.log_output.min_height/2) - (self.no_combat_text.height/2)
@@ -3434,7 +3448,17 @@ class FileEditor(UIElement):
         text = re.sub(r"(?<=\n)( *#{1,6}.*)", "\033[38;2;86;156;214m\\1\033[0m", text)
         text = re.sub(r"(?<=\n)( *-(?!-))", "\033[38;2;103;150;230m\\1\033[0m", text)
 
-        return text
+        def repl(match:re.Match) -> str:
+            t = match.group()
+
+            if (m := re.match(r"#{1,6}.*", t)):
+                return f"\033[38;2;86;156;214m{m.group()}\033[0m"
+            elif (m := re.match(r" *(-|\d+(:|\.))", t)):
+                return f"\033[38;2;103;150;230m{m.group()}\033[0m"
+            elif (m := re.match(r"[│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌]+", t)):
+                return f"\033[38;2;150;150;150m{m.group()}\033[0m"
+
+        return re.sub(r"((?:^|(?<=\n))#{1,6}.*|(?:^|(?<=\n)) *\-|(?:^|(?<=\n)) *\d+(?:\.|:)|[│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌]+)", repl, text)
 
     def _update_layout(self, editor):
         self.edit_area.width = self.width
@@ -4065,17 +4089,17 @@ class CodeEditor(UIElement):
         if self.selected_drag in ["bottom_drag", "bottom_right_drag", "bottom_left_drag"]:
             # print(rmy, rsy, rmy-rsy)
             # print(f"rmy:{rmy} - rsy:{rsy} = {rmy-rsy}")
-            editor.height = max(405, rmy - rsy)
+            editor.height = max(425, rmy - rsy)
             # print(editor.height)
             self._update_layout(editor)
         if self.selected_drag in ["left_drag", "bottom_left_drag"]:
             editor.set_window_location(min (rmx, self.drag_offset[0]-100), self.drag_offset[1])
-            editor.width = max(720, self.drag_offset[0] - rmx)
+            editor.width = max(800, self.drag_offset[0] - rmx)
             # print(editor.width)
             self._update_layout(editor)
         if self.selected_drag in ["right_drag", "bottom_right_drag"]:
             # print(f"rmx:{rmx} - rsx:{rsx} = {rmx-rsx}")
-            editor.width = max(720, rmx - rsx)
+            editor.width = max(800, rmx - rsx)
             self._update_layout(editor)
 
 

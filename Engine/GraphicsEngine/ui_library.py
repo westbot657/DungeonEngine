@@ -2905,7 +2905,6 @@ class Editor:
         self._focused_object = None
         self._hovered = False
         self._hovering = None
-        
 
         self.unicodes = {
             pygame.K_UP: "$↑",
@@ -2972,6 +2971,7 @@ class Editor:
             self._hovering = None
             self.mouse = list(pygame.mouse.get_pressed())
             self.mouse_pos = pygame.mouse.get_pos()
+            print(f"mouse: {self.mouse_pos}")
             # self.new_keys.clear()
             # self.old_keys.clear()
             self.width, self.height = self.Width, self.Height = self.screen.get_size()
@@ -4018,6 +4018,7 @@ class CodeEditor(UIElement):
 
         rmx, rmy = mouse.get_position()
         rsx, rsy = self.get_screen_pos(editor)
+        print(rmx, rmy, rsx, rsy)
 
         if self.bottom_drag.hovered:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZENS)
@@ -4052,6 +4053,7 @@ class CodeEditor(UIElement):
 
         if self.selected_drag in ["bottom_drag", "bottom_right_drag", "bottom_left_drag"]:
             # print(rmy, rsy, rmy-rsy)
+            # print(f"rmy:{rmy} - rsy:{rsy} = {rmy-rsy}")
             editor.height = max(405, rmy - rsy)
             # print(editor.height)
             self._update_layout(editor)
@@ -4061,6 +4063,7 @@ class CodeEditor(UIElement):
             # print(editor.width)
             self._update_layout(editor)
         if self.selected_drag in ["right_drag", "bottom_right_drag"]:
+            # print(f"rmx:{rmx} - rsx:{rsx} = {rmx-rsx}")
             editor.width = max(720, rmx - rsx)
             self._update_layout(editor)
 

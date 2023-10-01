@@ -833,12 +833,14 @@ class MultilineTextBox(UIElement):
         else:
             self._history.insert(0, content)
             self._future.clear()
+
     def undo(self):
         if len(self._history) > 1:
             self.set_content(p := self._history.pop(0))
             self._future.insert(0, p)
         elif len(self._history) == 1:
             self.set_content(self._history[0])
+
     def redo(self):
         if self._future:
             self.set_content(p := self._future.pop(0))
@@ -1008,7 +1010,7 @@ class MultilineTextBox(UIElement):
         data = self.format_text("\n".join(self.get_lines()), self.text_color)
 
         for line, surface in zip(data, self.surfaces):
-            x = 0
+            x = 1
             for col, segment in line:
 
                 s = self.font.render(segment, True, tuple(col))
@@ -1824,6 +1826,7 @@ class Tabs(UIElement):
             self._tab_objects.clear()
 
         if self.tab_style == Tabs.Style.TOP:
+            self._tabs_area.swap_scroll = True
             if self.scrollable_tabs:
                 x = 0
                 y = 0
@@ -1859,6 +1862,7 @@ class Tabs(UIElement):
                 self._tabs_area.right_bound = -x
         
         elif self.tab_style == Tabs.Style.BOTTOM:
+            self._tabs_area.swap_scroll = True
             if self.scrollable_tabs:
                 x = 0
                 y = 0
@@ -1886,6 +1890,7 @@ class Tabs(UIElement):
                 self._tabs_area.right_bound = -x
 
         elif self.tab_style == Tabs.Style.LEFT:
+            self._tabs_area.swap_scroll = False
             if self.scrollable_tabs:
                 x = 0
                 y = 0
@@ -1913,6 +1918,7 @@ class Tabs(UIElement):
                 self._tabs_area.bottom_bound = -y
 
         elif self.tab_style == Tabs.Style.RIGHT:
+            self._tabs_area.swap_scroll = False
             if self.scrollable_tabs:
                 x = 0
                 y = 0
@@ -1940,6 +1946,7 @@ class Tabs(UIElement):
                 self._tabs_area.bottom_bound = -y
 
         elif self.tab_style == Tabs.Style.MENU:
+            self._tabs_area.swap_scroll = False
             if self.scrollable_tabs:
                 x = 0
                 y = 0
@@ -2100,6 +2107,7 @@ class Scrollable:
             self.top_bound = options.get("top_bound", None)
             self.right_bound = options.get("right_bound", None)
             self.bottom_bound = options.get("bottom_bound", None)
+            self.swap_scroll = options.get("swap_scroll", False)
             if self.left_bound is not None and self.right_bound is not None:
                 assert self.left_bound >= self.right_bound, "left bound must be larger than right bound (I know, it's wierd)"
             if self.top_bound is not None and self.bottom_bound is not None:
@@ -2169,13 +2177,13 @@ class Scrollable:
                 if editor._hovering or any([c.hovered for child in self.children if hasattr(c, "hovered")]):
                     self.hovered = True
                     if editor.scroll is not None:
-                        if pygame.K_LSHIFT in editor.keys: # pylint: disable=no-member
+                        if (pygame.K_LSHIFT in editor.keys and not self.swap_scroll) or (self.swap_scroll): # pylint: disable=no-member
                             self.offsetX += editor.scroll * self.scroll_speed
                             if self.left_bound is not None:
                                 self.offsetX = min(self.offsetX, self.left_bound)
                             if self.right_bound is not None:
                                 self.offsetX = max(self.offsetX, self.right_bound)
-                        else:
+                        elif (pygame.K_LSHIFT in editor.keys and self.swap_scroll) or (not self.swap_scroll):
                             self.offsetY += editor.scroll * self.scroll_speed
                             if self.top_bound is not None:
                                 self.offsetY = min(self.offsetY, self.top_bound)
@@ -3408,7 +3416,7 @@ class FileEditor(UIElement):
             if (m := re.match(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*)", t)): # /* */ # //
                 return f"\033[38;2;106;153;85m{m.group()}\033[0m"
             elif (m := re.match(r"(\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')", t)): # "..." # '...'
-                t = re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", m.group())
+                t = re.sub(r"(\\.|`[^`]*`)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", m.group())
                 return f"\033[38;2;206;145;120m{t}\033[0m"
             elif (m := re.match(r"\[([^:]+:)((?:[^/\]]+/)*)([^\]]+)\]", t)): # [engine:combat/start]
                 ns, g, f = m.groups()
@@ -3453,12 +3461,14 @@ class FileEditor(UIElement):
 
             if (m := re.match(r"#{1,6}.*", t)):
                 return f"\033[38;2;86;156;214m{m.group()}\033[0m"
-            elif (m := re.match(r" *(-|\d+(:|\.))", t)):
+            elif (m := re.match(r" *(\-|\+|\*|\d+(:|\.))", t)):
                 return f"\033[38;2;103;150;230m{m.group()}\033[0m"
-            elif (m := re.match(r"[│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌]+", t)):
-                return f"\033[38;2;150;150;150m{m.group()}\033[0m"
+            # elif (m := re.match(r"[│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌]+", t)):
+            #     return f"\033[38;2;150;150;150m{m.group()}\033[0m"
+            else:
+                return t
 
-        return re.sub(r"((?:^|(?<=\n))#{1,6}.*|(?:^|(?<=\n)) *\-|(?:^|(?<=\n)) *\d+(?:\.|:)|[│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌]+)", repl, text)
+        return re.sub(r"((?:^|(?<=\n))#{1,6}.*|(?:^|(?<=\n)) *(\-|\+|\*)|(?:^|(?<=\n)) *\d+(?:\.|:)|[│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌]+)", repl, text)
 
     def _update_layout(self, editor):
         self.edit_area.width = self.width
@@ -3532,7 +3542,7 @@ class Opener:
         if file_path not in self.open_files.keys():
             new = {file_path: FileEditor(329, 41, editor.width-329, editor.height-62, file_path, file_path.rsplit("/", 1)[-1], editor)}
             self.open_files.update(new)
-            n = "  " + file_path.rsplit("/", 1)[-1] + "   "
+            n = "  " + file_path.replace("./Dungeons/", "") + "   " #"  " + file_path.rsplit("/", 1)[-1] + "   "
             self.file_tabs.add_tab(n, [new[file_path]])
             
             tab = self.file_tabs.get_tab(n)
@@ -3551,7 +3561,7 @@ class Opener:
             
             # print(tab, tab.children)
             
-        self.file_tabs.active_tab = "  " + file_path.rsplit("/", 1)[-1] + "   "
+        self.file_tabs.active_tab = "  " + file_path.replace("./Dungeons/", "") + "   " #.rsplit("/", 1)[-1] + "   "
         self.file_tabs.reset_tab_colors()
         self.focused_file = file_path
 

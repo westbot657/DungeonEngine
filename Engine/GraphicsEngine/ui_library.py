@@ -14,7 +14,7 @@ import random
 #from io import BytesIO
 from enum import Enum, auto
 from ctypes import windll
-
+import imp
 from pypresence import Presence
 
 from win32api import GetMonitorInfo, MonitorFromPoint
@@ -3178,7 +3178,15 @@ class GameApp(UIElement):
             ("combat", self.page_combat_tab, self.page_combat_icons),
             ("log", self.page_log_tab, self.page_log_icons)
         )
-        
+
+        self.play_pause_buttons = (
+            Image(f"{PATH}/play_gray.png", 0, 0, 50, 50),
+            Image(f"{PATH}/play_solid.png", 0, 0, 50, 50),
+            Image(f"{PATH}/pause_gray.png", 0, 0, 50, 50),
+            Image(f"{PATH}/pause_solid.png", 0, 0, 50, 50)
+        )
+
+
         self.page_seperator_line = Box(editor.width-451, 21, 1, editor.height-128, (70, 70, 70))
         self.children.append(self.page_seperator_line)
         
@@ -3191,6 +3199,8 @@ class GameApp(UIElement):
         self.no_combat_text = Text(0, 0, 1, "You are not in combat", text_size=25)
         self.in_combat = False
         
+        self.play_pause = Button(editor.width-501, 21, 50, 50, "", self.play_pause_buttons[0], hover_color=self.play_pause_buttons[1])
+        self.children.append(self.play_pause)
         # self.test = GameApp.HealthBar(100, 100, 100, 20, 67, 34)
         # self.test.set_current_health(33)
         # self.children.append(self.test)
@@ -4090,7 +4100,9 @@ if __name__ == "__main__":
     # from threading import Thread
     # import traceback
 
-    from Engine.Engine import Engine
+    sys.path.append("./Engine")
+    _Engine = imp.load_source("Engine", "./Engine/Engine.py")
+    Engine = _Engine.Engine
 
     io_hook = IOHook()
 

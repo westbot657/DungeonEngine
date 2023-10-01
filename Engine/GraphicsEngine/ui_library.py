@@ -13,7 +13,8 @@ import mouse
 import random
 #from io import BytesIO
 from enum import Enum, auto
-from ctypes import windll
+from ctypes import windll, WINFUNCTYPE, POINTER
+from ctypes.wintypes import BOOL, HWND, RECT
 import imp
 from pypresence import Presence
 
@@ -2971,7 +2972,7 @@ class Editor:
             self._hovering = None
             self.mouse = list(pygame.mouse.get_pressed())
             self.mouse_pos = pygame.mouse.get_pos()
-            print(f"mouse: {self.mouse_pos}")
+            # print(f"mouse: {self.mouse_pos}")
             # self.new_keys.clear()
             # self.old_keys.clear()
             self.width, self.height = self.Width, self.Height = self.screen.get_size()
@@ -3895,9 +3896,19 @@ class CodeEditor(UIElement):
 
     def get_screen_pos(self, editor):
         mx, my = mouse.get_position()
-        rx, ry = editor.mouse_pos
-        # print(f"mouse: ({mx}, {my}) -> ({rx}, {ry})  ({mx-rx}, {my-ry})")
-        return mx-rx, my-ry
+        # rx, ry = editor.mouse_pos
+        # # print(f"mouse: ({mx}, {my}) -> ({rx}, {ry})  ({mx-rx}, {my-ry})")
+        # return mx-rx, my-ry
+    
+        hwnd = pygame.display.get_wm_info()["window"]
+
+        prototype = WINFUNCTYPE(BOOL, HWND, POINTER(RECT))
+        paramflags = (1, "hwnd"), (2, "lprect")
+
+        GetWindowRect = prototype(("GetWindowRect", windll.user32), paramflags)
+
+        rect = GetWindowRect(hwnd)
+        return rect.left, rect.top
 
     def set_fullscreen(self, editor):
         monitor_info = GetMonitorInfo(MonitorFromPoint((0,0)))
@@ -4018,7 +4029,7 @@ class CodeEditor(UIElement):
 
         rmx, rmy = mouse.get_position()
         rsx, rsy = self.get_screen_pos(editor)
-        print(rmx, rmy, rsx, rsy)
+        # print(rmx, rmy, rsx, rsy)
 
         if self.bottom_drag.hovered:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZENS)

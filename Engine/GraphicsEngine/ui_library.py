@@ -892,8 +892,8 @@ class MultilineTextBox(UIElement):
         self._save = self._default_save_event
         self._on_enter = self._default_on_enter_event
         
-        self.char_whitelist: list = None
-        self.char_blacklist: list = None
+        self.char_whitelist: list[str] = None
+        self.char_blacklist: list[str] = None
 
         self.set_content(content)
 

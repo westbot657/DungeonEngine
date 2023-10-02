@@ -41,6 +41,9 @@ class Inventory(FunctionalElement):
             self.defaults.update({key: abstract.createInstance(function_memory)})
             self.equips.update({key: self.defaults[key]})
 
+    # def get_ui_data(self):
+    #     return self
+
     def equip(self, objectType:str, gameObject:GameObject):
         if gameObject not in self.contents: self.contents.append(gameObject)
         self.equips.update({objectType: gameObject})

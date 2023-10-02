@@ -230,6 +230,8 @@ class Combat(FunctionalElement):
         self.tick = self._mainloop(function_memory)
         self.tick.send(None)
         function_memory.engine.combats.append(self)
+        
+        function_memory.engine.sendOutput(2, self)
 
     # def responseHandler(self):
     #     while True:
@@ -349,6 +351,7 @@ class Combat(FunctionalElement):
                     self.scheduled_tasks.append(
                         Combat.Task(Combat.Operation.Message(self.data.get("player_lose_message", "Combat Ended. Players lost"), player), 0)
                     )
+                    function_memory.engine.sendOutput(2, None)
 
 
             case Combat.Operation._HandleInput():
@@ -485,6 +488,7 @@ class Combat(FunctionalElement):
                     self.scheduled_tasks.append(
                         Combat.Task(Combat.Operation.Message(self.data.get("player_win_message", "Combat Ended. Players win!"), *self.players), 0)
                     )
+                    function_memory.engine.sendOutput(2, None)
                     
                     for player in self.players:
                         player.in_combat = False

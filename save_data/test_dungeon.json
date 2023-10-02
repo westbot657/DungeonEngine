@@ -1,0 +1,96 @@
+{
+    "rooms": {
+        "test_dungeon:rooms/room1": {
+            "interactions": {
+                "start_passage": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/start",
+                        "travel_message": "you go back to the start",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "room3_passage": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room3",
+                        "travel_message": "you go to room 3",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "room4_door": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room4",
+                        "travel_message": "you enter room 4"
+                    }
+                }
+            }
+        },
+        "test_dungeon:rooms/room2": {
+            "interactions": {
+                "start_passage": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/start",
+                        "travel_message": "you go back to the start",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "room4_door": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room4",
+                        "travel_message": "you enter room 4"
+                    }
+                }
+            }
+        },
+        "test_dungeon:rooms/room3": {
+            "interactions": {
+                "room1_passage": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room1",
+                        "travel_message": "you go back to room 1",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                }
+            }
+        },
+        "test_dungeon:rooms/room4": {
+            "interactions": {
+                "room1_door": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room1",
+                        "travel_message": "you enter room 1"
+                    }
+                },
+                "room2_door": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room2",
+                        "travel_message": "you enter room 2"
+                    }
+                }
+            }
+        },
+        "test_dungeon:rooms/start": {
+            "interactions": {
+                "room1_passage": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room1",
+                        "travel_message": "You go to room 1",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "room2_passage": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room2",
+                        "travel_message": "You go to room 2",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                }
+            }
+        }
+    }
+}

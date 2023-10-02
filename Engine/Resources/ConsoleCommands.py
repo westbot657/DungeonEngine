@@ -7,6 +7,7 @@ try:
     from .Inventory import Inventory
     from .FunctionMemory import FunctionMemory
     from .Logger import Log
+    from .EngineErrors import EngineError
 except ImportError:
     from ConsoleCommand import ConsoleCommand
     from Identifier import Identifier
@@ -14,6 +15,7 @@ except ImportError:
     from Inventory import Inventory
     from FunctionMemory import FunctionMemory
     from Logger import Log
+    from EngineErrors import EngineError
 
 @ConsoleCommand(
     Identifier("engine", "", "save-game"),
@@ -74,4 +76,36 @@ def engine_toggle_log(function_memory:FunctionMemory):
 )
 def engine_stop(function_memory:FunctionMemory):
     function_memory.unloadGame()
+
+@ConsoleCommand(
+    Identifier("engine", "ui/", "get_inventory"),
+    {
+        "player: engine:Player": None
+    }
+)
+def engine_ui_get_inventory(function_memory:FunctionMemory, player):
+    function_memory.engine.sendOutput(2, player.inventory)
+
+@ConsoleCommand(
+    Identifier("engine", "ui/", "get_combat"),
+    {
+        "player: engine:Player": None
+    }
+)
+def engine_ui_get_combat(function_memory:FunctionMemory, player):
+    function_memory.engine.sendOutput(3, player.combat)
+
+@ConsoleCommand(
+    Identifier("engine", "ui/", "get_player"),
+    {
+        "player_id: engine:int": None
+    }
+)
+def engine_ui_get_player(function_memory:FunctionMemory, player_id:int):
+    try:
+        player = function_memory.engine.getPlayer(player_id)
+        function_memory.engine.sendOutput(4, player)
+    except EngineError as e:
+        Log["ERROR"]("\n".join(e.args))
+        
 

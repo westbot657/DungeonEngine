@@ -2,6 +2,7 @@
 
 from threading import Thread
 import re, os, sys
+from typing import Any
 # from colorama import AnsiToWin32
 import simpleaudio as sa
 import warnings
@@ -68,7 +69,7 @@ except ImportError as e:
         def stop(self):
             self.running = False
 
-        def sendOutput(self, target:int|str, text:str):
+        def sendOutput(self, target:int|str, text:str|Any):
             if self.running:
                 if target == 0:
                     print(f"[engine]: {text}")
@@ -76,7 +77,8 @@ except ImportError as e:
                     print(f"[sound]: {text}")
                     if os.path.exists(text):
                         sa.WaveObject.from_wave_file(text).play()
-                        
+                elif target in [2, 3, 4]:
+                    pass
                 elif target == "log":
                     print(f"[{target}]: {text}")
 

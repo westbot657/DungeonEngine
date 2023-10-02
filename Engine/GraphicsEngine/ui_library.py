@@ -184,6 +184,9 @@ class Text(UIElement):
         self.surface = self.font.render(self.content, True, tuple(self.text_color))
         self.width, self.height = self.surface.get_size()
 
+    def set_text(self, text:str):
+        self.content = text
+
     def _event(self, *_):
         if self.content != self._content:
             self._content = self.content
@@ -888,6 +891,9 @@ class MultilineTextBox(UIElement):
         self.highlights = []
         self._save = self._default_save_event
         self._on_enter = self._default_on_enter_event
+        
+        self.char_whitelist: list = None
+        self.char_blacklist: list = None
 
         self.set_content(content)
 
@@ -1196,6 +1202,7 @@ class MultilineTextBox(UIElement):
 
         if self.focused:
             for key in editor.typing:
+                
                 # print(f"{key!r}")
                 if key == "$↑":
                     _old = self.cursor_location.copy()
@@ -1267,6 +1274,7 @@ class MultilineTextBox(UIElement):
                         self._text_selection_start = self._text_selection_end = None
                 elif key in "\n\r":
                     if self.single_line:
+                        self._on_enter(self)
                         continue
                     if self.get_selection():
                         self.set_selection("")
@@ -1382,6 +1390,9 @@ class MultilineTextBox(UIElement):
                     self._save(self, content, selection, cursor)
                     self.save_history()
                 else:
+                    
+                    if ((self.char_whitelist is not None) and (key not in self.char_whitelist)) or ((self.char_blacklist is not None) and (key in self.char_blacklist)):
+                        continue
                     if self.get_selection():
                         self.set_selection("")
                     self._lines[self.cursor_location.line].insert(self.cursor_location.col, key)
@@ -3199,16 +3210,20 @@ class GameApp(UIElement):
                 self.shadow_damage_bar._update(editor, X+self.x, Y+self.y)
 
     class EnemyCard(UIElement):
-        def __init__(self, name:str, max_hp, current_hp):
+        def __init__(self, enemy, y_pos):
             self.children = []
             self.width = 400
             self.height = 85
-            
+            self.x = 25
+            self.y = y_pos
+            self.enemy = enemy
             self.background = Image(f"{PATH}/enemy_card.png", 0, 0, 400, 85)
             
-            self.name_display = Text(10, 10, 1, name)
+            self.name_display = Text(10, 10, 1, enemy.name)
             
-            self.health_bar = GameApp.HealthBar(290, 10, 100, 20, max_hp, current_hp)
+            self.health_bar = GameApp.HealthBar(290, 10, 100, 20, enemy.max_health, enemy.health)
+        
+            self.old_health = enemy.health
         
             self.children.append(self.background)
             self.children.append(self.name_display)
@@ -3219,8 +3234,21 @@ class GameApp(UIElement):
                 child._update(editor, X, Y)
         
         def _event(self, editor, X, Y):
+            
+            if self.old_health != self.enemy.health:
+                self.health_bar.set_current_health(self.enemy.health)
+                self.old_health = self.enemy.health
+            
             for child in self.children:
                 child._event(editor, X, Y)
+    
+    # class CombatLabel(UIElement):
+    #     def __init__(self, ):
+    #         self.children = []
+    #         self.width = 400
+    #         self.height = 85
+    #         self.background = Image(f"{PATH}/enemy_card.png", 0, 0, 400, 85)
+            
     
     def __init__(self, code_editor, editor):
         self.code_editor = code_editor
@@ -3228,6 +3256,9 @@ class GameApp(UIElement):
         self.editor = editor
 
         self.player_id = 10
+        
+        self.player = None
+        
 
 
         editor.game_app = self
@@ -3239,6 +3270,9 @@ class GameApp(UIElement):
         
         self.main_hud_line = Box(51, editor.height-107, editor.width-52, 1, (70, 70, 70))
         self.children.append(self.main_hud_line)
+        
+        self.player_inventory = None
+        self.current_combat = None
         
         self.page = "inv"
         # pages: IO, Inventory, Combat, Logs
@@ -3307,7 +3341,7 @@ class GameApp(UIElement):
         
         self.enemy_card_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130)
         self.no_combat_text = Text(0, 0, 1, "You are not in combat", text_size=25)
-        self.in_combat = False
+        # self.in_combat = False
         
         self.buttons_left_bar = Box(editor.width-502, 21, 1, 50, (70, 70, 70))
         self.buttons_bottom_bar = Box(editor.width-501, 71, 51, 1, (70, 70, 70))
@@ -3319,11 +3353,25 @@ class GameApp(UIElement):
         self.play_pause.on_left_click = self.play_pause_toggle
         self.children.append(self.play_pause)
 
+        
         self.input_marker = Text(52, editor.height-106, content="Input:", text_bg_color=(70, 70, 70))
         self.input_box = MultilineTextBox(52+self.input_marker.width, editor.height-106, editor.width-504-self.input_marker.width, self.input_marker.height, text_bg_color=(70, 70, 70))
         self.children.append(self.input_marker)
         self.children.append(self.input_box)
         self.input_box.on_enter(self.input_on_enter)
+        
+        self.id_refresh = Button(56, editor.height-75, 40, 40, "", Image(f"{PATH}/id_refresh.png", 0, 0, 20, 20), hover_color=Image(f"{PATH}/id_refresh_hovered.png", 0, 0, 20, 20))
+        self.id_input = MultilineTextBox(96, editor.height-75, 25, 20, "10", text_bg_color=(31, 31, 31))
+        self.id_input.single_line = True
+        self.id_input.char_whitelist = [a for a in "0123456789"]
+        self.children.append(self.id_refresh)
+        self.children.append(self.id_input)
+        
+        self.player_name_display = Text(146, editor.height-75, content="[Start game to load player info]", text_size=20)
+
+        self.player_health_bar = GameApp.HealthBar(56+self.player_name_display.width, editor.height-75, 200, self.player_name_display.height, 20, 20)
+
+        self.children.append(self.player_name_display)
 
         # self.test = GameApp.HealthBar(100, 100, 100, 20, 67, 34)
         # self.test.set_current_health(33)
@@ -3348,6 +3396,47 @@ class GameApp(UIElement):
         # who's turn it is
         # 
 
+    def id_input_on_enter(self, text_box:MultilineTextBox):
+        c = int(text_box.get_content())
+        
+        if c < 10:
+            c = 10
+            text_box.set_content("10")
+        self.player_id = c
+        self.refresh_player_data(self.editor)
+    
+    def refresh_player_data(self, editor):
+        editor.engine.handleInput(0, f"engine:ui/get_player {self.player_id}")
+
+    def updateInventory(self, inventory=...):
+        if inventory is not ...:
+            self.player_inventory = inventory
+    
+    def updateCombat(self, combat=...):
+        if combat is not ...:
+            self.current_combat = combat
+            
+        if self.current_combat is not None:
+            y = 25
+            self.enemy_card_scrollable.children.clear()
+            for entity in self.current_combat.turn_order:
+                card = GameApp.EnemyCard(entity, y)
+                y += card.height + 25
+                self.enemy_card_scrollable.children.append(card)
+
+    def updatePlayer(self, player=...):
+        if player is not ...:
+            self.player = player
+
+        if self.player is None:
+            self.player_name_display.content = "[Start game to load player info]"
+        
+        else:
+            self.player_name_display.content = self.player.name
+            
+
+
+
     def input_on_enter(self, text_box:MultilineTextBox):
 
         text = text_box.get_content().strip()
@@ -3363,8 +3452,15 @@ class GameApp(UIElement):
             editor.engine.stop()
             self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[0]
             self.play_pause.hover_color = self.play_pause_buttons[1]
+            
+            self.updateInventory(None)
+            self.updateCombat(None)
         else:
             editor.engine.start()
+            
+            editor.engine.handleInput(0, f"engine:ui/get_inventory {self.player_id}")
+            editor.engine.handleInput(0, f"engine:ui/get_combat {self.player_id}")
+            
             self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[2]
             self.play_pause.hover_color = self.play_pause_buttons[3]
 
@@ -3445,6 +3541,8 @@ class GameApp(UIElement):
 
         self.play_pause.x = (editor.width-501)
 
+        self.id_input.y = self.id_refresh.y = self.player_name_display.y = self.player_health_bar.y = editor.height-75
+
         self.buttons_left_bar.x = self.buttons_bottom_bar.x = editor.width-502
         
         self.no_combat_text.x = (editor.width-224)-(self.no_combat_text.width/2)
@@ -3460,7 +3558,7 @@ class GameApp(UIElement):
         if self.page == "log":
             self.log_scrollable._event(editor, X, Y)
         elif self.page == "combat":
-            if self.in_combat:
+            if self.current_combat is not None:
                 self.enemy_card_scrollable._event(editor, X, Y)
             else:
                 self.no_combat_text._event(editor, X, Y)
@@ -3472,10 +3570,13 @@ class GameApp(UIElement):
         if self.page == "log":
             self.log_scrollable._update(editor, X, Y)
         elif self.page == "combat":
-            if self.in_combat:
+            if self.current_combat is not None:
                 self.enemy_card_scrollable._update(editor, X, Y)
             else:
                 self.no_combat_text._update(editor, X, Y)
+        
+        if self.player is not None:
+            self.player_health_bar._update(editor, X, Y)
 
 
 # Dungeon Building Editors:
@@ -4302,7 +4403,7 @@ class IOHook:
         return re.sub(r"(\"(?:\\.|[^\"\\\n])*\"|\[(?:| INFINITE |EQUIPPED|WEARING)\]|\[=*-*\](?: *\d+/\d+)?|(?:\+|\-)(?:\d+|\[\d+\-\d+\])(?:dmg|def)\b|\d+ft\b|`[^`\n]*`|\d+\/\d+)", repl, text)
 
     def sendOutput(self, target, text):
-        if target in ["log", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]:
+        if target in ["log", 0, 1, 5, 6, 7, 8, 9]:
             # self._log_queue.append(text)
 
             cl = self.game_app.log_output.colored_content.split("\n")
@@ -4316,6 +4417,15 @@ class IOHook:
             self.game_app.log_output.set_colored_content("\n".join(cl))
 
             self.game_app.log_scrollable.offsetY = -(self.game_app.log_output._text_height - (self.game_app.log_output.min_height - 20))
+
+        elif target == 2:
+            self.game_app.updateInventory(text)
+        
+        elif target == 3:
+            self.game_app.updateCombat(text)
+
+        elif target == 4:
+            self.game_app.updatePlayer(text)
 
         else:
 

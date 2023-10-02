@@ -94,7 +94,7 @@ class Interactable(FunctionalElement):
 
         data_save = {}
 
-        for name, value in self.data:
+        for name, value in self.data.items():
             if (abstract_value := self.abstract.data.get(name, None)) is not None:
                 if value != abstract_value:
                     data_save.update({name: value})

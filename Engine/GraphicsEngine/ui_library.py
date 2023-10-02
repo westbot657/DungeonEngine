@@ -493,21 +493,94 @@ class MultilineText(UIElement):
         self.min_width = min_width
         self.min_height = min_height
         self.content = content
+        self.colored_content = content
         self.text_color = Color.color(text_color)
         self.text_bg_color = Color.color(text_bg_color)
         self.font = pygame.font.Font(FONT, TEXT_SIZE)
         self.surfaces = []
-        for line in content.split("\n"):
-            s = self.font.render(line, True, tuple(self.text_color))
+
+        self._text_width = self.min_width
+        self._text_height = self.min_height
+
+        self.refresh_surfaces()
+        # for line in content.split("\n"):
+        #     s = self.font.render(line, True, tuple(self.text_color))
             
+        #     self.surfaces.append(s)
+
+    def get_lines(self):
+        return self.content.split("\n")
+
+    def _refresh_surfaces(self):
+        self.surfaces.clear()
+        self._text_width = 0
+        self._text_height = 0
+        for line in self.get_lines():
+            s = self.font.render(line or " ", True, (0, 0, 0))
+            s = pygame.Surface(s.get_size(), pygame.SRCALPHA)
+            # s.fill(tuple(self.text_bg_color))
             self.surfaces.append(s)
+            self._text_width = max(self._text_width, s.get_width(), self.min_width)
+            self._text_height += s.get_height()
+        self._text_height = max(self._text_height, self.min_height)
+
+    def set_colored_content(self, text:str):
+        self.content = re.sub(r"\033\[(\d+;?)*m", "", text)
+        self.colored_content = text
+        self.refresh_surfaces()
+
+    def color_text(self, text:str) -> str:
+        return self.colored_content #re.sub(r"(#.*)", "\033[38;2;106;153;85m\\1\033[0m", text)
+
+    def format_text(self, text:str, default_color:Color|list|tuple) -> list[tuple[Color|list|tuple, str]]:
+
+        col = default_color
+
+        raw = re.split("(\033\\[(?:\\d+;?)+m|\n)", self.color_text(text))
+        data = []
+        curr_line = []
+
+        for r in raw:
+            # print(f"{r!r}")
+            if m := re.match(r"\033\[38;2;(?P<R>\d+);(?P<G>\d+);(?P<B>\d+)m", r):
+                # print("is color")
+                d = m.groupdict()
+                col = (int(d["R"]), int(d["G"]), int(d["B"]))
+            elif r == "\033[0m":
+                # print("is color reset")
+                col = default_color
+            elif r == "\n":
+                data.append(curr_line)
+                curr_line = []
+            else:
+                curr_line.append((col, r))
+        
+        if curr_line:
+            data.append(curr_line)
+                
+
+        return data #[[(default_color, l)] for l in text.split("\n")]
+
+    def refresh_surfaces(self):
+        self._refresh_surfaces()
+        data = self.format_text("\n".join(self.get_lines()), self.text_color)
+
+        for line, surface in zip(data, self.surfaces):
+            x = 1
+            for col, segment in line:
+
+                s = self.font.render(segment, True, tuple(col))
+                surface.blit(s, (x, 0))
+                x += s.get_width()
 
     def set_content(self, content:str=""):
         self.content = content
-        self.surfaces.clear()
-        for line in content.split("\n"):
-            s = self.font.render(line, True, tuple(self.text_color))
-            self.surfaces.append(s)
+
+        self.refresh_surfaces()
+        # self.surfaces.clear()
+        # for line in content.split("\n"):
+        #     s = self.font.render(line, True, tuple(self.text_color))
+        #     self.surfaces.append(s)
 
     def _event(self, *_):
         pass
@@ -814,6 +887,7 @@ class MultilineTextBox(UIElement):
         self._highlight = pygame.image.load(f"{PATH}/highlight.png")#pygame.Surface((1, 1), pygame.SRCALPHA, 24) # pylint: disable=no-member
         self.highlights = []
         self._save = self._default_save_event
+        self._on_enter = self._default_on_enter_event
 
         self.set_content(content)
 
@@ -860,7 +934,14 @@ class MultilineTextBox(UIElement):
         self._save = function
         return function
 
+    def on_enter(self, function):
+        self._on_enter = function
+        return function
+
     def _default_save_event(self, _, content:str, selection:Selection|None, cursorPos:Cursor):
+        pass
+
+    def _default_on_enter_event(self, _):
         pass
 
     def refresh_highlight(self):
@@ -1195,6 +1276,7 @@ class MultilineTextBox(UIElement):
                     self.cursor_location.col = 0
                     self._lines.insert(self.cursor_location.line, txt)
                     self.save_history()
+                    self._on_enter(self)
                 elif key == "\t":
                     pre = "".join(self._lines[self.cursor_location.line][0:self.cursor_location.col])
                     if pre.strip() == "":
@@ -2894,9 +2976,11 @@ class DirectoryTree(UIElement):
         # self.surface._event(editor, X + self.x, Y + self.y)
 
 class Editor:
-    def __init__(self, engine, width=1280, height=720) -> None:
+    def __init__(self, engine, io_hook, width=1280, height=720) -> None:
         self.screen:pygame.Surface = None
         self.engine = engine
+        self.io_hook = io_hook
+        self.game_app: GameApp = None
         # self.window = Window.from_display_module()
         self.previous_mouse = [False, False, False]
         self.mouse = [False, False, False]
@@ -3141,6 +3225,14 @@ class GameApp(UIElement):
     def __init__(self, code_editor, editor):
         self.code_editor = code_editor
         self.children = []
+        self.editor = editor
+
+        self.player_id = 10
+
+
+        editor.game_app = self
+        self.io_hook = editor.io_hook
+        editor.io_hook.game_app = self
         
         self.main_hud = Box(51, editor.height-106, editor.width-57, 85, (24, 24, 24))
         self.children.append(self.main_hud)
@@ -3203,10 +3295,15 @@ class GameApp(UIElement):
         self.page_seperator_line = Box(editor.width-451, 21, 1, editor.height-128, (70, 70, 70))
         self.children.append(self.page_seperator_line)
         
-        self.main_output = MultilineText(52, 22, editor.width-504, editor.height-130, "This is where the main output\nwill appear", text_bg_color=(31, 31, 31))
-        self.children.append(self.main_output)
+        self.main_out_scrollable = Scrollable(52, 22, editor.width-504, editor.height-130, (31, 31, 31), left_bound=0, top_bound=0)
+
+        self.main_output = MultilineText(0, 0, editor.width-504, editor.height-130, "", text_bg_color=(31, 31, 31))
+        self.main_out_scrollable.children.append(self.main_output)
+        self.children.append(self.main_out_scrollable)
         
-        self.log_output = MultilineText(editor.width-449, 22, 450, editor.height-130, "Log output")
+        self.log_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130, (24, 24, 24), left_bound=0, top_bound=0)
+        self.log_output = MultilineText(0, 0, 450, editor.height-130, "")
+        self.log_scrollable.children.append(self.log_output)
         
         self.enemy_card_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130)
         self.no_combat_text = Text(0, 0, 1, "You are not in combat", text_size=25)
@@ -3219,7 +3316,15 @@ class GameApp(UIElement):
         
 
         self.play_pause = Button(editor.width-501, 21, 50, 50, "", self.play_pause_buttons[0], hover_color=self.play_pause_buttons[1])
+        self.play_pause.on_left_click = self.play_pause_toggle
         self.children.append(self.play_pause)
+
+        self.input_marker = Text(52, editor.height-106, content="Input:", text_bg_color=(70, 70, 70))
+        self.input_box = MultilineTextBox(52+self.input_marker.width, editor.height-106, editor.width-504-self.input_marker.width, self.input_marker.height, text_bg_color=(70, 70, 70))
+        self.children.append(self.input_marker)
+        self.children.append(self.input_box)
+        self.input_box.on_enter(self.input_on_enter)
+
         # self.test = GameApp.HealthBar(100, 100, 100, 20, 67, 34)
         # self.test.set_current_health(33)
         # self.children.append(self.test)
@@ -3242,6 +3347,26 @@ class GameApp(UIElement):
         # other player's names (maybe health?)
         # who's turn it is
         # 
+
+    def input_on_enter(self, text_box:MultilineTextBox):
+
+        text = text_box.get_content().strip()
+        text_box.set_content("")
+
+        text_box.cursor_location.line = 0
+        text_box.cursor_location.col = 0
+
+        self.io_hook.sendInput(self.player_id, text)
+
+    def play_pause_toggle(self, editor):
+        if editor.engine.running:
+            editor.engine.stop()
+            self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[0]
+            self.play_pause.hover_color = self.play_pause_buttons[1]
+        else:
+            editor.engine.start()
+            self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[2]
+            self.play_pause.hover_color = self.play_pause_buttons[3]
 
     def set_page(self, page:str):
         for name, tab, icons in self.tab_buttons:
@@ -3295,8 +3420,8 @@ class GameApp(UIElement):
         self.main_hud_line.y = editor.height-107
         self.main_hud_line.width = editor.width - 52
         
-        self.main_output.min_width = editor.width - 504
-        self.main_output.min_height = editor.height - 130
+        self.main_output.min_width = self.main_out_scrollable.width = editor.width - 504
+        self.main_output.min_height = self.main_out_scrollable.height = editor.height - 130
         
         self.page_inv_tab.x = editor.width-(50*3)
         self.page_inv_tab.y = editor.height-107
@@ -3309,18 +3434,21 @@ class GameApp(UIElement):
         
         self.page_seperator_line.x = editor.width - 451
         self.page_seperator_line.height = editor.height - (23 + 105)
+
+        self.input_marker.y = self.input_box.y = editor.height - 106
+        self.input_box.min_width = self.main_out_scrollable.width - self.input_marker.width
         
         # self.log_output = MultilineText(editor.width-449, 22, 450, editor.height-130, "Log output")
         
-        self.log_output.x = self.enemy_card_scrollable.x = editor.width-449
-        self.log_output.min_height = self.enemy_card_scrollable.height = editor.height-130
+        self.enemy_card_scrollable.x = self.log_scrollable.x = editor.width-449
+        self.log_output.min_height = self.log_scrollable.height = self.enemy_card_scrollable.height = editor.height-130
 
         self.play_pause.x = (editor.width-501)
 
         self.buttons_left_bar.x = self.buttons_bottom_bar.x = editor.width-502
         
         self.no_combat_text.x = (editor.width-224)-(self.no_combat_text.width/2)
-        self.no_combat_text.y = self.log_output.y + (self.log_output.min_height/2) - (self.no_combat_text.height/2)
+        self.no_combat_text.y = self.log_scrollable.y + (self.log_output.min_height/2) - (self.no_combat_text.height/2)
         
     def _event(self, editor, X, Y):
         self._update_layout(editor)
@@ -3330,7 +3458,7 @@ class GameApp(UIElement):
             child._event(editor, X, Y)
             
         if self.page == "log":
-            self.log_output._event(editor, X, Y)
+            self.log_scrollable._event(editor, X, Y)
         elif self.page == "combat":
             if self.in_combat:
                 self.enemy_card_scrollable._event(editor, X, Y)
@@ -3342,7 +3470,7 @@ class GameApp(UIElement):
             child._update(editor, X, Y)
             
         if self.page == "log":
-            self.log_output._update(editor, X, Y)
+            self.log_scrollable._update(editor, X, Y)
         elif self.page == "combat":
             if self.in_combat:
                 self.enemy_card_scrollable._update(editor, X, Y)
@@ -3741,6 +3869,7 @@ class CodeEditor(UIElement):
     def __init__(self, width, height, editor):
         self.resolution = [width, height]
         self.children = []
+        self.editor = editor
         self.hover_color = (50, 50, 50)
         self.click_button = (70, 70, 70)
         self.ctx_tree_opts = (20, TEXT_COLOR, TEXT_BG_COLOR, (70, 70, 70), TEXT_SIZE, (50, 50, 50), (50, 50, 50))
@@ -3979,6 +4108,7 @@ class CodeEditor(UIElement):
 
     def close_window(self, editor):
         editor.running = False
+        editor.engine.stop()
         pygame.display.quit()
         pygame.quit()
         sys.exit()
@@ -4129,20 +4259,103 @@ class CodeEditor(UIElement):
 class IOHook:
     def __init__(self):
         self.engine = None
-        self.running = False
+        self.player_data = None
+        self.game_app: GameApp = None
+        # self.running = False
+        # self._input_queue = []
+        # self._output_queue = []
+        # self._log_queue = []
     
     def init(self, engine):
         self.engine = engine
 
+    def color_text(self, text:str) -> str:
+
+        def repl(match:re.Match):
+            t = match.group()
+            if (m := re.match(r"(\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')", t)): # "..." # '...'
+                t = re.sub(r"(\\.|`[^`]*`)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", m.group())
+                return f"\033[38;2;206;145;120m{t}\033[0m"
+            elif (m := re.match(r"\+(?:\d+|\[\d+\-\d+\])(?:dmg|def)\b", t)):
+                return f"\033[38;2;100;250;100m{m.group()}\033[0m"
+            elif (m := re.match(r"\-(?:\d+|\[\d+\-\d+\])(?:dmg|def)\b", t)):
+                return f"\033[38;2;250;100;100m{m.group()}\033[0m"
+            elif (m := re.match(r"\[(?: INFINITE |EQUIPPED|WEARING)\]", t)):
+                return f"\033[38;2;255;255;255m[\033[38;2;25;180;40m{m.group().replace('[', '').replace(']', '')}\033[38;2;255;255;255m]\033[0m"
+            elif (m := re.match(r"\[(=*)(-*)\](?: *(\d+)/(\d+))?", t)):
+                g = m.groups()
+                if g[2] is None:
+                    return f"\033[38;2;255;255;255m[\033[38;2;100;250;100m{g[0]}\033[38;2;250;100;100m{g[1]}\033[38;2;255;255;255m]\033[0m"
+                else:
+                    a = int(g[2])
+                    b = int(g[3])
+                    d = int(a/b*10)
+                    c1 = (255/10) * d
+                    c2 = 255 - c1
+
+                    return f"\033[38;2;255;255;255m[\033[38;2;100;250;100m{g[0]}\033[38;2;250;100;100m{g[1]}\033[38;2;255;255;255m] \033[38;2;{int(c2)};{int(c1)};0m{a}\033[38;2;255;255;255m/\033[38;2;255;255;255m{b}\033[0m"
+            elif (m := re.match(r"`[^`\n]*`", t)):
+                return f"\033[38;2;95;240;255m{m.group().replace('`', '')}\033[0m"
+            else:
+                return t
+
+        return re.sub(r"(\"(?:\\.|[^\"\\\n])*\"|\[(?:| INFINITE |EQUIPPED|WEARING)\]|\[=*-*\](?: *\d+/\d+)?|(?:\+|\-)(?:\d+|\[\d+\-\d+\])(?:dmg|def)\b|\d+ft\b|`[^`\n]*`|\d+\/\d+)", repl, text)
+
     def sendOutput(self, target, text):
-        ...
+        if target in ["log", 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]:
+            # self._log_queue.append(text)
+
+            cl = self.game_app.log_output.colored_content.split("\n")
+            cl.append("[" + {
+                0: "engine",
+                1: "sound"
+            }.get(target, target) + "]: " + text)
+            if len(cl) > 200:
+                cl = cl[-200:]
+
+            self.game_app.log_output.set_colored_content("\n".join(cl))
+
+            self.game_app.log_scrollable.offsetY = -(self.game_app.log_output._text_height - (self.game_app.log_output.min_height - 20))
+
+        else:
+
+            cl = self.game_app.main_output.colored_content.split("\n")
+            cl.append("\n" + text)
+            if len(cl) > 200:
+                cl = cl[-200:]
+
+            self.game_app.main_output.set_colored_content(self.color_text("\n".join(cl)))
+
+            self.game_app.main_out_scrollable.offsetY = -(self.game_app.main_output._text_height - (self.game_app.main_output.min_height - 20))
+
+
+            # self._output_queue.append("\n" + text)
 
     def start(self):
-        self.running = True
+        pass #self.running = True
     
     def stop(self):
-        self.running = False
+        pass #self.running = False
         
+    # def _input_thread(self):
+    #     while self.running:
+    #         while self._input_queue:
+    #             self.engine.handleInput(*self._input_queue.pop(0))
+    
+    def sendInput(self, player_id, text):
+        # self._input_queue.append((player_id, text))
+        if self.engine is None: return
+    
+        cl = self.game_app.log_output.colored_content.split("\n")
+        cl.append(f"\033[38;2;100;250;100m[{player_id}]: \033[38;2;255;255;255m" + text + "\033[0m")
+        if len(cl) > 200:
+            cl = cl[-200:]
+
+        self.game_app.log_output.set_colored_content("\n".join(cl))
+
+        self.game_app.log_scrollable.offsetY = -(self.game_app.log_output._text_height - (self.game_app.log_output.min_height - 20))
+
+        self.engine.handleInput(player_id, text)
 
 if __name__ == "__main__":
     # from threading import Thread
@@ -4156,7 +4369,7 @@ if __name__ == "__main__":
 
     engine = Engine(io_hook)
 
-    editor = Editor(engine)
+    editor = Editor(engine, io_hook)
     
     # def inp_thread():
     #     while not editor.running: pass

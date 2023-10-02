@@ -67,3 +67,11 @@ def engine_giveGameObject(function_memory:FunctionMemory, target, objectType, ga
 def engine_toggle_log(function_memory:FunctionMemory):
     Log.toggle()
 
+
+@ConsoleCommand(
+    Identifier("engine", "", "stop"),
+    {}
+)
+def engine_stop(function_memory:FunctionMemory):
+    function_memory.unloadGame()
+

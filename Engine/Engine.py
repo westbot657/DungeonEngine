@@ -119,6 +119,9 @@ class Engine:
     def saveGame(self):
         self.loader.saveGame(self)
         #Player.saveData(self)
+    
+    def unloadGame(self):
+        self.loader.unloadGame()
 
     def start(self):
         if not self.thread_running:
@@ -130,6 +133,8 @@ class Engine:
     def stop(self):
         self.running = False
         self.thread_running = False
+        self.saveGame()
+        self.unloadGame()
 
     def pause(self):
         self.running = False
@@ -454,7 +459,7 @@ class Engine:
 
             # do other engine stuff
 
-        self.saveGame()
+        # self.saveGame()
         self.io_hook.stop()
 
 

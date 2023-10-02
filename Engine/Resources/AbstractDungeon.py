@@ -49,7 +49,7 @@ class AbstractDungeon:
         self.entry_point: Location = Location.fromString(data.get("entry_point", None))
         self.events: dict|None = data.get("events", {})
         self.data: dict = data.get("data", {})
-        self.recovery_location: Location|None = Location.fromString(l) if (l := data.get("recovery_location", None)) is not None else None
+        self.recovery_location: Location = Location.fromString(l) if (l := data.get("recovery_location", None)) is not None else Location.fromString("world:rooms/start")
 
         if map := data.get("map", None): self.map = Map(map)
         else: self.map = None

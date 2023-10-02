@@ -46,6 +46,9 @@ class FunctionMemory:
     def saveGame(self):
         self.engine.saveGame()
 
+    def unloadGame(self):
+        self.engine.unloadGame()
+
     def __init__(self, engine:Engine):
         self.symbol_table = {}
         self.context_data = {}

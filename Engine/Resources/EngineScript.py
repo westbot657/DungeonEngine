@@ -743,16 +743,18 @@ def p_error(p):
 parser = yacc.yacc()
 
 
-script_files = glob.glob("**/*.dungeon_script", recursive=True) + glob.glob("**/*.ds", recursive=True)
-
-
 class EngineScript:
 
     _scripts = {}
+    script_files: list = [] #glob.glob("**/*.dungeon_script", recursive=True) + glob.glob("**/*.ds", recursive=True)
+
+    @classmethod
+    def load(cls):
+        cls.script_files = glob.glob("**/*.dungeon_script", recursive=True) + glob.glob("**/*.ds", recursive=True)
 
     def __new__(cls, script_file):
 
-        for f in script_files:
+        for f in cls.script_files:
             if f.replace("\\", "/").endswith(f"{script_file.replace('.dungeon_script', '').replace('.ds', '')}.dungeon_script".replace("\\", "/")):
                 script_file = f
                 break
@@ -771,7 +773,7 @@ class EngineScript:
     def _init_(self, script_file):
         self.script_file = script_file
 
-        for f in script_files:
+        for f in self.script_files:
             if f.replace("\\", "/").endswith(f"{script_file.replace('.dungeon_script', '').replace('.ds', '')}.dungeon_script".replace("\\", "/")):
                 self.script_file = f
                 break
@@ -785,7 +787,7 @@ class EngineScript:
     @classmethod
     def preCompileAll(cls):
         Log["loadup"]["engine script"]("loading and compiling scripts")
-        for script_file in script_files:
+        for script_file in cls.script_files:
             Log["loadup"]["engine script"](f"compiling script '{script_file}'")
             es = EngineScript(script_file)
             es.compile()
@@ -809,6 +811,10 @@ class EngineScript:
             self.compile()
         return self.compiled_script
 
+    @classmethod
+    def unload(cls):
+        cls._scripts.clear()
+        cls.script_files.clear()
 
 
 if __name__ == "__main__":

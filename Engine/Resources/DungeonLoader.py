@@ -751,6 +751,7 @@ class DungeonLoader:
 
         start_time = time.time()
 
+        EngineScript.load()
         EngineScript.preCompileAll()
 
         Log["loadup"]["loader"]("Loading Abstract Status Effects...")
@@ -821,3 +822,59 @@ class DungeonLoader:
         Player.saveData(engine._function_memory)
 
         Log["loadup"]["loader"]("Finished saving")
+
+    def unloadGame(self):
+
+        Log["loader"]["shutdown"]("Unloading Weapons")
+        AbstractWeapon._loaded.clear()
+        self.abstract_weapons.clear()
+
+        Log["loader"]["shutdown"]("Unloading Ammo")
+        AbstractAmmo._loaded.clear()
+        self.abstract_ammo.clear()
+
+        Log["loader"]["shutdown"]("Unloading Armor")
+        AbstractArmor._loaded.clear()
+        self.abstract_armor.clear()
+
+        Log["loader"]["shutdown"]("Unloading Tools")
+        AbstractTool._loaded.clear()
+        self.abstract_tools.clear()
+
+        Log["loader"]["shutdown"]("Unloading Items")
+        AbstractItem._loaded.clear()
+        self.abstract_items.clear()
+
+        Log["loader"]["shutdown"]("Unloading Combats")
+        AbstractCombat._loaded.clear()
+        self.abstract_combats.clear()
+
+        Log["loader"]["shutdown"]("Unloading Enemies")
+        AbstractEnemy._loaded.clear()
+        self.abstract_enemies.clear()
+
+        Log["loader"]["shutdown"]("Unloading Attacks")
+        AbstractAttack._loaded.clear()
+        self.abstract_attacks.clear()
+
+        Log["loader"]["shutdown"]("Unloading Interactables")
+        AbstractInteractable._loaded.clear()
+        self.abstract_interactables.clear()
+
+        Log["loader"]["shutdown"]("Unloading Dungeons")
+        AbstractDungeon._loaded.clear()
+        self.abstract_dungeons.clear()
+        self.dungeons.clear()
+
+        Log["loader"]["shutdown"]("Unloading Rooms")
+        AbstractRoom._loaded.clear()
+        self.abstract_rooms.clear()
+
+        Log["loader"]["shutdown"]("Unloading Status Effects")
+        AbstractStatusEffect._loaded.clear()
+        self.abstract_status_effects.clear()
+
+        Log["loader"]["shutdown"]("Unloading Scripts")
+        EngineScript.unload()
+
+

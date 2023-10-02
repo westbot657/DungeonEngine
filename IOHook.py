@@ -26,6 +26,14 @@ class IOHook:
 
     # required function
     def sendOutput(self, target:int|str, text:str):
+        """
+        Targets:
+        log: Debug Logger
+        0: Engine
+        1: Sound System
+        2: Inventory UI
+        3: Combat UI
+        """
         if self.running:
             if target == 0:
                 print(f"[engine]: {text}")
@@ -33,6 +41,8 @@ class IOHook:
                 print(f"[sound]: {text}")
                 if os.path.exists(text):
                     sa.WaveObject.from_wave_file(text).play()
+            if target in [2, 3]:
+                pass
                 
             elif target == "log":
                 print(f"[{target}]: {text}")

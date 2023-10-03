@@ -265,7 +265,7 @@ class Player(Entity):
     def getPlayer(cls, player_id):
         if player_id in cls._loaded:
             return cls._loaded.get(player_id)
-        for player in cls._loaded:
+        for player in cls._loaded.values():
             player:Player
             if player.name == player_id:
                 return player

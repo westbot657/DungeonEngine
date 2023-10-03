@@ -130,18 +130,22 @@ class Combat(FunctionalElement):
             return f"Combat.Task:[{self.task}]"
 
     def __new__(cls, abstract, enemies, sequence, data, respawn_point):
-        if abstract in cls._combats.keys():
-            return cls._combats[abstract]
+        print(cls._combats, abstract)
+        if abstract.identifier.full() in cls._combats:
+            # print("returning old combat!")
+            return cls._combats[abstract.identifier.full()]
         else:
+            # print("creating new combat!")
             self = super().__new__(cls)
-            self.__init__(abstract, enemies, sequence, data, respawn_point)
-            cls._combats.update({abstract: self})
+            self._init_(abstract, enemies, sequence, data, respawn_point)
+            cls._combats.update({abstract.identifier.full(): self})
             return self
 
-    def __init__(self, abstract, enemies:list[Enemy], sequence:dict, data:dict, respawn_point:Location):
+    def _init_(self, abstract, enemies:list[Enemy], sequence:dict, data:dict, respawn_point:Location):
         self.abstract = abstract
         self.location: Location = None
         self.abstract_enemies: list[AbstractEnemy] = enemies
+        self.complete = False
         self.enemies = []
         self.sequence: dict = sequence
         self.data: dict = data
@@ -179,7 +183,8 @@ class Combat(FunctionalElement):
             ".turn": self.turn,
             ".last_trigger": self.last_trigger,
             ".old_trigger": self.old_trigger,
-            ".turn_order": self.turn_order
+            ".turn_order": self.turn_order,
+            ".complete": self.complete
         }
         return d
 
@@ -192,7 +197,8 @@ class Combat(FunctionalElement):
             "turn": self.turn,
             "last_trigger": self.last_trigger,
             "old_trigger": self.old_trigger,
-            "turn_order": self.turn_order
+            "turn_order": self.turn_order,
+            "complete": self.complete
         }
 
     def updateLocalVariables(self, locals: dict):
@@ -208,15 +214,18 @@ class Combat(FunctionalElement):
         self.updateLocalVariables(function_memory.symbol_table)
 
     def addTask(self, task:Operation._Operation, position:int=-1, delay:int=0):
+        if self.complete: return
         self.scheduled_tasks.insert(position, Combat.Task(task, delay))
 
     def addPlayer(self, player:Player):
+        if self.complete: return
         player.in_combat = True
         player._combat = self
         self.players.append(player)
         self.scheduled_tasks.insert(0, Combat.Task(Combat.Operation._HandlePlayerJoin(player, Combat.JoinPriority.NEXT), 0))
 
     def removePlayer(self, player:Player):
+        
         self.scheduled_tasks.insert(0, Combat.Task(Combat.Operation._HandlePlayerLeave(player), 0))
         player._combat = None
         player.in_combat = False
@@ -224,9 +233,17 @@ class Combat(FunctionalElement):
             self.players.remove(player)
 
     def onInput(self, player:Player, text:str):
+        if self.complete: return
         self.scheduled_tasks.insert(0, Combat.Task(Combat.Operation._HandleInput(player, text), 0))
 
     def start(self, function_memory:FunctionMemory):
+        
+        # print("start called")
+        
+        if self.complete: return
+        
+        # print("combat.complete is False")
+        
         self.tick = self._mainloop(function_memory)
         self.tick.send(None)
         function_memory.engine.combats.append(self)
@@ -252,6 +269,11 @@ class Combat(FunctionalElement):
 
     def enemyAttackPlayer(self, enemy:Enemy, player:Player):
         Log["debug"]["enemy"]("ENEMY ATTACK PLAYER!!")
+        
+        if enemy.health <= 0 and enemy.max_health > 0:
+            # self.addTask(Combat.Operation._NextTurn())
+            return
+        
         self.function_memory.update({
             "damage": 0
         })
@@ -301,6 +323,7 @@ class Combat(FunctionalElement):
         ...
 
     def handleOperation(self, function_memory:FunctionMemory, operation):
+        # if self.complete: return
         match operation:
             case Combat.Operation._HandlePlayerJoin():
                 
@@ -351,6 +374,7 @@ class Combat(FunctionalElement):
                     self.scheduled_tasks.append(
                         Combat.Task(Combat.Operation.Message(self.data.get("player_lose_message", "Combat Ended. Players lost"), player), 0)
                     )
+                    self.complete = True
                     function_memory.engine.sendOutput(3, None)
 
 
@@ -484,11 +508,12 @@ class Combat(FunctionalElement):
                         if i <= self.current_turn:
                             self.current_turn -= 1
                 
-                if all(isinstance(a, Player) for a in self.turn_order):
+                if all((isinstance(a, Player) or ((isinstance(a, Enemy) and a.health <= 0))) for a in self.turn_order):
                     Log["debug"]["combat"]("Combat ended. Players win!")
                     self.scheduled_tasks.append(
                         Combat.Task(Combat.Operation.Message(self.data.get("player_win_message", "Combat Ended. Players win!"), *self.players), 0)
                     )
+                    self.complete = True
                     function_memory.engine.sendOutput(3, None)
                     
                     for player in self.players:
@@ -537,11 +562,14 @@ class Combat(FunctionalElement):
         self.function_memory = function_memory
         #result = yield {}
         result = None
+        
+        if self.complete: return
+        
         while self.active:
             # if result == None:
             #     result = yield {}
             #     continue
-
+            
             for task in self.scheduled_tasks.copy():
                 task: Combat.Task
                 task.delay -= 1
@@ -562,6 +590,13 @@ class Combat(FunctionalElement):
                                 function_memory.engine.evaluateResult(function_memory.engine._default_input_handler, function_memory.engine.default_input_handler, e.value, player_id, "")
                     except CombatError as e:
                         Log["ERROR"]["combat"](e)
+
+            if self.complete:
+                if self.scheduled_tasks:
+                    continue
+                else:
+                    self.active = False
+                    return
 
             if len(self.turn_order) == 0:
                 if self.scheduled_tasks:

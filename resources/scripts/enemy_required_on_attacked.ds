@@ -2,10 +2,6 @@
 [engine:enemy/damage](<#damage>)
 
 
-if (<#enemy.health> <= 0) {
-    [engine:combat/kill_enemy](<.uid>)
-}
-
 [engine:player/message](
     [engine:text/join](
         "You attack `",
@@ -16,6 +12,21 @@ if (<#enemy.health> <= 0) {
         seperator=""
     )
 )
+
+if (<#enemy.health> <= 0) {
+    [engine:combat/kill_enemy](<.uid>)
+
+    [engine:combat/message](
+        [engine:text/join](
+            "`", <#enemy.name>, "` has been defeated.",
+            seperator=""
+        )
+    )
+
+}
+
+
+
 
 [engine:combat/next_turn]
 

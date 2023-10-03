@@ -4,7 +4,7 @@
         "name": "Weston",
         "max_health": 20,
         "health": 20,
-        "location": "world:rooms/start",
+        "location": "test_dungeon:rooms/start",
         "position": [
             0,
             0
@@ -37,7 +37,8 @@
                 "type": "engine:weapon",
                 "parent": "engine:weapons/bow",
                 "name": "Pew Pew",
-                "durability": 28
+                "durability": 28,
+                "equipped": true
             },
             {
                 "type": "engine:ammo",
@@ -59,8 +60,7 @@
                 "type": "engine:weapon",
                 "parent": "engine:weapons/sword",
                 "name": "Excaliber",
-                "description": "A perfectly normal sword",
-                "equipped": true
+                "description": "A perfectly normal sword"
             }
         ],
         "status_effects": [],

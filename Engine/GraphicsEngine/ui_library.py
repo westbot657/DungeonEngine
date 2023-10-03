@@ -3286,7 +3286,7 @@ class GameApp(UIElement):
             self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
             self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
 
-            self.damage_display = Text(5, 55, 100, f"{obj.damage.quickDisplay(self.game_app.editor.engine._function_memory)}dmg", text_bg_color=None)
+            self.damage_display = Text(5, 55, 100, f"{obj.damage.quickDisplay(self.game_app.editor.engine._function_memory)} damage", text_bg_color=None)
             self.durability_bar = GameApp.HealthBar(295, 55, 100, 15, obj.max_durability, obj.durability)
 
             self.children.append(self.icon)

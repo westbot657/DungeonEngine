@@ -1,0 +1,14 @@
+{
+    "text_size": 14,
+    "text_color": [200, 200, 200],
+    "text_bg_color": [24, 24, 24],
+    "text_highlight": [0, 122, 204, 127],
+    "icons": {
+        "engine:object/weapon": "sword_icon",
+        "engine:object/ammo": "ammo_icon",
+        "engine:object/armor": "shield_icon",
+        "engine:object/tool": "tool_icon",
+        "engine:object/item": "item_icon",
+        "engine:weapons/bow": "bow_icon"
+    }
+}

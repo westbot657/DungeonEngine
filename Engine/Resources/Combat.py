@@ -231,7 +231,7 @@ class Combat(FunctionalElement):
         self.tick.send(None)
         function_memory.engine.combats.append(self)
         
-        function_memory.engine.sendOutput(2, self)
+        function_memory.engine.sendOutput(3, self)
 
     # def responseHandler(self):
     #     while True:
@@ -351,7 +351,7 @@ class Combat(FunctionalElement):
                     self.scheduled_tasks.append(
                         Combat.Task(Combat.Operation.Message(self.data.get("player_lose_message", "Combat Ended. Players lost"), player), 0)
                     )
-                    function_memory.engine.sendOutput(2, None)
+                    function_memory.engine.sendOutput(3, None)
 
 
             case Combat.Operation._HandleInput():
@@ -473,6 +473,7 @@ class Combat(FunctionalElement):
                             if r <= self.current_turn:
                                 self.current_turn += 1
                 self.turn = self.turn_order[self.current_turn]
+                function_memory.engine.sendOutput(9, "update-combat-ui")
 
             case Combat.Operation.Despawn():
                 for enemy_id in operation.enemies:
@@ -488,7 +489,7 @@ class Combat(FunctionalElement):
                     self.scheduled_tasks.append(
                         Combat.Task(Combat.Operation.Message(self.data.get("player_win_message", "Combat Ended. Players win!"), *self.players), 0)
                     )
-                    function_memory.engine.sendOutput(2, None)
+                    function_memory.engine.sendOutput(3, None)
                     
                     for player in self.players:
                         player.in_combat = False
@@ -499,6 +500,7 @@ class Combat(FunctionalElement):
                     self.turn = 0
                 else:
                     self.turn = self.turn_order[self.current_turn]
+                function_memory.engine.sendOutput(9, "update-combat-ui")
 
             case Combat.Operation.Message():
                 Log["debug"]["combat"]["message"](operation.message)
@@ -510,6 +512,10 @@ class Combat(FunctionalElement):
                         function_memory.engine.sendOutput(player, operation.message)
 
             case Combat.Operation._NextTurn():
+
+                if len(self.turn_order) == 0:
+                    return
+
                 self.current_turn += 1
                 if self.current_turn >= len(self.turn_order):
                     self.current_turn = 0
@@ -519,6 +525,8 @@ class Combat(FunctionalElement):
                     self.scheduled_tasks.append(
                         Combat.Task(Combat.Operation._EnemyAttack(self.turn, random.choice(self.players)), 10000)
                     )
+                else:
+                    function_memory.engine.sendOutput(9, "update-combat-ui")
 
             case _:
                 raise CombatError(f"Unrecognized combat operation: '{operation}'")

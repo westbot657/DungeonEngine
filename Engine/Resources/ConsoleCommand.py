@@ -98,6 +98,7 @@ class ConsoleCommand:
     def _parse_args(cls, function_memory, arg_tree:dict|None, text:str) -> list|None:
         engine = function_memory.engine
         args = []
+        text = text + " END"
         for arg, con in arg_tree.items():
             arg: str
             con: dict|None
@@ -105,6 +106,10 @@ class ConsoleCommand:
             arg_types = arg_types.strip().split("|")
             for tp in arg_types:
                 tp = tp.strip()
+
+                if text.strip() == "END":
+                    raise FunctionCallError(f"Not enough args passed to function")
+
                 try:
                     match tp:
                         case "engine:str":
@@ -141,43 +146,46 @@ class ConsoleCommand:
                             while out is None:
                                 try:
                                     out = json.loads(s)
+                                    args.append(out)
                                 except json.decoder.JSONDecodeError as e:
                                     if e.args:
                                         if m := re.match(r"Extra data: line \d+ column \d+ \(char (?P<col>\d+)\)", e.args[0]):
                                             col = m.groupdict()["col"]
                                             s = s[0:col].strip()
+                                            args.append(json.loads(s))
                                         else:
                                             raise e
                         case "engine:Player":
                             n, other = text.split(" ", 1)
                             try:
-                                return Player.getPlayer(n)
-                            except UnknownPlayerError:
-                                pass
+                                args.append(Player.getPlayer(n))
+                            except UnknownPlayerError as e:
+                                f = "\n".join(e.args)
+                                print(f"Failed to get player.\n{f}")
                         case "engine:Ammo":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_ammo.get(n, None):
-                                return a
+                                args.append(a)
                         case "engine:Armor":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_armor.get(n, None):
-                                return a
+                                args.append(a)
                         case "engine:Attack":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_attacks.get(n, None):
-                                return a
+                                args.append(a)
                         case "engine:Item":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_items.get(n, None):
-                                return a
+                                args.append(a)
                         case "engine:Tool":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_tools.get(n, None):
-                                return a
+                                args.append(a)
                         case "engine:Weapon":
                             n, other = text.split(" ", 1)
                             if a := engine.loader.abstract_weapons.get(n, None):
-                                return a
+                                args.append(a)
                         case "engine:GameObjectType":
                             n, other = text.split(" ", 1)
 

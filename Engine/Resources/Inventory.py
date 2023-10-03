@@ -37,6 +37,7 @@ class Inventory(FunctionalElement):
         self.contents = contents
         self.equips = {}
         self.defaults = {}
+        self.function_memory = function_memory
         for key, abstract in Inventory._default_equips.items():
             self.defaults.update({key: abstract.createInstance(function_memory)})
             self.equips.update({key: self.defaults[key]})
@@ -47,11 +48,13 @@ class Inventory(FunctionalElement):
     def equip(self, objectType:str, gameObject:GameObject):
         if gameObject not in self.contents: self.contents.append(gameObject)
         self.equips.update({objectType: gameObject})
+        self.function_memory.engine.sendOutput(9, "update-inventory-ui")
 
     def unequipObject(self, gameObject:GameObject):
         for key in self.equips.keys():
             if self.equips[key] is gameObject:
                 self.equips[key] = self.defaults.get(key, None)
+                self.function_memory.engine.sendOutput(9, "update-inventory-ui")
                 
     def removeObject(self, game_object:GameObject):
         if game_object in self.contents:
@@ -59,6 +62,7 @@ class Inventory(FunctionalElement):
                 self.unequipObject(game_object)
             self.contents.remove(game_object)
             game_object.owner = None
+            self.function_memory.engine.sendOutput(9, "update-inventory-ui")
 
     def addObject(self, game_object:GameObject):
 
@@ -70,13 +74,16 @@ class Inventory(FunctionalElement):
                         if diff < game_object.count:
                             game_object.count -= diff
                             obj.count = obj.max_count
+                            # self.function_memory.engine.sendOutput(9, "update-inventory-ui")
                             break
                         else:
                             obj.count += game_object.count
+                            self.function_memory.engine.sendOutput(9, "update-inventory-ui")
                             return
 
         game_object.owner = self.parent
         self.contents.append(game_object)
+        self.function_memory.engine.sendOutput(9, "update-inventory-ui")
     
     def setParent(self, parent):
         self.parent = parent
@@ -114,6 +121,7 @@ class Inventory(FunctionalElement):
     def unequipType(self, objectType:str):
         if objectType in self.equips:
             self.equips[objectType] = self.defaults.get(objectType, None)
+            self.function_memory.engine.sendOutput(9, "update-inventory-ui")
 
     def fullStats(self, function_memory:FunctionMemory):
         equip_stats = []
@@ -127,6 +135,7 @@ class Inventory(FunctionalElement):
         if equip_stats:
             st = " | ".join(equip_stats)
         
+        function_memory.engine.sendOutput(9, "update-inventory-ui")
         
         for obj in self.contents:
             out.append(obj.fullStats(function_memory, obj in self.equips.values()))

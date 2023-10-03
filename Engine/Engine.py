@@ -131,10 +131,11 @@ class Engine:
             t.start()
 
     def stop(self):
-        self.running = False
-        self.thread_running = False
-        self.saveGame()
-        self.unloadGame()
+        if self.running:
+            self.running = False
+            self.thread_running = False
+            self.saveGame()
+            self.unloadGame()
 
     def pause(self):
         self.running = False

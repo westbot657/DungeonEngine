@@ -11,6 +11,7 @@ import os
 import sys
 import mouse
 import random
+import json
 #from io import BytesIO
 from enum import Enum, auto
 from ctypes import windll, WINFUNCTYPE, POINTER
@@ -116,10 +117,15 @@ class Color(list):
 PATH = "./Engine/GraphicsEngine/resources"
 
 FONT = f"{PATH}/PTMono-Regular.ttf" # PTMono-Regular has correct lineup for │ and ┼!
-TEXT_SIZE = 14
-TEXT_COLOR = Color(200, 200, 200)
-TEXT_BG_COLOR = Color(24, 24, 24)
-TEXT_HIGHLIGHT = Color(0, 122, 204, 127)
+
+with open("./editor_settings.json", "r+", encoding="utf-8") as f:
+    SETTINGS = json.load(f)
+
+
+TEXT_SIZE = SETTINGS["text_size"]
+TEXT_COLOR = Color(*SETTINGS["text_color"])
+TEXT_BG_COLOR = Color(*SETTINGS["text_bg_color"])
+TEXT_HIGHLIGHT = Color(*SETTINGS["text_highlight"])
 TAB_SIZE = 4
 CURSOR_BLINK_TIME = 50
 CURSOR_COLOR = Color(190, 190, 190)
@@ -488,7 +494,7 @@ class Animation(UIElement):
         return i
 
 class MultilineText(UIElement):
-    def __init__(self, x:int, y:int, min_width:int=1, min_height:int=1, content:str="", text_color:Color|tuple|int=TEXT_COLOR, text_bg_color:Color|tuple|int=TEXT_BG_COLOR):
+    def __init__(self, x:int, y:int, min_width:int=1, min_height:int=1, content:str="", text_color:Color|tuple|int=TEXT_COLOR, text_bg_color:Color|tuple|int=TEXT_BG_COLOR, text_size=TEXT_SIZE):
         assert min_width >= 1, "Min width must be 1 or more"
         assert min_height >= 1, "Min height must be 1 or more"
         self.x = x
@@ -499,7 +505,7 @@ class MultilineText(UIElement):
         self.colored_content = content
         self.text_color = Color.color(text_color)
         self.text_bg_color = Color.color(text_bg_color)
-        self.font = pygame.font.Font(FONT, TEXT_SIZE)
+        self.font = pygame.font.Font(FONT, text_size)
         self.surfaces = []
 
         self._text_width = self.min_width
@@ -1054,7 +1060,8 @@ class MultilineTextBox(UIElement):
         self._text_height = 0
         for line in self.get_lines():
             s = self.font.render(line or " ", True, (0, 0, 0))
-            s = pygame.Surface(s.get_size(), pygame.SRCALPHA)
+            a, b = s.get_size()
+            s = pygame.Surface((a+2, b), pygame.SRCALPHA)
             # s.fill(tuple(self.text_bg_color))
             self.surfaces.append(s)
             self._text_width = max(self._text_width, s.get_width())
@@ -1390,8 +1397,8 @@ class MultilineTextBox(UIElement):
                     self._save(self, content, selection, cursor)
                     self.save_history()
                 else:
-                    
-                    if ((self.char_whitelist is not None) and (key not in self.char_whitelist)) or ((self.char_blacklist is not None) and (key in self.char_blacklist)):
+                    # self.char_blacklist: list
+                    if ((self.char_whitelist is not None) and (key not in self.char_whitelist)) or ((self.char_blacklist is not None) and (key in self.char_blacklist)): # pylint: disable=unsupported-membership-test
                         continue
                     if self.get_selection():
                         self.set_selection("")
@@ -3210,29 +3217,37 @@ class GameApp(UIElement):
                 self.shadow_damage_bar._update(editor, X+self.x, Y+self.y)
 
     class EnemyCard(UIElement):
-        def __init__(self, enemy, y_pos):
+        def __init__(self, game_app, enemy, y_pos):
             self.children = []
             self.width = 400
             self.height = 85
             self.x = 25
             self.y = y_pos
             self.enemy = enemy
+            self.game_app = game_app
             self.background = Image(f"{PATH}/enemy_card.png", 0, 0, 400, 85)
+            self.background_turn = Image(f"{PATH}/enemy_card_turn.png", 0, 0, 400, 85)
             
-            self.name_display = Text(10, 10, 1, enemy.name)
+            self.name_display = Text(10, 10, 1, enemy.name, text_bg_color=None)
             
             self.health_bar = GameApp.HealthBar(290, 10, 100, 20, enemy.max_health, enemy.health)
         
             self.old_health = enemy.health
         
-            self.children.append(self.background)
+            # self.children.append(self.background)
             self.children.append(self.name_display)
             self.children.append(self.health_bar)
         
         def _update(self, editor, X, Y):
+            if self.enemy is self.game_app.current_combat.turn:
+                self.background_turn._update(editor, X+self.x, Y+self.y)
+            else:
+                self.background._update(editor, X+self.x, Y+self.y)
+
             for child in self.children:
-                child._update(editor, X, Y)
-        
+                child._update(editor, X+self.x, Y+self.y)
+
+
         def _event(self, editor, X, Y):
             
             if self.old_health != self.enemy.health:
@@ -3240,16 +3255,267 @@ class GameApp(UIElement):
                 self.old_health = self.enemy.health
             
             for child in self.children:
-                child._event(editor, X, Y)
+                child._event(editor, X+self.x, Y+self.y)
     
+
+    class GameCard(UIElement):
+        height = 75
+
+        @staticmethod
+        def get_icon(obj):
+            if p := SETTINGS["icons"].get(obj.abstract.identifier.full(), None):
+                return Image(f"{PATH}/{p}.png", 0, 0, 25, 25)
+            elif p := SETTINGS["icons"].get(obj.identifier.full()):
+                return Image(f"{PATH}/{p}.png", 0, 0, 25, 25)
+            return f"{PATH}/sword_icon.png"
+
+    class WeaponCard(UIElement):
+        
+        def __init__(self, game_app, obj, x, y, active):
+            self.game_app = game_app
+            self.obj = obj
+            self.x = x
+            self.y = y
+            self.width = 400
+            self.height = GameApp.GameCard.height
+            self.children = []
+            self.background = Image(f"{PATH}/object_card.png", 0, 0, 400, GameApp.GameCard.height)
+            self.background_active = Image(f"{PATH}/object_card_active.png", 0, 0, 400, GameApp.GameCard.height)
+
+            self.icon = GameApp.GameCard.get_icon(obj)
+            self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
+            self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
+
+            self.damage_display = Text(5, 55, 100, f"{obj.damage.quickDisplay(self.game_app.editor.engine._function_memory)}dmg", text_bg_color=None)
+            self.durability_bar = GameApp.HealthBar(295, 55, 100, 15, obj.max_durability, obj.durability)
+
+            self.children.append(self.icon)
+            self.children.append(self.name_display)
+            self.children.append(self.description_display)
+            self.children.append(self.damage_display)
+            self.children.append(self.durability_bar)
+
+            self.active = active
+
+        def _update(self, editor, X, Y):
+
+            if self.active:
+                self.background_active._update(editor, X+self.x, Y+self.y)
+            else:
+                self.background._update(editor, X+self.x, Y+self.y)
+
+            for child in self.children:
+                child._update(editor, X+self.x, Y+self.y)
+
+        def _event(self, editor, X, Y):
+            _c = self.children.copy()
+            _c.reverse()
+            for child in _c:
+                child._event(editor, X+self.x, Y+self.y)
+
+    class ToolCard(UIElement):
+        def __init__(self, game_app, obj, x, y, active):
+            self.game_app = game_app
+            self.obj = obj
+            self.x = x
+            self.y = y
+            self.width = 400
+            self.height = GameApp.GameCard.height
+            self.children = []
+            self.background = Image(f"{PATH}/object_card.png", 0, 0, 400, GameApp.GameCard.height)
+            self.background_active = Image(f"{PATH}/object_card_active.png", 0, 0, 400, GameApp.GameCard.height)
+
+            self.icon = GameApp.GameCard.get_icon(obj)
+            self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
+            self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
+
+            # self.damage_display = Text(5, 55, 100, f"{obj.damage}dmg", text_bg_color=None)
+            self.durability_bar = GameApp.HealthBar(295, 55, 100, 15, obj.max_durability, obj.durability)
+
+            self.children.append(self.icon)
+            self.children.append(self.name_display)
+            self.children.append(self.description_display)
+            # self.children.append(self.damage_display)
+            self.children.append(self.durability_bar)
+
+            self.active = active
+
+        def _update(self, editor, X, Y):
+
+            if self.active:
+                self.background_active._update(editor, X+self.x, Y+self.y)
+            else:
+                self.background._update(editor, X+self.x, Y+self.y)
+
+            for child in self.children:
+                child._update(editor, X+self.x, Y+self.y)
+
+        def _event(self, editor, X, Y):
+            _c = self.children.copy()
+            _c.reverse()
+            for child in _c:
+                child._event(editor, X+self.x, Y+self.y)
+
+    class AmmoCard(UIElement):
+        def __init__(self, game_app, obj, x, y, active):
+            self.game_app = game_app
+            self.obj = obj
+            self.x = x
+            self.y = y
+            self.width = 400
+            self.height = GameApp.GameCard.height
+            self.children = []
+            self.background = Image(f"{PATH}/object_card.png", 0, 0, 400, GameApp.GameCard.height)
+            self.background_active = Image(f"{PATH}/object_card_active.png", 0, 0, 400, GameApp.GameCard.height)
+
+            self.icon = GameApp.GameCard.get_icon(obj)
+            self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
+            self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
+
+            dmg = obj.bonus_damage.quickDisplay(self.game_app.editor.engine._function_memory)
+            self.damage_display = Text(5, 55, 100, f"{dmg} bonus damage", text_bg_color=None)
+            self.count_disp = f"{obj.count}/{obj.max_count}" if obj.max_count > 0 else f"{obj.count}"
+            self.count_display = Text(0, 0, 1, self.count_disp, text_bg_color=None)
+            self.count_display.x = 395 - self.count_display.width
+            self.count_display.y = 70 - self.count_display.height
+
+            self.old_count = obj.count
+
+            self.children.append(self.icon)
+            self.children.append(self.name_display)
+            self.children.append(self.description_display)
+            self.children.append(self.damage_display)
+            self.children.append(self.count_display)
+
+            self.active = active
+
+        def _update(self, editor, X, Y):
+
+            if self.active:
+                self.background_active._update(editor, X+self.x, Y+self.y)
+            else:
+                self.background._update(editor, X+self.x, Y+self.y)
+
+            for child in self.children:
+                child._update(editor, X+self.x, Y+self.y)
+
+        def _event(self, editor, X, Y):
+
+            if self.old_count != self.obj.count:
+                self.count_disp = f"{self.obj.count}/{self.obj.max_count}" if self.obj.max_count > 0 else f"{self.obj.count}"
+                self.count_display.set_text(self.count_disp)
+                self.count_display.x = 395 - self.count_display.width
+
+            _c = self.children.copy()
+            _c.reverse()
+            for child in _c:
+                child._event(editor, X+self.x, Y+self.y)
+    
+    class ArmorCard(UIElement):
+        def __init__(self, game_app, obj, x, y, active):
+            self.game_app = game_app
+            self.obj = obj
+            self.x = x
+            self.y = y
+            self.width = 400
+            self.height = GameApp.GameCard.height
+            self.children = []
+            self.background = Image(f"{PATH}/object_card.png", 0, 0, 400, GameApp.GameCard.height)
+            self.background_active = Image(f"{PATH}/object_card_active.png", 0, 0, 400, GameApp.GameCard.height)
+
+            self.icon = GameApp.GameCard.get_icon(obj)
+            self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
+            self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
+
+            self.damage_display = Text(5, 55, 100, f"{obj.damage_reduction.quickDisplay(self.game_app.editor.engine._function_memory)} defence", text_bg_color=None)
+            self.durability_bar = GameApp.HealthBar(295, 55, 100, 15, obj.max_durability, obj.durability)
+
+            self.children.append(self.icon)
+            self.children.append(self.name_display)
+            self.children.append(self.description_display)
+            self.children.append(self.damage_display)
+            self.children.append(self.durability_bar)
+
+            self.active = active
+
+        def _update(self, editor, X, Y):
+
+            if self.active:
+                self.background_active._update(editor, X+self.x, Y+self.y)
+            else:
+                self.background._update(editor, X+self.x, Y+self.y)
+
+            for child in self.children:
+                child._update(editor, X+self.x, Y+self.y)
+
+        def _event(self, editor, X, Y):
+            _c = self.children.copy()
+            _c.reverse()
+            for child in _c:
+                child._event(editor, X+self.x, Y+self.y)
+    
+    class ItemCard(UIElement):
+        def __init__(self, game_app, obj, x, y, active):
+            self.game_app = game_app
+            self.obj = obj
+            self.x = x
+            self.y = y
+            self.width = 400
+            self.height = GameApp.GameCard.height
+            self.children = []
+            self.background = Image(f"{PATH}/object_card.png", 0, 0, 400, GameApp.GameCard.height)
+            self.background_active = Image(f"{PATH}/object_card_active.png", 0, 0, 400, GameApp.GameCard.height)
+
+            self.icon = GameApp.GameCard.get_icon(obj)
+            self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
+            self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
+
+            # self.damage_display = Text(5, 55, 100, f"{'+' if obj.damage >= 0 else '-'}{obj.damage}dmg", text_bg_color=None)
+            self.count_disp = f"{obj.count}/{obj.max_count}" if obj.max_count > 0 else f"{obj.count}"
+            self.count_display = Text(0, 0, 1, self.count_disp, text_bg_color=None)
+            self.count_display.x = 395 - self.count_display.width
+            self.count_display.y = 70 - self.count_display.height
+
+            self.old_count = obj.count
+
+            self.children.append(self.icon)
+            self.children.append(self.name_display)
+            self.children.append(self.description_display)
+            # self.children.append(self.damage_display)
+            self.children.append(self.count_display)
+
+            self.active = active
+
+        def _update(self, editor, X, Y):
+
+            if self.active:
+                self.background_active._update(editor, X+self.x, Y+self.y)
+            else:
+                self.background._update(editor, X+self.x, Y+self.y)
+
+            for child in self.children:
+                child._update(editor, X+self.x, Y+self.y)
+
+        def _event(self, editor, X, Y):
+
+            if self.old_count != self.obj.count:
+                self.count_disp = f"{self.obj.count}/{self.obj.max_count}" if self.obj.max_count > 0 else f"{self.obj.count}"
+                self.count_display.set_text(self.count_disp)
+                self.count_display.x = 395 - self.count_display.width
+
+            _c = self.children.copy()
+            _c.reverse()
+            for child in _c:
+                child._event(editor, X+self.x, Y+self.y)
+
+
     # class CombatLabel(UIElement):
     #     def __init__(self, ):
     #         self.children = []
     #         self.width = 400
     #         self.height = 85
     #         self.background = Image(f"{PATH}/enemy_card.png", 0, 0, 400, 85)
-            
-    
+
     def __init__(self, code_editor, editor):
         self.code_editor = code_editor
         self.children = []
@@ -3259,8 +3525,6 @@ class GameApp(UIElement):
         
         self.player = None
         
-
-
         editor.game_app = self
         self.io_hook = editor.io_hook
         editor.io_hook.game_app = self
@@ -3339,9 +3603,12 @@ class GameApp(UIElement):
         self.log_output = MultilineText(0, 0, 450, editor.height-130, "")
         self.log_scrollable.children.append(self.log_output)
         
-        self.enemy_card_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130)
+        self.enemy_card_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130, left_bound=0, top_bound=0, right_bound=0)
         self.no_combat_text = Text(0, 0, 1, "You are not in combat", text_size=25)
         # self.in_combat = False
+
+        self.inventory_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130, left_bound=0, top_bound=0, right_bound=0, scroll_speed=30)
+        self.empty_inventory_text = Text(0, 0, 1, "Your inventory is empty or not loaded", text_size=18)
         
         self.buttons_left_bar = Box(editor.width-502, 21, 1, 50, (70, 70, 70))
         self.buttons_bottom_bar = Box(editor.width-501, 71, 51, 1, (70, 70, 70))
@@ -3360,16 +3627,18 @@ class GameApp(UIElement):
         self.children.append(self.input_box)
         self.input_box.on_enter(self.input_on_enter)
         
-        self.id_refresh = Button(56, editor.height-75, 40, 40, "", Image(f"{PATH}/id_refresh.png", 0, 0, 20, 20), hover_color=Image(f"{PATH}/id_refresh_hovered.png", 0, 0, 20, 20))
-        self.id_input = MultilineTextBox(96, editor.height-75, 25, 20, "10", text_bg_color=(31, 31, 31))
+        self.id_refresh = Button(56, editor.height-75, 15, 15, "", Image(f"{PATH}/id_refresh.png", 0, 0, 15, 15), hover_color=Image(f"{PATH}/id_refresh_hovered.png", 0, 0, 15, 15))
+        self.id_refresh.on_left_click = self.refresh_player_data
+        self.id_input = MultilineTextBox(71, editor.height-75, 15, 15, "10", text_bg_color=(31, 31, 31))
         self.id_input.single_line = True
         self.id_input.char_whitelist = [a for a in "0123456789"]
         self.children.append(self.id_refresh)
         self.children.append(self.id_input)
         
-        self.player_name_display = Text(146, editor.height-75, content="[Start game to load player info]", text_size=20)
+        self.player_name_display = Text(96, editor.height-75, content="[Start game to load player info]", text_size=15)
 
-        self.player_health_bar = GameApp.HealthBar(56+self.player_name_display.width, editor.height-75, 200, self.player_name_display.height, 20, 20)
+        self.player_health_bar = GameApp.HealthBar(80+self.player_name_display.width + self.id_input._text_width+self.id_refresh.width, editor.height-75, 200, self.player_name_display.height, 20, 20)
+        self._old_health = 0
 
         self.children.append(self.player_name_display)
 
@@ -3411,16 +3680,39 @@ class GameApp(UIElement):
     def updateInventory(self, inventory=...):
         if inventory is not ...:
             self.player_inventory = inventory
+
+        self.inventory_scrollable.children.clear()
+
+        if self.player_inventory is not None:
+            equips = self.player_inventory.equips.values()
+            y = 10
+            x = 25
+            for item in self.player_inventory.contents:
+                card = {
+                    "engine:object/weapon": GameApp.WeaponCard,
+                    "engine:object/ammo": GameApp.AmmoCard,
+                    "engine:object/tool": GameApp.ToolCard,
+                    "engine:object/item": GameApp.ItemCard,
+                    "engine:object/armor": GameApp.ArmorCard,
+                }.get(item.identifier.full())
+            
+                self.inventory_scrollable.children.append(
+                    card(self, item, x, y, item in equips)
+                )
+                y += GameApp.GameCard.height + 10
+
+
     
     def updateCombat(self, combat=...):
         if combat is not ...:
             self.current_combat = combat
             
+        self.enemy_card_scrollable.children.clear()
+            
         if self.current_combat is not None:
             y = 25
-            self.enemy_card_scrollable.children.clear()
             for entity in self.current_combat.turn_order:
-                card = GameApp.EnemyCard(entity, y)
+                card = GameApp.EnemyCard(self, entity, y)
                 y += card.height + 25
                 self.enemy_card_scrollable.children.append(card)
 
@@ -3429,6 +3721,7 @@ class GameApp(UIElement):
             self.player = player
 
         if self.player is None:
+            self._old_health = player.health
             self.player_name_display.content = "[Start game to load player info]"
         
         else:
@@ -3458,9 +3751,10 @@ class GameApp(UIElement):
         else:
             editor.engine.start()
             
-            editor.engine.handleInput(0, f"engine:ui/get_inventory {self.player_id}")
-            editor.engine.handleInput(0, f"engine:ui/get_combat {self.player_id}")
-            
+            # editor.engine.handleInput(0, f"engine:ui/get_inventory {self.player_id}")
+            # editor.engine.handleInput(0, f"engine:ui/get_combat {self.player_id}")
+            editor.engine.handleInput(0, f"engine:ui/get_player {self.player_id}")
+
             self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[2]
             self.play_pause.hover_color = self.play_pause_buttons[3]
 
@@ -3473,6 +3767,9 @@ class GameApp(UIElement):
                 tab.hover_color = icons[1]
     
     def page_inv_onclick(self, editor):
+
+        self.editor.engine.handleInput(0, f"engine:ui/get_inventory {self.player_id}")
+
         self.page = "inv"
         RPCD["state"] = random.choice([
             "Playing strategicaly (maybe? idk lmao)",
@@ -3484,8 +3781,11 @@ class GameApp(UIElement):
         self.set_page("inv")
     
     def page_combat_onclick(self, editor):
+
+        self.editor.engine.handleInput(0, f"engine:ui/get_combat {self.player_id}")
+
         self.page = "combat"
-        if self.in_combat:
+        if self.current_combat:
             RPCD["state"]=random.choice([
                 "Currently in combat! (don't distract me (or do, I don't care lol))",
                 "Fighting uhh...  something! (I might make it actually say what when combat actually works)"
@@ -3536,17 +3836,22 @@ class GameApp(UIElement):
         
         # self.log_output = MultilineText(editor.width-449, 22, 450, editor.height-130, "Log output")
         
-        self.enemy_card_scrollable.x = self.log_scrollable.x = editor.width-449
-        self.log_output.min_height = self.log_scrollable.height = self.enemy_card_scrollable.height = editor.height-130
+        self.enemy_card_scrollable.x = self.log_scrollable.x = self.inventory_scrollable.x = editor.width-449
+        self.log_output.min_height = self.log_scrollable.height = self.enemy_card_scrollable.height = self.inventory_scrollable.height = editor.height-130
 
         self.play_pause.x = (editor.width-501)
 
         self.id_input.y = self.id_refresh.y = self.player_name_display.y = self.player_health_bar.y = editor.height-75
 
+        self.player_health_bar.x = 80 + self.player_name_display.width + self.id_input._text_width + self.id_refresh.width
+
         self.buttons_left_bar.x = self.buttons_bottom_bar.x = editor.width-502
         
         self.no_combat_text.x = (editor.width-224)-(self.no_combat_text.width/2)
         self.no_combat_text.y = self.log_scrollable.y + (self.log_output.min_height/2) - (self.no_combat_text.height/2)
+
+        self.empty_inventory_text.x = (editor.width-224)-(self.empty_inventory_text.width/2)
+        self.empty_inventory_text.y = self.log_scrollable.y + (self.log_output.min_height/2) - (self.empty_inventory_text.height/2)
         
     def _event(self, editor, X, Y):
         self._update_layout(editor)
@@ -3562,6 +3867,15 @@ class GameApp(UIElement):
                 self.enemy_card_scrollable._event(editor, X, Y)
             else:
                 self.no_combat_text._event(editor, X, Y)
+        elif self.page == "inv":
+            if self.player_inventory:
+                self.inventory_scrollable._event(editor, X, Y)
+            else:
+                self.empty_inventory_text._event(editor, X, Y)
+        
+        if (self.player is not None) and self.player.health != self._old_health:
+            self._old_health = self.player.health
+            self.player_health_bar.set_current_health(self._old_health)
     
     def _update(self, editor, X, Y):
         for child in self.children:
@@ -3574,6 +3888,11 @@ class GameApp(UIElement):
                 self.enemy_card_scrollable._update(editor, X, Y)
             else:
                 self.no_combat_text._update(editor, X, Y)
+        elif self.page == "inv":
+            if self.player_inventory:
+                self.inventory_scrollable._update(editor, X, Y)
+            else:
+                self.empty_inventory_text._update(editor, X, Y)
         
         if self.player is not None:
             self.player_health_bar._update(editor, X, Y)
@@ -4403,14 +4722,15 @@ class IOHook:
         return re.sub(r"(\"(?:\\.|[^\"\\\n])*\"|\[(?:| INFINITE |EQUIPPED|WEARING)\]|\[=*-*\](?: *\d+/\d+)?|(?:\+|\-)(?:\d+|\[\d+\-\d+\])(?:dmg|def)\b|\d+ft\b|`[^`\n]*`|\d+\/\d+)", repl, text)
 
     def sendOutput(self, target, text):
-        if target in ["log", 0, 1, 5, 6, 7, 8, 9]:
+
+        if target in ["log", 0, 1, 5, 6, 7, 8]:
             # self._log_queue.append(text)
 
             cl = self.game_app.log_output.colored_content.split("\n")
-            cl.append("[" + {
+            cl.append("[" + str({
                 0: "engine",
                 1: "sound"
-            }.get(target, target) + "]: " + text)
+            }.get(target, target)) + "]: " + text)
             if len(cl) > 200:
                 cl = cl[-200:]
 
@@ -4419,13 +4739,24 @@ class IOHook:
             self.game_app.log_scrollable.offsetY = -(self.game_app.log_output._text_height - (self.game_app.log_output.min_height - 20))
 
         elif target == 2:
+            # print(f"{target}: {text}")
             self.game_app.updateInventory(text)
         
         elif target == 3:
+            # print(f"{target}: {text}")
             self.game_app.updateCombat(text)
 
         elif target == 4:
+            # print(f"{target}: {text}")
             self.game_app.updatePlayer(text)
+            self.game_app.updateInventory(text.inventory)
+
+        elif target == 9:
+
+            if text == "update-combat-ui":
+                self.game_app.updateCombat()
+            elif text == "update-inventory-ui":
+                self.game_app.updateInventory()
 
         else:
 

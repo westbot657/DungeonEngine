@@ -36,9 +36,8 @@
             {
                 "type": "engine:weapon",
                 "parent": "engine:weapons/bow",
-                "name": "Pew Pew!!",
-                "durability": 28,
-                "equipped": true
+                "name": "Pew Pew",
+                "durability": 28
             },
             {
                 "type": "engine:ammo",
@@ -54,6 +53,13 @@
                 "type": "engine:tool",
                 "parent": "engine:tools/test_tool",
                 "data": {},
+                "equipped": true
+            },
+            {
+                "type": "engine:weapon",
+                "parent": "engine:weapons/sword",
+                "name": "Excaliber",
+                "description": "A perfectly normal sword",
                 "equipped": true
             }
         ],

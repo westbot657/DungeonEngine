@@ -80,30 +80,38 @@ def engine_stop(function_memory:FunctionMemory):
 @ConsoleCommand(
     Identifier("engine", "ui/", "get_inventory"),
     {
-        "player: engine:Player": None
+        "player: engine:int": None
     }
 )
 def engine_ui_get_inventory(function_memory:FunctionMemory, player):
-    function_memory.engine.sendOutput(2, player.inventory)
+    try:
+        player = function_memory.engine.getPlayer(player)
+        function_memory.engine.sendOutput(2, player.inventory)
+    except EngineError as e:
+        Log["ERROR"]("\n".join(e.args))
 
 @ConsoleCommand(
     Identifier("engine", "ui/", "get_combat"),
     {
-        "player: engine:Player": None
+        "player: engine:int": None
     }
 )
 def engine_ui_get_combat(function_memory:FunctionMemory, player):
-    function_memory.engine.sendOutput(3, player.combat)
+    try:
+        player = function_memory.engine.getPlayer(player)
+        function_memory.engine.sendOutput(3, player._combat)
+    except EngineError as e:
+        Log["ERROR"]("\n".join(e.args))
 
 @ConsoleCommand(
     Identifier("engine", "ui/", "get_player"),
     {
-        "player_id: engine:int": None
+        "player: engine:int": None
     }
 )
-def engine_ui_get_player(function_memory:FunctionMemory, player_id:int):
+def engine_ui_get_player(function_memory:FunctionMemory, player:int):
     try:
-        player = function_memory.engine.getPlayer(player_id)
+        player = function_memory.engine.getPlayer(player)
         function_memory.engine.sendOutput(4, player)
     except EngineError as e:
         Log["ERROR"]("\n".join(e.args))

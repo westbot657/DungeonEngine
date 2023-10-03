@@ -14,6 +14,6 @@
     [engine:interaction/interact](".ritual_dagger")
 }
 @pattern: "armor" # {
-    [engine:interaction/interact](".armor")
+    [engine:interaction/interact](".bark_armor")
 }
 

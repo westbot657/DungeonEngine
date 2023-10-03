@@ -2825,8 +2825,8 @@ class NumberedTextArea(UIElement):
 
         txt = [f"{i+1: >9}" for i in range(lines)]
 
-        print(self.collapsable.aside.children[0])
-        self.collapsable.aside.children[0].set_content("\n".join(txt))
+        # print(self.collapsable.aside.children[0])
+        self.collapsable.aside.children[0].set_colored_content("\n".join(txt))
 
         # if lines == 0:
         #     raise Exception("Numbered Text Editor reached 0 lines, which is meant to be impossible!!")

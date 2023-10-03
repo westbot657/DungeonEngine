@@ -627,7 +627,6 @@ class MultilineText(UIElement):
         pass
 
     def _update(self, editor, X, Y):
-        y = self.y
         w = self.min_width
         h = 0
         for s in self.surfaces:
@@ -2822,7 +2821,11 @@ class NumberedTextArea(UIElement):
 
         lines = len(self.collapsable.main_area.children[0].get_lines())
 
+        # print(f"Numbered Text Area lines: {lines}")
+
         txt = [f"{i+1: >9}" for i in range(lines)]
+
+        print(self.collapsable.aside.children[0])
         self.collapsable.aside.children[0].set_content("\n".join(txt))
 
         # if lines == 0:

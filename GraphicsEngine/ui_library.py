@@ -3636,11 +3636,14 @@ class GameApp(UIElement):
         self.children.append(self.id_input)
         
         self.player_name_display = Text(96, editor.height-75, content="[Start game to load player info]", text_size=15)
+        self.player_location_display = Text(56, editor.height-50, 1, "[location]", text_size=12)
+        self._old_location = ""
 
         self.player_health_bar = GameApp.HealthBar(80+self.player_name_display.width + self.id_input._text_width+self.id_refresh.width, editor.height-75, 200, self.player_name_display.height, 20, 20)
         self._old_health = 0
 
         self.children.append(self.player_name_display)
+        self.children.append(self.player_location_display)
 
         # self.test = GameApp.HealthBar(100, 100, 100, 20, 67, 34)
         # self.test.set_current_health(33)
@@ -3726,6 +3729,7 @@ class GameApp(UIElement):
         
         else:
             self.player_name_display.content = self.player.name
+            self.player_location_display.content = self.player.location.translate(self.editor.engine._function_memory)
             
 
 
@@ -3845,6 +3849,10 @@ class GameApp(UIElement):
 
         self.player_health_bar.x = 80 + self.player_name_display.width + self.id_input._text_width + self.id_refresh.width
 
+        self.player_location_display.y = editor.height - 50
+        
+        
+
         self.buttons_left_bar.x = self.buttons_bottom_bar.x = editor.width-502
         
         self.no_combat_text.x = (editor.width-224)-(self.no_combat_text.width/2)
@@ -3873,9 +3881,14 @@ class GameApp(UIElement):
             else:
                 self.empty_inventory_text._event(editor, X, Y)
         
-        if (self.player is not None) and self.player.health != self._old_health:
-            self._old_health = self.player.health
-            self.player_health_bar.set_current_health(self._old_health)
+        if (self.player is not None):
+            if self.player.health != self._old_health:
+                self._old_health = self.player.health
+                self.player_health_bar.set_current_health(self._old_health)
+            if self._old_location != self.player.location.full():
+                self._old_location = self.player.location.full()
+                self.player_location_display.content = self.player.location.translate(self.editor.engine._function_memory)
+            
     
     def _update(self, editor, X, Y):
         for child in self.children:

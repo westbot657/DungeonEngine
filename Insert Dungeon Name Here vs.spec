@@ -2,15 +2,15 @@
 
 
 a = Analysis(
-    ['Engine\\ConsoleRunner.py'],
-    pathex=["./Engine"],
+    ['GraphicsEngine\\ui_library.py', 'Engine\\Engine.py'],
+    pathex=["./GraphicsEngine", "./Engine", "./Engine/Resources"],
     binaries=[],
     datas=[],
-    hiddenimports=[],
+    hiddenimports=["Engine.py"],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=["IOHook.py"],
+    excludes=["IOHook.py", "editor_settings.json"],
     noarchive=False,
 )
 pyz = PYZ(a.pure)
@@ -21,7 +21,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='Insert Dungeon Name Here',
+    name='Insert Dungeon Name Here VS',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -34,5 +34,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['Engine\\GraphicsEngine\\resources\\dungeon_builder_iconx512.png'],
+    icon=['ui_resources\\dungeon_builder_iconx512.png'],
 )

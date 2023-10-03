@@ -114,7 +114,7 @@ class Color(list):
         else:
             raise ValueError(f"Invalid Color! ({obj})")
 
-PATH = "./Engine/GraphicsEngine/resources"
+PATH = "./ui_resources"
 
 FONT = f"{PATH}/PTMono-Regular.ttf" # PTMono-Regular has correct lineup for │ and ┼!
 
@@ -4802,9 +4802,12 @@ if __name__ == "__main__":
     # from threading import Thread
     # import traceback
 
-    sys.path.append("./Engine")
-    _Engine = imp.load_source("Engine", "./Engine/Engine.py")
-    Engine = _Engine.Engine
+    try:
+        from Engine import Engine
+    except:
+        sys.path.append("./Engine")
+        _Engine = imp.load_source("Engine", "Engine/Engine.py")
+        Engine = _Engine.Engine
 
     io_hook = IOHook()
 

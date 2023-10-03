@@ -604,7 +604,7 @@ class MultilineText(UIElement):
 
     def refresh_surfaces(self):
         self._refresh_surfaces()
-        data = self.format_text("\n".join(self.get_lines()), self.text_color)
+        data = self.format_text(self.content, self.text_color)
 
         for line, surface in zip(data, self.surfaces):
             x = 1

@@ -56,9 +56,9 @@ RPC.update(
 
 
 class Color(list):
-    __slots__ = [
-        "r", "g", "b", "a"
-    ]
+    # __slots__ = [
+    #     "r", "g", "b", "a"
+    # ]
     def __init__(self, r, g, b, a=None):
         self.r = r
         self.g = g
@@ -1707,17 +1707,17 @@ class Resizable(Draggable):
 
 class Button(UIElement):
 
-    __slots__ = [
-        "x", "y", "width", "height", "text", "bg_color", "hover_color", "click_color",
-        "text_color", "lheld", "rheld", "hovered", "_hovered", "children", "_uoffx",
-        "_uoffy", "text_size", "font", "surface", "_override", "_mimic"
-    ]
+    # __slots__ = [
+    #     "x", "y", "width", "height", "text", "bg_color", "hover_color", "click_color",
+    #     "text_color", "lheld", "rheld", "hovered", "_hovered", "children", "_uoffx",
+    #     "_uoffy", "text_size", "font", "surface", "_override", "_mimic"
+    # ]
 
     class _overrider:
         
-        __slots__ = [
-            "_parent", "screen"
-        ]
+        # __slots__ = [
+        #     "_parent", "screen"
+        # ]
         
         def __init__(self, parent):
             self._parent = parent
@@ -1867,11 +1867,11 @@ class Tabs(UIElement):
 
     class _Tab(Button):
         
-        __slots__ = [
-            "tcu", "tch", "tcs",
-            "bgu", "bgh", "bgs",
-            "location", "tabs_parent"
-        ]
+        # __slots__ = [
+        #     "tcu", "tch", "tcs",
+        #     "bgu", "bgh", "bgs",
+        #     "location", "tabs_parent"
+        # ]
         
         def __init__(self, parent, x, y, width, height, location, text, tcu:tuple[int, int, int]|Image=TEXT_COLOR, tch:tuple[int, int, int]|Image=TEXT_COLOR, tcs:tuple[int, int, int]|Image=TEXT_COLOR, bgu:tuple[int, int, int]|Image=TEXT_BG_COLOR, bgh:tuple[int, int, int]|Image=TEXT_BG_COLOR, bgs:tuple[int, int, int]|Image=TEXT_BG_COLOR, text_size=TEXT_SIZE):
             super().__init__(x, y, width, height, text, bgu, tcu, text_size, bgh, bgs)
@@ -1916,17 +1916,17 @@ class Tabs(UIElement):
         def _update(self, editor, X, Y):
             return super()._update(editor, X, Y)
 
-    __slots__ = [
-        "x", "y", "width", "height", "tab_style",
-        "tab_data", "tab_children", "active_tab",
-        "tab_color_unselected", "tab_color_hovered",
-        "tab_color_selected", "tab_color_empty",
-        "text_color_unselected", "text_color_hovered",
-        "text_color_selected", "content_bg_color",
-        "tab_buffer", "tab_height", "tab_width",
-        "scrollable_tabs", "tab_padding",
-        "_tabs_area", "_tab_objects"
-    ]
+    # __slots__ = [
+    #     "x", "y", "width", "height", "tab_style",
+    #     "tab_data", "tab_children", "active_tab",
+    #     "tab_color_unselected", "tab_color_hovered",
+    #     "tab_color_selected", "tab_color_empty",
+    #     "text_color_unselected", "text_color_hovered",
+    #     "text_color_selected", "content_bg_color",
+    #     "tab_buffer", "tab_height", "tab_width",
+    #     "scrollable_tabs", "tab_padding",
+    #     "_tabs_area", "_tab_objects"
+    # ]
 
     def __init__(self, x:int, y:int, width:int, height:int, tab_style:Style=Style.TOP, tab_data:dict[str, list]=..., **options):
         """
@@ -2835,9 +2835,9 @@ class NumberedTextArea(UIElement):
 
 class Tie(UIElement):
 
-    __slots__ = [
-        "controller", "child", "size_only"
-    ]
+    # __slots__ = [
+    #     "controller", "child", "size_only"
+    # ]
 
     @classmethod
     def group(cls, ties):
@@ -2879,14 +2879,14 @@ class ContextTree(UIElement):
     
     global_tree = None
     
-    class Line:
-        __slots__ = []
+    class Line: pass
+        # __slots__ = []
     
-    __slots__ = [
-        "visible", "width", "option_height", "text_color", "bg_color",
-        "line_color", "text_size", "hover_color", "click_color", "tree",
-        "parent"
-    ]
+    # __slots__ = [
+    #     "visible", "width", "option_height", "text_color", "bg_color",
+    #     "line_color", "text_size", "hover_color", "click_color", "tree",
+    #     "parent"
+    # ]
     
     @classmethod
     def new(cls, x, y, width, height, label, *args, **kwargs) -> Button:
@@ -2982,10 +2982,10 @@ class DirectoryTree(UIElement):
     
     class Folder(UIElement):
         
-        __slots__ = [
-            "parent", "name", "width", "components", "collapsed", "height", "_height",
-            "hitbox", "fold_arrow", "label"
-        ]
+        # __slots__ = [
+        #     "parent", "name", "width", "components", "collapsed", "height", "_height",
+        #     "hitbox", "fold_arrow", "label"
+        # ]
         
         def __init__(self, name, width, components, parent, collapsed:bool=True):
             self.parent = parent
@@ -3035,10 +3035,10 @@ class DirectoryTree(UIElement):
 
     class File(UIElement):
         
-        __slots__ = [
-            "parent", "name", "width", "on_click", "icon", "height",
-            "hitbox", "label"
-        ]
+        # __slots__ = [
+        #     "parent", "name", "width", "on_click", "icon", "height",
+        #     "hitbox", "label"
+        # ]
         
         def __init__(self, name, on_click, icon, width, parent):
             self.parent = parent
@@ -3302,11 +3302,11 @@ class GameApp(UIElement):
     
     class HealthBar(UIElement):
         
-        __slots__ = [
-            "x", "y", "width", "height", "max_health", "current_health", "background",
-            "current", "shadow_heal", "shadow_damage", "full_bar", "current_bar",
-            "shadow_heal_bar", "shadow_damage_bar", "shadow"
-        ]
+        # __slots__ = [
+        #     "x", "y", "width", "height", "max_health", "current_health", "background",
+        #     "current", "shadow_heal", "shadow_damage", "full_bar", "current_bar",
+        #     "shadow_heal_bar", "shadow_damage_bar", "shadow"
+        # ]
         
         def __init__(self, x, y, width, height, max_health, current_health, **options):
             """

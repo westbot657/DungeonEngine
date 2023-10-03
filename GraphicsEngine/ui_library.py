@@ -180,11 +180,11 @@ class EditorMimic:
             setattr(overrider, __name, __value)
 
 class Text(UIElement):
-    # __slots__ = [
-    #     "x", "y", "content", "_content",
-    #     "min_width", "text_color", "text_bg_color",
-    #     "text_size", "font", "surface", "width", "height"
-    # ]
+    __slots__ = [
+        "x", "y", "content", "_content",
+        "min_width", "text_color", "text_bg_color",
+        "text_size", "font", "surface", "width", "height"
+    ]
 
     def __init__(self, x:int, y:int, min_width:int=1, content:str="", text_color:Color|tuple|int=TEXT_COLOR, text_bg_color:Color|tuple|int=TEXT_BG_COLOR, text_size:int=TEXT_SIZE):
         assert min_width >= 1, "Min width must be 1 or more"
@@ -216,11 +216,11 @@ class Text(UIElement):
 
 class Image(UIElement):
     
-    # __slots__ = [
-    #     "surface", "_surface",
-    #     "x", "y", "width", "height",
-    #     "file_location", "_width", "_height"
-    # ]
+    __slots__ = [
+        "surface", "_surface",
+        "x", "y", "width", "height",
+        "file_location", "_width", "_height"
+    ]
     
     def __init__(self, file_location:str, x:int=0, y:int=0, width:int|None=None, height:int|None=None):
         self.surface = self._surface = pygame.image.load(file_location)
@@ -288,13 +288,13 @@ class Image(UIElement):
 
 class Animation(UIElement):
     
-    # __slots__ = [
-    #     "x", "y", "sprite_sheet", "sprite_width",
-    #     "sprite_height", "source", "offsetX", "offsetY",
-    #     "_sheet", "_rX", "_rY", "_frames" "frames", "surface",
-    #     "order", "loop", "fps", "s", "hovered", "_hovered",
-    #     "current_frame", "t"
-    # ]
+    __slots__ = [
+        "x", "y", "sprite_sheet", "sprite_width",
+        "sprite_height", "source", "offsetX", "offsetY",
+        "_sheet", "_rX", "_rY", "_frames" "frames", "surface",
+        "order", "loop", "fps", "s", "hovered", "_hovered",
+        "current_frame", "t"
+    ]
     
     def __init__(self, x:int, y:int, **options):
         """
@@ -520,11 +520,11 @@ class Animation(UIElement):
 
 class MultilineText(UIElement):
     
-    # __slots__ = [
-    #     "x", "y", "min_width", "min_height", "content",
-    #     "colored_content", "text_color", "text_bg_color",
-    #     "font", "surfaces", "_text_width", "_text_height"
-    # ]
+    __slots__ = [
+        "x", "y", "min_width", "min_height", "content",
+        "colored_content", "text_color", "text_bg_color",
+        "font", "surfaces", "_text_width", "_text_height"
+    ]
     
     def __init__(self, x:int, y:int, min_width:int=1, min_height:int=1, content:str="", text_color:Color|tuple|int=TEXT_COLOR, text_bg_color:Color|tuple|int=TEXT_BG_COLOR, text_size=TEXT_SIZE):
         assert min_width >= 1, "Min width must be 1 or more"
@@ -645,14 +645,14 @@ class MultilineText(UIElement):
 
 class TextBox(UIElement):
     
-    # __slots__ = [
-    #     "x", "y", "min_width", "text_color", "text_bg_color",
-    #     "text_size", "font", "surface", "focused", "hovered",
-    #     "_letters", "cursor_location", "_cursor_surface",
-    #     "_cursor_tick", "_blink", "_cursor_visible",
-    #     "_text_selection_end", "_text_selection_start",
-    #     "_highlight", "highlight"
-    # ]
+    __slots__ = [
+        "x", "y", "min_width", "text_color", "text_bg_color",
+        "text_size", "font", "surface", "focused", "hovered",
+        "_letters", "cursor_location", "_cursor_surface",
+        "_cursor_tick", "_blink", "_cursor_visible",
+        "_text_selection_end", "_text_selection_start",
+        "_highlight", "highlight"
+    ]
     
     def __init__(self, x:int, y:int, min_width:int=1, content:str="", text_color:Color|tuple|int=TEXT_COLOR, text_bg_color:Color|tuple|int=TEXT_BG_COLOR, text_size:int=TEXT_SIZE):
         self.x = x
@@ -856,9 +856,9 @@ class TextBox(UIElement):
 
 class Selection:
     
-    # __slots__ = [
-    #     "text", "start", "end"
-    # ]
+    __slots__ = [
+        "text", "start", "end"
+    ]
     
     def __init__(self, text:str, start:int, end:int):
         self.text = text
@@ -870,10 +870,10 @@ class Selection:
 
 class Cursor:
     
-    # __slots__ = [
-    #     "line",
-    #     "col"
-    # ]
+    __slots__ = [
+        "line",
+        "col"
+    ]
     
     def __init__(self, line, col):
         self.line = line
@@ -1471,10 +1471,10 @@ class MultilineTextBox(UIElement):
 
 class Box(UIElement):
     
-    # __slots__ = [
-    #     "x", "y", "width", "height",
-    #     "color", "children", "hovered"
-    # ]
+    __slots__ = [
+        "x", "y", "width", "height",
+        "color", "children", "hovered"
+    ]
 
     def __init__(self, x, y, width, height, color:Color|Image|tuple|int=TEXT_COLOR):
         self.x = x
@@ -1514,9 +1514,9 @@ class Box(UIElement):
 
 class LayeredObjects(UIElement):
     
-    # __slots__ = [
-    #     "x", "y", "layers"
-    # ]
+    __slots__ = [
+        "x", "y", "layers"
+    ]
     
     def __init__(self, layers:dict, x:int=0, y:int=0):
         self.layers = layers
@@ -1542,11 +1542,11 @@ class LayeredObjects(UIElement):
 
 class Draggable(UIElement):
     
-    # __slots__ = [
-    #     "x", "y", "width", "height", "held",
-    #     "hovered", "hx", "hy", "children",
-    #     "lock_horizontal", "lock_vertical"
-    # ]
+    __slots__ = [
+        "x", "y", "width", "height", "held",
+        "hovered", "hx", "hy", "children",
+        "lock_horizontal", "lock_vertical"
+    ]
     
     def __init__(self, x, y, width, height, lock_horizontal=False, lock_vertical=False, children=[]):
         self.x = x
@@ -1610,11 +1610,11 @@ class Draggable(UIElement):
 
 class Resizable(Draggable):
     
-    # __slots__ = [
-    #     "min_width", "min_height", "max_width", "max_height",
-    #     "color", "can_drag", "right_resize", "down_resize",
-    #     "corner_resize", "bg"
-    # ]
+    __slots__ = [
+        "min_width", "min_height", "max_width", "max_height",
+        "color", "can_drag", "right_resize", "down_resize",
+        "corner_resize", "bg"
+    ]
     
     def __init__(self, x:int, y:int, width:int, height:int, color:Color|Image|tuple|int=TEXT_BG_COLOR, min_width:int=1, min_height:int=1, max_width:int=..., max_height:int=..., can_drag:bool=True):
         
@@ -1706,17 +1706,17 @@ class Resizable(Draggable):
 
 class Button(UIElement):
 
-    # __slots__ = [
-    #     "x", "y", "width", "height", "text", "bg_color", "hover_color", "click_color",
-    #     "text_color", "lheld", "rheld", "hovered", "_hovered", "children", "_uoffx",
-    #     "_uoffy", "text_size", "font", "surface", "_override", "_mimic"
-    # ]
+    __slots__ = [
+        "x", "y", "width", "height", "text", "bg_color", "hover_color", "click_color",
+        "text_color", "lheld", "rheld", "hovered", "_hovered", "children", "_uoffx",
+        "_uoffy", "text_size", "font", "surface", "_override", "_mimic"
+    ]
 
     class _overrider:
         
-        # __slots__ = [
-        #     "_parent", "screen"
-        # ]
+        __slots__ = [
+            "_parent", "screen"
+        ]
         
         def __init__(self, parent):
             self._parent = parent
@@ -1866,11 +1866,11 @@ class Tabs(UIElement):
 
     class _Tab(Button):
         
-        # __slots__ = [
-        #     "tcu", "tch", "tcs",
-        #     "bgu", "bgh", "bgs",
-        #     "location", "tabs_parent"
-        # ]
+        __slots__ = [
+            "tcu", "tch", "tcs",
+            "bgu", "bgh", "bgs",
+            "location", "tabs_parent"
+        ]
         
         def __init__(self, parent, x, y, width, height, location, text, tcu:tuple[int, int, int]|Image=TEXT_COLOR, tch:tuple[int, int, int]|Image=TEXT_COLOR, tcs:tuple[int, int, int]|Image=TEXT_COLOR, bgu:tuple[int, int, int]|Image=TEXT_BG_COLOR, bgh:tuple[int, int, int]|Image=TEXT_BG_COLOR, bgs:tuple[int, int, int]|Image=TEXT_BG_COLOR, text_size=TEXT_SIZE):
             super().__init__(x, y, width, height, text, bgu, tcu, text_size, bgh, bgs)
@@ -1915,17 +1915,17 @@ class Tabs(UIElement):
         def _update(self, editor, X, Y):
             return super()._update(editor, X, Y)
 
-    # __slots__ = [
-    #     "x", "y", "width", "height", "tab_style",
-    #     "tab_data", "tab_children", "active_tab",
-    #     "tab_color_unselected", "tab_color_hovered",
-    #     "tab_color_selected", "tab_color_empty",
-    #     "text_color_unselected", "text_color_hovered",
-    #     "text_color_selected", "content_bg_color",
-    #     "tab_buffer", "tab_height", "tab_width",
-    #     "scrollable_tabs", "tab_padding",
-    #     "_tabs_area", "_tab_objects"
-    # ]
+    __slots__ = [
+        "x", "y", "width", "height", "tab_style",
+        "tab_data", "tab_children", "active_tab",
+        "tab_color_unselected", "tab_color_hovered",
+        "tab_color_selected", "tab_color_empty",
+        "text_color_unselected", "text_color_hovered",
+        "text_color_selected", "content_bg_color",
+        "tab_buffer", "tab_height", "tab_width",
+        "scrollable_tabs", "tab_padding",
+        "_tabs_area", "_tab_objects"
+    ]
 
     def __init__(self, x:int, y:int, width:int, height:int, tab_style:Style=Style.TOP, tab_data:dict[str, list]=..., **options):
         """
@@ -2757,7 +2757,7 @@ class Collapsable:
 class NumberedTextArea(UIElement):
 
     class Fold:
-        
+        __slots__ = ["lines"]
         def __init__(self, lines:list):
             self.lines = lines
 
@@ -2838,9 +2838,9 @@ class NumberedTextArea(UIElement):
 
 class Tie(UIElement):
 
-    # __slots__ = [
-    #     "controller", "child", "size_only"
-    # ]
+    __slots__ = [
+        "controller", "child", "size_only"
+    ]
 
     @classmethod
     def group(cls, ties):
@@ -2885,11 +2885,11 @@ class ContextTree(UIElement):
     class Line: pass
         # __slots__ = []
     
-    # __slots__ = [
-    #     "visible", "width", "option_height", "text_color", "bg_color",
-    #     "line_color", "text_size", "hover_color", "click_color", "tree",
-    #     "parent"
-    # ]
+    __slots__ = [
+        "visible", "width", "option_height", "text_color", "bg_color",
+        "line_color", "text_size", "hover_color", "click_color", "tree",
+        "parent"
+    ]
     
     @classmethod
     def new(cls, x, y, width, height, label, *args, **kwargs) -> Button:
@@ -2978,17 +2978,17 @@ class DirectoryTree(UIElement):
     }
     file_icons["ds"] = file_icons["dungeon_script"]
     
-    # __slots__ = [
-    #     "x", "y", "name", "expanded", "width", "children",
-    #     "_height", "height", "components", "surface", "folder"
-    # ]
+    __slots__ = [
+        "x", "y", "name", "expanded", "width", "children",
+        "_height", "height", "components", "surface", "folder"
+    ]
     
     class Folder(UIElement):
         
-        # __slots__ = [
-        #     "parent", "name", "width", "components", "collapsed", "height", "_height",
-        #     "hitbox", "fold_arrow", "label"
-        # ]
+        __slots__ = [
+            "parent", "name", "width", "components", "collapsed", "height", "_height",
+            "hitbox", "fold_arrow", "label"
+        ]
         
         def __init__(self, name, width, components, parent, collapsed:bool=True):
             self.parent = parent
@@ -3038,10 +3038,10 @@ class DirectoryTree(UIElement):
 
     class File(UIElement):
         
-        # __slots__ = [
-        #     "parent", "name", "width", "on_click", "icon", "height",
-        #     "hitbox", "label"
-        # ]
+        __slots__ = [
+            "parent", "name", "width", "on_click", "icon", "height",
+            "hitbox", "label"
+        ]
         
         def __init__(self, name, on_click, icon, width, parent):
             self.parent = parent
@@ -3305,11 +3305,11 @@ class GameApp(UIElement):
     
     class HealthBar(UIElement):
         
-        # __slots__ = [
-        #     "x", "y", "width", "height", "max_health", "current_health", "background",
-        #     "current", "shadow_heal", "shadow_damage", "full_bar", "current_bar",
-        #     "shadow_heal_bar", "shadow_damage_bar", "shadow"
-        # ]
+        __slots__ = [
+            "x", "y", "width", "height", "max_health", "current_health", "background",
+            "current", "shadow_heal", "shadow_damage", "full_bar", "current_bar",
+            "shadow_heal_bar", "shadow_damage_bar", "shadow"
+        ]
         
         def __init__(self, x, y, width, height, max_health, current_health, **options):
             """

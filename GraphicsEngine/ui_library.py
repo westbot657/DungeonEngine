@@ -3126,19 +3126,61 @@ class DirectoryTree(UIElement):
         # self.surface._event(editor, X + self.x, Y + self.y)
 
 class Popup(UIElement):
+    _popup = None
     
     def __init__(self, width:int, height:int):
         self.width = width
         self.height = height
+        self.children = []
+        
+        self.mask = Button(0, 0, 1, 1, "", (0, 0, 0, 127))
+        
+        self._on_close = self._default_on_close
+        
+        self.x = 0
+        self.y = 0
+
+    def _default_on_close(self):
+        return
+
+    def on_close(self, function):
+        self._on_close = function
+        return function
+        
+    def popup(self):
+        if isinstance(self._popup, Popup):
+            self._popup._on_close()
+        self._popup = self
+    
+    def close(self):
+        self._popup = None
+        self._on_close()
+        
+    def _mask_on_click(self, editor):
+        self.close()
         
     def _update_layout(self, editor):
-        ...
+        self.x = (editor.width-self.width)/2
+        self.y = (editor.height-self.height)/2
+        
+        self.mask.width = editor.width
+        self.mask.height = editor.height
     
     def _update(self, editor, X, Y):
-        ...
+        
+        self.mask._update(editor, X, Y)
+        
+        for child in self.children:
+            child._update(editor, X+self.x, Y+self.y)
     
     def _event(self, editor, X, Y):
-        ...
+        _c = self.children.copy()
+        _c.reverse()
+        for child in _c:
+            child._event(editor, X+self.x, Y+self.y)
+            
+        self.mask._event(editor, X, Y)
+        
 
 class Editor:
     def __init__(self, engine, io_hook, width=1280, height=720) -> None:

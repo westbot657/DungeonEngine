@@ -2951,7 +2951,7 @@ class DirectoryTree(UIElement):
         else:
             return DirectoryTree.File(name, tree, self._get_icon_for_file(name), self.width, parent)
 
-    def __init__(self, x, y, name, components:dict, width):
+    def __init__(self, x, y, name, components:dict, width, editor):
         self.x = x
         self.y = y
         self.name = name
@@ -4138,7 +4138,7 @@ class FileEditorSubApp(UIElement):
             for f in files:
                 curr.update({f: file_opener_getter(f"./{'/'.join(path)}/{f}", editor)})
         
-        self.dir_tree = DirectoryTree(103, 21, folder_name.replace("./", "").rsplit("/", 1)[-1].upper(), dir_tree[folder_name], 225)
+        self.dir_tree = DirectoryTree(103, 21, folder_name.replace("./", "").rsplit("/", 1)[-1].upper(), dir_tree[folder_name], 225, editor)
             
     def tab_remover_getter(self, tab_name):
         

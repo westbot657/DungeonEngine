@@ -40,7 +40,7 @@ class AbstractItem(AbstractGameObject):
         self.max_count: int = data.get("max_count", None)
         self.count: int = data.get("count", self.max_count)
         self.data: dict = data.get("data", {})
-        self.events: dict = data.get("events", None)
+        self.events: dict = data.get("events", {})
         self.keywords: list = data.get("keywords", None)
 
         self.is_template: bool = data.get("template", False)

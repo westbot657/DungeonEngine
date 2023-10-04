@@ -3244,6 +3244,9 @@ class Popup(UIElement):
     def _update_layout(self, editor):
         self.x = (editor.width-self.width)/2
         self.y = (editor.height-self.height)/2
+
+        self.bg.width = self.width
+        self.bg.height = self.height
         
         self.mask.width = editor.width
         self.mask.height = editor.height
@@ -4791,8 +4794,9 @@ class CodeEditor(UIElement):
         self.children.append(self.close_button)
 
     def _error_message_update_layout(self, editor):
-        self._error_popup.width = self._error_message._text_width + 50
-        self._error_popup.height = self._error_message._text_height + 50
+        # print("popup update layout")
+        self._error_popup.width = self._error_popup.bg.width = self._error_message._text_width + 50
+        self._error_popup.height = self._error_popup.bg.height = self._error_message._text_height + 50
         
         self._error_popup.x = (editor.width-self._error_popup.width)/2
         self._error_popup.y = (editor.height-self._error_popup.height)/2

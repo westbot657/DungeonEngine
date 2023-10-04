@@ -14,6 +14,8 @@ import random
 import json
 #from io import BytesIO
 from enum import Enum, auto
+
+from mergedeep import merge
 from ctypes import windll, WINFUNCTYPE, POINTER
 from ctypes.wintypes import BOOL, HWND, RECT
 
@@ -3005,7 +3007,28 @@ class DirectoryTree(UIElement):
             
             self.hitbox.on_left_click = self._toggle
             
-        def _toggle(self, editor):
+        def get_expanded(self) -> dict:
+            if self.collapsed: return {}
+
+            d = {}
+
+            for f in self.components:
+                if isinstance(f, DirectoryTree.Folder):
+                    d.update(f.get_expanded())
+
+            return {self.name: d}
+        
+        def expand_tree(self, tree):
+            if self.collapsed:
+                self._toggle(None)
+                
+            for f in self.components:
+                if isinstance(f, DirectoryTree.Folder) and (f.name in tree.keys()):
+                    f.expand_tree(tree[f.name])
+
+
+
+        def _toggle(self, editor): # "editor" is an argument as it is passed by the button this function is bound to
             # print("toggle fold!")
             self.collapsed = not self.collapsed
             self.fold_arrow = DirectoryTree.folds["closed" if self.collapsed else "open"]
@@ -3040,7 +3063,7 @@ class DirectoryTree(UIElement):
         
         __slots__ = [
             "parent", "name", "width", "on_click", "icon", "height",
-            "hitbox", "label"
+            "hitbox", "label"#, "rct"
         ]
         
         def __init__(self, name, on_click, icon, width, parent):
@@ -3053,17 +3076,59 @@ class DirectoryTree(UIElement):
             
             self.hitbox = Button(0, 0, width, 15, "", (255, 0, 0))
             self.label = Text(14, -1, width-14, name, text_size=12, text_bg_color=None)
-            
+
+            # self.ctx_tree_opts = (20, TEXT_COLOR, TEXT_BG_COLOR, (70, 70, 70), TEXT_SIZE, (50, 50, 50), (50, 50, 50))
+            # self.top_bar_file = ContextTree.new(
+            #     20, 0, 40, 20, "File", [
+            #         {
+            #             "New File...": self.top_bar_file_new_file
+            #         },
+            #         ContextTree.Line(),
+            #         {
+            #             "Open File...": self.top_bar_file_open_file,
+            #             "Open Folder...": self.top_bar_file_open_folder
+            #         },
+            #         ContextTree.Line(),
+            #         {
+            #             "Save": self.top_bar_file_save,
+            #             "Save All": self.top_bar_file_save_all
+            #         },
+            #         ContextTree.Line(),
+            #         {
+            #             "Exit": self.top_bar_file_exit
+            #         }
+            #     ], 115, *self.ctx_tree_opts
+            # )
+
+            # self.rct = ContextTree([
+            #     {
+            #         "Rename... (WIP)": self.rename_opt,
+            #         "Delete": self.delete_opt
+            #     }
+            # ], 115, 20)
+
+            # self.rct.parent = self
+
             self.hitbox.on_left_click = on_click
+            # self.hitbox.on_right_click = self.rct
+            # self.children.append(self.rct)
             
+        # def rename_opt(self, *_, **__):
+        #     print("rename!")
+        
+        # def delete_opt(self, *_, **__):
+        #     print("delete!")
+
         def _update(self, editor, X, Y, x_offset=0):
             # self.hitbox._update(editor, X, Y)
             self.icon._update(editor, X+x_offset, Y)
             self.label._update(editor, X+x_offset, Y)
+            # self.rct._update(editor, X+x_offset, Y)
         
         def _event(self, editor, X, Y, x_offset=0):
             self.hitbox._event(editor, X, Y)
-            self.label.width
+            # self.label.width
+            # self.rct._event(editor, X+x_offset, Y)
 
     def _get_icon_for_file(self, file_name):
         if file_name.endswith((".ds", ".dungeon_script")):
@@ -3104,6 +3169,12 @@ class DirectoryTree(UIElement):
         self.folder = DirectoryTree.Folder(self.name, width, self.components, self, False)
         self.surface.children.append(self.folder)
 
+    def get_expanded(self):
+        return self.folder.get_expanded()
+
+    def expand_tree(self, tree):
+        self.folder.expand_tree(tree["DUNGEONS"])
+
     def _update_layout(self, editor):
         self.surface.height = editor.height-42
 
@@ -3127,16 +3198,21 @@ class DirectoryTree(UIElement):
 
 class Popup(UIElement):
     _popup = None
+
+    tick = 0
     
     def __init__(self, width:int, height:int):
         self.width = width
         self.height = height
         self.children = []
-        
-        self.mask = Button(0, 0, 1, 1, "", (0, 0, 0, 127))
-        
+
+        self.mask = Button(0, 0, 1, 1, "", (0, 0, 0, 127), hover_color=(0, 0, 0, 127))
+        self.mask.on_left_click = self._mask_on_click
+
+        self.bg = Box(0, 0, self.width, self.height, (24, 24, 24))
+
         self._on_close = self._default_on_close
-        
+
         self.x = 0
         self.y = 0
 
@@ -3146,14 +3222,20 @@ class Popup(UIElement):
     def on_close(self, function):
         self._on_close = function
         return function
-        
+    
+    def add_children(self, *children):
+        self.children += [c for c in children]
+        return self
+
     def popup(self):
-        if isinstance(self._popup, Popup):
-            self._popup._on_close()
-        self._popup = self
+        if isinstance(Popup._popup, Popup):
+            Popup._popup._on_close()
+        
+        self.tick = 25
+        Popup._popup = self
     
     def close(self):
-        self._popup = None
+        Popup._popup = None
         self._on_close()
         
     def _mask_on_click(self, editor):
@@ -3167,18 +3249,27 @@ class Popup(UIElement):
         self.mask.height = editor.height
     
     def _update(self, editor, X, Y):
+
+        if self.tick > 0: return
         
         self.mask._update(editor, X, Y)
+        self.bg._update(editor, X+self.x, Y+self.y)
         
         for child in self.children:
             child._update(editor, X+self.x, Y+self.y)
     
     def _event(self, editor, X, Y):
+
+        if self.tick > 0:
+            self.tick -= 1
+            return
+
         _c = self.children.copy()
         _c.reverse()
         for child in _c:
             child._event(editor, X+self.x, Y+self.y)
-            
+        
+        self.bg._event(editor, X+self.x, Y+self.y)
         self.mask._event(editor, X, Y)
         
 
@@ -3273,7 +3364,7 @@ class Editor:
             self.previous_mouse = self.mouse
             self._hovered = False
             self._hovering = None
-            self.mouse = list(a and b for a, b in zip(pygame.mouse.get_pressed(), [mouse.is_pressed(mouse.LEFT), mouse.is_pressed(mouse.MIDDLE), mouse.is_pressed(mouse.RIGHT)]))
+            self.mouse = list(pygame.mouse.get_pressed()) #[mouse.is_pressed(mouse.LEFT), mouse.is_pressed(mouse.MIDDLE), mouse.is_pressed(mouse.RIGHT)]#list(a and b for a, b in zip(pygame.mouse.get_pressed(), ))
             self.mouse_pos = pygame.mouse.get_pos()
             # print(f"mouse: {self.mouse_pos}")
             # self.new_keys.clear()
@@ -3315,6 +3406,12 @@ class Editor:
             layers = [*self.layers.keys()]
             layers.sort()
 
+            if Popup._popup:
+                Popup._popup._update_layout(self)
+                Popup._popup._event(self, 0, 0)
+
+            rmd = self.right_mouse_down()
+
             _layers = layers.copy()
             _layers.reverse()
             for l in _layers:
@@ -3323,9 +3420,23 @@ class Editor:
                 for i in _l:
                     i._event(self, 0, 0)
 
+            if rmd:
+                # print("right click!")
+                if self._hovering is not None:
+                    # print(f"right clicked on {self._hovering}")
+                    if hasattr(self._hovering, "on_right_click"):
+                        try:
+                            self._hovering.on_right_click(self, self._hovering)
+                        except Exception as e:
+                            print("\n".join(e.args))
+
             for l in layers:
                 for i in self.layers[l]:
                     i._update(self, 0, 0)
+
+            
+            if Popup._popup:
+                Popup._popup._update(self, 0, 0)
             #self.screen.fill((255, 0, 0), (self.mouse_pos[0]-1, self.mouse_pos[1]-1, 3, 3))
 
             # print(self._hovering)
@@ -4347,6 +4458,18 @@ class FileEditorSubApp(UIElement):
                 curr.update({f: file_opener_getter(f"./{'/'.join(path)}/{f}", editor)})
         
         self.dir_tree = DirectoryTree(103, 21, folder_name.replace("./", "").rsplit("/", 1)[-1].upper(), dir_tree[folder_name], 225, editor)
+
+        for c in self.children.copy():
+            if isinstance(c, DirectoryTree) and (c is not self.dir_tree):
+                i = self.children.index(c)
+                self.children.remove(c)
+
+                tree = c.get_expanded()
+
+                self.children.insert(i, self.dir_tree)
+
+                self.dir_tree.expand_tree(tree)
+
             
     def tab_remover_getter(self, tab_name):
         
@@ -4547,6 +4670,12 @@ class CodeEditor(UIElement):
         self.bottom_bar_line = Box(0, height-21, width, 1, (70, 70, 70))
         self.children.append(self.bottom_bar_line)
 
+        self._error_message = MultilineText(25, 25, 1, 1, "", text_color=(255, 200, 200), text_bg_color=None)
+        self._error_popup = Popup(400, 30).add_children(
+            self._error_message
+        )
+        self._error_popup._update_layout = self._error_message_update_layout
+
         self._app_game_icon = Image(f"{PATH}/dungeon_game_app_icon.png", 0, 0, 50, 50)
         self._app_game_icon_hovered = Image(f"{PATH}/dungeon_game_app_icon_hovered.png", 0, 0, 50, 50)
         self._app_game_icon_selected = Image(f"{PATH}/dungeon_game_app_icon_selected.png", 0, 0, 50, 50)
@@ -4567,6 +4696,17 @@ class CodeEditor(UIElement):
         self.top_bar_icon = Image(f"{PATH}/dungeon_game_icon.png", 2, 2, 16, 16)
         self.children.append(self.top_bar_icon)
         
+
+        self.new_file_input_box = MultilineTextBox(25, 25, 350, 16, "", text_bg_color=(31, 31, 31))
+
+        self.new_file_input_box.single_line = True
+        self.new_file_input_box.on_enter(self.create_new_file)
+
+        self.new_file_popup = Popup(400, 150).add_children(
+            self.new_file_input_box
+        )
+
+
         
         self.top_bar_file = ContextTree.new(
             20, 0, 40, 20, "File", [
@@ -4649,6 +4789,20 @@ class CodeEditor(UIElement):
         self.close_button = Button(width-26, 0, 26, 20, "", self._close, hover_color=self._close_hovered)
         self.close_button.on_left_click = self.close_window
         self.children.append(self.close_button)
+
+    def _error_message_update_layout(self, editor):
+        self._error_popup.width = self._error_message._text_width + 50
+        self._error_popup.height = self._error_message._text_height + 50
+        
+        self._error_popup.x = (editor.width-self._error_popup.width)/2
+        self._error_popup.y = (editor.height-self._error_popup.height)/2
+        
+        self._error_popup.mask.width = editor.width
+        self._error_popup.mask.height = editor.height
+
+    def popupError(self, message):
+        self._error_message.set_colored_content(message)
+        self._error_popup.popup()
 
     def reset_app_selectors(self):
         self.app_game_selector.bg_color = self.app_game_selector._bg_color = self._app_game_icon
@@ -4741,8 +4895,50 @@ class CodeEditor(UIElement):
         pygame.quit()
         sys.exit()
 
+    def create_new_file(self, text_box):
+        c = text_box.get_content()
+        text_box.set_content("")
+
+
+        comps = c.strip().replace("\\", "/").split("/")
+
+        file_name = comps.pop(-1)
+
+        if comps[0] == "Dungeons":
+            comps.pop(0)
+
+        path = "./Dungeons/"
+
+        a = {"DUNGEONS": {}}
+        b = a["DUNGEONS"]
+
+        while comps:
+            b.update({comps[0]: {}})
+            b = b[comps[0]]
+            path += comps.pop(0) + "/"
+            try:
+                os.mkdir(path)
+            except:
+                pass
+
+        if os.path.exists(path+file_name):
+            err = "Error: file already exists:"
+            w = max(len(path+file_name), len(err))
+            self.popupError(f"{err: ^{w}}\n{path+file_name: ^{w}}")
+            return
+        else:
+            open(path+file_name, "w+", encoding="utf-8").close()
+
+        self.editor_app.sub_app_file_editor.open_folder("./Dungeons", self.editor_app.sub_app_file_editor.file_opener_getter, self.editor)
+        # self.open_folder("./Dungeons", self.file_opener_getter, editor)
+        self.editor_app.sub_app_file_editor.file_opener_getter(path+file_name, self.editor)()
+        self.editor_app.sub_app_file_editor.dir_tree.expand_tree(a)
+
+
     def top_bar_file_new_file(self, *_, **__):
-        ...
+        # print("popup?")
+        self.top_bar_file.children[0].toggle_visibility()
+        self.new_file_popup.popup()
     def top_bar_file_open_file(self, *_, **__):
         ...
     def top_bar_file_open_folder(self, *_, **__):

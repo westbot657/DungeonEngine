@@ -194,7 +194,10 @@ class Enemy(Entity):
                     return e.value
                 if isinstance(v, _EngineOperation):
                     return v
-            #return e.value or v
+            elif isinstance(e.value, int):
+                v = e.value
+            print(f"Enemy.attackPlayer(): v: {e.value}")
+            return e.value if e.value is not None else v
         
 
 

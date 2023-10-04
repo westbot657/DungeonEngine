@@ -112,7 +112,8 @@ class Attack(FunctionalElement):
             if isinstance(e.value, _EngineOperation):
                 yield e.value
             else:
-                v = e.value or v
+                v = e.value if e.value is not None else v
+        print(f"Attack.onAttack(): v: {v}")
         return v
 
     def onHit(self, function_memory:FunctionMemory, target):
@@ -166,6 +167,8 @@ class Attack(FunctionalElement):
                     v = ev.send(res)
             except StopIteration as e:
                 v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+        
+        return 0
 
 
 

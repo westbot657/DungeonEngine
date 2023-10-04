@@ -303,6 +303,8 @@ class Combat(FunctionalElement):
 
         damage = self.function_memory.ref("damage")
 
+        print(f"Combat: damage: {damage}")
+
         ev = player.onAttacked(self.function_memory, enemy, damage)
         v = None
         try:

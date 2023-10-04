@@ -4978,7 +4978,7 @@ class CodeEditor(UIElement):
                 os.remove(f"./Dungeons/{txt}")
                 self.editor_app.sub_app_file_editor.open_folder("./Dungeons", self.editor_app.sub_app_file_editor.file_opener_getter, self.editor)
             except Exception as e:
-                self.popupError("\n".join(e.args))
+                self.popupError("Error: " + "\n".join(str(a) for a in e.args))
         else:
             if txt and (not txt2):
                 self.delete_file_err.set_colored_content("Please re-enter file name in second text box")

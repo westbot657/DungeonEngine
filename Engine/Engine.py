@@ -17,7 +17,7 @@ Log._tag_colors = {
     "engine": "\u001b[38;2;255;215;0m"
 }
 
-Log.log_to_file("./latest.log")
+# Log.log_to_file("./latest.log")
 
 from Resources.AbstractAmmo         import AbstractAmmo, Ammo
 from Resources.AbstractArmor        import AbstractArmor, Armor

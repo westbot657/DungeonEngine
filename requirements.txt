@@ -3,3 +3,4 @@ pyperclip
 mouse
 pypresence
 simpleaudio
+mergedeep

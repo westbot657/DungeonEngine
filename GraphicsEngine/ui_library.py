@@ -3206,7 +3206,7 @@ class Popup(UIElement):
         self.height = height
         self.children = []
 
-        self.mask = Button(0, 0, 1, 1, "", (0, 0, 0, 127), hover_color=(0, 0, 0, 127))
+        self.mask = Button(0, 20, 1, 1, "", (0, 0, 0, 127), hover_color=(0, 0, 0, 127))
         self.mask.on_left_click = self._mask_on_click
 
         self.bg = Box(0, 0, self.width, self.height, (24, 24, 24))
@@ -3249,7 +3249,7 @@ class Popup(UIElement):
         self.bg.height = self.height
         
         self.mask.width = editor.width
-        self.mask.height = editor.height
+        self.mask.height = editor.height-40
     
     def _update(self, editor, X, Y):
 
@@ -4329,7 +4329,7 @@ class FileEditor(UIElement):
         def repl(match:re.Match) -> str:
             t = match.group()
 
-            if (m := re.match(r"#{1,6}.*", t)):
+            if (m := re.match(r"#{1,6}[^#\n].*", t)):
                 return f"\033[38;2;86;156;214m{m.group()}\033[0m"
             elif (m := re.match(r" *(\-|\+|\*|\d+(:|\.))", t)):
                 return f"\033[38;2;103;150;230m{m.group()}\033[0m"
@@ -4338,7 +4338,7 @@ class FileEditor(UIElement):
             else:
                 return t
 
-        return re.sub(r"((?:^|(?<=\n))#{1,6}.*|(?:^|(?<=\n)) *(\-|\+|\*)|(?:^|(?<=\n)) *\d+(?:\.|:)|[│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌]+)", repl, text)
+        return re.sub(r"((?:^|(?<=\n))#{1,6}[^#\n].*|(?:^|(?<=\n)) *(\-|\+|\*)|(?:^|(?<=\n)) *\d+(?:\.|:)|[│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌]+)", repl, text)
 
     def _update_layout(self, editor):
         self.edit_area.width = self.width
@@ -4700,36 +4700,58 @@ class CodeEditor(UIElement):
         self.children.append(self.top_bar_icon)
         
 
+        self.new_file_display = Text(25, 5, 1, "Enter new file path/name:", text_size=13)
         self.new_file_input_box = MultilineTextBox(25, 25, 350, 16, "", text_bg_color=(31, 31, 31))
 
         self.new_file_input_box.single_line = True
         self.new_file_input_box.on_enter(self.create_new_file)
 
-        self.new_file_popup = Popup(400, 150).add_children(
+        self.new_file_popup = Popup(400, 50).add_children(
+            self.new_file_display,
             self.new_file_input_box
         )
+        
+        
+        self.delete_file_display = Text(25, 5, 1, "Delete File:", text_size=13)
+        self.delete_file_input_box = MultilineTextBox(25, 25, 350, 16, "", text_bg_color=(31, 31, 31))
+        self.delete_file_confirm_display = Text(25, 45, 1, "Re-enter file name to delete:", text_size=13)
+        self.delete_file_confirm_input_box = MultilineTextBox(25, 65, 350, 16, "", text_bg_color=(31, 31, 31))
+        self.delete_file_err = MultilineText(25, 80, 350, 32, "", text_color=(255, 180, 180), text_bg_color=None, text_size=13)
 
 
+        self.delete_file_input_box.single_line = True
+        self.delete_file_input_box.on_enter(self.delete_focus_confirm_file)
+        self.delete_file_confirm_input_box.single_line = True
+        self.delete_file_confirm_input_box.on_enter(self.delete_file)
+
+        self.delete_file_popup = Popup(400, 120).add_children(
+            self.delete_file_display,
+            self.delete_file_input_box,
+            self.delete_file_confirm_display,
+            self.delete_file_confirm_input_box,
+            self.delete_file_err
+        )
         
         self.top_bar_file = ContextTree.new(
             20, 0, 40, 20, "File", [
                 {
-                    "New File...": self.top_bar_file_new_file
+                    "New File...": self.top_bar_file_new_file,
+                    "Delete File...": self.top_bar_file_delete_file
                 },
-                ContextTree.Line(),
-                {
-                    "Open File...": self.top_bar_file_open_file,
-                    "Open Folder...": self.top_bar_file_open_folder
-                },
-                ContextTree.Line(),
-                {
-                    "Save": self.top_bar_file_save,
-                    "Save All": self.top_bar_file_save_all
-                },
-                ContextTree.Line(),
-                {
-                    "Exit": self.top_bar_file_exit
-                }
+                # ContextTree.Line(),
+                # {
+                #     "Open File...": self.top_bar_file_open_file,
+                #     "Open Folder...": self.top_bar_file_open_folder
+                # },
+                # ContextTree.Line(),
+                # {
+                #     "Save": self.top_bar_file_save,
+                #     "Save All": self.top_bar_file_save_all
+                # },
+                # ContextTree.Line(),
+                # {
+                #     "Exit": self.top_bar_file_exit
+                # }
             ], 115, *self.ctx_tree_opts
         )
         self.top_bar_file._uoffx = -self.top_bar_file.width
@@ -4748,11 +4770,11 @@ class CodeEditor(UIElement):
                     "Copy": self.top_bar_edit_copy,
                     "Paste": self.top_bar_edit_paste
                 },
-                ContextTree.Line(),
-                {
-                    "Find": self.top_bar_edit_find,
-                    "Replace": self.top_bar_edit_replace
-                }
+                # ContextTree.Line(),
+                # {
+                #     "Find": self.top_bar_edit_find,
+                #     "Replace": self.top_bar_edit_replace
+                # }
             ], 60, *self.ctx_tree_opts
         )
         self.top_bar_edit._uoffx = -self.top_bar_edit.width
@@ -4901,7 +4923,7 @@ class CodeEditor(UIElement):
 
     def create_new_file(self, text_box):
         c = text_box.get_content()
-        text_box.set_content("")
+        text_box.set_colored_content("")
 
 
         comps = c.strip().replace("\\", "/").split("/")
@@ -4938,11 +4960,44 @@ class CodeEditor(UIElement):
         self.editor_app.sub_app_file_editor.file_opener_getter(path+file_name, self.editor)()
         self.editor_app.sub_app_file_editor.dir_tree.expand_tree(a)
 
+    def delete_focus_confirm_file(self, text_box):
+        text_box.focused = False
+        text_box._cursor_visible = False
+        self.delete_file_confirm_input_box.focused = True
+        self.delete_file_confirm_input_box.cursor_location.col = len(self.delete_file_confirm_input_box.get_content())
+    
+    def delete_file(self, text_box):
+        
+        txt = self.delete_file_input_box.get_content().strip()
+        txt2 = text_box.get_content().strip()
+        
+        if txt == txt2 and txt:
+            self.delete_file_input_box.set_content("")
+            text_box.set_content("")
+            try:
+                os.remove(f"./Dungeons/{txt}")
+                self.editor_app.sub_app_file_editor.open_folder("./Dungeons", self.editor_app.sub_app_file_editor.file_opener_getter, self.editor)
+            except Exception as e:
+                self.popupError("\n".join(e.args))
+        else:
+            if txt and (not txt2):
+                self.delete_file_err.set_colored_content("Please re-enter file name in second text box")
+            elif txt2 and (not txt):
+                self.delete_file_err.set_colored_content("Please enter file name in first text box")
+            elif txt and txt2:
+                self.delete_file_err.set_colored_content("File names do not match")
+            else:
+                self.delete_file_err.set_colored_content("Please enter name of file to delete")
+                
 
     def top_bar_file_new_file(self, *_, **__):
         # print("popup?")
         self.top_bar_file.children[0].toggle_visibility()
         self.new_file_popup.popup()
+    def top_bar_file_delete_file(self, *_, **__):
+        self.top_bar_file.children[0].toggle_visibility()
+        self.delete_file_popup.popup()
+        
     def top_bar_file_open_file(self, *_, **__):
         ...
     def top_bar_file_open_folder(self, *_, **__):

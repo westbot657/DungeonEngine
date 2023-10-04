@@ -196,16 +196,18 @@ class Enemy(Entity):
                     return v
             #return e.value or v
         
-        ev = self.onEvent(function_memory, current_trigger, "on_attack_hit")
-        v = None
-        try:
-            v = ev.send(None)
-            while isinstance(v, _EngineOperation):
-                res = yield v
-                v = None
-                v = ev.send(res)
-        except StopIteration as e:
-            v = function_memory.engine.loader.stopIterationEval(e.value, v)
+
+
+        # ev = self.onEvent(function_memory, current_trigger, "on_attack_hit")
+        # v = None
+        # try:
+        #     v = ev.send(None)
+        #     while isinstance(v, _EngineOperation):
+        #         res = yield v
+        #         v = None
+        #         v = ev.send(res)
+        # except StopIteration as e:
+        #     v = function_memory.engine.loader.stopIterationEval(e.value, v)
     
     def damage(self, function_memory:FunctionMemory, amount:int):
         self.health -= amount

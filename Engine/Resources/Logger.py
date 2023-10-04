@@ -2,7 +2,7 @@
 
 from enum import Enum, auto
 
-import time
+import time, re
 
 class _Log:
     _instance = None
@@ -27,7 +27,12 @@ class _Log:
         self.counted = 0
         self.enabled = True
 
+        self._file = None
+
         self.engine = None
+
+    def log_to_file(self, file):
+        self._file = open(file, "w+", encoding="utf-8")
 
     def toggle(self):
         self.enabled = not self.enabled
@@ -58,10 +63,16 @@ class _Log:
             else:
                 out += f"[{tag}]"
         out += f": \033[38;2;160;160;160m{sep.join(str(v) for v in values)}\033[0m"
+        out = f"[{time.asctime()[11:19]}] " + out.strip()
         if self.engine:
-            self.engine.sendOutput("log", f"[{time.asctime()[11:19]}] " + out.strip())
+            self.engine.sendOutput("log", out)
         else:
-            print(f"[{time.asctime()[11:19]}] " + out.strip())
+            print(out)
+        
+        if self._file:
+            self._file.write(re.sub("\033\\[(?:\\d+;?)*m", "", f"{out}\n"))
+            self._file.flush()
+
         self.tags.clear()
 
     def track(self, num_items, *tags):
@@ -126,5 +137,12 @@ class _Log:
         if not self.counting: return
         if self.counted >= len(self.data):
             self.end_track()
+
+    def stop_log(self):
+        if self._file:
+            try:
+                self._file.close()
+            except:
+                pass
 
 Log = _Log()

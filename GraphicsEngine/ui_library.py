@@ -1992,7 +1992,7 @@ class Tabs(UIElement):
         self.tab_padding           : int  = options.get("tab_padding", 0)
         
         if self.scrollable_tabs:
-            self._tabs_area = Scrollable(self.x, self.y, 1, 1, self.tab_color_empty, left_bound=0, top_bound=0)
+            self._tabs_area = Scrollable(self.x, self.y, 1, 1, self.tab_color_empty, left_bound=0, top_bound=0, scroll_speed=40)
         else:
             self._tab_objects = []
         self.load_tabs()

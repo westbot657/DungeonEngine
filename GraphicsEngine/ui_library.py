@@ -3402,7 +3402,7 @@ class Editor:
 
             nt = time.time()
             for key, t in self.unicode.items():
-                if (nt - t) > 0.2:
+                if (nt - t) > 0.8:
                     if int(((nt - t) * 1000) % 5) == 0:
                         self.typing.append(key)
 

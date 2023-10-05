@@ -3540,12 +3540,19 @@ class GameApp(UIElement):
             self.name_display = Text(10, 10, 1, enemy.name, text_bg_color=None)
             
             self.health_bar = GameApp.HealthBar(290, 10, 100, 20, enemy.max_health, enemy.health)
+            self._max = enemy.max_health
+
+            self.health_display = Text(290, 12, 100, f"{enemy.health}/{enemy.max_health}", (0, 0, 0), text_size=14, text_bg_color=None)
+
+            self.health_display.set_text(f"{self.enemy.health}/{self._max}")
+            self.health_display.x = 340 - (self.health_display.width/2)
         
             self.old_health = enemy.health
         
             # self.children.append(self.background)
             self.children.append(self.name_display)
             self.children.append(self.health_bar)
+            self.children.append(self.health_display)
         
         def _update(self, editor, X, Y):
             if self.enemy is self.game_app.current_combat.turn:
@@ -3558,8 +3565,11 @@ class GameApp(UIElement):
 
 
         def _event(self, editor, X, Y):
+
             
             if self.old_health != self.enemy.health:
+                self.health_display.set_text(f"{max(0, self.enemy.health)}/{self._max}")
+                self.health_display.x = 340 - (self.health_display.width/2)
                 self.health_bar.set_current_health(self.enemy.health)
                 self.old_health = self.enemy.health
             

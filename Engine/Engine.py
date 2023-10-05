@@ -58,6 +58,7 @@ class Engine:
         self.running = False
         self.thread_running = False
         self.input_queue = {}
+        self._loaded = False
         self.io_hook = io_hook
         self.loader: DungeonLoader = DungeonLoader()
         #self.function_memory: FunctionMemory = FunctionMemory()
@@ -117,9 +118,11 @@ class Engine:
         # )
         self.players = self.loader.players
         # self.players.update({0: self.engine_player})
+        self._loaded = True
 
     def saveGame(self):
-        self.loader.saveGame(self)
+        if self._loaded:
+            self.loader.saveGame(self)
         #Player.saveData(self)
     
     def unloadGame(self):

@@ -915,6 +915,9 @@ class Cursor:
         return f"Cursor({self.line}, {self.col})"
 
 class MultilineTextBox(UIElement):
+
+    _focused = None
+
     def __init__(self, x:int, y:int, min_width:int=1, min_height:int=1, content:str="", text_color:Color|tuple|int=TEXT_COLOR, text_bg_color:Color|Image|tuple|int=TEXT_BG_COLOR, text_size:int=TEXT_SIZE, cursor_color:Color|tuple|int=CURSOR_COLOR, single_line:bool=False):
         self.x = x
         self.y = y
@@ -1201,6 +1204,14 @@ class MultilineTextBox(UIElement):
     def refresh_lines(self):
         self._lines = expand_text_lists(self._lines)
 
+    @classmethod
+    def set_focus(cls, box):
+        if cls._focused:
+            cls._focused.focused = False
+            cls._focused._cursor_visible = False
+        
+        cls._focused = box
+
     def _event(self, editor, X, Y):
         w, h = max(self.min_width, self._text_width), max(self.min_height, self._text_height)
         _x, _y = editor.mouse_pos
@@ -1232,6 +1243,7 @@ class MultilineTextBox(UIElement):
                 else:
                     self._text_selection_start = self._text_selection_end = None
 
+                MultilineTextBox.set_focus(self)
                 self.focused = True
                 self._cursor_visible = True
                 self._cursor_tick = time.time()
@@ -3209,7 +3221,7 @@ class Popup(UIElement):
         self.mask = Button(0, 20, 1, 1, "", (0, 0, 0, 127), hover_color=(0, 0, 0, 127))
         self.mask.on_left_click = self._mask_on_click
 
-        self.bg = Box(0, 0, self.width, self.height, (24, 24, 24))
+        self.bg = Button(0, 0, self.width, self.height, bg_color=(24, 24, 24), hover_color=(24, 24, 24))
 
         self._on_close = self._default_on_close
 
@@ -3228,6 +3240,7 @@ class Popup(UIElement):
         return self
 
     def popup(self):
+        MultilineTextBox.set_focus(None)
         if isinstance(Popup._popup, Popup):
             Popup._popup._on_close()
         

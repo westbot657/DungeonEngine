@@ -3031,7 +3031,7 @@ class Engine_Interaction_Interact(LoaderFunction):
 
 class Engine_Combat_Start(LoaderFunction):
     id = Identifier("engine", "combat/", "start")
-    pre_evaluate_args = False
+    # pre_evaluate_args = False
 
     script_flags = {
         "required_args": 1,

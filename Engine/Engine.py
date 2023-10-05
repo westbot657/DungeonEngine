@@ -17,7 +17,7 @@ Log._tag_colors = {
     "engine": "\u001b[38;2;255;215;0m"
 }
 
-# Log.log_to_file("./latest.log")
+Log.log_to_file("./latest.log")
 
 from Resources.AbstractAmmo         import AbstractAmmo, Ammo
 from Resources.AbstractArmor        import AbstractArmor, Armor
@@ -126,7 +126,9 @@ class Engine:
         #Player.saveData(self)
     
     def unloadGame(self):
-        self.loader.unloadGame()
+        if self._loaded:
+            self.loader.unloadGame()
+            self._loaded = False
 
     def start(self):
         if not self.thread_running:

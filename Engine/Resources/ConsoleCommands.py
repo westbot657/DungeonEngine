@@ -28,14 +28,12 @@ def engine_saveGame(function_memory:FunctionMemory):
     Identifier("engine", "", "new-player"),
     {
         "player_id: engine:int": {
-            "max_health: engine:int": {
-                "name: engine:str": None
-            }
+            "name: engine:str": None
         }
     }
 )
-def engine_newPlayer(function_memory:FunctionMemory, player_id, max_health, name):
-    Player.newPlayer(function_memory, player_id, name, max_health)
+def engine_newPlayer(function_memory:FunctionMemory, player_id, name):
+    Player.newPlayer(function_memory, player_id, name, 20)
 
 
 @ConsoleCommand(

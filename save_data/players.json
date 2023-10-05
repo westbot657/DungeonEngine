@@ -4,7 +4,7 @@
         "name": "Weston",
         "max_health": 20,
         "health": 20,
-        "location": "shadow_grove:rooms/right_tunnel",
+        "location": "world:rooms/start",
         "position": [
             0,
             0
@@ -64,7 +64,7 @@
             }
         ],
         "status_effects": [],
-        "in_combat": true,
+        "in_combat": false,
         "text_pattern_categories": [
             "global",
             "common",

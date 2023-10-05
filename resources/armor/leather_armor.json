@@ -1,5 +1,9 @@
 {
     "name": "Leather Armor",
-    "damage_reduction": 1,
+    "damage_reduction": {
+        "function": "engine:random/weighted",
+        "weights": [25, 75],
+        "values": [0, 1]
+    },
     "max_durability": 20
 }

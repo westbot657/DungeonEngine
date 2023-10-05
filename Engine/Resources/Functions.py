@@ -1779,11 +1779,11 @@ class Engine_Random_Range(LoaderFunction):
         return random.randint(min, max)
 
     @classmethod
-    def getFullDisplay(self, function_memory: FunctionMemory, data: dict) -> str:
+    def getFullDisplay(self, function_memory:FunctionMemory, data: dict) -> str:
         return f"[{data['min']}-{data['max']}]"
 
     @classmethod
-    def getQuickDisplay(self, function_memory: FunctionMemory, data: dict) -> str:
+    def getQuickDisplay(self, function_memory:FunctionMemory, data: dict) -> str:
         return f"[{data['min']}-{data['max']}]"
 
 class Engine_Random_Weighted(LoaderFunction):
@@ -1794,8 +1794,8 @@ class Engine_Random_Weighted(LoaderFunction):
         "required_args": 2,
         "optional_args": 0,
         "args": {
-            "rolls": "required parameter",
-            "pool": "required parameter"
+            "weights": "required parameter",
+            "values": "required parameter"
         }
     }
     
@@ -1803,19 +1803,46 @@ class Engine_Random_Weighted(LoaderFunction):
     def chek(cls, function_memory:FunctionMemory, args:dict):
         match args:
             case {
-                "rolls": int(),
-                "pool": dict()
-            }: ...
+                "weights": list(),
+                "values": list()
+            }: return cls.random_weighted
             case _: return None
     @staticmethod
-    def random_weighted(function_memory:FunctionMemory, rolls:int, pool:dict):
-        weighted_list = []
-        for weight, value in pool.items():
-            for w in range(weight):
-                weighted_list.append(value)
-        result = []
-        for roll in rolls:
-            result.append(random.choice(weighted_list))
+    def random_weighted(function_memory:FunctionMemory, weights:list, values:list):
+        
+        pool = []
+
+        for weight, val in zip(weights, values):
+            for i in range(int(weight)):
+                pool.append(val)
+        
+        return random.choice(pool)
+
+    @classmethod
+    def getFullDisplay(self, function_memory:FunctionMemory, data:dict) -> str:
+
+        # print(data)
+
+        weights = json.loads(data["weights"].replace("'", ""))
+        values = json.loads(data["values"].replace("'", ""))
+        out = []
+        total = sum(weights)
+        for weight, val in zip(weights, values):
+            out.append(f"{weight/total:.2%}".strip("0") + f":{val}")
+        return f"[{' '.join(out)}]"
+
+    @classmethod
+    def getQuickDisplay(self, function_memory:FunctionMemory, data:dict) -> str:
+
+        # print(data)
+
+        weights = json.loads(data["weights"].replace("'", ""))
+        values = json.loads(data["values"].replace("'", ""))
+        out = []
+        total = sum(weights)
+        for weight, val in zip(weights, values):
+            out.append(f"{f'{weight/total:.2f}'.strip('0').strip('.')}%" + f":{val}")
+        return f"[{' '.join(out)}]"
 
 class Engine_Random_LootTable(LoaderFunction):
     id = Identifier("engine", "random/", "loot_table")

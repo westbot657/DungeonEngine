@@ -3588,7 +3588,6 @@ class GameApp(UIElement):
             
             for child in self.children:
                 child._event(editor, X+self.x, Y+self.y)
-    
 
     class GameCard(UIElement):
         height = 75
@@ -3976,6 +3975,29 @@ class GameApp(UIElement):
 
         self.children.append(self.player_name_display)
         self.children.append(self.player_location_display)
+        
+        
+        
+        self.new_player_id_label = Text(15, 25, 1, "Player ID:", text_bg_color=None)
+        
+        self.new_player_name_label = Text(250, 25, 1, "Player Name:", text_bg_color=None)
+        
+        self.new_player_id_box = MultilineTextBox(15, 50, 75, 1, "10", text_bg_color=(70, 70, 70))
+        self.new_player_id_box.single_line = True
+        self.new_player_id_box.char_whitelist = [a for a in "0123456789"]
+
+        self.new_player_name_box = MultilineTextBox(250, 50, 325, 1, "", text_bg_color=(70, 70, 70))
+        self.new_player_name_box.single_line = True
+        
+        self.new_player_error = MultilineText(15, 75, 570, 300, "", text_color=(255, 180, 180), text_bg_color=None)
+        
+        self.new_player_popup = Popup(600, 400).add_children(
+            self.new_player_id_label,
+            self.new_player_name_label,
+            self.new_player_id_box,
+            self.new_player_name_box,
+            self.new_player_error
+        )
 
         # self.test = GameApp.HealthBar(100, 100, 100, 20, 67, 34)
         # self.test.set_current_health(33)
@@ -3999,6 +4021,12 @@ class GameApp(UIElement):
         # other player's names (maybe health?)
         # who's turn it is
         # 
+
+    def popup_createplayer(self, editor):
+        self.new_player_popup.popup()
+
+    def create_player(self, *_, **__):
+        ...
 
     def id_input_on_enter(self, text_box:MultilineTextBox):
         c = int(text_box.get_content())
@@ -4035,8 +4063,6 @@ class GameApp(UIElement):
                     card(self, item, x, y, item in equips)
                 )
                 y += GameApp.GameCard.height + 10
-
-
     
     def updateCombat(self, combat=...):
         if combat is not ...:
@@ -4062,9 +4088,6 @@ class GameApp(UIElement):
         else:
             self.player_name_display.content = self.player.name
             self.player_location_display.content = self.player.location.translate(self.editor.engine._function_memory)
-            
-
-
 
     def input_on_enter(self, text_box:MultilineTextBox):
 
@@ -4220,8 +4243,7 @@ class GameApp(UIElement):
             if self._old_location != self.player.location.full():
                 self._old_location = self.player.location.full()
                 self.player_location_display.content = self.player.location.translate(self.editor.engine._function_memory)
-            
-    
+
     def _update(self, editor, X, Y):
         for child in self.children:
             child._update(editor, X, Y)

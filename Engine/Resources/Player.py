@@ -11,11 +11,11 @@ try:
     from .EngineErrors import MemoryError, UnknownPlayerError
     from .FunctionalElement import FunctionalElement
     from .FunctionMemory import FunctionMemory
-    from .Weapon import Weapon
-    from .Tool import Tool
-    from .Item import Item
-    from .Ammo import Ammo
-    from .Armor import Armor
+    from .AbstractWeapon import AbstractWeapon, Weapon
+    from .AbstractTool import AbstractTool, Tool
+    from .AbstractItem import AbstractItem, Item
+    from .AbstractAmmo import AbstractAmmo, Ammo
+    from .AbstractArmor import AbstractArmor, Armor
     from .EngineOperation import _EngineOperation
 except ImportError:
     from Inventory import Inventory
@@ -28,11 +28,11 @@ except ImportError:
     from EngineErrors import MemoryError, UnknownPlayerError
     from FunctionalElement import FunctionalElement
     from FunctionMemory import FunctionMemory
-    from Weapon import Weapon
-    from Tool import Tool
-    from Item import Item
-    from Ammo import Ammo
-    from Armor import Armor
+    from AbstractWeapon import AbstractWeapon, Weapon
+    from AbstractTool import AbstractTool, Tool
+    from AbstractItem import AbstractItem, Item
+    from AbstractAmmo import AbstractAmmo, Ammo
+    from AbstractArmor import AbstractArmor, Armor
     from EngineOperation import _EngineOperation
 
 from typing import Any
@@ -89,6 +89,10 @@ class Player(Entity):
         )
 
         cls._loaded.update({uuid: new_player})
+
+        # TODO: give player starting equipment?
+
+
         return new_player
 
     def getLocalVariables(self):

@@ -3967,7 +3967,7 @@ class GameApp(UIElement):
         self.children.append(self.id_input)
         
         self.player_name_display = Text(96, editor.height-75, content="[Start game to load player info]", text_size=15)
-        self.player_location_display = Text(56, editor.height-50, 1, "[location]", text_size=12)
+        self.player_location_display = Text(56, editor.height-55, 1, "[location]", text_size=12)
         self._old_location = ""
 
         self.player_health_bar = GameApp.HealthBar(80+self.player_name_display.width + self.id_input._text_width+self.id_refresh.width, editor.height-75, 200, self.player_name_display.height, 20, 20)
@@ -3976,18 +3976,24 @@ class GameApp(UIElement):
         self.children.append(self.player_name_display)
         self.children.append(self.player_location_display)
         
-        
+        self.new_player_button = Button(56, editor.height-33, 100, 12, "+ NEW PLAYER", (31, 31, 31), text_size=10, hover_color=(70, 70, 70))
+
+        self.new_player_button.on_left_click = self.popup_createplayer
+
+        self.children.append(self.new_player_button)
         
         self.new_player_id_label = Text(15, 25, 1, "Player ID:", text_bg_color=None)
         
-        self.new_player_name_label = Text(250, 25, 1, "Player Name:", text_bg_color=None)
+        self.new_player_name_label = Text(125, 25, 1, "Player Name:", text_bg_color=None)
         
         self.new_player_id_box = MultilineTextBox(15, 50, 75, 1, "10", text_bg_color=(70, 70, 70))
         self.new_player_id_box.single_line = True
         self.new_player_id_box.char_whitelist = [a for a in "0123456789"]
+        self.new_player_id_box.on_enter(self.create_player_id_on_enter)
 
-        self.new_player_name_box = MultilineTextBox(250, 50, 325, 1, "", text_bg_color=(70, 70, 70))
+        self.new_player_name_box = MultilineTextBox(125, 50, 450, 1, "", text_bg_color=(70, 70, 70))
         self.new_player_name_box.single_line = True
+        self.new_player_name_box.on_enter(self.create_player)
         
         self.new_player_error = MultilineText(15, 75, 570, 300, "", text_color=(255, 180, 180), text_bg_color=None)
         
@@ -4025,8 +4031,36 @@ class GameApp(UIElement):
     def popup_createplayer(self, editor):
         self.new_player_popup.popup()
 
-    def create_player(self, *_, **__):
-        ...
+    def create_player_id_on_enter(self, text_box):
+        id = int(text_box.get_content())
+
+        if id < 10:
+            self.new_player_error.set_colored_content(f"Invalid ID:\nID must be 10 or larger.")
+            text_box.set_content("10")
+            return
+
+        MultilineTextBox.set_focus(self.new_player_name_box)
+        
+
+    def create_player(self, text_box):
+        name = text_box.get_content().strip()
+
+        id = int(self.new_player_id_box.get_content())
+
+        if id < 10 and not name:
+            self.new_player_error.set_colored_content(f"Invalid ID:\nID must be 10 or larger.\n\nInvalid Name:\nName cannot be blank or whitespace.")
+            self.new_player_id_box.set_content("10")
+            return
+        elif id < 10:
+            self.new_player_error.set_colored_content(f"Invalid ID:\nID must be 10 or larger.")
+            self.new_player_id_box.set_content("10")
+            return
+        elif not name:
+            self.new_player_error.set_colored_content(f"Invalid Name:\nName cannot be blank or whitespace.")
+            self.new_player_id_box.set_content("10")
+            return
+        else:
+            self.editor.engine.handleInput(0, f"engine:new-player {id} \"{name}\"")
 
     def id_input_on_enter(self, text_box:MultilineTextBox):
         c = int(text_box.get_content())
@@ -4038,6 +4072,10 @@ class GameApp(UIElement):
         self.refresh_player_data(self.editor)
     
     def refresh_player_data(self, editor):
+
+        self.player_id = max(10, int(self.id_input.get_content()))
+        self.id_input.set_content(str(self.player_id))
+
         editor.engine.handleInput(0, f"engine:ui/get_player {self.player_id}")
 
     def updateInventory(self, inventory=...):
@@ -4204,9 +4242,9 @@ class GameApp(UIElement):
 
         self.player_health_bar.x = 80 + self.player_name_display.width + self.id_input._text_width + self.id_refresh.width
 
-        self.player_location_display.y = editor.height - 50
+        self.player_location_display.y = editor.height - 55
         
-        
+        self.new_player_button.y = editor.height - 33
 
         self.buttons_left_bar.x = self.buttons_bottom_bar.x = editor.width-502
         

@@ -52,6 +52,14 @@ class Currency:
             c.convert_positive()
             return c
 
+    def getLocalVariables(self):
+        d = {
+            "gold": self.gold,
+            "silver": self.silver,
+            "copper": self.copper
+        }
+        return d
+
     def convert(self, conversion, target=1):
         g = self.gold
         s = self.silver

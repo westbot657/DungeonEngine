@@ -3968,6 +3968,7 @@ class GameApp(UIElement):
         
         self.player_name_display = Text(96, editor.height-75, content="[Start game to load player info]", text_size=15)
         self.player_location_display = Text(56, editor.height-55, 1, "[location]", text_size=12)
+        self.player_money_display = Text(editor.width-200, editor.height-75, 1, "[money]", text_bg_color=None, text_size=13)
         self._old_location = ""
 
         self.player_health_bar = GameApp.HealthBar(80+self.player_name_display.width + self.id_input._text_width+self.id_refresh.width, editor.height-75, 200, self.player_name_display.height, 20, 20)
@@ -3975,6 +3976,7 @@ class GameApp(UIElement):
 
         self.children.append(self.player_name_display)
         self.children.append(self.player_location_display)
+        self.children.append(self.player_money_display)
         
         self.new_player_button = Button(56, editor.height-33, 100, 12, "+ NEW PLAYER", (31, 31, 31), text_size=10, hover_color=(70, 70, 70))
 
@@ -4121,11 +4123,13 @@ class GameApp(UIElement):
 
         if self.player is None:
             self._old_health = player.health
-            self.player_name_display.content = "[Start game to load player info]"
+            self.player_name_display.set_text("[Start game to load player info]")
+            self.player_money_display.set_text("[money]")
         
         else:
-            self.player_name_display.content = self.player.name
-            self.player_location_display.content = self.player.location.translate(self.editor.engine._function_memory)
+            self.player_name_display.set_text(self.player.name)
+            self.player_location_display.set_text(self.player.location.translate(self.editor.engine._function_memory))
+            self.player_money_display.set_text(str(self.player.currency))
 
     def input_on_enter(self, text_box:MultilineTextBox):
 
@@ -4243,6 +4247,7 @@ class GameApp(UIElement):
         self.player_health_bar.x = 80 + self.player_name_display.width + self.id_input._text_width + self.id_refresh.width
 
         self.player_location_display.y = editor.height - 55
+        self.player_money_display.x = editor.width - self.player_money_display.width - 460
         
         self.new_player_button.y = editor.height - 33
 

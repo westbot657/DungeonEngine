@@ -17,6 +17,7 @@ try:
     from .AbstractAmmo import AbstractAmmo, Ammo
     from .AbstractArmor import AbstractArmor, Armor
     from .EngineOperation import _EngineOperation
+    from .Currency import Currency
 except ImportError:
     from Inventory import Inventory
     from Entity import Entity
@@ -34,6 +35,7 @@ except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
     from EngineOperation import _EngineOperation
+    from Currency import Currency
 
 from typing import Any
 
@@ -59,7 +61,7 @@ class Player(Entity):
             def __init__(self):
                 super().__init__("Force Miss")
 
-    def __init__(self, uuid:int, name:str, max_health:int, health:int, inventory:Inventory, location:Location, position:Position, _text_pattern_categories:list[str], in_combat:bool):
+    def __init__(self, uuid:int, name:str, max_health:int, health:int, inventory:Inventory, location:Location, position:Position, _text_pattern_categories:list[str], in_combat:bool, currency:Currency):
         self.uuid = uuid
         self.name = name
         self.max_health = max_health
@@ -69,6 +71,7 @@ class Player(Entity):
         self.status_effects = StatusEffectManager()
         self.in_combat = in_combat
         self._combat = None
+        self.currency = currency
 
         self.dungeon_data = {}
         self._text_pattern_categories = _text_pattern_categories
@@ -85,7 +88,8 @@ class Player(Entity):
             Location("world", "rooms/", "start"),
             Position(0, 0),
             function_memory.engine._player_input_categories,
-            False
+            False,
+            Currency(10, 0, 0)
         )
 
         cls._loaded.update({uuid: new_player})
@@ -105,7 +109,8 @@ class Player(Entity):
             ".status_effects": self.status_effects,
             ".in_combat": self.in_combat,
             ".location": self.location,
-            ".last_location": self.last_location
+            ".last_location": self.last_location,
+            ".currency": self.currency
         }
         return d
     
@@ -172,7 +177,8 @@ class Player(Entity):
             "location": self.location._get_save(function_memory),
             "position": self.position._get_save(function_memory),
             "inventory": self.inventory._get_save(function_memory),
-            "status_effects": self.status_effects._get_save(function_memory)
+            "status_effects": self.status_effects._get_save(function_memory),
+            "currency": self.currency.get_save()
         }
         return data
 
@@ -182,6 +188,7 @@ class Player(Entity):
     def fullInventoryStats(self, function_memory:FunctionMemory):
         text = "\n".join([
             f"{self.name} | {self.health}/{self.max_health} | {self.location.translate(function_memory)}",
+            f"{self.currency}",
             self.inventory.fullStats(function_memory),
             self.status_effects.fullStats(function_memory)
         ]).strip()
@@ -297,6 +304,7 @@ class Player(Entity):
             position_list: list = data.get("position")
             inv_list: list = data.get("inventory")
             in_combat: bool = data.get("in_combat", False)
+            currency: Currency = Currency(*data.get("currency", (0, 0, 0)))
             status_effects: list = data.get("status_effects", [])
 
             _text_pattern_categories: list[str] = data.get("text_pattern_categories")
@@ -306,7 +314,7 @@ class Player(Entity):
             position: Position = Position(*position_list)
             inventory: Inventory = Inventory.from_list(engine, inv_list)
             
-            p = cls(Id, name, max_health, health, inventory, location, position, _text_pattern_categories, in_combat)
+            p = cls(Id, name, max_health, health, inventory, location, position, _text_pattern_categories, in_combat, currency)
             cls._loaded.update({Id: p})
             Log["loadup"]["player"]("player instance created")
         Log["loadup"]["player"](f"Loaded players: {cls._loaded}")

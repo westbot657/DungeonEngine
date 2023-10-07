@@ -18,6 +18,7 @@ try:
     from .AbstractArmor import AbstractArmor, Armor
     from .EngineOperation import _EngineOperation
     from .Currency import Currency
+    from .EngineOperation import EngineOperation
 except ImportError:
     from Inventory import Inventory
     from Entity import Entity
@@ -36,6 +37,7 @@ except ImportError:
     from AbstractArmor import AbstractArmor, Armor
     from EngineOperation import _EngineOperation
     from Currency import Currency
+    from EngineOperation import EngineOperation
 
 from typing import Any
 
@@ -93,6 +95,8 @@ class Player(Entity):
         )
 
         cls._loaded.update({uuid: new_player})
+
+        function_memory.engine.evaluateResult(function_memory.engine._default_input_handler, function_memory.engine.default_input_handler, EngineOperation.MovePlayer(new_player, new_player.location), new_player.uuid, "")
 
         # TODO: give player starting equipment?
 

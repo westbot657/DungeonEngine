@@ -707,7 +707,7 @@ class DungeonLoader:
     @staticmethod
     def checkTextYell(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         yell = groupdict['keyword']
-        words = groupdict['words']
+        words = groupdict['words'].upper()
         function_memory.engine.sendOutput(player, f"You {yell} \"{words}\"")
 
     _element_types = {

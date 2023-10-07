@@ -67,7 +67,7 @@ except ImportError:
 
 
 from typing import Any, Generator
-import re, time
+import re, time, random
 
 class DungeonLoader:
 
@@ -703,16 +703,12 @@ class DungeonLoader:
     def checkTextInventory(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         function_memory.engine.sendOutput(player, player.fullInventoryStats(function_memory))
 
-    # @TextPattern(r"\b(?:go *to|travel *to) *(?P<location_name>.*)\b", TextPattern.CheckType.SEARCH, ["world"])
-    # @staticmethod
-    # def checkTravelTo(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
-    #     location_name = groupdict["location_name"]
-
-    #     for dungeon_name, dungeon in function_memory.engine.loader.dungeons.items():
-    #         dungeon: Dungeon
-    #         if location_name.lower() == dungeon_name or location_name.lower() == dungeon.name.lower():                
-    #             yield EngineOperation.MovePlayer(player, dungeon.entry_point)
-    #             return
+    @TextPattern(r"\b(?P<keyword>yell|shout(?: out)?|scream|shriek)\b (?P<words>.*)", TextPattern.CheckType.SEARCH, ['common'])
+    @staticmethod
+    def checkTextYell(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
+        yell = groupdict['keyword']
+        words = groupdict['words']
+        function_memory.engine.sendOutput(player, f"You {yell} \"{words}\"")
 
     _element_types = {
         "engine:text": str,

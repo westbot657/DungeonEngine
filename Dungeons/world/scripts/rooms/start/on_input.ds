@@ -7,8 +7,9 @@ $help2 =
 
 `unequip <armor/weapon/tool>` - unequips an item.
 
-`use <tool/item>` - use a tool. for food items, this is
-    how you eat them.
+`use <tool/item>` - use a tool or item. for food items,
+    this is how you eat them. \"use\" can be replaced by
+    any of: \"eat\", \"throw\", \"apply\", or \"drink\"
 "
 
 

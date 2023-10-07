@@ -3978,7 +3978,8 @@ class GameApp(UIElement):
         self.children.append(self.player_location_display)
         self.children.append(self.player_money_display)
         
-        self.new_player_button = Button(56, editor.height-33, 100, 12, "+ NEW PLAYER", (31, 31, 31), text_size=10, hover_color=(70, 70, 70))
+        self.new_player_button = Button(50, editor.height-33, 85, 13, " + NEW PLAYER", (31, 31, 31), text_size=10, hover_color=(70, 70, 70))
+
 
         self.new_player_button.on_left_click = self.popup_createplayer
 
@@ -4122,11 +4123,12 @@ class GameApp(UIElement):
             self.player = player
 
         if self.player is None:
-            self._old_health = player.health
             self.player_name_display.set_text("[Start game to load player info]")
+            self.player_location_display.set_text("[location]")
             self.player_money_display.set_text("[money]")
         
         else:
+            self._old_health = player.health
             self.player_name_display.set_text(self.player.name)
             self.player_location_display.set_text(self.player.location.translate(self.editor.engine._function_memory))
             self.player_money_display.set_text(str(self.player.currency))
@@ -4242,8 +4244,9 @@ class GameApp(UIElement):
 
         self.play_pause.x = (editor.width-501)
 
-        self.id_input.y = self.id_refresh.y = self.player_name_display.y = self.player_health_bar.y = editor.height-75
+        self.id_input.y = self.id_refresh.y = self.player_name_display.y = self.player_money_display.y = self.player_health_bar.y = editor.height-75
 
+        self.player_name_display.x = 70 + self.id_input._text_width + self.id_refresh.width
         self.player_health_bar.x = 80 + self.player_name_display.width + self.id_input._text_width + self.id_refresh.width
 
         self.player_location_display.y = editor.height - 55
@@ -4258,7 +4261,7 @@ class GameApp(UIElement):
 
         self.empty_inventory_text.x = (editor.width-224)-(self.empty_inventory_text.width/2)
         self.empty_inventory_text.y = self.log_scrollable.y + (self.log_output.min_height/2) - (self.empty_inventory_text.height/2)
-        
+
     def _event(self, editor, X, Y):
         self._update_layout(editor)
         _c = self.children.copy()
@@ -4339,6 +4342,9 @@ class FileEditor(UIElement):
             case "md":
                 self.edit_area.editable.color_text = self.md_colors
         self.edit_area.editable.refresh_surfaces()
+
+    def __repr__(self):
+        return f"File Editor: {self.file_location}/{self.file_name}"
 
     def save_file(self, text_box:MultilineTextBox, content:str, selection:Selection|None, cursorPos:Cursor):
         with open(self.file_location, "w+", encoding="utf-8") as f:
@@ -4565,11 +4571,16 @@ class FileEditorSubApp(UIElement):
     def tab_remover_getter(self, tab_name):
         
         def remove_tab(*_, **__):
+            print(f"{tab_name} - {self.open_files}")
             self.file_tabs.remove_tab(tab_name)
             for k, c in self.open_files.copy().items():
-                if c.file_name == tab_name.strip():
+                
+                if k.strip().endswith(tab_name.strip()):
+                    
                     self.open_files.pop(k)
-                    break
+                    return
+
+            
             if self.focused_file == tab_name:
                 self.focused_file = None
         
@@ -5122,6 +5133,9 @@ class CodeEditor(UIElement):
         for child in self.children:
             child._update(editor, X, Y)
 
+        # if self.active_app == "game":
+        #     self.game_app._update2(editor, X, Y)
+
     def _update_layout(self, editor):
         
         pygame.display.set_mode((editor.width, editor.height), pygame.RESIZABLE | pygame.NOFRAME)
@@ -5300,7 +5314,8 @@ class IOHook:
         elif target == 4:
             # print(f"{target}: {text}")
             self.game_app.updatePlayer(text)
-            self.game_app.updateInventory(text.inventory)
+            if text is not None:
+                self.game_app.updateInventory(text.inventory)
 
         elif target == 9:
 
@@ -5389,7 +5404,7 @@ if __name__ == "__main__":
 # │┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌
 
 Ideas:
-
+♣♠•◘○◙♂♀♪♫☼►◄
 
 Combat Sequence Editor:
 ╔════════════════════════════════════════════════╦════════════╗ 

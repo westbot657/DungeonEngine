@@ -130,6 +130,8 @@ class Engine:
             self.loader.unloadGame()
             self._loaded = False
 
+            self.sendOutput(4, None)
+
     def start(self):
         if not self.thread_running:
             t = Thread(target=self._main_loop_threaded)

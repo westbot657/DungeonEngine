@@ -113,5 +113,7 @@ def engine_ui_get_player(function_memory:FunctionMemory, player:int):
         function_memory.engine.sendOutput(4, player)
     except EngineError as e:
         Log["ERROR"]("\n".join(e.args))
+        function_memory.engine.sendOutput(4, None)
+
         
 

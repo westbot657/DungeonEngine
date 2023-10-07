@@ -89,7 +89,7 @@ class Player(Entity):
             Position(0, 0),
             function_memory.engine._player_input_categories,
             False,
-            Currency(10, 0, 0)
+            Currency(10, 5, 5)
         )
 
         cls._loaded.update({uuid: new_player})

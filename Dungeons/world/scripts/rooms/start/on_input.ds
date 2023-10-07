@@ -1,6 +1,67 @@
 
+$help2 =
+"
+─── General keyword functions: ─────────────────────────
+`equip <armor/weapon/tool>` - equips an item you have
+    in your inventory.
+
+`unequip <armor/weapon/tool>` - unequips an item.
+
+`use <tool/item>` - use a tool. for food items, this is
+    how you eat them.
+"
+
 
 [engine:text/match](<#text>)
+@pattern: "[Hh][Ee][Ll][Pp] *[Uu][Ii]" # {
+    [engine:player/message]( // this is the UI help section
+[engine:text/join](
+"
+═══ UI help ════════════════════════════════════════════
+Press the `+ NEW PLAYER` Button to create
+a new player.
+
+Type `go to <dungeon name>` to go to a dungeon.
+
+Words highlighted in `blue` within dungeons are
+keywords type those words to interact/use/etc...
+
+The Backpack tab on the right lets you view your
+inventory.
+
+The Crossed sword tab lets you view details about
+combats you are in.
+
+The Log tab lets you see the game log. Mainly useful
+for debugging a dungeon
+",
+$help2
+))
+}
+@pattern: "[Hh][Ee][Ll][Pp] *[Cc][Mm][Dd]" # {
+    [engine:player/message]( // this is the console help section
+[engine:text/join](
+"
+═══ CMD help ═══════════════════════════════════════════
+Type `[0]: engine:new-player <id> <name>`
+- id must be 10 or greater
+- name may have spaces if wraped in quotes
+    (ie: `\"name with spaces\"`)
+
+Optionally, type `[0]: engine:toggle-log` to disable
+the log output. This may make it easier to read actual
+output
+
+to send a message as your player character, begin each
+message with `[<id>]:` including a space after it.
+    (ie: `[10]: equip sword`)
+
+this id prefix will not be shown in any of the following
+examples, but is still required
+",
+$help2
+))
+}
 @pattern: "go to (?P<dungeon_name>.*)" # {
     <dungeon_name> = [engine:text/set_case](<dungeon_name>, "lower")
 

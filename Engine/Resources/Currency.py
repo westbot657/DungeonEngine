@@ -14,7 +14,7 @@ class Currency:
         self.copper = copper
 
     def __repr__(self):
-        return ((f"{self.gold} Gold " if self.gold else "") + (f"{self.silver} Silver " if self.silver else "") + (f"{self.copper} Copper" if self.copper else "")).strip()
+        return ((f"{self.gold} Gold  " if self.gold else "") + (f"{self.silver} Silver  " if self.silver else "") + (f"{self.copper} Copper" if self.copper else "")).strip()
 
     def __int__(self):
         return self.copper + (10*self.silver) + (100*self.gold)
@@ -155,3 +155,5 @@ class Currency:
             self.silver -= 10
             self.gold += 1
 
+    def get_save(self):
+        return [self.gold, self.silver, self.copper]

@@ -8,9 +8,13 @@
 */
 
 [engine:player/message](
-"Welcome to Insert Dungeon Name Here!
+"Welcome to:
+═══ Insert Dungeon Name Here! ═══
+────── Version Alpha-3.0.0 ──────
 
-
+Help:
+type `1` for UI-specific help
+type `2` for console-specific help
 
 "
 )

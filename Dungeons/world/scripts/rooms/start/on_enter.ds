@@ -13,8 +13,8 @@
 ────── Version Alpha-3.0.0 ──────
 
 Help:
-type `1` for UI-specific help
-type `2` for console-specific help
+type `help UI` for UI-specific help
+type `help CMD` for console-specific help
 
 "
 )

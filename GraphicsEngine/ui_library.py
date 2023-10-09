@@ -594,7 +594,8 @@ class MultilineText(UIElement):
         self._text_height = 0
         for line in self.get_lines():
             s = self.font.render(line or " ", True, (0, 0, 0))
-            s = pygame.Surface(s.get_size(), pygame.SRCALPHA)
+            a, b = s.get_size()
+            s = pygame.Surface([a+5, b], pygame.SRCALPHA)
             # s.fill(tuple(self.text_bg_color))
             self.surfaces.append(s)
             self._text_width = max(self._text_width, s.get_width(), self.min_width)

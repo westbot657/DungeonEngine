@@ -4130,6 +4130,9 @@ class GameApp(UIElement):
         else:
             self._old_health = player.health
             self.player_name_display.set_text(self.player.name)
+            self.player_health_bar.max_health = self.player.max_health
+            self.player_health_bar.health = self.player.health
+            self.player_health_bar.previous_health = self.player.health
             self.player_location_display.set_text(self.player.location.translate(self.editor.engine._function_memory))
             self.player_money_display.set_text(str(self.player.currency))
 
@@ -4154,8 +4157,8 @@ class GameApp(UIElement):
         else:
             editor.engine.start()
             
-            # editor.engine.handleInput(0, f"engine:ui/get_inventory {self.player_id}")
-            # editor.engine.handleInput(0, f"engine:ui/get_combat {self.player_id}")
+            editor.engine.handleInput(0, f"engine:ui/get_inventory {self.player_id}")
+            editor.engine.handleInput(0, f"engine:ui/get_combat {self.player_id}")
             editor.engine.handleInput(0, f"engine:ui/get_player {self.player_id}")
 
             self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[2]

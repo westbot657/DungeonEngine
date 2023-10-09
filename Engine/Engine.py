@@ -58,6 +58,7 @@ class Engine:
         self.running = False
         self.thread_running = False
         self.input_queue = {}
+        self.cmd_queue = []
         self._loaded = False
         self.io_hook = io_hook
         self.loader: DungeonLoader = DungeonLoader()
@@ -150,6 +151,14 @@ class Engine:
         self.running = False
 
     def handleInput(self, player_id:str|int, text:str):
+        
+        if player_id == 0:
+            if player_id not in self.input_queue:
+                self.input_queue.update({player_id: [self._default_input_handler, self.default_input_handler, text]})
+            else:
+                self.cmd_queue.append({player_id: [self._default_input_handler, self.default_input_handler, text]})
+                return
+        
         if player_id not in self.input_queue:
             self.input_queue.update({player_id: [self._default_input_handler, self.default_input_handler, text]})
         else:
@@ -396,7 +405,10 @@ class Engine:
 
                 if player_id == 0:
                     if text:
-                        self.input_queue.update({0: [self._default_input_handler, self.default_input_handler, ""]})
+                        if self.cmd_queue:
+                            self.input_queue.update(self.cmd_queue.pop(0))
+                        else:
+                            self.input_queue.update({0: [self._default_input_handler, self.default_input_handler, ""]})
                         ConsoleCommand.handle_input(self._function_memory, text)
                     continue
                 try:

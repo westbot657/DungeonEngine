@@ -151,6 +151,7 @@ class Combat(FunctionalElement):
         self.data: dict = data
         self.respawn_point = respawn_point
         self.players: list[Player] = []
+        self.old_players: list[Player] = []
         self.turn_order: list[Player|Enemy] = []
         self.current_turn: int = 0
         self.scheduled_tasks: list[Combat.Task] = []
@@ -224,6 +225,7 @@ class Combat(FunctionalElement):
         player.in_combat = True
         player._combat = self
         self.players.append(player)
+        self.old_players.append(player)
         self.scheduled_tasks.insert(0, Combat.Task(Combat.Operation._HandlePlayerJoin(player, Combat.JoinPriority.NEXT), 0))
 
     def removePlayer(self, player:Player):
@@ -335,14 +337,23 @@ class Combat(FunctionalElement):
                 
                 if operation.priority == Combat.JoinPriority.NEXT:
                     self.turn_order.insert(self.current_turn+1, operation.player)
+                    i = self.current_turn+1
                 elif operation.priority == Combat.JoinPriority.LAST:
                     self.turn_order.insert(self.current_turn, operation.player)
+                    i = self.current_turn
                     self.current_turn += 1
                 elif operation.priority == Combat.JoinPriority.RANDOM:
                     r = random.randint(1, len(self.turn_order))
                     self.turn_order.insert(r, operation.player)
+                    i = r
                     if r <= self.current_turn:
                         self.current_turn += 1
+                
+                # reset turn to player if player is first to join/is re-joining combat
+                if len([a for a in self.turn_order if isinstance(a, Player)]) == 1:
+                    self.current_turn = i
+                    self.turn = operation.player
+                    
 
             case Combat.Operation._HandlePlayerLeave():
                 i = self.turn_order.index(operation.player)
@@ -380,7 +391,7 @@ class Combat(FunctionalElement):
                     self.active = False
                     Log["debug"]["combat"]("Combat ended. Players lost")
                     self.scheduled_tasks.append(
-                        Combat.Task(Combat.Operation.Message(self.data.get("player_lose_message", "Combat Ended. Players lost"), player), 0)
+                        Combat.Task(Combat.Operation.Message(self.data.get("player_lose_message", "Combat Ended. Players lost"), *self.old_players), 0)
                     )
                     self.complete = True
                     function_memory.engine.sendOutput(3, None)

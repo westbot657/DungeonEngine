@@ -184,7 +184,8 @@ class Combat(FunctionalElement):
             ".last_trigger": self.last_trigger,
             ".old_trigger": self.old_trigger,
             ".turn_order": self.turn_order,
-            ".complete": self.complete
+            ".complete": self.complete,
+            ".respawn_point": self.respawn_point
         }
         return d
 
@@ -198,7 +199,8 @@ class Combat(FunctionalElement):
             "last_trigger": self.last_trigger,
             "old_trigger": self.old_trigger,
             "turn_order": self.turn_order,
-            "complete": self.complete
+            "complete": self.complete,
+            "respawn_point": self.respawn_point
         }
 
     def updateLocalVariables(self, locals: dict):
@@ -303,7 +305,7 @@ class Combat(FunctionalElement):
 
         damage = self.function_memory.ref("damage")
 
-        print(f"Combat: damage: {damage}")
+        # print(f"Combat: damage: {damage}")
 
         ev = player.onAttacked(self.function_memory, enemy, damage)
         v = None
@@ -316,6 +318,8 @@ class Combat(FunctionalElement):
         except StopIteration as e:
             if isinstance(e.value, _EngineOperation):
                 return e.value
+            elif isinstance(e.value, Combat.Operation._HandlePlayerDeath):
+                self.scheduled_tasks.insert(0, Combat.Task(e.value, 0))
 
 
     # im okay not implementing these 2 for a while
@@ -361,6 +365,8 @@ class Combat(FunctionalElement):
                 if i <= self.current_turn:
                     self.current_turn -= 1
                 self.turn = self.turn_order[self.current_turn]
+
+                player.health = 3 # TODO: set player recovery health
 
                 yield (player.uuid, EngineOperation.KillPlayer(player, self.respawn_point))
                 Log["debug"]["combat"](f"Player `{player}` died. respawned at `{self.respawn_point}`")

@@ -116,7 +116,7 @@ class Armor(GameObject):
         #     "damage": damage
         # })
         reduced_damage = self.damage_reduction.getNew(function_memory)
-        # print(f"Armor.onPlayerHit(): damage reducer: {}")
+        print(f"Armor.onPlayerHit(): damage: {damage} | damage reducer: {reduced_damage}")
         function_memory.update({
             "damage": max(0, damage - reduced_damage)
         })

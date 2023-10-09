@@ -1800,7 +1800,8 @@ class Engine_Random_Weighted(LoaderFunction):
     }
     
     @classmethod
-    def chek(cls, function_memory:FunctionMemory, args:dict):
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        print(f"random-weighted: {args}")
         match args:
             case {
                 "weights": list(),
@@ -1810,12 +1811,14 @@ class Engine_Random_Weighted(LoaderFunction):
     @staticmethod
     def random_weighted(function_memory:FunctionMemory, weights:list, values:list):
         
+        # print(weights, values)
         pool = []
 
         for weight, val in zip(weights, values):
             for i in range(int(weight)):
-                pool.append(val)
+                pool.append(int(val))
         
+        # print(pool)
         return random.choice(pool)
 
     @classmethod

@@ -42,6 +42,9 @@ class DynamicValue(FunctionalElement):
         """
         returns the result of passing this value's raw_data to `DungeonLoader.evaluateFunction()`
         """
+
+        # print(f"DynamicValue.getNew(): {self.raw_data}")
+
         if isinstance(self.raw_data, dict):
             self.cached_value = function_memory.evaluateFunction(self.raw_data)
         else:

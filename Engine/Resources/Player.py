@@ -274,7 +274,16 @@ class Player(Entity):
         self.health -= damage
 
         if self.health <= 0:
-            raise Exception(f"TODO: I have no idea how to do player death...")
+
+            combat = function_memory.ref("#combat")
+
+            return combat.Operation._HandlePlayerDeath(self)
+
+            pass
+            # raise Exception(f"TODO: I have no idea how to do player death...")
+
+            # TODO: player recovery health
+            # self.health = 3
 
     @classmethod
     def getPlayer(cls, player_id):

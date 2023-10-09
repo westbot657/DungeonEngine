@@ -38,8 +38,9 @@ class EngineOperation:
             self.target_location = target_location
 
     class KillPlayer(_EngineOperation):
-        def __init__(self, player):
+        def __init__(self, player, respawn_point):
             self.player = player
+            self.respawn_point = respawn_point
 
     class Restart(_EngineOperation):
         """

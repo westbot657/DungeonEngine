@@ -287,10 +287,15 @@ class Engine:
                 mover.send(None)
                 self.tasks.append(mover)
 
-            # case EngineOperation.KillPlayer():
-            #     player = result.player
+            case EngineOperation.KillPlayer():
+                player = result.player
+                respawn_point = result.respawn_point
 
-            #     self.players.pop(player.uuid)
+                mover = self._move_player(self._function_memory, player, respawn_point, handler_getter, handler, True)
+                mover.send(None)
+                self.tasks.append(mover)
+
+                # self.players.pop(player.uuid)
 
             case EngineOperation.Restart():
                 gen = self.input_queue[player_id][0]

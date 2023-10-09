@@ -515,7 +515,7 @@ class Combat(FunctionalElement):
                             enemy.combat = self
                             if r <= self.current_turn:
                                 self.current_turn += 1
-                self.turn = self.turn_order[self.current_turn]
+                # self.turn = self.turn_order[self.current_turn]
                 function_memory.engine.sendOutput(9, "update-combat-ui")
 
             case Combat.Operation.Despawn():

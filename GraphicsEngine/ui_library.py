@@ -44,18 +44,52 @@ else:
     RPC = fake_presence()
 RPC.connect()
 
-RPCD = {
-    "details": "Testing <Insert Dungeon Name Here>",
-    "state": "debugging",
-    "start": time.time(),
-    "large_image": "dungeon_builder_icon",
-    "large_text": "<Insert Dungeon Name Here>"
-}
+class DiscordPresence(dict):
+    def __init__(self, RPC):
+        self.RPC = RPC
+        self.active = {"default": {}}
+        self.activity = "default"
+        self.old = []
+        self.default = {
+            "details": "Testing <Insert Dungeon Name Here>",
+            "state": "debugging",
+            "start": time.time(),
+            "large_image": "dungeon_builder_icon",
+            "large_text": "<Insert Dungeon Name Here>"
+        }
+        self.update()
+        
+    def update(self, *_, **__):
+        self.RPC.update(*merge({}, self.default, self.active[self.activity]))
+        
+    def start_activity(self, id, **kwargs):
+        self.active.update({id: kwargs})
+        self.old.insert(0, self.activity)
+        self.activity = id
+        self.update()
+    
+    def end_activity(self, id):
+        if id in self.active:
+            self.activity = id
+            self.active.pop(id)
+        self.update()
+        
+    def __dict__(self):
+        return {}
+        
+    def __setitem__(self, item, value):
+        return self.active[self.activity].__setitem__(item, value)
+    
+    def __getitem__(self, item):
+        return self.active[self.activity].__getitem__(item)
 
-RPC.update(
-    **RPCD
-)
+    def modify_activity(self, id, **kwargs):
+        if id in self.active:
+            self.active[id].update(kwargs)
 
+RPCD = DiscordPresence(RPC)
+
+RPC = RPCD
 
 class Color(list):
     # __slots__ = [
@@ -4131,8 +4165,8 @@ class GameApp(UIElement):
             self._old_health = player.health
             self.player_name_display.set_text(self.player.name)
             self.player_health_bar.max_health = self.player.max_health
-            self.player_health_bar.health = self.player.health
-            self.player_health_bar.previous_health = self.player.health
+            self.player_health_bar.set_current_health(self.player.health)
+            self.player_health_bar.set_current_health(self.player.health)
             self.player_location_display.set_text(self.player.location.translate(self.editor.engine._function_memory))
             self.player_money_display.set_text(str(self.player.currency))
 
@@ -4177,13 +4211,13 @@ class GameApp(UIElement):
         self.editor.engine.handleInput(0, f"engine:ui/get_inventory {self.player_id}")
 
         self.page = "inv"
+        
         RPCD["state"] = random.choice([
             "Playing strategicaly (maybe? idk lmao)",
             "Having Fun! (hopefully)",
             "¯\_(ツ)_/¯",
             "<Insert goofy message here>"
         ])
-        RPC.update(**RPCD)
         self.set_page("inv")
     
     def page_combat_onclick(self, editor):

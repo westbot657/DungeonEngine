@@ -4078,7 +4078,6 @@ class GameApp(UIElement):
             return
 
         MultilineTextBox.set_focus(self.new_player_name_box)
-        
 
     def create_player(self, text_box):
         name = text_box.get_content().strip()
@@ -5296,7 +5295,7 @@ class IOHook:
 
         def repl(match:re.Match):
             t = match.group()
-            if (m := re.match(r"(\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')", t)): # "..." # '...'
+            if (m := re.match(r"(\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')", t)): # "..."
                 t = re.sub(r"(\\.|`[^`]*`)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", m.group())
                 return f"\033[38;2;206;145;120m{t}\033[0m"
             elif (m := re.match(r"\+(?:\d+|\[\d+\-\d+\])(?:dmg|def)\b", t)):
@@ -5319,10 +5318,14 @@ class IOHook:
                     return f"\033[38;2;255;255;255m[\033[38;2;100;250;100m{g[0]}\033[38;2;250;100;100m{g[1]}\033[38;2;255;255;255m] \033[38;2;{int(c2)};{int(c1)};0m{a}\033[38;2;255;255;255m/\033[38;2;255;255;255m{b}\033[0m"
             elif (m := re.match(r"`[^`\n]*`", t)):
                 return f"\033[38;2;95;240;255m{m.group().replace('`', '')}\033[0m"
+            elif (m := re.match(r"\*[^\*\n]*\*", t)):
+                return f"\033[38;2;30;200;80m{m.group().replace('*', '')}\033[0m"
+            elif (m := re.match(r"_[^_\n]*_", t)):
+                return f"\033[38;2;220;90;145m{m.group().replace('_', '')}\033[0m"
             else:
                 return t
 
-        return re.sub(r"(\"(?:\\.|[^\"\\\n])*\"|\[(?:| INFINITE |EQUIPPED|WEARING)\]|\[=*-*\](?: *\d+/\d+)?|(?:\+|\-)(?:\d+|\[\d+\-\d+\])(?:dmg|def)\b|\d+ft\b|`[^`\n]*`|\d+\/\d+)", repl, text)
+        return re.sub(r"(\"(?:\\.|[^\"\\\n])*\"|\[(?:| INFINITE |EQUIPPED|WEARING)\]|\[=*-*\](?: *\d+/\d+)?|(?:\+|\-)(?:\d+|\[\d+\-\d+\])(?:dmg|def)\b|\d+ft\b|`[^`\n]*`|\*[^\*\n]*\*|_[^_\n]*_|\d+\/\d+)", repl, text)
 
     def sendOutput(self, target, text):
 

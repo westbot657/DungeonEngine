@@ -9,8 +9,8 @@
 
 [engine:player/message](
 "Welcome to:
-═══ Insert Dungeon Name Here! ═══
-────── Version Alpha-3.0.0 ──────
+*═══ Insert Dungeon Name Here! ═══*
+_────── Version Alpha-3.0.0 ──────_
 
 Help:
 type `help UI` for UI-specific help

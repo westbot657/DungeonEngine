@@ -1,7 +1,6 @@
 
 $help2 =
 "
-─── General keyword functions: ─────────────────────────
 `equip <armor/weapon/tool>` - equips an item you have
     in your inventory.
 
@@ -18,7 +17,7 @@ $help2 =
     [engine:player/message]( // this is the UI help section
 [engine:text/join](
 "
-═══ UI help ════════════════════════════════════════════
+*═══ UI help ════════════════════════════════════════════*
 Press the `+ NEW PLAYER` Button to create
 a new player.
 
@@ -35,7 +34,9 @@ combats you are in.
 
 The Log tab lets you see the game log. Mainly useful
 for debugging a dungeon
-",
+
+
+_─── General keyword functions: ─────────────────────────_",
 $help2
 ))
 }
@@ -59,7 +60,8 @@ message with `[<id>]:` including a space after it.
 
 this id prefix will not be shown in any of the following
 examples, but is still required
-",
+
+─── General keyword functions: ─────────────────────────",
 $help2
 ))
 }

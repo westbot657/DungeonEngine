@@ -353,6 +353,11 @@ class Combat(FunctionalElement):
                 if len([a for a in self.turn_order if isinstance(a, Player)]) == 1:
                     self.current_turn = i
                     self.turn = operation.player
+                
+                    self.current_turn += 1
+                    if self.current_turn >= len(self.turn_order):
+                        self.current_turn = 0
+                    self.turn = self.turn_order[self.current_turn]
                     
 
             case Combat.Operation._HandlePlayerLeave():
@@ -557,7 +562,7 @@ class Combat(FunctionalElement):
 
             case Combat.Operation._NextTurn():
 
-                if len(self.turn_order) == 0:
+                if len(self.turn_order) == 0 or len([a for a in self.players if isinstance(a, Player)]) == 0:
                     return
 
                 self.current_turn += 1

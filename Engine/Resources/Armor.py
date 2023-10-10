@@ -116,10 +116,19 @@ class Armor(GameObject):
         #     "damage": damage
         # })
         reduced_damage = self.damage_reduction.getNew(function_memory)
-        print(f"Armor.onPlayerHit(): damage: {damage} | damage reducer: {reduced_damage}")
+        # print(f"Armor.onPlayerHit(): damage: {damage} | damage reducer: {reduced_damage}")
         function_memory.update({
             "damage": max(0, damage - reduced_damage)
         })
+        function_memory.addContextData({
+            "#damage_reduction": reduced_damage
+        })
+        
+        # if reduced_damage > 0:
+        #     if reduced_damage < damage:
+        #         function_memory.engine.sendOutput(function_memory.ref("#player"), f"`{self.name}` ─ Blocked *{reduced_damage}* damage!")
+        #     elif reduced_damage >= damage:
+        #         function_memory.engine.sendOutput(function_memory.ref("#player"), f"`{self.name}` ─ Attack blocked!")
 
         if on_player_hit := self.events.get("on_player_hit", None):
             #self.prepFunctionMemory(function_memory)

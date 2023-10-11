@@ -351,10 +351,10 @@ class Combat(FunctionalElement):
                 
                 # reset turn to player if player is first to join/is re-joining combat
                 if len([a for a in self.turn_order if isinstance(a, Player)]) == 1:
-                    self.current_turn = i
-                    self.turn = operation.player
+                    self.current_turn = i + 1
+                    # self.turn = operation.player
                 
-                    self.current_turn += 1
+                    # self.current_turn += 1
                     if self.current_turn >= len(self.turn_order):
                         self.current_turn = 0
                     self.turn = self.turn_order[self.current_turn]

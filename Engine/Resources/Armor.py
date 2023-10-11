@@ -124,11 +124,15 @@ class Armor(GameObject):
             "#damage_reduction": reduced_damage
         })
         
-        # if reduced_damage > 0:
-        #     if reduced_damage < damage:
-        #         function_memory.engine.sendOutput(function_memory.ref("#player"), f"`{self.name}` ─ Blocked *{reduced_damage}* damage!")
-        #     elif reduced_damage >= damage:
-        #         function_memory.engine.sendOutput(function_memory.ref("#player"), f"`{self.name}` ─ Attack blocked!")
+        if reduced_damage > 0:
+            combat = function_memory.ref("#combat")
+            if reduced_damage < damage:
+                combat.scheduled_tasks.append(combat.Task(combat.Operation.Message(f"`{self.name}` ─ Blocked *{reduced_damage}* damage!", function_memory.ref("#player")), 0))
+                # function_memory.engine.sendOutput(function_memory.ref("#player"), f"`{self.name}` ─ Blocked *{reduced_damage}* damage!")
+            elif reduced_damage >= damage:
+                combat.scheduled_tasks.append(combat.Task(combat.Operation.Message(f"`{self.name}` ─ Attack blocked!", function_memory.ref("#player")), 0))
+                
+                # function_memory.engine.sendOutput(function_memory.ref("#player"), f"`{self.name}` ─ Attack blocked!")
 
         if on_player_hit := self.events.get("on_player_hit", None):
             #self.prepFunctionMemory(function_memory)

@@ -198,13 +198,13 @@ class Enemy(Entity):
                 v = e.value
             print(f"Enemy.attackPlayer(): v: {e.value}")
             
-            damage = function_memory.ref("damage")
-            reduced_damage = function_memory.ref("#damage_reduction?") or 0
-            if reduced_damage > 0:
-                if reduced_damage < damage:
-                    function_memory.engine.sendOutput(function_memory.ref("#player"), f"`{self.name}` ─ Blocked *{reduced_damage}* damage!")
-                elif reduced_damage >= damage:
-                    function_memory.engine.sendOutput(function_memory.ref("#player"), f"`{self.name}` ─ Attack blocked!")
+            # damage = function_memory.ref("damage")
+            # reduced_damage = function_memory.ref("#damage_reduction?") or 0
+            # if reduced_damage > 0:
+            #     if reduced_damage < damage:
+            #         function_memory.engine.sendOutput(function_memory.ref("#player"), f"`{self.name}` ─ Blocked *{reduced_damage}* damage!")
+            #     elif reduced_damage >= damage:
+            #         function_memory.engine.sendOutput(function_memory.ref("#player"), f"`{self.name}` ─ Attack blocked!")
             
             return e.value if e.value is not None else v
         

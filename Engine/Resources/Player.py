@@ -277,8 +277,8 @@ class Player(Entity):
 
             combat = function_memory.ref("#combat")
 
-            return combat.Operation._HandlePlayerDeath(self)
-
+            combat.scheduled_tasks.append(combat.Task(combat.Operation._HandlePlayerDeath(self), 0))
+            
             pass
             # raise Exception(f"TODO: I have no idea how to do player death...")
 

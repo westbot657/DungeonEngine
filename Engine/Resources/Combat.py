@@ -384,7 +384,6 @@ class Combat(FunctionalElement):
 
                 player.health = 3 # TODO: set player recovery health
 
-                yield (player.uuid, EngineOperation.KillPlayer(player, self.respawn_point))
                 Log["debug"]["combat"](f"Player `{player}` died. respawned at `{self.respawn_point}`")
                 self.scheduled_tasks.append(
                     Combat.Task(Combat.Operation.Message(self.data.get("player_death_message", "`{player}` died.").format(player=player)), 0)
@@ -401,6 +400,7 @@ class Combat(FunctionalElement):
                     self.complete = True
                     function_memory.engine.sendOutput(3, None)
 
+                yield (player.uuid, EngineOperation.KillPlayer(player, self.respawn_point))
 
             case Combat.Operation._HandleInput():
                 text = operation.text
@@ -466,6 +466,9 @@ class Combat(FunctionalElement):
                     enemy = operation.enemy
                     player = operation.target
 
+                    if (not player) or (player not in self.players):
+                        return
+
                     ev = self.enemyAttackPlayer(enemy, player)
                     v = None
                     try:
@@ -487,7 +490,7 @@ class Combat(FunctionalElement):
 
                     if isinstance(self.turn, Enemy):
                         self.scheduled_tasks.append(
-                            Combat.Task(Combat.Operation._EnemyAttack(self.turn, random.choice(self.players)), 10000)
+                            Combat.Task(Combat.Operation._EnemyAttack(self.turn, random.choice(self.players or [None])), 10000)
                         )
 
             case Combat.Operation.Trigger():

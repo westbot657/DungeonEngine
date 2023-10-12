@@ -5363,9 +5363,9 @@ class IOHook:
             if (m := re.match(r"(\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')", t)): # "..."
                 t = re.sub(r"(\\.|`[^`]*`)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", m.group())
                 return f"\033[38;2;206;145;120m{t}\033[0m"
-            elif (m := re.match(r"\+(?:\d+|\[\d+\-\d+\])(?:dmg|def)\b", t)):
+            elif (m := re.match(r"\+(?:\d+|\[(?:\d+\-\d+|(?:\d+\%\:\d+ *)+)\])(?:dmg|def)\b", t)):
                 return f"\033[38;2;100;250;100m{m.group()}\033[0m"
-            elif (m := re.match(r"\-(?:\d+|\[\d+\-\d+\])(?:dmg|def)\b", t)):
+            elif (m := re.match(r"\-(?:\d+|\[(?:\d+\-\d+|(?:\d+\%\:\d+ *)+)\])(?:dmg|def)\b", t)):
                 return f"\033[38;2;250;100;100m{m.group()}\033[0m"
             elif (m := re.match(r"\[(?: INFINITE |EQUIPPED|WEARING)\]", t)):
                 return f"\033[38;2;255;255;255m[\033[38;2;25;180;40m{m.group().replace('[', '').replace(']', '')}\033[38;2;255;255;255m]\033[0m"
@@ -5381,6 +5381,19 @@ class IOHook:
                     c2 = 255 - c1
 
                     return f"\033[38;2;255;255;255m[\033[38;2;100;250;100m{g[0]}\033[38;2;250;100;100m{g[1]}\033[38;2;255;255;255m] \033[38;2;{int(c2)};{int(c1)};0m{a}\033[38;2;255;255;255m/\033[38;2;255;255;255m{b}\033[0m"
+            elif (m := re.match(r"```(?P<lang>json|md|ds|dungeon_script|ascii)?(?:\\.|[^`])*```", t)):
+                d = m.groupdict()
+                lang = d["lang"]
+                text = t[3+len(lang or ""):-3]
+                if lang == "json":
+                    return FileEditor.json_colors(None, text)
+                elif lang == "md":
+                    return FileEditor.md_colors(None, text)
+                elif lang in ["ds", "dungeon_script"]:
+                    return FileEditor.ds_colors(None, text)
+                else:
+                    return self.ascii_colors(text)
+                # return f"\033[38;2;200;200;200m{text}\033[0m"
             elif (m := re.match(r"`[^`\n]*`", t)):
                 return f"\033[38;2;95;240;255m{m.group().replace('`', '')}\033[0m"
             elif (m := re.match(r"\*[^\*\n]*\*", t)):
@@ -5390,7 +5403,11 @@ class IOHook:
             else:
                 return t
 
-        return re.sub(r"(\"(?:\\.|[^\"\\\n])*\"|\[(?:| INFINITE |EQUIPPED|WEARING)\]|\[=*-*\](?: *\d+/\d+)?|(?:\+|\-)(?:\d+|\[\d+\-\d+\])(?:dmg|def)\b|\d+ft\b|`[^`\n]*`|\*[^\*\n]*\*|_[^_\n]*_|\d+\/\d+)", repl, text)
+        return re.sub(r"(```(?:\\.|[^`])*```|\"(?:\\.|[^\"\\\n])*\"|\[(?:| INFINITE |EQUIPPED|WEARING)\]|\[=*-*\](?: *\d+/\d+)?|(?:\+|\-)(?:\d+|\[(?:\d+\-\d+|(?:\d+\%\:\d+ *)+)\])(?:dmg|def)\b|\d+ft\b|`[^`\n]*`|\*[^\*\n]*\*|_[^_\n]*_|\d+\/\d+)", repl, text)
+
+    def ascii_colors(self, text:str) -> str:
+
+        return re.sub(r"([│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌]+)", "\033[38;2;100;100;100m\\1\033[0m", text)
 
     def sendOutput(self, target, text):
 

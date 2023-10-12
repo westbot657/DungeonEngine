@@ -1831,7 +1831,7 @@ class Engine_Random_Weighted(LoaderFunction):
         out = []
         total = sum(weights)
         for weight, val in zip(weights, values):
-            out.append(f"{weight/total:.2%}".strip("0") + f":{val}")
+            out.append(f"{f'{weight/total:.2f}'.strip('0').strip('.')}%" + f":{val}")
         return f"[{' '.join(out)}]"
 
     @classmethod

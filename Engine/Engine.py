@@ -151,7 +151,7 @@ class Engine:
         self.running = False
 
     def handleInput(self, player_id:str|int, text:str):
-        print(f"Engine handle-input: {player_id}: '{text}'")
+        # print(f"Engine handle-input: {player_id}: '{text}'")
         if player_id == 0:
             if player_id not in self.input_queue:
                 self.input_queue.update({player_id: [self._default_input_handler, self.default_input_handler, text]})

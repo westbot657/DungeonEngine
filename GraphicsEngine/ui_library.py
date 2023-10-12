@@ -3507,6 +3507,72 @@ class DebugApp(UIElement):
 
 class GameApp(UIElement):
     
+    ####XXX########################################XXX####
+    ### XXX Multiplayer server replacement classes XXX ###
+    ####XXX########################################XXX####
+    
+    class SerialIdentifier:
+        ...
+    class SerialAbstractObject:
+        ...
+    class SerialTool:
+        ...
+    class SerialAmmo:
+        ...
+    class SerialArmor:
+        ...
+    class SerialWeapon:
+        ...
+    class SerialItem:
+        ...
+    class SerialInventory:
+        def __init__(self, data:list):
+            self.equips = {}
+            self.contents = []
+            
+    class SerialLocation:
+        ...
+    class SerialPosition:
+        ...
+    class SerialStatusEffect:
+        ...
+    class SerialStatusEffectManager:
+        def __init__(self, data:list):
+            ...
+    class SerialCurrency:
+        __slots__ = [
+            "gold", "silver", "copper"
+        ]
+        def __init__(self, data:list):
+            self.gold, self.silver, self.copper = data
+    class SerialPlayer:
+        def __init__(self, data:dict):
+            self.uuid = data["id"]
+            self.name = data["name"]
+            self.health = data["health"]
+            self.max_health = data["max_health"]
+            self.inventory = GameApp.SerialInventory(data["inventory"])
+            self.location = GameApp.SerialLocation(data["location"])
+            self.position = GameApp.SerialPosition(data["position"])
+            self.status_effects = GameApp.SerialStatusEffectManager(data["status_effects"])
+            self.in_combat = data["in_combat"]
+            self.currency = GameApp.SerialCurrency(data["currency"])
+
+    class SerialEntity:
+        def __init__(self, data:dict):
+            self.name = data["name"]
+            self.health = data["health"]
+            self.max_health = data["max_health"]
+
+    class SerialCombat:
+        def __init__(self, data:dict):
+            self.turn_order = [GameApp.SerialEntity(d) for d in data["turn_order"]]
+            self.turn = self.turn_order[data["turn"]]
+    
+    ####XXX###############################################XXX####
+    ### XXX UI elements for game objects and combat stats XXX ###
+    ####XXX###############################################XXX####
+    
     class HealthBar(UIElement):
         
         __slots__ = [
@@ -3614,7 +3680,6 @@ class GameApp(UIElement):
 
         def _event(self, editor, X, Y):
 
-            
             if self.old_health != self.enemy.health:
                 self.health_display.set_text(f"{max(0, self.enemy.health)}/{self._max}")
                 self.health_display.x = 340 - (self.health_display.width/2)

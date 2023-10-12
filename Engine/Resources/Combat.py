@@ -164,6 +164,12 @@ class Combat(FunctionalElement):
         self.active = True
         self._enemies = {}
 
+    def resetCombat(self):
+        try:
+            Combat._combats.pop(self.abstract.identifier.full())
+        except:
+            pass
+
     def getEnemy(self, function_memory:FunctionMemory, enemy_id:str):
         if enemy := self._enemies.get(enemy_id, None):
             return enemy
@@ -225,7 +231,8 @@ class Combat(FunctionalElement):
         player.in_combat = True
         player._combat = self
         self.players.append(player)
-        self.old_players.append(player)
+        if player not in self.old_players:
+            self.old_players.append(player)
         self.scheduled_tasks.insert(0, Combat.Task(Combat.Operation._HandlePlayerJoin(player, Combat.JoinPriority.NEXT), 0))
 
     def removePlayer(self, player:Player):
@@ -397,7 +404,8 @@ class Combat(FunctionalElement):
                     self.scheduled_tasks.append(
                         Combat.Task(Combat.Operation.Message(self.data.get("player_lose_message", "Combat Ended. Players lost"), *self.old_players), 0)
                     )
-                    self.complete = True
+                    # self.complete = True
+                    self.resetCombat()
                     function_memory.engine.sendOutput(3, None)
 
                 yield (player.uuid, EngineOperation.KillPlayer(player, self.respawn_point))

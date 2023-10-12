@@ -372,6 +372,23 @@ class Player(Entity):
         with open("./save_data/players.json", "w+", encoding="utf-8") as f:
             json.dump(data, f, indent=4)
 
+    def serialize(self, function_memory:FunctionMemory):
+        """
+        This returns only the information needed to display player data for combat in multiplayer
+        """
+        data = {
+            "name": self.name,
+            "health": self.health,
+            "max_health": self.max_health
+        }
+        
+        return data
+
+    def full_serialize(self, function_memory:FunctionMemory):
+        """
+        This function sends all data needed for multiplayer clients to re-create player displays
+        """
+        return self._get_save(function_memory)
 
 
 if __name__ == "__main__":

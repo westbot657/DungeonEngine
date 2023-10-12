@@ -733,7 +733,17 @@ class Combat(FunctionalElement):
         ]
         
         return "\n".join(lines)
+    
+    def serialize(self, function_memory:FunctionMemory):
+        """
+        This returns only the information needed to re-create the combat ui display for multiplayer
+        """
+        data = {
+            "turn_order": [e.serialize(function_memory) for e in self.turn_order],
+            "turn": self.turn_order.index(self.turn)
+        }
         
+        return data
         
 
 

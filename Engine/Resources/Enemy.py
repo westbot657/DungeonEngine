@@ -283,5 +283,15 @@ class Enemy(Entity):
     def _get_save(self, function_memory:FunctionMemory) -> dict:
         return {}
 
+    def serialize(self, function_memory:FunctionMemory):
+        """
+        This only returns information needed to display for multiplayer
+        """
+        data = {
+            "name": self.name,
+            "health": self.health,
+            "max_health": self.max_health
+        }
+        return data
 
 

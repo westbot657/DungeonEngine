@@ -676,6 +676,61 @@ class Combat(FunctionalElement):
         ...
     
     def fullStats(self, function_memory:FunctionMemory):
-        ...
+        WIDTH = 50
+        # │┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌▓▒░
+        
+        
+        #      ┌─────────────╓╥╥╥╥╥╥╥╥╥╥╥╥──────┐
+        #      │ Zombie 1    ╙╨╨╨╨╨╨╨╨╨╨╨╨──────┤
+        #      └────────────────────────────────┘
+        
+        lines = [
+            "```"
+            f"┌{'─'*WIDTH}┐",
+            f"│ {'Combat Stats':< {WIDTH-4}} │",
+            f"├{'─'*WIDTH}┤",
+        ]
+        
+        for t in self.turn_order:
+            t: Enemy|Player
+            
+            if self.turn is t:
+                per = int(t.health/t.max_health*15)
+                
+                if per == 0:
+                    b1 = f"╔{'═'*15}╗"
+                    b2 = f"╙{'─'*15}╢"
+                else:
+                    b1 = f"╔{'╦'*per}{'═'*(15-per)}╗"
+                    b2 = f"╙{'╨'*per}{'─'*(15-per)}╢"
+
+                sub = [
+                    f"│ ╔{'═'*(WIDTH-(20))}{b1} │",
+                    f"│ ║ {t.name:< {WIDTH-21}} {b2} │",
+                    f"│ ╚{'═'*(WIDTH-4)}╝ │"
+                ]
+            
+            else:
+                per = int(t.health/t.max_health*15)
+                
+                if per == 0:
+                    b1 = f"┌{'─'*15}┐"
+                    b2 = f"└{'─'*15}┤"
+                else:
+                    b1 = f"╓{'╥'*per}{'─'*(15-per)}┐"
+                    b2 = f"╙{'╨'*per}{'─'*(15-per)}┤"
+
+                sub = [
+                    f"│ ┌{'─'*(WIDTH-20)}{b1} │",
+                    f"│ │ {t.name:< {WIDTH-21}} {b2}",
+                    f"│ └{'─'*(WIDTH-4)}┘"
+                ]
+            lines += sub
+        
+        lines += [
+            f"└{'─'*WIDTH}┘"
+        ]
+        
+        
 
 

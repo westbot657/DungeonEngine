@@ -102,6 +102,20 @@ def engine_ui_get_combat(function_memory:FunctionMemory, player):
         Log["ERROR"]("\n".join(e.args))
 
 @ConsoleCommand(
+    Identifier("engine", "", "get-combat"),
+    {
+        "player: engine:int": None
+    }
+)
+def engine_get_combat(function_memory:FunctionMemory, player):
+    try:
+        player = function_memory.engine.getPlayer(player)
+        if player._combat:
+            function_memory.engine.sendOutput(player, player._combat.fullStats(function_memory))
+    except EngineError as e:
+        Log["ERROR"]("\n".join(e.args))
+
+@ConsoleCommand(
     Identifier("engine", "ui/", "get_player"),
     {
         "player: engine:int": None

@@ -19,6 +19,7 @@ except ImportError:
 
 from typing import Generator
 
+
 class Armor(GameObject):
     identifier = Identifier("engine", "object/", "armor")
     def __init__(self, abstract, name:str, description:str, damage_reduction:DynamicValue, max_durability:int, durability:int, events:dict):
@@ -136,6 +137,7 @@ class Armor(GameObject):
 
         if on_player_hit := self.events.get("on_player_hit", None):
             #self.prepFunctionMemory(function_memory)
+            
             
             ev = function_memory.generatorEvaluateFunction(on_player_hit)
             v = None

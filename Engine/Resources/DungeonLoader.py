@@ -703,6 +703,15 @@ class DungeonLoader:
     def checkTextInventory(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         function_memory.engine.sendOutput(player, player.fullInventoryStats(function_memory))
 
+    @TextPattern(r"\b(?:combat|battle|stats)\b", TextPattern.CheckType.SEARCH, ["global"])
+    @staticmethod
+    def checkTextCombat(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
+        if player.in_combat:
+            if player._combat:
+                function_memory.engine.sendOutput(player, player._combat.fullStats(function_memory))
+        else:
+            function_memory.engine.sendOutput(player, "You are not in combat")
+
     @TextPattern(r"\b(?P<keyword>yell|shout(?: out)?|scream|shriek)\b (?P<words>.*)", TextPattern.CheckType.SEARCH, ['common'])
     @staticmethod
     def checkTextYell(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):

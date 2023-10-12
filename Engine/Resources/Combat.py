@@ -685,9 +685,9 @@ class Combat(FunctionalElement):
         #      └────────────────────────────────┘
         
         lines = [
-            "```"
+            "```",
             f"┌{'─'*WIDTH}┐",
-            f"│ {'Combat Stats':< {WIDTH-4}} │",
+            f"│ {'Combat Stats': <{WIDTH-2}} │",
             f"├{'─'*WIDTH}┤",
         ]
         
@@ -706,7 +706,7 @@ class Combat(FunctionalElement):
 
                 sub = [
                     f"│ ╔{'═'*(WIDTH-(20))}{b1} │",
-                    f"│ ║ {t.name:< {WIDTH-21}} {b2} │",
+                    f"│ ║ {t.name: <{WIDTH-22}} {b2} │",
                     f"│ ╚{'═'*(WIDTH-4)}╝ │"
                 ]
             
@@ -722,14 +722,17 @@ class Combat(FunctionalElement):
 
                 sub = [
                     f"│ ┌{'─'*(WIDTH-20)}{b1} │",
-                    f"│ │ {t.name:< {WIDTH-21}} {b2}",
-                    f"│ └{'─'*(WIDTH-4)}┘"
+                    f"│ │ {t.name: <{WIDTH-22}} {b2} │",
+                    f"│ └{'─'*(WIDTH-4)}┘ │"
                 ]
             lines += sub
         
         lines += [
-            f"└{'─'*WIDTH}┘"
+            f"└{'─'*WIDTH}┘",
+            "```"
         ]
+        
+        return "\n".join(lines)
         
         
 

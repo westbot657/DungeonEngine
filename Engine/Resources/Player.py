@@ -250,6 +250,9 @@ class Player(Entity):
 
         for gameObject in [equipped_armor, equipped_tool, equipped_weapon, self.status_effects]:
             gameObject: Armor|Tool|Weapon|StatusEffectManager
+            
+            if gameObject is None: continue
+            
             ev = gameObject.onPlayerHit(function_memory, damage)
             v = None
             try:

@@ -151,13 +151,13 @@ class Engine:
         self.running = False
 
     def handleInput(self, player_id:str|int, text:str):
-        
+        print(f"Engine handle-input: {player_id}: '{text}'")
         if player_id == 0:
             if player_id not in self.input_queue:
                 self.input_queue.update({player_id: [self._default_input_handler, self.default_input_handler, text]})
             else:
                 self.cmd_queue.append({player_id: [self._default_input_handler, self.default_input_handler, text]})
-                return
+            return
         
         if player_id not in self.input_queue:
             self.input_queue.update({player_id: [self._default_input_handler, self.default_input_handler, text]})
@@ -396,6 +396,10 @@ class Engine:
                     self.combats.remove(combat)
 
             # check inputs
+            
+            if (0 not in self.input_queue.keys()) and self.cmd_queue:
+                self.input_queue.update(self.cmd_queue.pop(0))
+            
             for player_id in [k for k in self.input_queue.copy().keys()]:
                 handler_getter, response_handler, text = self.input_queue[player_id]
                 handler_getter: Callable
@@ -408,7 +412,8 @@ class Engine:
                         if self.cmd_queue:
                             self.input_queue.update(self.cmd_queue.pop(0))
                         else:
-                            self.input_queue.update({0: [self._default_input_handler, self.default_input_handler, ""]})
+                            self.input_queue.pop(0)
+                            # self.input_queue.update({0: [self._default_input_handler, self.default_input_handler, ""]})
                         ConsoleCommand.handle_input(self._function_memory, text)
                     continue
                 try:

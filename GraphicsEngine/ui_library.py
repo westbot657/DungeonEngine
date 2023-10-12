@@ -5330,6 +5330,7 @@ class IOHook:
     def sendOutput(self, target, text):
 
         if target in ["log", 0, 1, 5, 6, 7, 8]:
+            # print(f"{target}: {text}")
             # self._log_queue.append(text)
 
             cl = self.game_app.log_output.colored_content.split("\n")

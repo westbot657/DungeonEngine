@@ -800,12 +800,29 @@ class EngineScript:
     def compile(self, ignore_file=False):
         if not ignore_file:
             with open(self.script_file, "r+", encoding="utf-8") as f:
-                self.script = f.read()
+                self.script = self.remove_syntax_sugar(f.read())
 
         macros.clear()
 
+
         self.compiled_script = parser.parse(self.script)
     
+    def remove_syntax_sugar(self, text):
+
+        def repl(match:re.Match):
+            t: str = match.group()
+
+            if m := re.match(r"(?:(?P<sugar>for *<(?P<value>[^>]+)> *in *(?P<list><[^>]+>)))", t):
+                d = m.groupdict()
+                return t.replace(d["sugar"], f"[engine:list/for_each]({d['list']}, \"{d['value']}\")")
+            elif m := re.match(r"(?:(?P<sugar>for *<(?P<key>[^>]+)>, *<(?P<value>[^>]+)> *in *(?P<dict><[^>]+>)))", t):
+                d = m.groupdict()
+                return t.replace(d["sugar"], f"[engine:dict/for_each]({d['dict']}, \"{d['key']}\", \"{d['value']}\")")
+            else:
+                return t
+
+        return re.sub(r"(?:(?:for *<[^>]+> *in *<[^>]+>)|(?:for *<[^>]+>, *<[^>]+> *in *<[^>]+>))", repl, text)
+
     def getScript(self):
         if not self.compiled_script:
             self.compile()

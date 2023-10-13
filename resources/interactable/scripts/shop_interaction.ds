@@ -14,7 +14,7 @@ if (<.closed>) {
 
     <inp> = [engine:player/get_input]
 
-    [engine:list/for_each](<.current_stock>, "item") {
+    for <item> in <.current_stock> {
         
     }
 

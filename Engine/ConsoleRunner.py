@@ -4,6 +4,8 @@ from threading import Thread
 import re, os, sys
 from typing import Any
 # from colorama import AnsiToWin32
+# from pydub import AudioSegment
+# from pydub.playback import play
 import simpleaudio as sa
 import warnings
 with warnings.catch_warnings():
@@ -28,7 +30,7 @@ from Engine import Engine
 
 os.system('') # this fixes console ansi colors for some reason
 
-
+# VOLUME_MOD = 0
 
 # if not os.path.exists("./Dungeons/"):
 
@@ -77,6 +79,11 @@ except ImportError as e:
                     print(f"[sound]: {text}")
                     if os.path.exists(text):
                         sa.WaveObject.from_wave_file(text).play()
+
+                        # audio = AudioSegment.from_file(text) + VOLUME_MOD
+
+                        
+
                 elif target in [2, 3, 4]:
                     pass
                 elif target == "log":

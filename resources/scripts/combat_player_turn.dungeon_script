@@ -1,8 +1,8 @@
 
 // [engine:debug/memory] // <- probably the most useful function I've added so far
 
-[engine:list/for_each] (<.enemies>, "enemy") // iterate through each enemy
-{
+// [engine:list/for_each] (<.enemies>, "enemy") // iterate through each enemy
+for <enemy> in <.enemies> {
     if ([engine:list/contains](<.turn_order>, <enemy>)) {
         // check if the enemy's name is in the player input
         [engine:text/match] ([engine:text/replace_pattern] (" +", " ", [engine:text/set_case] (<#text>, "lower")), "search")

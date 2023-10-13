@@ -1,0 +1,11 @@
+{
+    "parent": "engine:ammo/arrow",
+    "name": "Poison Arrow",
+    "description": "A toxic arrow. The head is infused with Vetrum",
+    "bonus_damage": {
+        "function": "engine:random/range",
+        "min": 1,
+        "max": 2
+    },
+    "max_count": 25
+}

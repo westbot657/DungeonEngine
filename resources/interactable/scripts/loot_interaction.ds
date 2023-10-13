@@ -1,12 +1,13 @@
 
-if (not <.picked_up>) {
+if ((not <.picked_up>)) { // once inventory has a space limit, add check for it here
+
     <obj> = [engine:player/give_game_object](<.loot>)
     <.picked_up> = true
 
     [engine:player/message](
         [engine:text/format](
             <.pickup_message>,
-            loot= <obj.name>
+            loot=<obj.name>
         )
     )
 }

@@ -1,0 +1,8 @@
+{
+    "name": "Thief",
+    "max_health": 12,
+    "attacks": [
+        "engine:attacks/stab",
+        "engine:attacks/kick"
+    ]
+}

@@ -1,6 +1,11 @@
 {
     "parent": "engine:ammo/arrow",
     "name": "Fire Arrow",
-    "bonus_damage": 3,
-    "max_count": 18
+    "description": "A burning arrow. The head is infused with Droitium",
+    "bonus_damage": {
+        "function": "engine:random/range",
+        "min": 2,
+        "max": 3
+    },
+    "max_count": 30
 }

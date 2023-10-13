@@ -1,0 +1,7 @@
+{
+    "parent": "engine:ammo/arrow",
+    "name": "Ice Arrow",
+    "description": "A freezing arrow. The head is infused with Fostrite",
+    "bonus_damage": 2,
+    "max_count": 30
+}

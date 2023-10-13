@@ -1,0 +1,19 @@
+{
+    "fields": {
+        "shopkeeper": {
+            "type": "engine:text",
+            "required": false
+        },
+        "stock": {
+            "type": "engine:loot_table",
+            "required": true
+        },
+        "restock_time": {
+            "type": "engine:text",
+            "required": false
+        }
+    },
+    "interaction": {
+        "#script": "resources/interactable/scripts/shop_interaction"
+    }
+}

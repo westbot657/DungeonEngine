@@ -1,0 +1,7 @@
+{
+    "name": "Crossbow",
+    "damage": 4,
+    "range": 30,
+    "max_durability": 400,
+    "ammo_type": "engine:ammo/crossbow_bolt"
+}

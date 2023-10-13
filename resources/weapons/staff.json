@@ -1,10 +1,10 @@
 {
-    "name": "Sword",
+    "name": "Staff",
     "damage": {
         "function": "engine:random/range",
-        "min": 2,
-        "max": 4
+        "min": 1,
+        "max": 2
     },
     "range": 2,
-    "max_durability": 100
+    "max_durability": 90
 }

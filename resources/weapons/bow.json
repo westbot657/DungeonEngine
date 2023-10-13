@@ -2,6 +2,6 @@
     "name": "Bow",
     "damage": 3,
     "range": 20,
-    "max_durability": 30,
+    "max_durability": 300,
     "ammo_type": "engine:ammo/arrow"
 }

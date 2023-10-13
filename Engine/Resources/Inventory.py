@@ -97,6 +97,12 @@ class Inventory(FunctionalElement):
                 matches.append(c)
         return matches
 
+    def getPreferedEquip(self, abstract_type:AbstractGameObject):
+        for c in self.equips.values():
+            if c.abstract.inherets_from(abstract_type):
+                return c
+        return self.getOfAbstractType(abstract_type)
+
     def containsGameObject(self, game_object:Identifier):
         for c in self.contents:
             if c.identifier == game_object:

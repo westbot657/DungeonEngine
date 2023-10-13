@@ -1,0 +1,7 @@
+{
+    "parent": "engine:ammo/arrow",
+    "name": "Magnetic Arrow",
+    "description": "Increased damage when shot towards metalic/magnetic targets. The head is infused with Keflian",
+    "bonus_damage": 3,
+    "max_count": 15
+}

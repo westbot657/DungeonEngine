@@ -1,5 +1,9 @@
 {
     "fields": {
+        "shop_name": {
+            "type": "engine:text",
+            "required": true
+        },
         "shopkeeper": {
             "type": "engine:text",
             "required": false
@@ -10,8 +14,37 @@
         },
         "restock_time": {
             "type": "engine:text",
-            "required": false
+            "required": false,
+            "default": ""
+        },
+        "out_of_stock_message": {
+            "type": "engine:text",
+            "required": false,
+            "default": "Out of stock."
+        },
+        "enter_message": {
+            "type": "engine:text",
+            "required": false,
+            "default": ""
+        },
+        "exit_message": {
+            "type": "engine:text",
+            "required": false,
+            "default": ""
+        },
+        "closed": {
+            "type": "engine:boolean",
+            "required": false,
+            "default": false
+        },
+        "closed_message": {
+            "type": "engine:text",
+            "required": false,
+            "default": "{shop_name} is closed."
         }
+    },
+    "data": {
+        "current_stock": null
     },
     "interaction": {
         "#script": "resources/interactable/scripts/shop_interaction"

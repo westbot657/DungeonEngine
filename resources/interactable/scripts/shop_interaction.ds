@@ -1,0 +1,21 @@
+
+
+
+if (<.closed>) {
+    [engine:player/message]([engine:text/format](<.closed_message>, shop_name=<.shop_name>))
+} else {
+    [engine:player/message]([engine:text/format](<.enter_message>, shop_name=<.shop_name>, shopkeeper=<.shopkeeper>))
+
+    // restock if needed
+
+    // display shop contents
+
+    // check inputs
+
+    <inp> = [engine:player/get_input]
+
+    [engine:list/for_each](<.current_stock>, "item") {
+        
+    }
+
+}

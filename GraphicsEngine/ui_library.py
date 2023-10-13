@@ -4505,7 +4505,7 @@ class FileEditor(UIElement):
                 
             elif (m := re.match(r"(@[^:]*:|#|%|\$[a-zA-Z_][a-zA-Z0-9_]*)", t)): # @tags:
                 return f"\033[38;2;79;193;255m{m.group()}\033[0m"
-            elif (m := re.match(r"\b(if|elif|else|break|return|pass)\b", t)): # keywords - if/elif/else/...
+            elif (m := re.match(r"\b(if|elif|else|break|return|pass|for|in)\b", t)): # keywords - if/elif/else/...
                 return f"\033[38;2;197;134;192m{m.group()}\033[0m"
             elif (m := re.match(r"\b(true|false|none|not|and|or)\b", t)): # keywords - and/or/not/...
                 return f"\033[38;2;86;156;214m{m.group()}\033[0m"
@@ -4514,7 +4514,7 @@ class FileEditor(UIElement):
             else:
                 return t
             
-        return re.sub(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*|(?:\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')|\[[^:]+:[^\]]+\]|<=|>=|<<|>>|==|!=|<[^>]+>|@[^:]+:|\$[a-zA-Z_0-9]+|\d+(?:\.\d+)?|\b(and|if|or|not|elif|else|not|return|break|pass)\b|#|%)", repl, text)
+        return re.sub(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*|(?:\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')|\[[^:]+:[^\]]+\]|<=|>=|<<|>>|==|!=|<[^>]+>|@[^:]+:|\$[a-zA-Z_0-9]+|\d+(?:\.\d+)?|\b(and|if|or|not|elif|else|not|return|break|pass|for|in)\b|#|%)", repl, text)
 
 
     def md_colors(self, text:str) -> str:

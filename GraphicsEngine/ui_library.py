@@ -3279,7 +3279,7 @@ class Popup(UIElement):
         if isinstance(Popup._popup, Popup):
             Popup._popup._on_close()
         
-        self.tick = 25
+        self.tick = 10
         Popup._popup = self
     
     def close(self):

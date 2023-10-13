@@ -365,5 +365,10 @@ Other "buildings":
 
 
 
+Resident Names and roles (~250):
+- ...
+- 
+
+
 
 

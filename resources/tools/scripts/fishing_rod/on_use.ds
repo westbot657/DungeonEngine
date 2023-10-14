@@ -13,10 +13,10 @@
         "fish-habitable": true
     }
 }) {
-    [engine:random/loot_table](1, %{
+    [engine:random/loot_table](%{
         "pools": %[
             %{
-                "rolls": 0,
+                "rolls": 1,
                 "entries": %[
                     %{
                         "weight": %{

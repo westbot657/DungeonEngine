@@ -10,7 +10,7 @@ if (<.closed>) {
 
     if ([engine:list/length](<.current_stock>) == 0) {
         if ([engine:time/check](<.restock_time>)) {
-            <.current_stock> = [engine:random/loot_table](<.stock>::"rolls", <.stock>::"pools")
+            <.current_stock> = [engine:random/loot_table](<.stock>::"pools")
         }
     }
 

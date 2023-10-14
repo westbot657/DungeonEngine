@@ -112,7 +112,7 @@ class Player(Entity):
             new_player.inventory.addObject(obj)
         
         for loot_table in cls._start_inventory["loot_tables"]:
-            lt = Util.flatten_list(LootTable.fromDict(loot_table))
+            lt = Util.flatten_list(LootTable.fromDict(loot_table).roll(function_memory))
 
             for item_data in lt:
                 obj = function_memory.engine.loader.constructGameObject(function_memory, item_data)

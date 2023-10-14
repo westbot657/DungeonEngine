@@ -1879,9 +1879,10 @@ class Engine_Random_Choice(LoaderFunction):
 
     script_flags = {
         "required_args": 1,
-        "optional_args": 0,
+        "optional_args": 1,
         "args": {
-            "options": "required parameter"
+            "options": "required parameter",
+            "evaluate_choice": "optional parameter"
         }
     }
     
@@ -1893,9 +1894,11 @@ class Engine_Random_Choice(LoaderFunction):
             }: return cls.choice
             case _: return None
     @staticmethod
-    def choice(function_memory:FunctionMemory, options:list):
+    def choice(function_memory:FunctionMemory, options:list, evaluate_choice=True):
         ret = random.choice(options)
         
+        if evaluate_choice:
+            return function_memory.generatorEvaluateFunction(ret)
         return function_memory.evaluateFunction(ret)
 
 # ^ Random ^ #

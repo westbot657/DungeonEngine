@@ -9,7 +9,8 @@
                     "Old Leather Tunic",
                     "Scrappy Tunic",
                     "Torn Cloak"
-                ]
+                ],
+                "evaluate_choice": false
             },
             "damage_reduction": {
                 "function": "engine:random/weighted",
@@ -32,7 +33,8 @@
                                 "function": "engine:random/choice",
                                 "options": [
                                     "Rusty Sword"
-                                ]
+                                ],
+                                "evaluate_choice": false
                             },
                             "max_durability": 50,
                             "durability": {
@@ -53,7 +55,8 @@
                                 "function": "engine:random/choice",
                                 "options": [
                                     "Rusty Shortsword"
-                                ]
+                                ],
+                                "evaluate_choice": false
                             },
                             "max_durability": 50,
                             "durability": {
@@ -74,7 +77,8 @@
                                 "function": "engine:random/choice",
                                 "options": [
                                     "Rusty Dagger"
-                                ]
+                                ],
+                                "evaluate_choice": false
                             },
                             "max_durability": 140,
                             "durability": {
@@ -101,7 +105,8 @@
                                     "function": "engine:random/choice",
                                     "options": [
                                         "Old Wooden Bow"
-                                    ]
+                                    ],
+                                    "evaluate_choice": false
                                 },
                                 "damage": {
                                     "function": "engine:random/weighted",
@@ -134,7 +139,8 @@
                                     "options": [
                                         "Damaged Crossbow",
                                         "Rickety Crossbow"
-                                    ]
+                                    ],
+                                    "evaluate_choice": false
                                 },
                                 "damage": {
                                     "function": "engine:random/weighted",

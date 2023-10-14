@@ -125,12 +125,12 @@ class AbstractWeapon(AbstractGameObject):
             raise InvalidObjectError(f"Weapon ammo_type is invalid: '{self.ammo_type}'")
         return a
 
-    def getEvents(self):
-        if self.events is None:
-            e = self.parent.getEvents() if self.parent else None
-        else:
-            e = self.events
-        return e or {}
+    def getEvents(self) -> dict:
+        if self.events:
+            return self.events
+        elif self.parent:
+            return self.parent.getEvents()
+        return {}
 
     def _assertAmmoType(self, tp) -> AbstractAmmo:
         if isinstance(tp, AbstractAmmo): return tp

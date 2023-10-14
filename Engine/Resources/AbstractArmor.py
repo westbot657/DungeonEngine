@@ -87,6 +87,13 @@ class AbstractArmor(AbstractGameObject):
             return d
         raise InvalidObjectError(f"Armor has no damage_reduction! ({self.identifier})")
 
+    def getEvents(self) -> dict:
+        if self.events:
+            return self.events
+        elif self.parent:
+            return self.parent.getEvents()
+        return {}
+
     def createInstance(self, function_memory, **override_values) -> Armor:
         if self.is_template:
             return random.choice(self.get_children()).createInstance(function_memory, **override_values)
@@ -98,7 +105,7 @@ class AbstractArmor(AbstractGameObject):
                 DynamicValue(override_values.get("damage_reduction", self.getDamageReduction())),
                 override_values.get("max_durability", self.getMaxDurability()),
                 DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(function_memory),
-                self.events
+                self.getEvents()
             )
 
     @classmethod

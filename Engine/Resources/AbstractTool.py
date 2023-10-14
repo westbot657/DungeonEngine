@@ -74,12 +74,12 @@ class AbstractTool(AbstractGameObject):
             return d
         raise InvalidObjectError(f"Tool has no durability! ({self.identifier})")
 
-    def getEvents(self):
-        if self.events is None:
-            e = self.parent.getEvents() if self.parent else None
-        else:
-            e = self.events
-        return e or {}
+    def getEvents(self) -> dict:
+        if self.events:
+            return self.events
+        elif self.parent:
+            return self.parent.getEvents()
+        return {}
 
     def getData(self) -> dict:
         _data = {}

@@ -12,7 +12,14 @@
             "id": "room2_passage",
             "target": "test_dungeon:rooms/room2",
             "travel_message": "You go to room 2"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "exit",
+            "target": "world:rooms/start",
+            "travel_message": "You leave the test dungeon"
         }
+        
     ],
     "events": {
         "on_enter": {

@@ -9,5 +9,8 @@
 @pattern: "2" # {
     [engine:interaction/interact](".room2_passage")
 }
+@pattern: "exit" # {
+    [engine:interaction/interact](".exit")
+}
 
 

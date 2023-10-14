@@ -637,7 +637,7 @@ class DungeonLoader:
     def rebuildData(self, function_memory:FunctionMemory, data:Any):
         ...
 
-    @TextPattern(r"\b(?:equip) *(?P<item_name>.*)\b", TextPattern.CheckType.SEARCH, ["common"])
+    @TextPattern(r"\b(?:[Ee]quip) *(?P<item_name>.*)\b", TextPattern.CheckType.SEARCH, ["common"])
     @staticmethod
     def checkTextEquip(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         item_name: str = groupdict["item_name"].strip()
@@ -672,7 +672,7 @@ class DungeonLoader:
                     else:
                         function_memory.engine.sendOutput(player, f"You have no Weapon, Armor, Tool, or Ammo called '{item_name}'")
 
-    @TextPattern(r"\b(?P<keyword>use|eat|throw|apply|drink) *(?P<item_name>.*)\b", TextPattern.CheckType.SEARCH, ["common"])
+    @TextPattern(r"\b(?P<keyword>[Uu]se|[Ee]at|[Tt]hrow|[Aa]pply|[Dd]rink) *(?P<item_name>.*)\b", TextPattern.CheckType.SEARCH, ["common"])
     @staticmethod
     def checkTextUse(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         keyword: str = groupdict["keyword"]
@@ -708,12 +708,12 @@ class DungeonLoader:
         if not found_item:
             function_memory.engine.sendOutput(player, f"You do not have '{item_name}'")
 
-    @TextPattern(r"\b(?:inventory|bag|items)\b", TextPattern.CheckType.SEARCH, ["global"])
+    @TextPattern(r"\b(?:[Ii]nventory|[Bb]ag|[Ii]tems)\b", TextPattern.CheckType.SEARCH, ["global"])
     @staticmethod
     def checkTextInventory(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         function_memory.engine.sendOutput(player, player.fullInventoryStats(function_memory))
 
-    @TextPattern(r"\b(?:combat|battle|stats)\b", TextPattern.CheckType.SEARCH, ["global"])
+    @TextPattern(r"\b(?:[Cc]ombat|[Bb]attle|[Ss]tats)\b", TextPattern.CheckType.SEARCH, ["global"])
     @staticmethod
     def checkTextCombat(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         if player.in_combat:
@@ -722,7 +722,7 @@ class DungeonLoader:
         else:
             function_memory.engine.sendOutput(player, "You are not in combat")
 
-    @TextPattern(r"\b(?P<keyword>yell|shout(?: out)?|scream|shriek)\b (?P<words>.*)", TextPattern.CheckType.SEARCH, ['common'])
+    @TextPattern(r"\b(?P<keyword>[Yy]ell|[Ss]hout(?: out)?|[Ss]cream|[Ss]hriek)\b (?P<words>.*)", TextPattern.CheckType.SEARCH, ['common'])
     @staticmethod
     def checkTextYell(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         yell = groupdict['keyword']

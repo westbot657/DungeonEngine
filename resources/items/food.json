@@ -6,13 +6,8 @@
     },
     "keywords": ["eat"],
     "events": {
-        "on_use": [
-            {
-                "function": "engine:player/heal",
-                "amount": {
-                    "ref": ".heal_amount"
-                }
-            }
-        ]
+        "on_use": {
+            "#script": "resources/items/scripts/food/on_use"
+        }
     }
 }

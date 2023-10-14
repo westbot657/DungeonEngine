@@ -1,0 +1,12 @@
+
+[engine:player/heal](<#item.heal_amount>)
+[engine:player/message](
+    [engine:text/join](
+        "You ate `",
+        <#item.name>,
+        "` healing you *",
+        <#item.heal_amount>,
+        "*!",
+        seperator=""
+    )
+)

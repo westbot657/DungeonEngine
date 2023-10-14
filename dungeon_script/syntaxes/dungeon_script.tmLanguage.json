@@ -13,10 +13,6 @@
 			"include": "#strings"
 		},
 		{
-			"name": "compare.dungeon_script",
-			"match": "(==|<=|>=|!=|<<|>>)"
-		},
-		{
 			"include": "#keywords"
 		},
 		{
@@ -28,12 +24,16 @@
 			"match": "\\b(true|false|none|not|and|or)\\b"
 		},
 		{
+			"name": "compare.dungeon_script",
+			"match": "(==|<=|>=|!=|<|>)"
+		},
+		{
 			"name": "operator.dungeon_script",
 			"match": "\\b(\\-|\\+|/|\\*|min|max)\\b"
 		},
 		{
 			"name": "constant.other.dungeon_script",
-			"match": "\\b(break|return|pass)\\b"
+			"match": "\\b(break|return)\\b"
 		},
 		{
 			"include": "#functions"
@@ -61,7 +61,7 @@
 				},
 				{
 					"name": "control.dungeon_script",
-					"match": "\\b(if|elif|else|break|return|pass)\\b"
+					"match": "\\b(if|elif|else|break|return|for|in|while)\\b"
 				},
 				{
 					"name": "flag.dungeon_script",
@@ -85,7 +85,7 @@
 				},
 				{
 					"name": "constmarker.dungeon_script",
-					"begin": "<(%)",
+					"begin": "<(\\%)",
 					"end": ">",
 					"patterns": [
 						{
@@ -129,21 +129,17 @@
 			]
 		},
 		"strings": {
+			"name": "string.dungeon_script",
+			"begin": "\"",
+			"end": "\"",
 			"patterns": [
 				{
-					"name": "string.dungeon_script",
-					"begin": "(?<![foil])\"",
-					"end": "\"",
-					"patterns": [
-						{
-							"name": "constant.character.escape.dungeon_script",
-							"match": "\\\\."
-						},
-						{
-							"name": "constant.character.escape.dungeon_script",
-							"match": "`[^`]*`"
-						}
-					]
+					"name": "constant.character.escape.dungeon_script",
+					"match": "\\\\."
+				},
+				{
+					"name": "constant.character.escape.dungeon_script",
+					"match": "`[^`]*`"
 				}
 			]
 		},

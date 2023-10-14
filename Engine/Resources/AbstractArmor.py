@@ -93,8 +93,8 @@ class AbstractArmor(AbstractGameObject):
             
         else:
             return Armor(self,
-                override_values.get("name", self.getName()),
-                override_values.get("description", self.getDescription()),
+                DynamicValue(override_values.get("name", self.getName())).getNew(function_memory),
+                DynamicValue(override_values.get("description", self.getDescription())).getNew(function_memory),
                 DynamicValue(override_values.get("damage_reduction", self.getDamageReduction())),
                 override_values.get("max_durability", self.getMaxDurability()),
                 DynamicValue(override_values.get("durability", self.getDurability())).getCachedOrNew(function_memory),

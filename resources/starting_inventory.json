@@ -162,8 +162,8 @@
                 },
                 {
                     "rolls": {
-                        "min": 1,
-                        "max": 5
+                        "min": 4,
+                        "max": 7
                     },
                     "entries": [
                         {

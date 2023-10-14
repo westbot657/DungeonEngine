@@ -109,8 +109,8 @@ class AbstractItem(AbstractGameObject):
             return random.choice(self.get_children()).createInstance(function_memory, **override_values)
         else:
             return Item(self,
-                override_values.get("name", self.getName()),
-                override_values.get("description", self.getDescription()),
+                DynamicValue(override_values.get("name", self.getName())).getNew(function_memory),
+                DynamicValue(override_values.get("description", self.getDescription())).getNew(function_memory),
                 int(override_values.get("max_count", self.getMaxCount())),
                 int(DynamicValue(override_values.get("count", self.getCount())).getCachedOrNew(function_memory)),
                 override_values.get("data", self.getData()),

@@ -19,6 +19,8 @@ try:
     from .EngineOperation import _EngineOperation
     from .Currency import Currency
     from .EngineOperation import EngineOperation
+    from .Util import Util
+    from .LootTable import LootTable
 except ImportError:
     from Inventory import Inventory
     from Entity import Entity
@@ -38,6 +40,8 @@ except ImportError:
     from EngineOperation import _EngineOperation
     from Currency import Currency
     from EngineOperation import EngineOperation
+    from Util import Util
+    from LootTable import LootTable
 
 from typing import Any
 
@@ -45,6 +49,9 @@ import json, random
 
 class Player(Entity):
     _loaded = {}
+
+    with open(f"./resources/starting_inventory.json", "r+", encoding="utf-8") as f:
+        _start_inventory: dict = json.load(f)
 
     class Operation:
         class _Operation:
@@ -100,6 +107,16 @@ class Player(Entity):
 
         # TODO: give player starting equipment?
 
+        for item_data in cls._start_inventory["static"]:
+            obj = function_memory.engine.loader.constructGameObject(function_memory, item_data)
+            new_player.inventory.addObject(obj)
+        
+        for loot_table in cls._start_inventory["loot_tables"]:
+            lt = Util.flatten_list(LootTable.fromDict(loot_table))
+
+            for item_data in lt:
+                obj = function_memory.engine.loader.constructGameObject(function_memory, item_data)
+                new_player.inventory.addObject(obj)
 
         return new_player
 

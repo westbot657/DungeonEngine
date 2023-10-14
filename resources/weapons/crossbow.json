@@ -1,6 +1,10 @@
 {
     "name": "Crossbow",
-    "damage": 4,
+    "damage": {
+        "function": "engine:random/weighted",
+        "weights": [2, 3, 5, 6],
+        "values": [4, 3, 2, 1]
+    },
     "range": 30,
     "max_durability": 400,
     "ammo_type": "engine:ammo/crossbow_bolt"

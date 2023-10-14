@@ -3,6 +3,16 @@ from typing import Any, Generator
 
 class Util:
 
+    @classmethod
+    def flatten_list(cls, ls:list):
+        out = []
+        for k in ls:
+            if isinstance(k, list):
+                out += cls.flatten_list(k)
+            else:
+                out.append(k)
+        return out
+
     @staticmethod
     def getRoundedUpKey(key:float, data:dict[float]):
         old = 0

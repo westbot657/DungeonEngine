@@ -1720,38 +1720,38 @@ class Engine_Location_Exists(LoaderFunction):
 ####XXX###############XXX####
 
 
-class Engine_Random_Uniform(LoaderFunction):
-    id = Identifier("engine", "random/", "uniform")
-    pre_evaluate_args = False
+# class Engine_Random_Uniform(LoaderFunction):
+#     id = Identifier("engine", "random/", "uniform")
+#     pre_evaluate_args = False
 
-    script_flags = {
-        "required_args": 2,
-        "optional_args": 0,
-        "args": {
-            "rolls": "required parameter",
-            "pool": "required parameter"
-        }
-    }
+#     script_flags = {
+#         "required_args": 2,
+#         "optional_args": 0,
+#         "args": {
+#             "rolls": "required parameter",
+#             "pool": "required parameter"
+#         }
+#     }
     
-    @classmethod
-    def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case {
-                "rolls": int(),
-                "pool": list()
-            }: return cls.uniform_list
-            case _: return None
-    @staticmethod
-    def uniform_list(function_memory:FunctionMemory, rolls:int, pool:list, roll_size:int=1):
-        if roll_size > len(pool): raise FunctionError(f"Cannot pull more elements from list than are available")
-        result = []
-        for roll in range(rolls):
-            _pool = pool.copy()
-            for r in range(roll_size):
-                p = random.choice(_pool)
-                _pool.remove(p)
-                result.append(p)
-        return result
+#     @classmethod
+#     def check(cls, function_memory:FunctionMemory, args:dict):
+#         match args:
+#             case {
+#                 "rolls": int(),
+#                 "pool": list()
+#             }: return cls.uniform_list
+#             case _: return None
+#     @staticmethod
+#     def uniform_list(function_memory:FunctionMemory, rolls:int, pool:list, roll_size:int=1):
+#         if roll_size > len(pool): raise FunctionError(f"Cannot pull more elements from list than are available")
+#         result = []
+#         for roll in range(rolls):
+#             _pool = pool.copy()
+#             for r in range(roll_size):
+#                 p = random.choice(_pool)
+#                 _pool.remove(p)
+#                 result.append(p)
+#         return result
 
 
 class Engine_Random_Range(LoaderFunction):
@@ -1852,11 +1852,11 @@ class Engine_Random_LootTable(LoaderFunction):
     pre_evaluate_args = False
 
     script_flags = {
-        "required_args": 2,
+        "required_args": 1,
         "optional_args": 0,
         "args": {
-            "rolls": "required parameter",
-            "pool": "required parameter"
+            # "rolls": "required parameter",
+            "pools": "required parameter"
         }
     }
     
@@ -1864,13 +1864,13 @@ class Engine_Random_LootTable(LoaderFunction):
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
             case {
-                "rolls": int(),
+                # "rolls": int(),
                 "pools": list()
             }: return cls.loot_table
             case _: return None
     @staticmethod
-    def loot_table(function_memory:FunctionMemory, rolls:int, pools:list[dict]):
-        table = LootTable.fromDict({"rolls": rolls, "pools": pools})
+    def loot_table(function_memory:FunctionMemory, pools:list[dict]):
+        table = LootTable.fromDict({"pools": pools})
         return table.roll(function_memory)
 
 class Engine_Random_Choice(LoaderFunction):

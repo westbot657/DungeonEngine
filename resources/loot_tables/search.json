@@ -1,8 +1,7 @@
 {
-    "rolls": 1,
     "pools": [
         {
-            "bonus_rolls": 0,
+            "rolls": 1,
             "count": {
                 "type": "engine:random/uniform",
                 "min": 1,

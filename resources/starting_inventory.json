@@ -96,7 +96,7 @@
                         [
                             {
                                 "type": "engine:weapon",
-                                "parent": "engine:waepons/bow",
+                                "parent": "engine:weapons/bow",
                                 "name": {
                                     "function": "engine:random/choice",
                                     "options": [
@@ -128,7 +128,7 @@
                         [
                             {
                                 "type": "engine:weapon",
-                                "parent": "engine:waepons/crossbow",
+                                "parent": "engine:weapons/crossbow",
                                 "name": {
                                     "function": "engine:random/choice",
                                     "options": [
@@ -168,7 +168,7 @@
                     "entries": [
                         {
                             "type": "engine:item",
-                            "parent": "engine:item/food/bread",
+                            "parent": "engine:item/bread",
                             "count": {
                                 "function":"engine:random/range",
                                 "min": 5,
@@ -177,7 +177,7 @@
                         },
                         {
                             "type": "engine:item",
-                            "parent": "engine:item/food/apple",
+                            "parent": "engine:item/apple",
                             "count": {
                                 "function":"engine:random/range",
                                 "min": 1,
@@ -186,7 +186,7 @@
                         },
                         {
                             "type": "engine:item",
-                            "parent": "engine:item/food/cod",
+                            "parent": "engine:item/cod",
                             "count": {
                                 "function":"engine:random/range",
                                 "min": 0,
@@ -195,7 +195,7 @@
                         },
                         {
                             "type": "engine:item",
-                            "parent": "engine:item/food/salmon",
+                            "parent": "engine:item/salmon",
                             "count": {
                                 "function":"engine:random/range",
                                 "min": 0,

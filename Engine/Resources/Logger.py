@@ -67,7 +67,7 @@ class _Log:
         if self.engine:
             self.engine.sendOutput("log", out)
         else:
-            print(out)
+            print(out.encode())
         
         if self._file:
             self._file.write(re.sub("\033\\[(?:\\d+;?)*m", "", f"{out}\n"))

@@ -19,6 +19,8 @@ except ImportError:
 
 import glob, json, random
 
+from mergedeep import merge
+
 class AbstractTool(AbstractGameObject):
     _loaded = {}
     _link_parents = []
@@ -73,13 +75,9 @@ class AbstractTool(AbstractGameObject):
         if d is not None:
             return d
         raise InvalidObjectError(f"Tool has no durability! ({self.identifier})")
-
+    
     def getEvents(self) -> dict:
-        if self.events:
-            return self.events
-        elif self.parent:
-            return self.parent.getEvents()
-        return {}
+        return merge({}, self.parent.getEvents() if self.parent else {}, self.events)
 
     def getData(self) -> dict:
         _data = {}

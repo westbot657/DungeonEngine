@@ -19,6 +19,8 @@ except ImportError:
 
 import glob, json, re, random
 
+from mergedeep import merge
+
 class AbstractArmor(AbstractGameObject):
     _loaded: dict = {}
     _link_parents:list = []
@@ -88,11 +90,7 @@ class AbstractArmor(AbstractGameObject):
         raise InvalidObjectError(f"Armor has no damage_reduction! ({self.identifier})")
 
     def getEvents(self) -> dict:
-        if self.events:
-            return self.events
-        elif self.parent:
-            return self.parent.getEvents()
-        return {}
+        return merge({}, self.parent.getEvents() if self.parent else {}, self.events)
 
     def createInstance(self, function_memory, **override_values) -> Armor:
         if self.is_template:

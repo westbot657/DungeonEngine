@@ -4,6 +4,7 @@
     "data": {
         "heal_amount": 2
     },
+    "keywords": ["eat"],
     "events": {
         "on_use": [
             {

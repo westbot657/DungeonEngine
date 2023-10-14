@@ -18,6 +18,7 @@ except ImportError:
     from Logger import Log
 
 import glob, json, re, random
+from mergedeep import merge
 
 
 class AbstractItem(AbstractGameObject):
@@ -104,11 +105,7 @@ class AbstractItem(AbstractGameObject):
         return words
 
     def getEvents(self) -> dict:
-        if self.events:
-            return self.events
-        elif self.parent:
-            return self.parent.getEvents()
-        return {}
+        return merge({}, self.parent.getEvents() if self.parent else {}, self.events)
 
     def createInstance(self, function_memory, **override_values) -> Item:
         if self.is_template:

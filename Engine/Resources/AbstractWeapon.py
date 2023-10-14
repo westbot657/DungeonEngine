@@ -21,6 +21,8 @@ except ImportError:
 
 import glob, json, random
 
+from mergedeep import merge
+
 """ example_dungeon:weapon/longsword
 {
     "parent": "engine:weapon/sword",
@@ -126,11 +128,7 @@ class AbstractWeapon(AbstractGameObject):
         return a
 
     def getEvents(self) -> dict:
-        if self.events:
-            return self.events
-        elif self.parent:
-            return self.parent.getEvents()
-        return {}
+        return merge({}, self.parent.getEvents() if self.parent else {}, self.events)
 
     def _assertAmmoType(self, tp) -> AbstractAmmo:
         if isinstance(tp, AbstractAmmo): return tp

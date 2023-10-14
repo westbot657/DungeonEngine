@@ -32,7 +32,7 @@ class Item(GameObject):
         self.owner = None
 
     def checkKeyword(self, keyword):
-        return keyword in self.abstract.getKeywords()
+        return keyword.lower() in self.abstract.getKeywords()
 
     def __repr__(self):
         return f"Item {self.name}: max_count:{self.max_count} count:{self.count} data:{self.data}"

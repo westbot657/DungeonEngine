@@ -676,7 +676,7 @@ class Combat(FunctionalElement):
         ...
     
     def fullStats(self, function_memory:FunctionMemory):
-        WIDTH = 50
+        WIDTH = 50-19
         # │┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌▓▒░
         
         

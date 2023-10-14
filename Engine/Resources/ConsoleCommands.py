@@ -73,6 +73,7 @@ def engine_toggle_log(function_memory:FunctionMemory):
     {}
 )
 def engine_stop(function_memory:FunctionMemory):
+    function_memory.saveGame()
     function_memory.unloadGame()
 
 @ConsoleCommand(

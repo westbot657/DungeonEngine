@@ -44,7 +44,7 @@
         }
     },
     "data": {
-        "current_stock": null
+        "current_stock": []
     },
     "interaction": {
         "#script": "resources/interactable/scripts/shop_interaction"

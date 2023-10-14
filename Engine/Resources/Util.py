@@ -64,4 +64,12 @@ class Util:
         else:
             return data
 
+    @staticmethod
+    def wrapNumber(min_num, x, max_num):
+        diff = (max_num+1) - min_num
 
+        while x > max_num:
+            x -= diff
+        while x < min_num:
+            x += diff
+        return x

@@ -18,6 +18,29 @@ except ImportError:
 
 import random
 
+"""
+LootTable Examples:
+
+
+{
+    "rolls": 3,
+    "pools": [
+        {
+            "bonus_rolls": 0,
+            "entries": [
+                {
+                    "item": {"type": "engine:weapon", "parent": "engine:weapons/sword"},
+                    "count": "",
+                    "cost": [1, 0, 0]
+                }
+            ]
+        }
+    ]
+}
+
+
+"""
+
 class LootEntry:
     def __init__(self, data):
         self.data = data
@@ -31,7 +54,7 @@ class LootEntry:
 
     def calcWeight(self, function_memory:FunctionMemory, curr_weight:float, num_entries_calculated:int, num_entries_total:int) -> float:
         if weight := self.data.get("weight", None): # all entries with specified weight should be calculated before ones with unspecified
-            Log["debug"]["fishing rod"](f"weight: {weight}")
+            # Log["debug"]["fishing rod"](f"weight: {weight}")
 
             ev = function_memory.generatorEvaluateFunction(weight)
             v = None
@@ -51,7 +74,7 @@ class LootEntry:
             return curr_weight + weight
         else:
             weight = (1 - curr_weight) / (num_entries_total - num_entries_calculated)
-            return min(curr_weight + weight, 1.0) # min() just in case the last one decides that 0.9 + 0.1 => 1.000000000001 or something stupid
+            return min(curr_weight + weight, 1.0) # min() just in case the last one decides that 0.9 + 0.1 = 1.000000000001 or something stupid
 
 
 class LootPool:

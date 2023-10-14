@@ -8,14 +8,55 @@ if (<.closed>) {
 
     // restock if needed
 
+    if ([engine:list/length](<.current_stock>) == 0) {
+        if ([engine:time/check](<.restock_time>)) {
+            <.current_stock> = [engine:random/loot_table](<.stock>::"rolls", <.stock>::"pools")
+        }
+    }
+
     // display shop contents
+
+    <output> = [engine:text/format]("┌─ {shop_name} {c:─<{w}}\n", shop_name=<.shop_name>, c="─", w=max(1, 60-[engine:text/length](<.shop_name>)))
+
+    for <item> in <.current_stock> {
+        /*
+        ┌─ The Armory ──────────────────────────────────────────────────
+        │          Lightning Arrow   x4 : 2 Gold  5 Copper
+        │               Fire Arrow  x16 : 1 Gold
+        │               Long Sword      : 1 Gold  5 Silver
+        │                    Stick  x12 : 5 Copper
+        */
+        <output> = [engine:text/join](
+            <output>,
+            [engine:text/format](
+                "│ {name: >40} {amount: >4} : {cost}",
+                name=[engine:text/join]("`", <item>::"item"::"name", "`", seperator=""),
+                amount=<item>::"amount",
+                cost=<item>::"cost"
+            ),
+            seperator=""
+        )
+    }
 
     // check inputs
 
-    <inp> = [engine:player/get_input]
+    while (true) {
+        <inp> = [engine:player/get_input]
 
-    for <item> in <.current_stock> {
-        
+
+        [engine:text/match](<inp>)
+        @pattern: "\b(exit|leave)\b" # {
+            break
+        }
+
+        for <item> in <.current_stock> {
+            [engine:text/match]([engine:text/set_case](<inp>, "lower"))
+            @pattern: [engine:text/set_case](<item.name>, "lower") # {
+                
+            }
+        }
+
+
     }
 
 }

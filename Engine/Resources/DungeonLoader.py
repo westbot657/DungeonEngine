@@ -22,6 +22,7 @@ try:
     from .Player import Player
     from .AbstractGameObject import AbstractGameObject, GameObject
     from .Util import Util
+    from .Currency import Currency
     from .Logger import Log
     from .FunctionMemory import FunctionMemory
     from .EngineOperation import EngineOperation, _EngineOperation
@@ -54,6 +55,7 @@ except ImportError:
     from Player import Player
     from AbstractGameObject import AbstractGameObject, GameObject
     from Util import Util
+    from Currency import Currency
     from Logger import Log
     from FunctionMemory import FunctionMemory
     from EngineOperation import EngineOperation, _EngineOperation
@@ -605,6 +607,7 @@ class DungeonLoader:
                     "%ENGINE:DATA-TYPE%": "Identifier",
                     "value": obj.full()
                 }
+            case Currency(): ...
             case Interactable(): ...
             case Item(): ...
             case Location():
@@ -751,6 +754,7 @@ class DungeonLoader:
         "engine:position": Position,
         "engine:interactable": Interactable,
         "engine:identifier": Identifier,
+        "engine:currency": Currency,
         "engine:dict": dict
     }
     def isElementOfType(self, element:Any, element_type:str):

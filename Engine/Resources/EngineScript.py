@@ -32,7 +32,7 @@ tokens = (
     "FUNCTION", "VARIABLE", "NUMBER", "STRING", "BOOLEAN",
     "TAG", "WORD", "RETURN", "BREAK", "CONTINUE", "MIN", "MAX",
     "IF", "ELSEIF", "ELSE", "AND", "OR", "EE", "NE", "GT", "GE",
-    "LT", "LE", "NOT", "MACRO", "PASS", "POW"
+    "LT", "LE", "NOT", "MACRO", "PASS", "POW", "WHILE"
 )
 
 literals = [
@@ -141,6 +141,8 @@ def t_WORD(t):
         t.type = "NOT"
     elif t.value == "pass":
         t.type = "PASS"
+    elif t.value == "while":
+        t.type = "WHILE"
     return t
 
 def t_NUMBER(t):
@@ -229,6 +231,15 @@ def p_if_statement(p):
     }
     if len(p) == 7:
         d.update(p[6])
+    p[0] = d
+
+def p_while_loop(p):
+    '''while_loop : WHILE '(' expression ')' scope'''
+    d = {
+        "function": "engine:control/while",
+        "condition": p[3],
+        "run": p[5]["scope"]
+    }
     p[0] = d
 
 def p_function_call(p):
@@ -522,7 +533,8 @@ def p_statement_break(p):
 
 def p_statement_expr(p):
     '''statement : expression
-                 | if_condition'''
+                 | if_condition
+                 | while_loop'''
     p[0] = p[1]
 
 def p_expression_function_call(p):
@@ -818,10 +830,15 @@ class EngineScript:
             elif m := re.match(r"(?:(?P<sugar>for *<(?P<key>[^>]+)>, *<(?P<value>[^>]+)> *in *(?P<dict><[^>]+>)))", t):
                 d = m.groupdict()
                 return t.replace(d["sugar"], f"[engine:dict/for_each]({d['dict']}, \"{d['key']}\", \"{d['value']}\")")
+            elif m := re.match(r"(<[^>]+>(?:::(?:\"(?:\\.|[^\"])+\"|<[^>]+>|\$[^:]+))+)", t):
+                d = m.group()
+                parts = d.split("::")
+                dct = parts.pop(0)
+                return f"[engine:dict/access]({dct}, {', '.join(parts)})"
             else:
                 return t
 
-        return re.sub(r"(?:(?:for *<[^>]+> *in *<[^>]+>)|(?:for *<[^>]+>, *<[^>]+> *in *<[^>]+>))", repl, text)
+        return re.sub(r"(?:\"(?:\\.|[^\"])*\"|(?:for *<[^>]+> *in *<[^>]+>)|(?:for *<[^>]+>, *<[^>]+> *in *<[^>]+>)|(<[^>]+>(?:::(?:\"(?:\\.|[^\"])+\"|<[^>]+>|\$[^:]+))+))", repl, text)
 
     def getScript(self):
         if not self.compiled_script:

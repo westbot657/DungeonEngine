@@ -2262,6 +2262,41 @@ class Engine_Dict_ForEach(LoaderFunction):
                 if isinstance(e.value, EngineOperation.StopLoop):
                     return
 
+class Engine_Dict_Access(LoaderFunction):
+    id = Identifier("engine", "dict/", "access")
+    # pre_evaluate_args = True
+
+    script_flags = {
+        "required_args": 2,
+        "optional_args": -1,
+        "args": {
+            "dict": "required parameter",
+            "keys": "*parameters"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if "dict" in args and "keys" in args:
+            return cls.access
+        return None
+
+    @staticmethod
+    def access(function_memory:FunctionMemory, **kwargs):
+        dct: dict = kwargs["dict"]
+        path: list[str] = kwargs["keys"]
+
+        p = dct
+        while path:
+            try:
+                p = p[path.pop(0)]
+            except KeyError:
+                return None
+            except Exception:
+                return None # maybe raise an actual error here...
+        return p
+            
+
 # ^ Dict ^ #
 
 ####XXX#############XXX####
@@ -2413,12 +2448,90 @@ class Engine_List_Contains(LoaderFunction):
         element = kwargs.get("element")
         return (element in ls)
 
+class Engine_List_Length(LoaderFunction):
+    id = Identifier("engine", "list/", "length")
+    pre_evaluate_args = True
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "list": "required parameter"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if "list" in args: return cls.length
+        return None
+    
+    @staticmethod
+    def length(function_memory:FunctionMemory, **kwargs):
+        lst = kwargs["list"]
+        return len(lst)
+
 # ^ List ^ #
 
 ####XXX################XXX####
 ### XXX Engine Control XXX ###
 ####XXX################XXX####
 
+class Engine_Control_While(LoaderFunction):
+    id = Identifier("engine", "control/", "while")
+    pre_evaluate_args = False
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "condition": "required parameter",
+            "run": "scope"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "condition": list()|dict(),
+                "run": list()|dict()
+            }:
+                return cls._while
+            case _: return None
+
+    @staticmethod
+    def _while(function_memory:FunctionMemory, **args):
+
+        condition = args.get("condition")
+        func: dict|list = args.get("run")
+        while True:
+
+            ev = function_memory.generatorEvaluateFunction(condition)
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                v = e.value if e.value is not None else (v if not isinstance(v, _EngineOperation) else None)
+            element = v
+
+            if not element:
+                return
+
+            ev = function_memory.generatorEvaluateFunction(Util.deepCopy(func))
+            v = None
+            try:
+                v = ev.send(None)
+                while isinstance(v, _EngineOperation):
+                    if isinstance(v, EngineOperation.StopLoop):
+                        return
+                    res = yield v
+                    v = ev.send(res)
+            except StopIteration as e:
+                if isinstance(e.value, EngineOperation.StopLoop):
+                    break
 
 class Engine_Control_Break(LoaderFunction):
     id = Identifier("engine", "control/", "break")
@@ -3442,6 +3555,84 @@ class Engine_Time_Get(LoaderFunction):
     @staticmethod
     def get(function_memory:FunctionMemory):
         return Time(time.time())
+
+
+
+
+
+class Engine_Time_Check(LoaderFunction):
+    id = Identifier("engine", "time/", "check")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "time_frame": "required parameter"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if "time_frame" in args: return cls.time_check
+        return None
+
+    @staticmethod
+    def time_check(function_memory:FunctionMemory, time_frame:str):
+        h, m = time.asctime()[11:16].split(":")
+        h = int(h)
+        m = int(m)
+        # x = "am" if h < 12 else "pm"
+        rules = time_frame.split(";")
+        for rule in rules:
+            if m := re.match(r"(?P<h1>\d+):(?P<m1>\d+)(?P<x1>am|pm)\-(?P<h2>\d+):(?P<m2>\d+)(?P<x2>am|pm)", rule):
+                d = m.groupdict()
+                h1 = int(d["h1"])
+                m1 = int(d["m1"])
+                x1 = d["x1"]
+                if x1 == "am" and h1 == 12: h1 = 0
+                elif x1 == "pm" and h1 != 12: h1 += 12
+                h2 = int(d["h2"])
+                m2 = int(d["m2"])
+                x2 = d["x2"]
+                if x2 == "am" and h2 == 12: h2 = 0
+                elif x2 == "pm" and h2 != 12: h2 += 12
+                if h1 <= h2:
+                    if (h1 <= h and m1 <= m) and (h <= h2 and m <= m2):
+                        return True
+                else:
+                    if (h2 <= h and m2 <= m) and (h <= h1 and m <= m1): # this may be wrong...
+                        return True
+
+            elif m := re.match(r"(?P<h1>\d+):(?P<m1>\d+)(?P<x1>am|pm)~(?P<h2>\d+):(?P<m2>\d+)", rule):
+                d = m.groupdict()
+                h1 = int(d["h1"])
+                m1 = int(d["m1"])
+                x1 = d["x1"]
+                if x1 == "am" and h1 == 12: h1 = 0
+                elif x1 == "pm" and h1 != 12: h1 += 12
+                h2 = int(d["h2"])
+                m2 = int(d["m2"])
+                if (Util.wrapNumber(0, h1-h2, 23) <= h and m1-m2 <= h) and (h <= Util.wrapNumber(0, h1+h2, 23) and m <= m1+m2):
+                    return True
+                
+            elif m := re.match(r"~(?P<h1>\d+):(?P<m1>\d+)", rule):
+                d = m.groupdict()
+                h1 = int(d["h1"])
+                m1 = int(d["m1"])
+                x1 = d["x1"]
+                if x1 == "am" and h1 == 12: h1 = 0
+                elif x1 == "pm" and h1 != 12: h1 += 12
+                h2 = 0
+                m2 = 5
+                if (Util.wrapNumber(0, h1-h2, 23) <= h and m1-m2 <= h) and (h <= Util.wrapNumber(0, h1+h2, 23) and m <= m1+m2):
+                    return True
+            elif m := re.match(r"(?P<h>\d+):(?P<m>\d+)", rule):
+                d = m.groupdict()
+                if h == int(d["h"]) and m == int(d["m"]):
+                    return True
+        return False
+
+        # time_frame format: "2:00pm~0:02;3:00pm-3:15pm;6:17pm"
 
 # ^ Time ^ #
 

@@ -4,9 +4,9 @@
     [engine:text/join](
         "You ate `",
         <#item.name>,
-        "` healing you *",
+        "`, healing you by *",
         <#item.heal_amount>,
-        "*!",
+        "* hp!",
         seperator=""
     )
 )

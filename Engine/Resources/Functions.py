@@ -1056,7 +1056,7 @@ class Engine_Player_Heal(LoaderFunction):
         match args:
             case {
                 "amount": int() | dict()
-            }: ...
+            }: return cls.heal
             case _: return None
     @staticmethod
     def heal(function_memory:FunctionMemory, amount:int|dict):

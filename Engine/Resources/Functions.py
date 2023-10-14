@@ -1831,7 +1831,7 @@ class Engine_Random_Weighted(LoaderFunction):
         out = []
         total = sum(weights)
         for weight, val in zip(weights, values):
-            out.append(f"{f'{weight/total:.2f}'.rstrip('0').strip('.').lstrip('0')}%" + f":{val}")
+            out.append(f"{f'{weight/total*100:.2f}'.rstrip('0').strip('.').lstrip('0')}%" + f":{val}")
         return f"[{' '.join(out)}]"
 
     @classmethod
@@ -1844,7 +1844,7 @@ class Engine_Random_Weighted(LoaderFunction):
         out = []
         total = sum(weights)
         for weight, val in zip(weights, values):
-            out.append(f"{f'{weight/total:.2f}'.rstrip('0').strip('.').lstrip('0')}%" + f":{val}")
+            out.append(f"{f'{weight/total*100:.2f}'.rstrip('0').strip('.').lstrip('0')}%" + f":{val}")
         return f"[{' '.join(out)}]"
 
 class Engine_Random_LootTable(LoaderFunction):
@@ -1896,7 +1896,7 @@ class Engine_Random_Choice(LoaderFunction):
     def choice(function_memory:FunctionMemory, options:list):
         ret = random.choice(options)
         
-        return function_memory.generatorEvaluateFunction(ret)
+        return function_memory.evaluateFunction(ret)
 
 # ^ Random ^ #
 

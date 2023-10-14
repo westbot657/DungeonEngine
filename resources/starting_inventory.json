@@ -168,7 +168,7 @@
                     "entries": [
                         {
                             "type": "engine:item",
-                            "parent": "engine:item/bread",
+                            "parent": "engine:items/bread",
                             "count": {
                                 "function":"engine:random/range",
                                 "min": 5,
@@ -177,7 +177,7 @@
                         },
                         {
                             "type": "engine:item",
-                            "parent": "engine:item/apple",
+                            "parent": "engine:items/apple",
                             "count": {
                                 "function":"engine:random/range",
                                 "min": 1,
@@ -186,7 +186,7 @@
                         },
                         {
                             "type": "engine:item",
-                            "parent": "engine:item/cod",
+                            "parent": "engine:items/cod",
                             "count": {
                                 "function":"engine:random/range",
                                 "min": 0,
@@ -195,7 +195,7 @@
                         },
                         {
                             "type": "engine:item",
-                            "parent": "engine:item/salmon",
+                            "parent": "engine:items/salmon",
                             "count": {
                                 "function":"engine:random/range",
                                 "min": 0,

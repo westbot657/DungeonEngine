@@ -106,6 +106,8 @@ class Enemy(Entity):
 
     def attackPlayer(self, function_memory:FunctionMemory, player, current_trigger:str|None=None):
 
+        combat = function_memory.ref("#combat")
+
         attack = random.choice(self.attacks)
 
         self.prepFunctionMemory(function_memory)
@@ -113,6 +115,12 @@ class Enemy(Entity):
             "#player": player
         })
         function_memory.update({
+            "attack": attack
+        })
+
+        combat.turn_summary.update({
+            "attacking_enemy": self,
+            "attacked_player": player,
             "attack": attack
         })
 

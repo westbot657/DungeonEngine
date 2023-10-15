@@ -24,6 +24,9 @@ class StatusEffectManager:
     def fullStats(self, function_memory:FunctionMemory):
         return "\n".join([effect.fullStats() for effect in self.effects]).strip()
 
+    def quickStats(self, function_memory:FunctionMemory):
+        return "\n".join([effect.quickStats() for effect in self.effects]).strip()
+
     def onPlayerHit(self, function_memory:FunctionMemory, damage:int):
         yield
 

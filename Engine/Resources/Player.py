@@ -208,13 +208,24 @@ class Player(Entity):
 
     def fullInventoryStats(self, function_memory:FunctionMemory):
         text = "\n".join([
+            "```less",
             f"{self.name} | {self.health}/{self.max_health} | {self.location.translate(function_memory)}",
             f"{self.currency}",
             self.inventory.fullStats(function_memory),
-            self.status_effects.fullStats(function_memory)
+            self.status_effects.fullStats(function_memory),
+            "```"
         ]).strip()
+        return text
 
-
+    def quickInventoryStats(self, function_memory:FunctionMemory):
+        text = "\n".join([
+            "```less",
+            f"{self.name} | {self.health}/{self.max_health}",
+            f"{self.currency}",
+            self.inventory.quickStats(function_memory),
+            self.status_effects.quickStats(function_memory),
+            "```"
+        ]).strip()
         return text
 
     def attackEnemy(self, function_memory:FunctionMemory, enemy):

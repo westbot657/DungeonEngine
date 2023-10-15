@@ -672,7 +672,7 @@ class DungeonLoader:
                     else:
                         function_memory.engine.sendOutput(player, f"You have no Weapon, Armor, Tool, or Ammo called '{item_name}'")
 
-    @TextPattern(r"\b(?P<keyword>[Uu]se|[Ee]at|[Tt]hrow|[Aa]pply|[Dd]rink) *(?P<item_name>.*)\b", TextPattern.CheckType.SEARCH, ["common"])
+    @TextPattern(r"\b(?P<keyword>[Uu]se|[Ee]at|[Tt]hrow|[Aa]pply|[Dd]rink)\b *(?P<item_name>.*)", TextPattern.CheckType.SEARCH, ["common"])
     @staticmethod
     def checkTextUse(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
         keyword: str = groupdict["keyword"]
@@ -711,7 +711,10 @@ class DungeonLoader:
     @TextPattern(r"\b(?:[Ii]nventory|[Bb]ag|[Ii]tems)\b", TextPattern.CheckType.SEARCH, ["global"])
     @staticmethod
     def checkTextInventory(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
-        function_memory.engine.sendOutput(player, player.fullInventoryStats(function_memory))
+        if "full" in raw_text:
+            function_memory.engine.sendOutput(player, player.fullInventoryStats(function_memory))
+        else:
+            function_memory.engine.sendOutput(player, player.quickInventoryStats(function_memory))
 
     @TextPattern(r"\b(?:[Cc]ombat|[Bb]attle|[Ss]tats)\b", TextPattern.CheckType.SEARCH, ["global"])
     @staticmethod

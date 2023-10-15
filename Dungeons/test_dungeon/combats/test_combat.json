@@ -35,7 +35,8 @@
             "functions": [
                 {
                     "function": "engine:combat/message",
-                    "message": "You walk in to a room. There are 2 zombies! they see you and slowly walk over to you..."
+                    "message": "You walk in to a room. There are 2 zombies! they see you and slowly walk over to you...",
+                    "gloabl_message": true
                 },
                 {
                     "function": "engine:combat/spawn",

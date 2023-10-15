@@ -148,6 +148,25 @@ class Inventory(FunctionalElement):
         if out: return "\n".join([st, *out])
         return f"{st}\n[no items in inventory]"
 
+    def quickStats(self, function_memory:FunctionMemory):
+        equip_stats = []
+        for v in self.equips.values():
+            v: GameObject|None
+            if v is None: continue
+            if (b := v.bonuses(function_memory)) is not None: equip_stats.append(b)
+        
+        out = []
+        st = ""
+        if equip_stats:
+            st = " | ".join(equip_stats)
+        
+        function_memory.engine.sendOutput(9, "update-inventory-ui")
+        
+        for obj in self.contents:
+            out.append(obj.quickStats(function_memory))
+        if out: return "\n".join([st, *out])
+        return f"{st}\n[no items in inventory]"
+
     @classmethod
     def from_list(cls, engine, data:list):
         equips = {}

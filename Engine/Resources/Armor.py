@@ -37,7 +37,7 @@ class Armor(GameObject):
         return f"+{self.damage_reduction.quickDisplay(engine)}def"
 
     def quickStats(self, function_memory:FunctionMemory):
-        return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
+        return f"{self.name} +{self.damage_reduction.quickDisplay(function_memory)}def {Util.getDurabilityBar(self.durability, self.max_durability)}"
 
     def fullStats(self, function_memory:FunctionMemory, is_equipped=False):
         return f"{self.name} +{self.damage_reduction.fullDisplay(function_memory)}def" + (f" \"{self.description}\"" if self.description else "") + f" {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [WEARING]" if is_equipped else "")
@@ -124,14 +124,20 @@ class Armor(GameObject):
         function_memory.addContextData({
             "#damage_reduction": reduced_damage
         })
+
+        combat = function_memory.ref("#combat")
+
+        combat.turn_summary.update({
+            "blocking_armor": self if reduced_damage else None,
+            "damage_blocked": reduced_damage
+        })
         
         if reduced_damage > 0:
-            combat = function_memory.ref("#combat")
             if reduced_damage < damage:
-                combat.scheduled_tasks.append(combat.Task(combat.Operation.Message(f"`{self.name}` ─ Blocked *{reduced_damage}* damage!", function_memory.ref("#player")), 0))
+                combat.addTask(combat.Operation.Message(f"`{self.name}` ─ Blocked *{reduced_damage}* damage!", function_memory.ref("#player")))
                 # function_memory.engine.sendOutput(function_memory.ref("#player"), f"`{self.name}` ─ Blocked *{reduced_damage}* damage!")
             elif reduced_damage >= damage:
-                combat.scheduled_tasks.append(combat.Task(combat.Operation.Message(f"`{self.name}` ─ Attack blocked!", function_memory.ref("#player")), 0))
+                combat.addTask(combat.Operation.Message(f"`{self.name}` ─ Attack blocked!", function_memory.ref("#player")))
                 
                 # function_memory.engine.sendOutput(function_memory.ref("#player"), f"`{self.name}` ─ Attack blocked!")
 

@@ -29,7 +29,7 @@ except ImportError:
 
 from enum import Enum, auto
 
-import random, re, json
+import random, re, json, time
 
 
 class Combat(FunctionalElement):
@@ -49,10 +49,11 @@ class Combat(FunctionalElement):
                 self.name = name
         
         class Message(_Operation):
-            def __init__(self, message:str, *players):
+            def __init__(self, message:str, *players, global_message=False):
                 super().__init__("Message")
                 self.message = message
                 self.players = players
+                self.global_message = global_message
 
         class Spawn(_Operation):
             def __init__(self, enemies:list[str], priority):
@@ -162,6 +163,17 @@ class Combat(FunctionalElement):
         self.function_memory = None
         self.combat_config = Util.deepCopy(self._combat_config)
         self.active = True
+        self.turn_summary = {
+            "damage_dealt": 0,
+            "damage_blocked": 0,
+            "attacking_enemy": None,
+            "attacked_player": None,
+            "attack": None,
+            "blocking_armor": None,
+            "attack_hit": None,
+            "outputs": []
+        }
+        self.summarize_output = True
         self._enemies = {}
 
     def resetCombat(self):
@@ -224,7 +236,11 @@ class Combat(FunctionalElement):
 
     def addTask(self, task:Operation._Operation, position:int=-1, delay:int=0):
         if self.complete: return
-        self.scheduled_tasks.insert(position, Combat.Task(task, delay))
+
+        if isinstance(task, Combat.Operation.Message) and (not task.global_message) and self.summarize_output:
+            self.turn_summary["outputs"].append(task.message)
+        else:
+            self.scheduled_tasks.insert(position, Combat.Task(task, delay))
 
     def addPlayer(self, player:Player):
         if self.complete: return
@@ -490,15 +506,18 @@ class Combat(FunctionalElement):
                             res = yield (player.uuid, e.value)
                         else:
                             v = e.value or v # idk why i'm doing this
+
+                    self.send_turn_summary(function_memory)
                     
                     self.current_turn += 1
                     if self.current_turn >= len(self.turn_order):
                         self.current_turn = 0
                     self.turn = self.turn_order[self.current_turn]
 
+
                     if isinstance(self.turn, Enemy):
                         self.scheduled_tasks.append(
-                            Combat.Task(Combat.Operation._EnemyAttack(self.turn, random.choice(self.players or [None])), 10000)
+                            Combat.Task(Combat.Operation._EnemyAttack(self.turn, random.choice(self.players or [None])), f"{time.time()+5}")
                         )
 
             case Combat.Operation.Trigger():
@@ -565,11 +584,17 @@ class Combat(FunctionalElement):
             case Combat.Operation.Message():
                 Log["debug"]["combat"]["message"](operation.message)
                 if operation.players:
-                    for player in operation.players:
-                        function_memory.engine.sendOutput(player, operation.message)
+                    if self.summarize_output:
+                        self.turn_summary["outputs"].append(operation.message)
+                    else:
+                        for player in operation.players:
+                            function_memory.engine.sendOutput(player, operation.message)
                 else:
-                    for player in self.players:
-                        function_memory.engine.sendOutput(player, operation.message)
+                    if self.summarize_output:
+                        self.turn_summary["outputs"].append(operation.message)
+                    else:
+                        for player in self.players:
+                            function_memory.engine.sendOutput(player, operation.message)
 
             case Combat.Operation._NextTurn():
 
@@ -581,17 +606,84 @@ class Combat(FunctionalElement):
                     self.current_turn = 0
                 self.turn = self.turn_order[self.current_turn]
                 
+                self.send_turn_summary(function_memory)
+
                 if isinstance(self.turn, Enemy):
+                    self.turn_summary = {
+                        "damage_dealt": 0,
+                        "damage_blocked": 0,
+                        "attacking_enemy": None,
+                        "attacked_player": None,
+                        "attack": None,
+                        "blocking_armor": None,
+                        "attack_hit": None,
+                        "outputs": []
+                    }
+                    self.summarize_output = True
                     self.scheduled_tasks.append(
-                        Combat.Task(Combat.Operation._EnemyAttack(self.turn, random.choice(self.players)), 10000)
+                        Combat.Task(Combat.Operation._EnemyAttack(self.turn, random.choice(self.players)), f"{time.time()+5}")
                     )
                 else:
+                    # self.summarize_output = False
                     function_memory.engine.sendOutput(9, "update-combat-ui")
 
             case _:
                 raise CombatError(f"Unrecognized combat operation: '{operation}'")
         yield (0, EngineOperation.Continue())
 
+
+    def send_turn_summary(self, function_memory:FunctionMemory):
+        targets = " / ".join(p.name for p in self.players)
+
+        damage: int = self.turn_summary["damage_dealt"]
+        blocked: int = self.turn_summary["damage_blocked"]
+        enemy: Enemy = self.turn_summary["attacking_enemy"]
+        target: Player = self.turn_summary["attacked_player"]
+        attack = self.turn_summary["attack"]
+        hit: bool = self.turn_summary["attack_hit"],
+        armor = self.turn_summary["blocking_armor"]
+        outs = "\n".join(self.turn_summary["outputs"])
+
+        if target is None: return
+
+
+        self.turn_summary = {
+            "damage_dealt": 0,
+            "damage_blocked": 0,
+            "attacking_enemy": None,
+            "attacked_player": None,
+            "attack": None,
+            "blocking_armor": None,
+            "attack_hit": None,
+            "outputs": []
+        }
+
+        if hit and damage:
+            summary = "\n".join([
+                "```less",
+                targets,
+                outs,
+                f"\n─ {enemy.name} {Util.getDurabilityBar(enemy.health, enemy.max_health)} ─ {attack.name} ─ HIT ─ {damage} damage",
+                f"Damage: {damage}" + (f" (-{blocked} {armor.name}) = {max(0, damage-blocked)}" if armor.name != "Common Clothes" else ""),
+                f"│ {target.name} {Util.getDurabilityBar(target.health, target.max_health)}"
+            ])
+
+            if armor.name != "Common Clothes":
+                summary += f"\n│ {armor.name} {armor.durability}/{armor.max_durability}"
+
+            summary += "\n```"
+
+        else:
+            summary = "\n".join([
+                "```less",
+                targets,
+                outs,
+                f"\n─ {enemy.name} {Util.getDurabilityBar(enemy.health, enemy.max_health)} ─ {attack.name} ─ MISS",
+                f"│ {target.name} {Util.getDurabilityBar(target.health, target.max_health)}",
+                "```"
+            ])
+        
+        function_memory.engine.sendOutput("Combat", summary)
 
     def _mainloop(self, function_memory:FunctionMemory):
         self.function_memory = function_memory
@@ -607,8 +699,13 @@ class Combat(FunctionalElement):
             
             for task in self.scheduled_tasks.copy():
                 task: Combat.Task
-                task.delay -= 1
-                if task.delay <= 0:
+                if isinstance(task.delay, int):
+                    task.delay -= 1
+                elif isinstance(task.delay, str):
+                    if time.time() >= float(task.delay):
+                        task.delay = 0
+                    
+                if isinstance(task.delay, (int, float)) and task.delay <= 0:
                     Log["debug"]["combat"](f"running combat-task: {task}")
                     self.scheduled_tasks.remove(task)
                     op = task.task

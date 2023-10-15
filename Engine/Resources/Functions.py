@@ -1841,11 +1841,10 @@ class Engine_Random_Weighted(LoaderFunction):
 
         weights = json.loads(data["weights"].replace("'", ""))
         values = json.loads(data["values"].replace("'", ""))
-        out = []
-        total = sum(weights)
-        for weight, val in zip(weights, values):
-            out.append(f"{f'{weight/total*100:.2f}'.rstrip('0').strip('.').lstrip('0')}%" + f":{val}")
-        return f"[{' '.join(out)}]"
+
+        low = min(values)
+        high = max(values)
+        return f"[{low}..{high}]"
 
 class Engine_Random_LootTable(LoaderFunction):
     id = Identifier("engine", "random/", "loot_table")
@@ -3375,7 +3374,8 @@ class Engine_Combat_Message(LoaderFunction):
         "optional_args": -1,
         "args": {
             "message": "required parameter",
-            "players": "*parameters"
+            "players": "*parameters",
+            "global_message": "optional parameter"
         }
     }
     
@@ -3391,7 +3391,7 @@ class Engine_Combat_Message(LoaderFunction):
         else: players = tuple()
         
         combat: Combat = function_memory.ref("#combat")
-        combat.addTask(Combat.Operation.Message(kwargs.get("message"), *players))
+        combat.addTask(Combat.Operation.Message(kwargs.get("message"), *players, global_message=kwargs.get("global_message", False)))
 
 class Engine_Combat_KillPlayer(LoaderFunction):
     id = Identifier("engine", "combat/", "kill_player")

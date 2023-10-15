@@ -48,7 +48,7 @@ class Weapon(GameObject):
         return f"{self.name} +{self.damage.fullDisplay(function_memory)}dmg {self.range}ft" + (f" \"{self.description}\"" if self.description else "") + f" {Util.getDurabilityBar(self.durability, self.max_durability)}" + (" [EQUIPPED]" if is_equipped else "")
 
     def quickStats(self, function_memory:FunctionMemory):
-        return f"{self.name} {Util.getDurabilityBar(self.durability, self.max_durability)}"
+        return f"{self.name} +{self.damage.quickDisplay(function_memory)}dmg {Util.getDurabilityBar(self.durability, self.max_durability)}"
 
     def getLocalVariables(self) -> dict:
         d = {

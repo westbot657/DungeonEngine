@@ -144,6 +144,13 @@ class Attack(FunctionalElement):
             if isinstance(dmg, int) and 0 <= dmg:
                 damage = dmg
         
+        combat = function_memory.ref("#combat")
+
+        combat.turn_summary.update({
+            "attack_hit": bool(damage > 0),
+            "damage_dealt": damage
+        })
+
         return damage
 
     def onMiss(self, function_memory:FunctionMemory, target):
@@ -168,6 +175,13 @@ class Attack(FunctionalElement):
             except StopIteration as e:
                 v = e.value or (v if not isinstance(v, _EngineOperation) else None)
         
+        combat = function_memory.ref("#combat")
+        
+        combat.turn_summary.update({
+            "attack_hit": False,
+            "damage_dealt": 0
+        })
+
         return 0
 
 

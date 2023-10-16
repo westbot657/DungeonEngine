@@ -3611,9 +3611,9 @@ class Engine_Time_Wait(LoaderFunction):
         # prompt = args.get("prompt", "")
         # x = yield EngineOperation.GetInput(function_memory.ref("#player"), prompt)
         # return x
-        print("waiting?")
+        # print("waiting?")
         yield EngineOperation.Wait(delay)
-        print("waited")
+        # print("waited")
         # return
 
 class Engine_Time_Check(LoaderFunction):

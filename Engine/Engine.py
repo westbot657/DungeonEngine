@@ -377,9 +377,9 @@ class Engine:
                     while True:
                         v = task.send(None)
                         try:
-                            print("=== BASE ENGINE LEVEL ===")
+                            # print("=== BASE ENGINE LEVEL ===")
                             if isinstance(v[2], EngineOperation.Wait):
-                                print("--- WAITING ---")
+                                # print("--- WAITING ---")
                                 self.delays.append((time.time()+v[2].delay, task))
                                 break
                             self.evaluateResult(*v)

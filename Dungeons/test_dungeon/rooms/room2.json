@@ -12,6 +12,25 @@
             "id": "room4_door",
             "target": "test_dungeon:rooms/room4",
             "travel_message": "you enter room 4"
+        },
+        {
+            "type": "engine:interactable/shop",
+            "id": "shop",
+            "stock": {
+                "pools": [
+                    {
+                        "rolls": 2,
+                        "entries": [
+                            {
+                                "name": "",
+                                "item": {},
+                                "cost": [],
+                                "amount": 0
+                            }
+                        ]
+                    }
+                ]
+            }
         }
     ],
     "events": {

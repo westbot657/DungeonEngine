@@ -2516,6 +2516,32 @@ class Engine_List_Length(LoaderFunction):
         lst = kwargs["list"]
         return len(lst)
 
+class Engine_List_Remove(LoaderFunction):
+    id = Identifier("engine", "list/", "remove")
+    
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "list": "required parameter",
+            "value": "required parameter"
+        }
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if "list" in args and "value" in args:
+            return cls.remove
+        return None
+    
+    @staticmethod
+    def remove(function_memory:FunctionMemory, **kwargs):
+        ls = kwargs.get("list")
+        val = kwargs.get("value")
+        if val in ls:
+            ls.remove(val)
+    
+
 # ^ List ^ #
 
 ####XXX################XXX####

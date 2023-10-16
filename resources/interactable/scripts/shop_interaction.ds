@@ -73,6 +73,7 @@ if (<.closed>) {
                 [engine:text/match](<response>)
                 @pattern: <%text/pattern/yes> # {
                     [engine:player/give_game_object](<item>::"item")
+                    [engine:list/remove](<.current_stock>, <item>)
                 }
 
             }

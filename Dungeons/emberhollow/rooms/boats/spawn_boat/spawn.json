@@ -1,0 +1,9 @@
+{
+    "name": "Boat",
+    "interactions": [],
+    "events": {
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/boats/spawn_boat/on_enter"
+        }
+    }
+}

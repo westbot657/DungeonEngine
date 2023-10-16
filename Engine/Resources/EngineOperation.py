@@ -2,9 +2,11 @@
 
 
 from enum import Enum, auto
+import time
 
 class OpType(Enum):
     GET_INPUT = auto()
+    WAIT = auto()
     RESTART = auto()
     SUCCESS = auto()
     CONTINUE = auto()
@@ -30,6 +32,16 @@ class EngineOperation:
             super().__init__(OpType.GET_INPUT)
             self.target = target
             self.prompt = prompt
+    
+    class Wait(_EngineOperation):
+        """
+        yield this to wait for a delay without blocking the engine execution
+        """
+        def __init__(self, delay:float|int):
+            super().__init__(OpType.WAIT)
+            self.delay = delay
+            self.task = None
+            self.exec_time = time.time() + delay
 
     class MovePlayer(_EngineOperation):
 

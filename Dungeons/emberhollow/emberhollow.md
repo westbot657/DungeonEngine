@@ -217,8 +217,12 @@ Docks/Slums:
 - 3-14: 
 
 
+The INN:
+Keepers family: Lyklor & Phyrra Inamaer - Kolvar, Tamnaeth, Syllia
+
+
 Houses (58 (residential) + 31 (slums) = 89):
-Residential: (100 people)
+Residential:
 1. Aubron & Zentha Farlee - Sana, Faelar
 2. Ailduin
 3. Nym
@@ -232,13 +236,13 @@ Residential: (100 people)
 11. Ariawyn & Ciliren Liaren - Phyrra, Elmyra
 12. Aired & Helartha Elcaryn
 13. Elorshin
-14. --- Player 2 ---
+14. Broldric (dwarf)
 15. Miirphys
 16. Eilauver
 17. Tanyl Oriris - Shalia, Esiyae
 18. Cohnal
 19. Beldroth
-20. --- Player 5 ---
+20. Aeson & Enania Parona
 21. Ilvisar
 22. Lamruil
 23. Almer (travel goodies)
@@ -246,7 +250,7 @@ Residential: (100 people)
 25. Alas & Lusha Venfina
 26. Agis
 27. Kindroth
-28. --- Player 1 ---
+28. Alen
 29. Intevar & Allisa Yllarel - Feno, Elas, Rhistel
 30. Syvis
 31. Castien & Edea Mordi - Saria, Madris, Folen, Elandorr
@@ -258,7 +262,7 @@ Residential: (100 people)
 37. Liluth (Bakery)
 38. Ryo & Ayla
 39. Alwin (corrupt person idk)
-40. --- Player 3 ---
+40. Elidyr
 41. Arbane
 42. Wyrran (corrupt person idk)
 43. Folred
@@ -268,9 +272,9 @@ Residential: (100 people)
 47. Bemere
 48. Ryul & Meira Elarie - Ivaran, Tanyl, Hagmer, Penelo, Alosrin
 49. Tyrael
-50. Duket (dwarf) & Heldrilin (dwarf)
+50. Duket (dwarf) & Heldrilin Silvertoe (dwarf)
 51. Haryk Kelfina (dnd ref)
-52. --- Player 4 ---
+52. Kavrala
 53. Feyrith
 54. Anulin (dwarf)
 55. Myrin
@@ -278,7 +282,7 @@ Residential: (100 people)
 57. Alre
 58. Darunia
 
-Slums: (52 people)
+Slums:
 1. Gaeleath & Lura Keyfiel
 2. Dendrod (dwarf)
 3. Kelvhan & Myantha Kelfir
@@ -295,7 +299,7 @@ Slums: (52 people)
 14. Eirina
 15. Elyon & Soliana Permys
 16. Kesefeon & Meriel Holaren - Elmer, Radelia
-17. --- Player 6 ---
+17. Ormuid (dwarf)
 18. Daratrine
 19. Kyrenic
 20. Triandal & Ameria Dathyra - Revalor
@@ -306,7 +310,7 @@ Slums: (52 people)
 25. Merethyl
 26. Katyr & Esta Heiynore
 27. Anfalen & Keya Fenric
-28. Akkar
+28. Akkar (retail shack)
 29. Luthais
 30. Elre & Aenwyn Iliydark
 31. Ardryll
@@ -329,12 +333,12 @@ Commercial/Public buildings (25):
 - Library
 - General Boating Supply Shop
 - Private Detective
-- food place ----- need better name
+- The Diner
 - Fresh foods Market
 - Blacksmith workshop
 - Armory
 - Magic Item Shop
-- Pawn Shop (Retail) ----- need better name
+- Akkar's retail shack
 - Bar
 - Theater
 - Carpentry Shop

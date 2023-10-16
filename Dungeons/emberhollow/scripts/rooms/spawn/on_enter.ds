@@ -1,0 +1,25 @@
+
+
+
+
+
+// Introduction/lore stuff
+
+[engine:player/set_tag]("story", true)
+
+/*
+
+if ([engine:player/get_tag]("story")) {
+    [engine:player/message]("")
+}
+
+*/
+
+
+if ([engine:player/get_tag]("story")) {
+    [engine:player/message]("[there will be a cool story here at some point]")
+}
+
+
+
+

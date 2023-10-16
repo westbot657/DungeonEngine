@@ -1,0 +1,8 @@
+{
+    "name": "spawn setup",
+    "events": {
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/spawn/on_enter.ds"
+        }
+    }
+}

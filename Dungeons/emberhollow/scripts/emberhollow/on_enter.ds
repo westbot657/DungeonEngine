@@ -18,6 +18,18 @@ they need to be given some tags:
 [engine:player/init_tag]("emberhollow_suspicion", 0)
 // this is how much the corrupt government thinks you may be onto them
 
+[engine:player/init_tag]("tutorial_stage", 1)
+// this is so that the dungeon will know to guide the player to the Inn
+// stages:
+// 0 - out of tutorial
+// 1 - just off the boat, needs directions to the Inn
+// 2 - on the way to the Inn, needs to point out some back alley type thing involving some government person
+// 3 - at the Inn, some criminals are attacking some defenseless person (Inn keeper) - player needs to step in to fight the criminals
+// 4 - player defeated the criminals should be directed to help the Inn keeper. - Inn keeper gives player a room, and talks about how the criminals are actually part of the government
+
+
+
+
 
 
 

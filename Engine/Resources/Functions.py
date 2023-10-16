@@ -2423,8 +2423,11 @@ class Engine_List_Append(LoaderFunction):
             return cls.append
     @staticmethod
     def append(function_memory:FunctionMemory, **kwargs):
-        ls = kwargs.get("list")
+        ls: list = kwargs.get("list")
         elements = kwargs.get("elements")
+
+        for element in elements:
+            ls.append(element)
 
 class Engine_List_Contains(LoaderFunction):
     id = Identifier("engine", "list/", "contains")
@@ -3462,7 +3465,7 @@ class Engine_Variable_IsDefined(LoaderFunction):
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
             case {
-                "var_name": str
+                "var_name": str()
             }: return cls.defined
             case _: return None
     @staticmethod
@@ -3559,9 +3562,32 @@ class Engine_Time_Get(LoaderFunction):
     def get(function_memory:FunctionMemory):
         return Time(time.time())
 
+class Engine_Time_Wait(LoaderFunction):
+    id = Identifier("engine", "time/", "wait")
 
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "delay": "required parameter"
+        }
+    }
 
-
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "delay": float()|int()
+            }: return cls.wait
+            case _: return None
+    @staticmethod
+    def wait(function_memory:FunctionMemory, delay):
+        # prompt = args.get("prompt", "")
+        # x = yield EngineOperation.GetInput(function_memory.ref("#player"), prompt)
+        # return x
+        ...
+        yield EngineOperation.Wait(delay)
+        return
 
 class Engine_Time_Check(LoaderFunction):
     id = Identifier("engine", "time/", "check")

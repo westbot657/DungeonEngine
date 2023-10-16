@@ -68,6 +68,7 @@ class Engine:
         self.players: dict[str, Player] = {}
         self.combats: list[Combat] = []
         self.tasks: list[Generator] = []
+        self.delays: list = []
         self._player_input_categories = ["common", "global", "world"]
         self._frame_times = [1 for _ in range(60)]
         self._frame_start = 0
@@ -208,6 +209,18 @@ class Engine:
         else:
             return EngineOperation.Success(v)
 
+    def task_wrapper(self, player_id, generator):
+        yield
+
+        try:
+            v = generator.send(None)
+            while isinstance(v, _EngineOperation):
+                res = yield (self.default_input_handler, generator, v, player_id, "")
+                v = generator.send(res)
+        except StopIteration as e:
+            if isinstance(e.value, _EngineOperation):
+                res = yield (self.default_input_handler, generator, v, player_id, "")
+
     def _move_player(self, function_memory:FunctionMemory, player:Player, target_location:Location, handler_getter:Callable, handler:Generator, is_death=False):
         old_room = self.loader.getLocation(self._function_memory, player.location)
         new_room = self.loader.getLocation(self._function_memory, target_location)
@@ -281,6 +294,15 @@ class Engine:
                 wrapper = self.inputGetterWrapper(handler)
                 wrapper.send(None)
                 self.input_queue.update({player_id: [handler_getter, wrapper, ""]})
+
+            case EngineOperation.Wait():
+                wrap = self.task_wrapper(player_id, result.task)
+                # print("wrap.send(None): ...")
+                # print("wrap.send(None)?:", )
+                wrap.send(None)
+                self.delays.append((time.time()+result.delay, wrap))
+
+                raise StopIteration
 
             case EngineOperation.StartCombat():
                 player: Player = result.player
@@ -362,6 +384,12 @@ class Engine:
                 continue
             # Main Loop
 
+            for delayed in self.delays.copy():
+                # print(f"{delayed=}")
+                if time.time() >= delayed[0]:
+                    self.delays.remove(delayed)
+                    self.tasks.append(delayed[1])
+
             # run scheduled tasks
             while self.tasks:
                 task = self.tasks.pop(0)
@@ -370,10 +398,15 @@ class Engine:
                     while True:
                         v = task.send(None)
                         try:
+                            # try:
+                            if isinstance(v[2], EngineOperation.Wait):
+                                v[2].task = task
+                            # except: pass
                             self.evaluateResult(*v)
                         except EngineError as e:
                             print(e)
                 except StopIteration as e:
+
                     Log["debug"]["engine"](f"Task completed: {task}  {v=}  {e.value=}")
 
             for combat in self.combats.copy():

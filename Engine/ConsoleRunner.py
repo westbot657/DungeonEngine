@@ -28,7 +28,7 @@ with warnings.catch_warnings():
 from Engine import Engine
 
 
-os.system('') # this fixes console ansi colors for some reason
+os.system('') # this fixes console ansi colors for some reason # NOTE: comment out when compiling VS version, it causes windows to think the exe is a virus
 
 # VOLUME_MOD = 0
 

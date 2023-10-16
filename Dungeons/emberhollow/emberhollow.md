@@ -1,6 +1,6 @@
 
 # Emberhollow
-- Mining town on the coast
+- Frozen Mining town on the coast
 
 - produce lots of weapons and armor, along with lots of stone that is used for construction.
 - local wizard will occasionally buy a collection of weapons/armor, enchant them, and re-sell them for more
@@ -136,185 +136,187 @@ why are the players here?
 
 
 
-Roads (29 (residential) + 30 (commercial) + 14 (docks) = 73):
+Roads (30 (residential) + 30 (commercial) + 14 (docks) = 74):
 Residential:
-- ...
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
+- 1-0
+- 1-1
+- 1-2
+- 1-3
+- 1-4
+- 1-5
+- 1-6
+- 1-7
+- 1-8
+- 1-9
+- 1-10
+- 1-11
+- 1-12
+- 1-13
+- 1-14
+- 1-15
+- 1-16
+- 1-17
+- 1-18
+- 1-19
+- 1-20
+- 1-21
+- 1-22
+- 1-23
+- 1-24
+- 1-25
+- 1-26
+- 1-27
+- 1-28
+- 1-29 (alley way to building 52)
 Commercial:
-- ...
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
+- 2-0
+- 2-1
+- 2-2
+- 2-3
+- 2-4
+- 2-5
+- 2-6
+- 2-7
+- 2-8
+- 2-9
+- 2-10
+- 2-11
+- 2-12
+- 2-13
+- 2-14
+- 2-15
+- 2-16
+- 2-17
+- 2-18
+- 2-19
+- 2-20
+- 2-21
+- 2-22
+- 2-23
+- 2-24
+- 2-25
+- 2-26
+- 2-27
+- 2-28
+- 2-29
+- 2-30
 Docks/Slums:
-- ...
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
-- 
+- 3-1: East path
+- 3-2: market boardwalk 1
+- 3-3: market boardwalk 2
+- 3-5: North path
+- 3-4: port corner
+- 3-6: side dock
+- 3-7: 
+- 3-8: 
+- 3-9: 
+- 3-10: 
+- 3-11: 
+- 3-12: 
+- 3-13: 
+- 3-14: 
 
 
 Houses (58 (residential) + 31 (slums) = 89):
-Residential:
-1. ...
-2. 
-3. 
-4. 
-5. 
-6. 
-7. 
-8. 
-9. 
-10. 
-11. 
-12. 
-13. 
-14. 
-15. 
-16. 
-17. 
-18. 
-19. 
-20. 
-21. 
-22. 
-23. 
-24. 
-25. 
-26. 
-27. 
-28. 
-29. 
-30. 
-31. 
-32. 
-33. 
-34. 
-35. 
-36. 
-37. 
-38. 
-39. 
-40. 
-41. 
-42. 
-43. 
-44. 
-45. 
-46. 
-47. 
-48. 
-49. 
-50. 
-51. 
-52. 
-53. 
-54. 
-55. 
-56. 
-57. 
-58. 
+Residential: (100 people)
+1. Aubron & Zentha Farlee - Sana, Faelar
+2. Ailduin
+3. Nym
+4. Edyrm (trinket shop)
+5. Alinar
+6. Elincia
+7. Gorwin & Nimue Olanan
+8. Estelar & Siora Adcaryn - Almon, Ievis
+9. Malon & Amedee Kelrel - Ashera, Maeral, Aerendyl
+10. Rydel
+11. Ariawyn & Ciliren Liaren - Phyrra, Elmyra
+12. Aired & Helartha Elcaryn
+13. Elorshin
+14. --- Player 2 ---
+15. Miirphys
+16. Eilauver
+17. Tanyl Oriris - Shalia, Esiyae
+18. Cohnal
+19. Beldroth
+20. --- Player 5 ---
+21. Ilvisar
+22. Lamruil
+23. Almer (travel goodies)
+24. Elred & Lenna (Pottry shop) Xyrren - Fenian, Pyria
+25. Alas & Lusha Venfina
+26. Agis
+27. Kindroth
+28. --- Player 1 ---
+29. Intevar & Allisa Yllarel - Feno, Elas, Rhistel
+30. Syvis
+31. Castien & Edea Mordi - Saria, Madris, Folen, Elandorr
+32. Iyrandrar
+33. Lymseia & Viessa Faecyne
+34. Sylvar & Sarya Virro - Elduin, Elluin, Edyrm
+35. Ilrune
+36. Ascal & Ena Krisrel - Selphie, Dilya
+37. Liluth (Bakery)
+38. Ryo & Ayla
+39. Alwin (corrupt person idk)
+40. --- Player 3 ---
+41. Arbane
+42. Wyrran (corrupt person idk)
+43. Folred
+44. Edwyrd (Travel Magic Tricks) & Lyra Ermaer - Sharian, Aolis
+45. Virion
+46. Theodred & Naexi Aera
+47. Bemere
+48. Ryul & Meira Elarie - Ivaran, Tanyl, Hagmer, Penelo, Alosrin
+49. Tyrael
+50. Duket (dwarf) & Heldrilin (dwarf)
+51. Haryk Kelfina (dnd ref)
+52. --- Player 4 ---
+53. Feyrith
+54. Anulin (dwarf)
+55. Myrin
+56. Ryfon
+57. Alre
+58. Darunia
 
-Slums:
-1. ...
-2. 
-3. 
-4. 
-5. 
-6. 
-7. 
-8. 
-9. 
-10. 
-11. 
-12. 
-13. 
-14. 
-15. 
-16. 
-17. 
-18. 
-19. 
-20. 
-21. 
-22. 
-23. 
-24. 
-25. 
-26. 
-27. 
-28. 
-29. 
-30. 
-31. 
+Slums: (52 people)
+1. Gaeleath & Lura Keyfiel
+2. Dendrod (dwarf)
+3. Kelvhan & Myantha Kelfir
+4. Laeroth & Amnestria Valxina
+5. Edraele
+6. Arnarra
+7. Nesic (dwarf)
+8. Sythaeryn & Leena Fenna
+9. Eroan & Llorva Ianna
+10. Brossod (dwarf)
+11. Hatharal & Faunalyn Leoren - Kavrala
+12. Arlen & Velatha Elbalar
+13. Elora
+14. Eirina
+15. Elyon & Soliana Permys
+16. Kesefeon & Meriel Holaren - Elmer, Radelia
+17. --- Player 6 ---
+18. Daratrine
+19. Kyrenic
+20. Triandal & Ameria Dathyra - Revalor
+21. Mihangyl & Thaola Trisric
+22. Entrydal
+23. Neldrida (dwarf)
+24. Tathaln & Farryn Kealen - Vaeri, Eliyen
+25. Merethyl
+26. Katyr & Esta Heiynore
+27. Anfalen & Keya Fenric
+28. Akkar
+29. Luthais
+30. Elre & Aenwyn Iliydark
+31. Ardryll
 
 Residential Shops:
-- __'s Bakery
-- __'s Pottery Shop
-- __'s Travel Magic Tricks
-- __'s Travel goodies
-- __'s Trinket Shop
+- Liluth's Bakery
+- Lenna's Pottery Shop
+- Edwyrd's Travel Magic Tricks
+- Almer's Travel goodies
+- Edyrm's Trinket Shop
 
 
 Commercial/Public buildings (25):
@@ -358,16 +360,12 @@ Government buildings (11):
 - law enforcement for the docks
 
 Other "buildings":
+- Wizard's Tower - Elran the Wizard
 - Wizard's Dragon Keep
 - Telecomms Dragon Perch
 - hidden courtyard 1
 - hidden courtyard 2
 
-
-
-Resident Names and roles (~250):
-- ...
-- 
 
 
 

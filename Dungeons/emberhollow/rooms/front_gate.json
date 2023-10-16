@@ -1,5 +1,13 @@
 {
     "name": "Front Gate",
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "exit",
+            "target": "world:rooms/start",
+            "travel_message": "You walk away from the front gate of Emberhollow"
+        }
+    ],
     "events": {
         "on_enter": {
             "#script": "emberhollow/scripts/rooms/front_gate/on_enter"

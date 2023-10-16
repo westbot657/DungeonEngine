@@ -18,6 +18,7 @@ try:
     from .AbstractStatusEffect import AbstractStatusEffect, StatusEffect
     from .AbstractTool import AbstractTool, Tool
     from .AbstractWeapon import AbstractWeapon, Weapon
+    from .AbstractGameObject import AbstractGameObject, GameObject
     from .FunctionMemory import FunctionMemory
     from .Currency import Currency
     from .Player import Player
@@ -44,6 +45,7 @@ except ImportError:
     from AbstractStatusEffect import AbstractStatusEffect, StatusEffect
     from AbstractTool import AbstractTool, Tool
     from AbstractWeapon import AbstractWeapon, Weapon
+    from AbstractGameObject import AbstractGameObject, GameObject
     from FunctionMemory import FunctionMemory
     from Currency import Currency
     from Player import Player
@@ -1101,6 +1103,9 @@ class Engine_Player_GiveGameObject(LoaderFunction):
             case {
                 "object": str()
             }: return cls.giveObject
+            case {
+                "object": GameObject()
+            }: return cls.giveGameObj
             case _: return None
     @classmethod
     def giveObject(cls, function_memory:FunctionMemory, **kwargs):
@@ -1131,6 +1136,16 @@ class Engine_Player_GiveGameObject(LoaderFunction):
         player.inventory.addObject(game_object)
 
         return game_object
+
+    @staticmethod
+    def giveGameObj(function_memory:FunctionMemory, **kwargs):
+        game_object = kwargs.get("object")
+        
+        if "player" in kwargs:
+            player: Player = Player.getPlayer(kwargs["player"])
+        else:
+            player: Player = function_memory.ref("#player")
+        player.inventory.addObject(game_object)
 
 class Engine_Player_GiveMoney(LoaderFunction):
     id = Identifier("engine", "player/", "give_money")

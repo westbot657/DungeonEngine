@@ -25,18 +25,27 @@ if (<.closed>) {
         │               Fire Arrow  x16 : 1 Gold
         │               Long Sword      : 1 Gold  5 Silver
         │                    Stick  x12 : 5 Copper
+        ├─ Weston ──────────────────────────────────────────────────────
+        │ 10 Gold  5 Silver  5 Copper
         */
         <output> = [engine:text/join](
             <output>,
             [engine:text/format](
                 "│ {name: >40} {amount: >4} : {cost}",
-                name=[engine:text/join]("`", <item>::"item"::"name", "`", seperator=""),
+                name=[engine:text/join]("`", <item>::"name", "`", seperator=""),
                 amount=<item>::"amount",
                 cost=<item>::"cost"
             ),
             seperator=""
         )
     }
+
+    <output> = [engine:text/join](
+        <output>,
+        [engine:text/format]("├─ {player} {c:─<{w}}", player=<#player.name>, w=max(1, 60-[engine:text/length](<#player.name>))),
+        [engine:text/format]("│ {money}", money=<#player.currency>),
+        seperator="\n"
+    )
 
     // check inputs
 
@@ -50,12 +59,24 @@ if (<.closed>) {
         }
 
         for <item> in <.current_stock> {
-            [engine:text/match]([engine:text/set_case](<inp>, "lower"))
-            @pattern: [engine:text/set_case](<item.name>, "lower") # {
-                
+            [engine:text/match]([engine:text/set_case](<inp>, "lower"), "fullmatch")
+            @pattern: [engine:text/set_case](<item>::"name", "lower") # {
+
+                if (<item>::"cost" >> <#player.currency>) {
+                    [engine:player/message]([engine:text/format]("You do not have enough money to buy `{item}`", item=<item>::"name"))
+                    break
+                }
+
+                [engine:player/message]([engine:text/format]("Purchase `{item}` for `{cost}`?", item=<item>::"name", cost=<item>::"cost"))
+                <response> = [engine:player/get_input]
+
+                [engine:text/match](<response>)
+                @pattern: <%text/pattern/yes> # {
+                    [engine:player/give_game_object](<item>::"item")
+                }
+
             }
         }
-
 
     }
 

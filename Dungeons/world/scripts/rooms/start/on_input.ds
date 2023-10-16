@@ -65,6 +65,9 @@ examples, but is still required
 $help2
 ))
 }
+@pattern: "\bstart\b" # {
+    [engine:player/set_location]("emberhollow:rooms/boats/spawn_boat/spawn")
+}
 @pattern: "go to (?P<dungeon_name>.*)" # {
     <dungeon_name> = [engine:text/set_case](<dungeon_name>, "lower")
 

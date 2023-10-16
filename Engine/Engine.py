@@ -98,7 +98,7 @@ class Engine:
         v = None
         try:
             v = ev.send(None)
-            if isinstance(v, _EngineOperation):
+            while isinstance(v, _EngineOperation):
                 res = yield v
                 v = ev.send(res)
         except StopIteration as e:
@@ -209,18 +209,6 @@ class Engine:
         else:
             return EngineOperation.Success(v)
 
-    def task_wrapper(self, player_id, generator):
-        yield
-
-        try:
-            v = generator.send(None)
-            while isinstance(v, _EngineOperation):
-                res = yield (self.default_input_handler, generator, v, player_id, "")
-                v = generator.send(res)
-        except StopIteration as e:
-            if isinstance(e.value, _EngineOperation):
-                res = yield (self.default_input_handler, generator, v, player_id, "")
-
     def _move_player(self, function_memory:FunctionMemory, player:Player, target_location:Location, handler_getter:Callable, handler:Generator, is_death=False):
         old_room = self.loader.getLocation(self._function_memory, player.location)
         new_room = self.loader.getLocation(self._function_memory, target_location)
@@ -295,15 +283,6 @@ class Engine:
                 wrapper.send(None)
                 self.input_queue.update({player_id: [handler_getter, wrapper, ""]})
 
-            case EngineOperation.Wait():
-                wrap = self.task_wrapper(player_id, result.task)
-                # print("wrap.send(None): ...")
-                # print("wrap.send(None)?:", )
-                wrap.send(None)
-                self.delays.append((time.time()+result.delay, wrap))
-
-                raise StopIteration
-
             case EngineOperation.StartCombat():
                 player: Player = result.player
                 combat: Combat = result.combat
@@ -371,11 +350,11 @@ class Engine:
 
         while self.thread_running:
 
-            self._frame_end = time.time()
-            self._frame_times = self._frame_times[1:] + [self._frame_end - self._frame_start]
-            if sum(self._frame_times) != 0:
-                self.tps = len(self._frame_times)/sum(self._frame_times)
-            self._frame_start = time.time()
+            # self._frame_end = time.time()
+            # self._frame_times = self._frame_times[1:] + [self._frame_end - self._frame_start]
+            # if sum(self._frame_times) != 0:
+            #     self.tps = len(self._frame_times)/sum(self._frame_times)
+            # self._frame_start = time.time()
 
             #print(f"\u001b[0F\u001b[30G{self.tps}\r")
 
@@ -385,10 +364,10 @@ class Engine:
             # Main Loop
 
             for delayed in self.delays.copy():
-                # print(f"{delayed=}")
-                if time.time() >= delayed[0]:
+                if time.time() > delayed[0]:
                     self.delays.remove(delayed)
                     self.tasks.append(delayed[1])
+
 
             # run scheduled tasks
             while self.tasks:
@@ -398,15 +377,15 @@ class Engine:
                     while True:
                         v = task.send(None)
                         try:
-                            # try:
+                            print("=== BASE ENGINE LEVEL ===")
                             if isinstance(v[2], EngineOperation.Wait):
-                                v[2].task = task
-                            # except: pass
+                                print("--- WAITING ---")
+                                self.delays.append((time.time()+v[2].delay, task))
+                                break
                             self.evaluateResult(*v)
                         except EngineError as e:
                             print(e)
                 except StopIteration as e:
-
                     Log["debug"]["engine"](f"Task completed: {task}  {v=}  {e.value=}")
 
             for combat in self.combats.copy():

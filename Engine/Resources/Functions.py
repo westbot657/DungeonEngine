@@ -19,6 +19,7 @@ try:
     from .AbstractTool import AbstractTool, Tool
     from .AbstractWeapon import AbstractWeapon, Weapon
     from .FunctionMemory import FunctionMemory
+    from .Currency import Currency
     from .Player import Player
     from .Logger import Log
     from .Interactable import Interactable
@@ -44,6 +45,7 @@ except ImportError:
     from AbstractTool import AbstractTool, Tool
     from AbstractWeapon import AbstractWeapon, Weapon
     from FunctionMemory import FunctionMemory
+    from Currency import Currency
     from Player import Player
     from Logger import Log
     from Interactable import Interactable
@@ -1129,6 +1131,30 @@ class Engine_Player_GiveGameObject(LoaderFunction):
         player.inventory.addObject(game_object)
 
         return game_object
+
+class Engine_Player_GiveMoney(LoaderFunction):
+    id = Identifier("engine", "player/", "give_money")
+
+    script_flags = {
+        "required_args": 0,
+        "optional_args": 3,
+        "args": {
+            "gold": "optional parameter",
+            "silver": "optional parameter",
+            "copper": "optional parameter"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if "gold" in args or "silver" in args or "copper" in args:
+            return cls.give_money
+        return None
+
+    @staticmethod
+    def give_money(function_memory:FunctionMemory, gold=0, silver=0, copper=0):
+        player: Player = function_memory.ref("#player")
+        player.currency = player.currency + Currency(gold, silver, copper)
 
 class Engine_Player_GiveStatusEffect(LoaderFunction):
     id = Identifier("engine", "player/", "give_status_effect")
@@ -3585,9 +3611,10 @@ class Engine_Time_Wait(LoaderFunction):
         # prompt = args.get("prompt", "")
         # x = yield EngineOperation.GetInput(function_memory.ref("#player"), prompt)
         # return x
-        ...
+        print("waiting?")
         yield EngineOperation.Wait(delay)
-        return
+        print("waited")
+        # return
 
 class Engine_Time_Check(LoaderFunction):
     id = Identifier("engine", "time/", "check")

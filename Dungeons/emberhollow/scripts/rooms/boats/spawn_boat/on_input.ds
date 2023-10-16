@@ -1,0 +1,9 @@
+
+
+[engine:text/match](<#text>)
+@pattern: "\bskip\b" # {
+    [engine:player/set_tag]("listening", false)
+    [engine:player/message]("skipping dialog")
+}
+
+

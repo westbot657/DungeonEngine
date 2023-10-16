@@ -135,6 +135,8 @@ types of districts:
 why are the players here?
 
 
+Evil people: The Twighlight Syndicate
+
 
 Roads (30 (residential) + 30 (commercial) + 14 (docks) = 74):
 Residential:

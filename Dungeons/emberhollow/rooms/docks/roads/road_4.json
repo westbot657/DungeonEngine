@@ -1,0 +1,19 @@
+{
+    "name": "Port Docks",
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "exit",
+            "target": "world:rooms/start",
+            "travel_message": ""
+        }
+    ],
+    "events": {
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/docks/roads/road_4/on_enter"
+        },
+        "on_input":{
+            "#script": "emberhollow/scripts/rooms/docks/roads/road_4/on_input"
+        }
+    }
+}

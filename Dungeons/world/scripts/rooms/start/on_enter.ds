@@ -16,6 +16,9 @@ Help:
 type `help UI` for UI-specific help
 type `help CMD` for console-specific help
 
+_─────────────────────────────────_
+type `start` to start your adventure when ready.
+
 "
 )
 

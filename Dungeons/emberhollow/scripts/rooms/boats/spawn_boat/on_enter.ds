@@ -2,3 +2,109 @@
 
 
 
+
+
+[engine:player/set_tag]("listening", true)
+
+[engine:player/message]("say `skip` to skip dialog")
+
+/*
+
+if ([engine:player/get_tag]("listening")) {
+    [engine:player/message]("")
+}
+
+
+if ([engine:player/get_tag]("listening")) {
+    [engine:player/message](
+        [engine:text/format]("`{boatman}`: ", boatman=<boatman>)
+    )
+}
+
+*/
+<boatman> = [engine:random/choice](%[
+    "Jerry",
+    "Thomas"
+])
+
+
+if ([engine:player/get_tag]("listening")) {
+    [engine:player/message](
+        [engine:text/format]("`{boatman}`: Well *{player}*, there it is!", boatman=<boatman>, player=<#player.name>)
+    )
+    [engine:time/wait](1)
+}
+
+
+
+if ([engine:player/get_tag]("listening")) {
+    [engine:player/message](
+        [engine:text/format]("`{boatman}`: `Emberhollow`.", boatman=<boatman>)
+    )
+    [engine:time/wait](2)
+}
+
+
+
+
+if ([engine:player/get_tag]("listening")) {
+    [engine:player/message](
+        [engine:text/format]("`{boatman}`: And as I prob'ly won' be see'n ya again, I wish ya best 'o luck on yer travels kid.", boatman=<boatman>)
+    )
+    [engine:time/wait](2)
+}
+
+
+
+
+if ([engine:player/get_tag]("listening")) {
+    [engine:player/message](
+        [engine:text/format]("`{boatman}`: Though, Ya aught'a `find the Inn`.\nI know the Inn-keeper family, `Phyrra`'ll take care of ya! just tell 'er I sent ya, and she migh' give ya a discount.", boatman=<boatman>)
+    )
+    [engine:time/wait](1)
+}
+
+
+
+if ([engine:player/get_tag]("listening")) {
+    [engine:player/message](
+        [engine:text/format]("{boatman} hesitates", boatman=<boatman>)
+    )
+    [engine:time/wait](1)
+}
+
+
+if ([engine:player/get_tag]("listening")) {
+    [engine:player/message](
+        [engine:text/format]("`{boatman}`: Er.. she *might* give ya a room...", boatman=<boatman>)
+    )
+    [engine:time/wait](3)
+}
+
+
+if ([engine:player/get_tag]("listening")) {
+    [engine:player/message](
+        [engine:text/format]("`{boatman}`: Ya know what, 'ow bout ya take this jus'n case.", boatman=<boatman>)
+    )
+}
+
+if ([engine:player/get_tag]("listening")) {
+    [engine:player/message](
+        [engine:text/format]("{boatman} hands you a small bag of coins\n(+10 Gold  5 Silver  5 Copper)", boatman=<boatman>)
+    )
+}
+
+[engine:player/give_money](10, 5, 5)
+
+[engine:time/wait](2)
+
+[engine:player/message]("...")
+
+[engine:time/wait](2)
+
+[engine:player/message]("the boat pulls into port, and you step off the boat.")
+
+[engine:player/set_location]("emberhollow:rooms/docks/roads/road_4")
+
+
+

@@ -11,8 +11,15 @@ if (<.closed>) {
     }
     
     // restock if needed
-    if (length(<.current_stock>) == 0 or [engine:time/check](<.restock_time>)) {
+    if ([engine:time/check](<.restock_time>) or (not <.initial_stock>)) {
+        <.initial_stock> = true
         <.current_stock> = [engine:interaction/get_shop_stock](<.stock>)
+    }
+    if (length(<.current_stock>) == 0) {
+        if (<.out_of_stock_message>) {
+            output(<.out_of_stock_message>, shop_name=<.shop_name>, shopkeeper=<.shopkeeper>)
+        }
+        return
     }
 
     // display shop contents
@@ -59,6 +66,9 @@ if (<.closed>) {
 
         [engine:text/match](<inp>)
         @pattern: "\b(exit|leave)\b" # {
+            if (<.exit_message>) {
+                output(format(<.exit_message>, shop_name=<.shop_name>, shopkeeper=<.shopkeeper>))
+            }
             break
         }
 

@@ -16,7 +16,7 @@
         "restock_time": {
             "type": "engine:text",
             "required": false,
-            "default": "6:00am-6:05am"
+            "default": ""
         },
         "out_of_stock_message": {
             "type": "engine:text",
@@ -45,7 +45,8 @@
         }
     },
     "data": {
-        "current_stock": []
+        "current_stock": [],
+        "initial_stock": false
     },
     "interaction": {
         "#script": "resources/interactable/scripts/shop_interaction"

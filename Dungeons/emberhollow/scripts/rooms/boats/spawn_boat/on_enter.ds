@@ -34,6 +34,10 @@ if ([engine:player/get_tag]("listening")) {
     "Captain Shaundyl"
 ])
 
+if ([engine:player/get_tag]("listening")) {
+    [engine:player/message]("*you find yourself on a boat. You can see docks and a town in the distance*")
+    [engine:time/wait](2)
+}
 
 [engine:text/match]([engine:random/choice](%["1", "2", "3", "4"]))
 @pattern: "1" # {
@@ -41,19 +45,19 @@ if ([engine:player/get_tag]("listening")) {
         [engine:player/message](
             [engine:text/format]("`{captain}`: Well *{player}*, there it is!", captain=<captain>, player=<#player.name>)
         )
-        [engine:time/wait](5)
+        [engine:time/wait](3)
     }
     if ([engine:player/get_tag]("listening")) {
         [engine:player/message](
             [engine:text/format]("`{captain}`: `Emberhollow`.", captain=<captain>)
         )
-        [engine:time/wait](10)
+        [engine:time/wait](8)
     }
     if ([engine:player/get_tag]("listening")) {
         [engine:player/message](
             [engine:text/format]("`{captain}`: And as I prob'ly won' be see'n ya again, I wish ya best 'o luck on yer travels kid.", captain=<captain>)
         )
-        [engine:time/wait](7)
+        [engine:time/wait](6)
     }
     if ([engine:player/get_tag]("listening")) {
         [engine:player/message](
@@ -65,19 +69,19 @@ if ([engine:player/get_tag]("listening")) {
         [engine:player/message](
             [engine:text/format]("{captain} hesitates", captain=<captain>)
         )
-        [engine:time/wait](1)
+        [engine:time/wait](2)
     }
     if ([engine:player/get_tag]("listening")) {
         [engine:player/message](
-            [engine:text/format]("`{captain}`: Er.. she *might*.. give ya a room...", captain=<captain>)
+            [engine:text/format]("`{captain}`: Er.. she *might*.. give ya a discount...", captain=<captain>)
         )
-        [engine:time/wait](4)
+        [engine:time/wait](3)
     }
     if ([engine:player/get_tag]("listening")) {
         [engine:player/message](
             [engine:text/format]("`{captain}`: Ya know what, 'ow bout ya take this jus'n case.", captain=<captain>)
         )
-        [engine:time/wait](5)
+        [engine:time/wait](3)
     }
     if ([engine:player/get_tag]("listening")) {
         [engine:player/message](
@@ -95,7 +99,7 @@ if ([engine:player/get_tag]("listening")) {
     }
     if ([engine:player/get_tag]("listening")) {
         [engine:player/message](
-            [engine:text/format]("`{captain}`: If you `find yourself at the Inn`, will you give this to `Phyyra` for me.", captain=<captain>)
+            [engine:text/format]("`{captain}`: Oh, If you `find yourself at the Inn`, will you give this to `Phyyra` for me?", captain=<captain>)
         )
         [engine:time/wait](2)
     }

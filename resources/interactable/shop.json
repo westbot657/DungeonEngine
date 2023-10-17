@@ -4,18 +4,19 @@
             "type": "engine:text",
             "required": true
         },
-        "shopkeeper": {
-            "type": "engine:text",
-            "required": false
-        },
         "stock": {
             "type": "engine:loot_table",
             "required": true
         },
-        "restock_time": {
+        "shopkeeper": {
             "type": "engine:text",
             "required": false,
             "default": ""
+        },
+        "restock_time": {
+            "type": "engine:text",
+            "required": false,
+            "default": "6:00am-6:05am"
         },
         "out_of_stock_message": {
             "type": "engine:text",

@@ -1376,7 +1376,7 @@ class Engine_Player_GetInput(LoaderFunction): # NOTE: this function may (probabl
     def getInput(cls, function_memory:FunctionMemory, **args):
         prompt = args.get("prompt", "")
         x = yield EngineOperation.GetInput(function_memory.ref("#player"), prompt)
-        return x
+        return x[2]
 
 class Engine_Player_SetLocation(LoaderFunction):
     id = Identifier("engine", "player/", "set_location")
@@ -2130,9 +2130,13 @@ class Engine_Text_Format(LoaderFunction):
             return cls.format
         else: return None
     @staticmethod
-    def format(function_memory:FunctionMemory, text:str, options):
+    def format(function_memory:FunctionMemory, text:str, options:dict):
         # print(options)
-        return text.format(**options)
+        # print(f"formatting text {text!r} with options:{options}")
+        opts = {}
+        for key, val in options.items():
+            opts.update({key: str(val)})
+        return text.format(**opts)
 
 class Engine_Text_Substring(LoaderFunction):
     id = Identifier("engine", "text/", "substring")
@@ -2181,6 +2185,25 @@ class Engine_Text_Length(LoaderFunction):
     @staticmethod
     def length(function_memory:FunctionMemory, text:str):
         return len(text)
+
+class Engine_Text_Convert(LoaderFunction):
+    id = Identifier("engine", "text/", "convert")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "text": "required parameter"
+        }
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if "text" in args: return cls.to_str
+    @staticmethod
+    def to_str(function_memory:FunctionMemory, text:str):
+        return str(text)
+
 
 class Engine_Text_SetCase(LoaderFunction):
     id = Identifier("engine", "text/", "set_case")
@@ -2565,7 +2588,7 @@ class Engine_Control_While(LoaderFunction):
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
             case {
-                "condition": list()|dict(),
+                "condition": list()|dict()|bool()|str()|int()|float(),
                 "run": list()|dict()
             }:
                 return cls._while
@@ -3210,6 +3233,41 @@ class Engine_Interaction_Interact(LoaderFunction):
 
         return interactable.onInteract(function_memory, player)
 
+
+class Engine_Interaction_GetShopStock(LoaderFunction):
+    id = Identifier("engine", "interaction/", "get_shop_stock")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "loot_table": "required parameter"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if "loot_table" in args: return cls.get_stock
+        return None
+    
+    @staticmethod
+    def get_stock(function_memory:FunctionMemory, loot_table:dict):
+        ls = Util.flatten_list(LootTable.fromDict(loot_table).roll(function_memory))
+        out = []
+
+        print(f"Shop stock: {ls}")
+
+        for l in ls:
+            item = function_memory.engine.loader.constructGameObject(function_memory, l["item"])
+            out.append({
+                "name": item.name,
+                "item": item,
+                "amount": f"x{item.count}" if hasattr(item, "count") else "",
+                "cost": Currency(*l["cost"])
+            })
+        return out
+
+
 # ^ Interaction ^ #
 
 ####XXX###############XXX####
@@ -3681,8 +3739,8 @@ class Engine_Time_Check(LoaderFunction):
         # x = "am" if h < 12 else "pm"
         rules = time_frame.split(";")
         for rule in rules:
-            if m := re.match(r"(?P<h1>\d+):(?P<m1>\d+)(?P<x1>am|pm)\-(?P<h2>\d+):(?P<m2>\d+)(?P<x2>am|pm)", rule):
-                d = m.groupdict()
+            if match := re.match(r"(?P<h1>\d+):(?P<m1>\d+)(?P<x1>am|pm)\-(?P<h2>\d+):(?P<m2>\d+)(?P<x2>am|pm)", rule):
+                d = match.groupdict()
                 h1 = int(d["h1"])
                 m1 = int(d["m1"])
                 x1 = d["x1"]
@@ -3700,8 +3758,8 @@ class Engine_Time_Check(LoaderFunction):
                     if (h2 <= h and m2 <= m) and (h <= h1 and m <= m1): # this may be wrong...
                         return True
 
-            elif m := re.match(r"(?P<h1>\d+):(?P<m1>\d+)(?P<x1>am|pm)~(?P<h2>\d+):(?P<m2>\d+)", rule):
-                d = m.groupdict()
+            elif match := re.match(r"(?P<h1>\d+):(?P<m1>\d+)(?P<x1>am|pm)~(?P<h2>\d+):(?P<m2>\d+)", rule):
+                d = match.groupdict()
                 h1 = int(d["h1"])
                 m1 = int(d["m1"])
                 x1 = d["x1"]
@@ -3712,8 +3770,8 @@ class Engine_Time_Check(LoaderFunction):
                 if (Util.wrapNumber(0, h1-h2, 23) <= h and m1-m2 <= h) and (h <= Util.wrapNumber(0, h1+h2, 23) and m <= m1+m2):
                     return True
                 
-            elif m := re.match(r"~(?P<h1>\d+):(?P<m1>\d+)", rule):
-                d = m.groupdict()
+            elif match := re.match(r"~(?P<h1>\d+):(?P<m1>\d+)", rule):
+                d = match.groupdict()
                 h1 = int(d["h1"])
                 m1 = int(d["m1"])
                 x1 = d["x1"]
@@ -3723,8 +3781,8 @@ class Engine_Time_Check(LoaderFunction):
                 m2 = 5
                 if (Util.wrapNumber(0, h1-h2, 23) <= h and m1-m2 <= h) and (h <= Util.wrapNumber(0, h1+h2, 23) and m <= m1+m2):
                     return True
-            elif m := re.match(r"(?P<h>\d+):(?P<m>\d+)", rule):
-                d = m.groupdict()
+            elif match := re.match(r"(?P<h>\d+):(?P<m>\d+)", rule):
+                d = match.groupdict()
                 if h == int(d["h"]) and m == int(d["m"]):
                     return True
         return False

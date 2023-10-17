@@ -195,19 +195,21 @@ class Engine:
         if default is ...: raise EngineError(f"Player does not exist with id: '{player_id}'")
         return default
 
-    def inputGetterWrapper(self, handler:Generator):
-        _, player_id, text = yield
+    # def inputGetterWrapper(self, handler:Generator):
+    #     _, player_id, text = yield
 
-        v = None
-        try:
-            v = handler.send(text)
-        except StopIteration as e:
-            v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+    #     v = None
+    #     try:
+    #         v = handler.send(text)
+    #     except StopIteration as e:
+    #         v = e.value or (v if not isinstance(v, _EngineOperation) else None)
 
-        if isinstance(v, (_EngineOperation)):
-            return v
-        else:
-            return EngineOperation.Success(v)
+    #     print(f"END OF GET_INPUT! HANDLER: {handler}")
+    #     self.input_queue.update({player_id: [self.default_input_handler, handler, ""]})
+    #     if isinstance(v, (_EngineOperation)):
+    #         return v
+    #     else:
+    #         return EngineOperation.Success(v)
 
     def _move_player(self, function_memory:FunctionMemory, player:Player, target_location:Location, handler_getter:Callable, handler:Generator, is_death=False):
         old_room = self.loader.getLocation(self._function_memory, player.location)
@@ -279,9 +281,9 @@ class Engine:
                     self.io_hook.sendOutput(target, prompt)
                 #self.input_queue.pop(player_id)
 
-                wrapper = self.inputGetterWrapper(handler)
-                wrapper.send(None)
-                self.input_queue.update({player_id: [handler_getter, wrapper, ""]})
+                # wrapper = self.inputGetterWrapper(handler)
+                # wrapper.send(None)
+                self.input_queue.update({player_id: [handler_getter, handler, ""]})
 
             case EngineOperation.StartCombat():
                 player: Player = result.player

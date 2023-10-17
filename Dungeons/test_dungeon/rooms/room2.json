@@ -16,16 +16,18 @@
         {
             "type": "engine:interactable/shop",
             "id": "shop",
+            "shop_name": "Test Shop",
             "stock": {
                 "pools": [
                     {
                         "rolls": 2,
                         "entries": [
                             {
-                                "name": "Sword",
-                                "item": {},
-                                "cost": [],
-                                "amount": 0
+                                "item": {
+                                    "type": "engine:weapon",
+                                    "parent": "engine:weapons/sword"
+                                },
+                                "cost": [1, 0, 3]
                             }
                         ]
                     }

@@ -9,5 +9,8 @@
 @pattern: "4" # {
     [engine:interaction/interact](".room4_door")
 }
+@pattern: "shop" # {
+    [engine:interaction/interact](".shop")
+}
 
 

@@ -673,13 +673,14 @@ def p_expression_min(p):
     """arith : MIN '(' comma_expressions ')'
              | MAX '(' comma_expressions ')'"""
     ls = p[3]
+    # print("ls, p: ", ls, p)
     for l in ls:
         if isinstance(l, dict):
             if l.get("function", None) == "engine:math/solve":
                 l.pop("function")
     p[0] = {
         "function": "engine:math/solve",
-        p[1]: l
+        p[1]: ls
     }
 
 def p_expression_group(p):

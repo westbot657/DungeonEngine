@@ -2,50 +2,53 @@
 
 
 if (<.closed>) {
-    [engine:player/message]([engine:text/format](<.closed_message>, shop_name=<.shop_name>))
+    if (<.closed_message>) {
+        [engine:player/message]([engine:text/format](<.closed_message>, shop_name=<.shop_name>))
+    }
 } else {
-    [engine:player/message]([engine:text/format](<.enter_message>, shop_name=<.shop_name>, shopkeeper=<.shopkeeper>))
-
+    if (<.enter_message>) {
+        [engine:player/message]([engine:text/format](<.enter_message>, shop_name=<.shop_name>, shopkeeper=<.shopkeeper>))
+    }
+    
     // restock if needed
-
-    if ([engine:list/length](<.current_stock>) == 0) {
-        if ([engine:time/check](<.restock_time>)) {
-            <.current_stock> = [engine:random/loot_table](<.stock>::"pools")
-        }
+    if ([engine:list/length](<.current_stock>) == 0 or [engine:time/check](<.restock_time>)) {
+        <.current_stock> = [engine:interaction/get_shop_stock](<.stock>)
     }
 
     // display shop contents
 
-    <output> = [engine:text/format]("┌─ {shop_name} {c:─<{w}}\n", shop_name=<.shop_name>, c="─", w=max(1, 60-[engine:text/length](<.shop_name>)))
+    // [engine:log/debug](<w>)
+    /*
+    ┌─ The Armory ──────────────────────────────────────────────────
+    │          Lightning Arrow   x4 : 2 Gold  5 Copper
+    │               Fire Arrow  x16 : 1 Gold
+    │               Long Sword      : 1 Gold  5 Silver
+    │                    Stick  x12 : 5 Copper
+    ├─ Weston ──────────────────────────────────────────────────────
+    │ 10 Gold  5 Silver  5 Copper
+    */
 
+    <output> = [engine:text/format]("┌─ {shop_name} {c:─<{w}}\n", shop_name=<.shop_name>, c="─", w=max(1, (60-[engine:text/length](<.shop_name>))))
     for <item> in <.current_stock> {
-        /*
-        ┌─ The Armory ──────────────────────────────────────────────────
-        │          Lightning Arrow   x4 : 2 Gold  5 Copper
-        │               Fire Arrow  x16 : 1 Gold
-        │               Long Sword      : 1 Gold  5 Silver
-        │                    Stick  x12 : 5 Copper
-        ├─ Weston ──────────────────────────────────────────────────────
-        │ 10 Gold  5 Silver  5 Copper
-        */
         <output> = [engine:text/join](
             <output>,
             [engine:text/format](
                 "│ {name: >40} {amount: >4} : {cost}",
                 name=[engine:text/join]("`", <item>::"name", "`", seperator=""),
                 amount=<item>::"amount",
-                cost=<item>::"cost"
+                cost=[engine:text/convert](<item>::"cost")
             ),
-            seperator=""
+            seperator="\n"
         )
     }
-
     <output> = [engine:text/join](
         <output>,
-        [engine:text/format]("├─ {player} {c:─<{w}}", player=<#player.name>, w=max(1, 60-[engine:text/length](<#player.name>))),
+        [engine:text/format]("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 60-[engine:text/length](<#player.name>))),
         [engine:text/format]("│ {money}", money=<#player.currency>),
+        "│ say `exit` to leave the shop",
         seperator="\n"
     )
+    [engine:player/message](<output>)
 
     // check inputs
 
@@ -67,13 +70,41 @@ if (<.closed>) {
                     break
                 }
 
-                [engine:player/message]([engine:text/format]("Purchase `{item}` for `{cost}`?", item=<item>::"name", cost=<item>::"cost"))
-                <response> = [engine:player/get_input]
+                // [engine:player/message]()
+                <response> = [engine:player/get_input]([engine:text/format]("Purchase `{item}` for `{cost}`? (yes/no)", item=<item>::"name", cost=<item>::"cost"))
+
+                [engine:player/message]("got input!")
 
                 [engine:text/match](<response>)
-                @pattern: <%text/pattern/yes> # {
+                @pattern: "[Yy](?:es)?" # {
+                    [engine:player/message]([engine:text/format]("You purchased `{item}`!", item=<item>::"name"))
                     [engine:player/give_game_object](<item>::"item")
                     [engine:list/remove](<.current_stock>, <item>)
+
+                    <output> = [engine:text/format]("┌─ {shop_name} {c:─<{w}}\n", shop_name=<.shop_name>, c="─", w=max(1, (60-[engine:text/length](<.shop_name>))))
+                    for <item> in <.current_stock> {
+                        <output> = [engine:text/join](
+                            <output>,
+                            [engine:text/format](
+                                "│ {name: >30} {amount: >4} : {cost}",
+                                name=[engine:text/join]("`", <item>::"name", "`", seperator=""),
+                                amount=<item>::"amount",
+                                cost=[engine:text/convert](<item>::"cost")
+                            ),
+                            seperator="\n"
+                        )
+                    }
+                    <output> = [engine:text/join](
+                        <output>,
+                        [engine:text/format]("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 60-[engine:text/length](<#player.name>))),
+                        [engine:text/format]("│ {money}", money=<#player.currency>),
+                        "│ say `exit` to leave the shop",
+                        seperator="\n"
+                    )
+                    [engine:player/message](<output>)
+
+                    break
+
                 }
 
             }

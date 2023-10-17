@@ -34,7 +34,7 @@ if (<.closed>) {
         <output> = [engine:text/join](
             <output>,
             [engine:text/format](
-                "│ {name: >20} {amount: >4} : {cost}",
+                "│ {name: >18} {amount: >4} : {cost}",
                 name=[engine:text/join]("`", <item>::"name", "`", seperator=""),
                 amount=<item>::"amount",
                 cost=[engine:text/convert](<item>::"cost")
@@ -88,7 +88,7 @@ if (<.closed>) {
                         <output> = [engine:text/join](
                             <output>,
                             [engine:text/format](
-                                "│ {name: >20} {amount: >4} : {cost}",
+                                "│ {name: >18} {amount: >4} : {cost}",
                                 name=[engine:text/join]("`", <item>::"name", "`", seperator=""),
                                 amount=<item>::"amount",
                                 cost=[engine:text/convert](<item>::"cost")

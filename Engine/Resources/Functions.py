@@ -2643,7 +2643,7 @@ class Engine_Control_Break(LoaderFunction):
         return cls._break
     @staticmethod
     def _break(function_memory:FunctionMemory):
-        return EngineOperation.StopLoop()
+        yield EngineOperation.StopLoop()
 
 class Engine_Control_CheckPredicate(LoaderFunction):
     id = Identifier("engine", "control/", "check_predicate")

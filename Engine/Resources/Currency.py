@@ -14,6 +14,8 @@ class Currency:
         self.copper = copper
 
     def __repr__(self):
+        if self.gold + self.silver + self.copper == 0:
+            return "[No Money]"
         return ((f"{self.gold} Gold  " if self.gold else "") + (f"{self.silver} Silver  " if self.silver else "") + (f"{self.copper} Copper" if self.copper else "")).strip()
 
     def __int__(self):

@@ -28,12 +28,13 @@ if (<.closed>) {
     │ 10 Gold  5 Silver  5 Copper
     */
 
-    <output> = [engine:text/format]("┌─ {shop_name} {c:─<{w}}\n", shop_name=<.shop_name>, c="─", w=max(1, (60-[engine:text/length](<.shop_name>))))
+    <output> = [engine:text/format]("┌─ {shop_name} {c:─<{w}}", shop_name=<.shop_name>, c="─", w=max(1, (40-[engine:text/length](<.shop_name>))))
     for <item> in <.current_stock> {
+        //         `Sword`
         <output> = [engine:text/join](
             <output>,
             [engine:text/format](
-                "│ {name: >40} {amount: >4} : {cost}",
+                "│ {name: >20} {amount: >4} : {cost}",
                 name=[engine:text/join]("`", <item>::"name", "`", seperator=""),
                 amount=<item>::"amount",
                 cost=[engine:text/convert](<item>::"cost")
@@ -43,7 +44,7 @@ if (<.closed>) {
     }
     <output> = [engine:text/join](
         <output>,
-        [engine:text/format]("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 60-[engine:text/length](<#player.name>))),
+        [engine:text/format]("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 40-[engine:text/length](<#player.name>))),
         [engine:text/format]("│ {money}", money=<#player.currency>),
         "│ say `exit` to leave the shop",
         seperator="\n"
@@ -81,12 +82,13 @@ if (<.closed>) {
                     [engine:player/give_game_object](<item>::"item")
                     [engine:list/remove](<.current_stock>, <item>)
 
-                    <output> = [engine:text/format]("┌─ {shop_name} {c:─<{w}}\n", shop_name=<.shop_name>, c="─", w=max(1, (60-[engine:text/length](<.shop_name>))))
+                    // ┌─ Test Shop ───────────────────────────────
+                    <output> = [engine:text/format]("┌─ {shop_name} {c:─<{w}}", shop_name=<.shop_name>, c="─", w=max(1, (40-[engine:text/length](<.shop_name>))))
                     for <item> in <.current_stock> {
                         <output> = [engine:text/join](
                             <output>,
                             [engine:text/format](
-                                "│ {name: >30} {amount: >4} : {cost}",
+                                "│ {name: >20} {amount: >4} : {cost}",
                                 name=[engine:text/join]("`", <item>::"name", "`", seperator=""),
                                 amount=<item>::"amount",
                                 cost=[engine:text/convert](<item>::"cost")
@@ -96,7 +98,7 @@ if (<.closed>) {
                     }
                     <output> = [engine:text/join](
                         <output>,
-                        [engine:text/format]("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 60-[engine:text/length](<#player.name>))),
+                        [engine:text/format]("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 40-[engine:text/length](<#player.name>))),
                         [engine:text/format]("│ {money}", money=<#player.currency>),
                         "│ say `exit` to leave the shop",
                         seperator="\n"

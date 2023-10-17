@@ -1,9 +1,9 @@
 {
     "name": "Battle Axe",
     "damage": {
-        "function": "engine:random/range",
-        "min": 2,
-        "max": 5
+        "function": "engine:random/weighted",
+        "weights": [16, 25, 21, 7],
+        "values": [2, 3, 4, 5]
     },
     "range": 2,
     "max_durability": 200

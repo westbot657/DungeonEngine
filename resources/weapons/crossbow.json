@@ -2,8 +2,8 @@
     "name": "Crossbow",
     "damage": {
         "function": "engine:random/weighted",
-        "weights": [2, 3, 5, 6],
-        "values": [4, 3, 2, 1]
+        "weights": [14, 33, 36, 18, 1],
+        "values": [1, 2, 3, 4, 5]
     },
     "range": 30,
     "max_durability": 400,

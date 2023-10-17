@@ -1,9 +1,9 @@
 {
     "name": "Spear",
     "damage": {
-        "function": "engine:random/range",
-        "min": 1,
-        "max": 4
+        "function": "engine:random/weighted",
+        "weights": [23, 40, 35],
+        "values": [1, 2, 3]
     },
     "range": 4,
     "max_durability": 60

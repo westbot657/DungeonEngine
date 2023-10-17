@@ -1,9 +1,9 @@
 {
     "name": "Sword",
     "damage": {
-        "function": "engine:random/range",
-        "min": 2,
-        "max": 4
+        "function": "engine:random/weighted",
+        "weights": [8, 24, 29, 18],
+        "values": [1, 2, 3, 4]
     },
     "range": 2,
     "max_durability": 100

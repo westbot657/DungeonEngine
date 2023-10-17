@@ -1855,12 +1855,13 @@ class Engine_Random_Weighted(LoaderFunction):
         # print(weights, values)
         pool = []
 
+        index = 0
         for weight, val in zip(weights, values):
             for i in range(int(weight)):
-                pool.append(int(val))
+                pool.append(index)
         
         # print(pool)
-        return random.choice(pool)
+        return values[random.choice(pool)]
 
     @classmethod
     def getFullDisplay(self, function_memory:FunctionMemory, data:dict) -> str:

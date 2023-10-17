@@ -1,0 +1,11 @@
+{
+    "parent": "engine:weapons/sword",
+    "name": "Longsword",
+    "damage": {
+        "function": "engine:random/weighted",
+        "weights": [21, 29, 25, 14, 1],
+        "values": [1, 2, 3, 4, 5]
+    },
+    "range": 3,
+    "max_durability": 80
+}

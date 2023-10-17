@@ -1,6 +1,10 @@
 {
     "name": "Bow",
-    "damage": 3,
+    "damage": {
+        "function": "engine:random/weighted",
+        "weights": [8, 22, 27, 17],
+        "values": [1, 2, 3, 4]
+    },
     "range": 20,
     "max_durability": 300,
     "ammo_type": "engine:ammo/arrow"

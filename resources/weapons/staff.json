@@ -1,9 +1,9 @@
 {
     "name": "Staff",
     "damage": {
-        "function": "engine:random/range",
-        "min": 1,
-        "max": 2
+        "function": "engine:random/weighted",
+        "weights": [45, 37, 16],
+        "values": [1, 2, 3]
     },
     "range": 2,
     "max_durability": 90

@@ -1,0 +1,11 @@
+{
+    "parent": "engine:weapons/sword",
+    "name": "Shortsword",
+    "damage": {
+        "function": "engine:random/weighted",
+        "weights": [20, 36, 25, 4],
+        "values": [2, 3, 4, 5]
+    },
+    "range": 2,
+    "max_durability": 150
+}

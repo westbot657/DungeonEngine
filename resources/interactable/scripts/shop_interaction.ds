@@ -28,7 +28,7 @@ if (<.closed>) {
     │ 10 Gold  5 Silver  5 Copper
     */
 
-    <output> = [engine:text/format]("┌─ {shop_name} {c:─<{w}}", shop_name=<.shop_name>, c="─", w=max(1, (40-[engine:text/length](<.shop_name>))))
+    <output> = [engine:text/format]("```less\n┌─ {shop_name} {c:─<{w}}", shop_name=<.shop_name>, c="─", w=max(1, (40-[engine:text/length](<.shop_name>))))
     for <item> in <.current_stock> {
         //         `Sword`
         <output> = [engine:text/join](
@@ -46,7 +46,7 @@ if (<.closed>) {
         <output>,
         [engine:text/format]("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 40-[engine:text/length](<#player.name>))),
         [engine:text/format]("│ {money}", money=<#player.currency>),
-        "│ say `exit` to leave the shop",
+        "│ say `exit` to leave the shop\n```",
         seperator="\n"
     )
     [engine:player/message](<output>)
@@ -83,7 +83,7 @@ if (<.closed>) {
                     [engine:list/remove](<.current_stock>, <item>)
 
                     // ┌─ Test Shop ───────────────────────────────
-                    <output> = [engine:text/format]("┌─ {shop_name} {c:─<{w}}", shop_name=<.shop_name>, c="─", w=max(1, (40-[engine:text/length](<.shop_name>))))
+                    <output> = [engine:text/format]("```less\n┌─ {shop_name} {c:─<{w}}", shop_name=<.shop_name>, c="─", w=max(1, (40-[engine:text/length](<.shop_name>))))
                     for <item> in <.current_stock> {
                         <output> = [engine:text/join](
                             <output>,
@@ -100,7 +100,7 @@ if (<.closed>) {
                         <output>,
                         [engine:text/format]("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 40-[engine:text/length](<#player.name>))),
                         [engine:text/format]("│ {money}", money=<#player.currency>),
-                        "│ say `exit` to leave the shop",
+                        "│ say `exit` to leave the shop\n```",
                         seperator="\n"
                     )
                     [engine:player/message](<output>)

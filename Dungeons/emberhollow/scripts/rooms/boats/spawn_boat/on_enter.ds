@@ -182,7 +182,7 @@ if ([engine:player/get_tag]("listening")) {
 
 [engine:player/message]("the boat pulls into port, and you step off the boat.")
 
-[engine:time/wait](5)
+[engine:time/wait](3)
 
 [engine:player/set_location]("emberhollow:rooms/docks/roads/road_4")
 

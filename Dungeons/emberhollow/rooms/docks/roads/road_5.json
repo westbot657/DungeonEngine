@@ -1,0 +1,19 @@
+{
+    "name": "Docks - North walkway",
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "tutorial_up",
+            "target": "emberhollow:rooms/commercial/roads/road_",
+            "travel_message": "[TODO: road_5 tutorial_up travel_message]"
+        }
+    ],
+    "events": {
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/docks/roads/road_5/on_enter"
+        },
+        "on_input": {
+            "#script": "emberhollow/scripts/rooms/docks/roads/road_5/on_input"
+        }
+    }
+}

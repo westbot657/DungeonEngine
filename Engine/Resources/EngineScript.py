@@ -848,10 +848,12 @@ class EngineScript:
                 return "[engine:player/get_input]("
             elif t == "length(":
                 return "[engine:text/length]("
+            elif t == "wait(":
+                return "[engine:time/wait]("
             else:
                 return t
 
-        return re.sub(r"(?:\"(?:\\.|[^\"])*\"|(?:for *<[^>]+> *in *<[^>]+>)|(?:for *<[^>]+>, *<[^>]+> *in *<[^>]+>)|(<[^>]+>(?:::(?:\"(?:\\.|[^\"])+\"|<[^>]+>|\$[^:]+))+)|\b(?:output|combat_output|format|join|input|length)\()", repl, text)
+        return re.sub(r"(?:\"(?:\\.|[^\"])*\"|(?:for *<[^>]+> *in *<[^>]+>)|(?:for *<[^>]+>, *<[^>]+> *in *<[^>]+>)|(<[^>]+>(?:::(?:\"(?:\\.|[^\"])+\"|<[^>]+>|\$[^:]+))+)|\b(?:output|combat_output|format|join|input|length|wait)\()", repl, text)
 
     def getScript(self):
         if not self.compiled_script:

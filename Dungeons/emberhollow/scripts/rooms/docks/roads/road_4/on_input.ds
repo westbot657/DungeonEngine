@@ -4,3 +4,11 @@
 @pattern: "start" # {
     [engine:interaction/interact](".exit")
 }
+
+[engine:text/match](<#dungeon.stage>)
+@pattern: "tutorial" # {
+
+}
+
+
+

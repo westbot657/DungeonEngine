@@ -1,0 +1,12 @@
+{
+    "name": "Docks - East walkway",
+    "interactions": [],
+    "events": {
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/docks/roads/road_1/on_enter"
+        },
+        "on_input": {
+            "#script": "emberhollow/scripts/rooms/docks/roads/road_1/on_input"
+        }
+    }
+}

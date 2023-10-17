@@ -1,11 +1,23 @@
 {
-    "name": "Port Docks",
+    "name": "Docks - Walkway Corner",
     "interactions": [
         {
             "type": "engine:interactable/passage",
             "id": "exit",
             "target": "world:rooms/start",
             "travel_message": ""
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "tutorial_left",
+            "target": "emberhollow:rooms/commercial/roads/road_5",
+            "travel_message": "You head left."
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "tutorial_right",
+            "target": "emberhollow:rooms/residential/roads/road_1",
+            "travel_message": "You head right."
         }
     ],
     "events": {

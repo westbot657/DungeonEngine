@@ -1,0 +1,15 @@
+
+
+[engine:text/match](<#dungeon.stage>)
+@pattern: "tutorial" # {
+
+    output("You get to the end of the walkway, and step down onto a cobbled path.")
+
+    wait(3)
+
+    output("You walk up the path into town, and arrive at a junction/crossroads/intersection")
+
+
+}
+
+

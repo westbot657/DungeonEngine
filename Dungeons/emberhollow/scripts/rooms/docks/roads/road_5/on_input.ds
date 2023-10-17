@@ -1,0 +1,7 @@
+
+
+[engine:text/match](<#dungeon.stage>)
+@pattern: "tutorial" # {
+    
+}
+

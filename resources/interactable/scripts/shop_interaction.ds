@@ -73,7 +73,7 @@ if (<.closed>) {
                 // [engine:player/message]()
                 <response> = [engine:player/get_input]([engine:text/format]("Purchase `{item}` for `{cost}`? (yes/no)", item=<item>::"name", cost=<item>::"cost"))
 
-                [engine:player/message]("got input!")
+                // [engine:player/message]("got input!")
 
                 [engine:text/match](<response>)
                 @pattern: "[Yy](?:es)?" # {

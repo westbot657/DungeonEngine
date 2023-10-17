@@ -1,7 +1,7 @@
 
-[engine:combat/message](
+output(
     [engine:random/choice](%[
-        [engine:text/join](<#enemy.name>,"bites",<target.name>,"but doesn't do any damage"),
-        [engine:text/join](<#enemy.name>,"takes a bite at",<target.name>,"but misses")
+        join(<#enemy.name>,"bites",<target.name>,"but doesn't do any damage"),
+        join(<#enemy.name>,"takes a bite at",<target.name>,"but misses")
     ])
 )

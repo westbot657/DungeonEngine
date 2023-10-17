@@ -2178,11 +2178,8 @@ class Engine_Text_Length(LoaderFunction):
     
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case {
-                "text": str()
-            }: return cls.length
-            case _: return None
+        if "text" in args: return cls.length
+        return None
     @staticmethod
     def length(function_memory:FunctionMemory, text:str):
         return len(text)

@@ -836,10 +836,22 @@ class EngineScript:
                 parts = d.split("::")
                 dct = parts.pop(0)
                 return f"[engine:dict/access]({dct}, {', '.join(parts)})"
+            elif t == "output(":
+                return "[engine:player/message](",
+            elif t == "combat_output(":
+                return "[engine:combat/message]("
+            elif t == "format(":
+                return "[engine:text/format]("
+            elif t == "join(":
+                return "[engine:text/join]("
+            elif t == "input(":
+                return "[engine:player/get_input]("
+            elif t == "length(":
+                return "[engine:text/length]("
             else:
                 return t
 
-        return re.sub(r"(?:\"(?:\\.|[^\"])*\"|(?:for *<[^>]+> *in *<[^>]+>)|(?:for *<[^>]+>, *<[^>]+> *in *<[^>]+>)|(<[^>]+>(?:::(?:\"(?:\\.|[^\"])+\"|<[^>]+>|\$[^:]+))+))", repl, text)
+        return re.sub(r"(?:\"(?:\\.|[^\"])*\"|(?:for *<[^>]+> *in *<[^>]+>)|(?:for *<[^>]+>, *<[^>]+> *in *<[^>]+>)|(<[^>]+>(?:::(?:\"(?:\\.|[^\"])+\"|<[^>]+>|\$[^:]+))+)|\b(?:output|combat_output|format|join|input|length)\()", repl, text)
 
     def getScript(self):
         if not self.compiled_script:

@@ -1,7 +1,7 @@
 
-[engine:combat/message](
+output(
     [engine:random/choice](%[
-        [engine:text/join]("`", <#enemy.name>,"` bites `",<target.name>,"`, dealing ",<damage>," damage",seperator=""),
-        [engine:text/join]("`", <#enemy.name>,"` takes a bite at `",<target.name>,"` and deals ",<damage>," damage",seperator="")
+        join("`", <#enemy.name>,"` bites `",<target.name>,"`, dealing ",<damage>," damage",seperator=""),
+        join("`", <#enemy.name>,"` takes a bite at `",<target.name>,"` and deals ",<damage>," damage",seperator="")
     ])
 )

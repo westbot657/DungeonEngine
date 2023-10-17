@@ -1,7 +1,7 @@
 
 [engine:player/heal](<#item.heal_amount>)
-[engine:player/message](
-    [engine:text/join](
+output(
+    join(
         "You ate `",
         <#item.name>,
         "`, healing you by *",

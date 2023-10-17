@@ -63,6 +63,10 @@ class Room(FunctionalElement):
     def onEnter(self, function_memory:FunctionMemory, player:Player):
         player.location.setLocation(self.location)
         self.players_in_room.append(player.uuid)
+        i = self._input_handler(function_memory)
+        i.send(None)
+        function_memory.engine.setInputHandler(player.uuid, i, self._input_handler)
+
         if (on_enter := self.events.get("on_enter", None)) is not None:
             self.prepFunctionMemory(function_memory)
             function_memory.addContextData({
@@ -82,9 +86,6 @@ class Room(FunctionalElement):
 
             self.postEvaluate(function_memory)
 
-        i = self._input_handler(function_memory)
-        i.send(None)
-        function_memory.engine.setInputHandler(player.uuid, i, self._input_handler)
         
         return EngineOperation.Continue()
 

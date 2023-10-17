@@ -11,6 +11,7 @@
     },
     "environment": {},
     "data": {
-        "dungeon_stage": "start"
+        "dungeon_stage": "start",
+        "player_ids": []
     }
 }

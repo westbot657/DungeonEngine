@@ -1,21 +1,25 @@
 // quick intro of arriving at emberhollow for a new life or smth
 
+<num_players> = [engine:list/length](<#dungeon.player_ids>)
 
+[engine:list/append](<#dungeon.player_ids>, <#player.uid>)
 
 
 
 [engine:player/set_tag]("listening", true)
 
+$listening = [engine:player/get_tag]("listening")
+
 [engine:player/message]("say `skip` to skip dialog")
 
 /*
 
-if ([engine:player/get_tag]("listening")) {
+if ($listening) {
     [engine:player/message]("")
 }
 
 
-if ([engine:player/get_tag]("listening")) {
+if ($listening) {
     [engine:player/message](
         [engine:text/format]("`{captain}`: ", captain=<captain>)
     )
@@ -34,135 +38,176 @@ if ([engine:player/get_tag]("listening")) {
     "Captain Shaundyl"
 ])
 
-if ([engine:player/get_tag]("listening")) {
+
+<g> = [engine:random/range](9, 11),
+<s> = [engine:random/range](5, 7),
+<c> = [engine:random/range](2, 9)
+
+
+if ($listening) {
     [engine:player/message]("*you find yourself on a boat. You can see docks and a town in the distance*")
     [engine:time/wait](2)
 }
 
+
+
 [engine:text/match]([engine:random/choice](%["1", "2", "3", "4"]))
 @pattern: "1" # {
-    if ([engine:player/get_tag]("listening")) {
+    if ($listening) {
         [engine:player/message](
             [engine:text/format]("`{captain}`: Well *{player}*, there it is!", captain=<captain>, player=<#player.name>)
         )
         [engine:time/wait](3)
     }
-    if ([engine:player/get_tag]("listening")) {
+    if ($listening) {
         [engine:player/message](
             [engine:text/format]("`{captain}`: `Emberhollow`.", captain=<captain>)
         )
         [engine:time/wait](8)
     }
-    if ([engine:player/get_tag]("listening")) {
+    if ($listening) {
         [engine:player/message](
             [engine:text/format]("`{captain}`: And as I prob'ly won' be see'n ya again, I wish ya best 'o luck on yer travels kid.", captain=<captain>)
         )
         [engine:time/wait](6)
     }
-    if ([engine:player/get_tag]("listening")) {
-        [engine:player/message](
-            [engine:text/format]("`{captain}`: Though, Ya aught'a `find the Inn`.\nI know the Inn-keeper family, `Phyrra`'ll take care of ya! just tell 'er I sent ya, and she migh' give ya a discount.", captain=<captain>)
-        )
-        [engine:time/wait](7)
+    if (<num_players> == 0) {
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("`{captain}`: Though, Ya aught'a `find the Inn`.\nI know the Inn-keeper family, `Phyrra`'ll take care of ya! just tell 'er I sent ya, and she migh' give ya a discount.", captain=<captain>)
+            )
+            [engine:time/wait](7)
+        }
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("{captain} hesitates", captain=<captain>)
+            )
+            [engine:time/wait](2)
+        }
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("`{captain}`: Er.. she *might*.. give ya a discount...", captain=<captain>)
+            )
+            [engine:time/wait](3)
+        }
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("`{captain}`: Ya know what, 'ow bout ya take this jus'n case.", captain=<captain>)
+            )
+            [engine:time/wait](3)
+        }
+    } else {
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("`{captain}`: Oh, and 'ere, Ya migh' find more use for this than me.", captain=<captain>)
+            )
+            [engine:time/wait](3)
+        }
     }
-    if ([engine:player/get_tag]("listening")) {
+    if ($listening) {
         [engine:player/message](
-            [engine:text/format]("{captain} hesitates", captain=<captain>)
-        )
-        [engine:time/wait](2)
-    }
-    if ([engine:player/get_tag]("listening")) {
-        [engine:player/message](
-            [engine:text/format]("`{captain}`: Er.. she *might*.. give ya a discount...", captain=<captain>)
-        )
-        [engine:time/wait](3)
-    }
-    if ([engine:player/get_tag]("listening")) {
-        [engine:player/message](
-            [engine:text/format]("`{captain}`: Ya know what, 'ow bout ya take this jus'n case.", captain=<captain>)
-        )
-        [engine:time/wait](3)
-    }
-    if ([engine:player/get_tag]("listening")) {
-        [engine:player/message](
-            [engine:text/format]("{captain} hands you a small bag of coins\n(+10 Gold  5 Silver  5 Copper)", captain=<captain>)
+            [engine:text/format]("{captain} hands you a small bag of coins\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
         )
         [engine:time/wait](2)
     }
 }
 @pattern: "2" # {
-    if ([engine:player/get_tag]("listening")) {
+    if ($listening) {
         [engine:player/message](
             [engine:text/format]("`{captain}`: We're almost to `Emberhollow`, you'd better get up.", captain=<captain>)
         )
         [engine:time/wait](6)
     }
-    if ([engine:player/get_tag]("listening")) {
-        [engine:player/message](
-            [engine:text/format]("`{captain}`: Oh, If you `find yourself at the Inn`, will you give this to `Phyyra` for me?", captain=<captain>)
-        )
-        [engine:time/wait](2)
+    if (<num_players> == 0) {
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("`{captain}`: Oh, If you `find yourself at the Inn`, will you give this to `Phyyra` for me?", captain=<captain>)
+            )
+            [engine:time/wait](2)
+        }
+    } else {
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("`{captain}`: Here's a little something to help you on your travels.", captain=<captain>)
+            )
+            [engine:time/wait](3)
+        }
     }
-    if ([engine:player/get_tag]("listening")) {
+    if ($listening) {
         [engine:player/message](
-            [engine:text/format]("{captain} hands you a small sack of coins.\n(+10 Gold  5 Silver  5 Copper)", captain=<captain>)
+            [engine:text/format]("{captain} hands you a small sack of coins.\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
         )
         [engine:time/wait](2)
     }
 }
 @pattern: "3" # {
-    if ([engine:player/get_tag]("listening")) {
+    if ($listening) {
         [engine:player/message](
             [engine:text/format]("`{captain}`: {player}, Welcome to `Emberhollow`!", captain=<captain>, player=<#player.name>)
         )
         [engine:time/wait](3.5)
     }
-    if ([engine:player/get_tag]("listening")) {
-        [engine:player/message](
-            [engine:text/format]("`{captain}`: Once we land, I suggest you `find the Inn`, It's a good place to stay.", captain=<captain>)
-        )
-        [engine:time/wait](6)
-    }
-    if ([engine:player/get_tag]("listening")) {
-        [engine:player/message](
-            [engine:text/format]("`{captain}`: Here, this'll get you a room for a few days.", captain=<captain>)
-        )
-        [engine:time/wait](4)
-    }
-    if ([engine:player/get_tag]("listening")) {
-        [engine:player/message](
-            [engine:text/format]("{captain} hands you a small pouch with some coins in it\n(+10 Gold  5 Silver  5 Copper)", captain=<captain>)
-        )
-        [engine:time/wait](6)
-    }
-    if ([engine:player/get_tag]("listening")) {
-        [engine:player/message](
-            [engine:text/format]("`{captain}`: Oh, and the Innkeeper's name is `Phyyra`. if you can't find her, ask around.", captain=<captain>)
-        )
-        [engine:time/wait](4)
+    if (<num_players> == 0) {
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("`{captain}`: Once we land, I suggest you `find the Inn`, It's a good place to stay.", captain=<captain>)
+            )
+            [engine:time/wait](6)
+        }
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("`{captain}`: Here, this'll get you a room for a few days.", captain=<captain>)
+            )
+            [engine:time/wait](4)
+        }
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("{captain} hands you a small pouch with some coins in it\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
+            )
+            [engine:time/wait](4)
+        }
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("`{captain}`: Oh, and the Innkeeper's name is `Phyyra`. if you can't find her, ask around.", captain=<captain>)
+            )
+            [engine:time/wait](4)
+        }
+    } else {
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("`{captain}`: Good luck, kid! Here's something for your travels.", captain=<captain>)
+            )
+            [engine:time/wait]()
+        }
+        if ($listening) {
+            [engine:player/message](
+                [engine:text/format]("{captain} hands you a small pouch with some coins in it\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>), g=<g>, s=<s>, c=<c>
+            )
+            [engine:time/wait](4)
+        }
     }
 
 }
 @pattern: "4" # {
-    if ([engine:player/get_tag]("listening")) {
+    if ($listening) {
         [engine:player/message](
             [engine:text/format]("`{captain}`: Well, I got ya ter `Emberhollow` didn' I.", captain=<captain>)
         )
         [engine:time/wait](3)
     }
-    if ([engine:player/get_tag]("listening")) {
+    if ($listening) {
         [engine:player/message](
             [engine:text/format]("`{captain}`: I 'spose I owe ya fer savin me from that beast on the way 'ere.", captain=<captain>)
         )
         [engine:time/wait](3.5)
     }
-    if ([engine:player/get_tag]("listening")) {
+    if ($listening) {
         [engine:player/message](
-            [engine:text/format]("{captain} hands you a bag of coins\n(+10 Gold  5 Silver  5 Copper)", captain=<captain>)
+            [engine:text/format]("{captain} hands you a bag of coins\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
         )
         [engine:time/wait](3)
     }
-    if ([engine:player/get_tag]("listening")) {
+    if ($listening and <num_players> == 0) {
         [engine:player/message](
             [engine:text/format]("`{captain}`: If ya want meh advice, go `find Phyyra at the Inn`, that money'll pay for a few nights stay.", captain=<captain>)
         )
@@ -172,17 +217,18 @@ if ([engine:player/get_tag]("listening")) {
 
 
 
-[engine:player/give_money](10, 5, 5)
+[engine:player/give_money](<g>, <s>, <c>)
 
-[engine:time/wait](2)
 
-[engine:player/message]("...")
-
-[engine:time/wait](7.5)
+if ($listening) {
+    [engine:time/wait](2)
+    [engine:player/message]("...")
+    [engine:time/wait](5)
+}
 
 [engine:player/message]("the boat pulls into port, and you step off the boat.")
 
-[engine:time/wait](3)
+[engine:time/wait](2)
 
 [engine:player/set_location]("emberhollow:rooms/docks/roads/road_4")
 

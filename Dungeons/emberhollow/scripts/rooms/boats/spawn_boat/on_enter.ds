@@ -21,7 +21,7 @@ if ($listening) {
 
 if ($listening) {
     output(
-        [engine:text/format]("`{captain}`: ", captain=<captain>)
+        format("`{captain}`: ", captain=<captain>)
     )
     wait()
 }
@@ -55,58 +55,58 @@ if ($listening) {
 @pattern: "1" # {
     if ($listening) {
         output(
-            [engine:text/format]("`{captain}`: Well *{player}*, there it is!", captain=<captain>, player=<#player.name>)
+            format("`{captain}`: Well *{player}*, there it is!", captain=<captain>, player=<#player.name>)
         )
         wait(3)
     }
     if ($listening) {
         output(
-            [engine:text/format]("`{captain}`: `Emberhollow`.", captain=<captain>)
+            format("`{captain}`: `Emberhollow`.", captain=<captain>)
         )
         wait(8)
     }
     if ($listening) {
         output(
-            [engine:text/format]("`{captain}`: And as I prob'ly won' be see'n ya again, I wish ya best 'o luck on yer travels kid.", captain=<captain>)
+            format("`{captain}`: And as I prob'ly won' be see'n ya again, I wish ya best 'o luck on yer travels kid.", captain=<captain>)
         )
         wait(6)
     }
     if (<num_players> == 0) {
         if ($listening) {
             output(
-                [engine:text/format]("`{captain}`: Though, Ya aught'a `find the Inn`.\nI know the Inn-keeper family, `Phyrra`'ll take care of ya! just tell 'er I sent ya, and she migh' give ya a discount.", captain=<captain>)
+                format("`{captain}`: Though, Ya aught'a `find the Inn`.\nI know the Inn-keeper family, `Phyrra`'ll take care of ya! just tell 'er I sent ya, and she migh' give ya a discount.", captain=<captain>)
             )
             wait(7)
         }
         if ($listening) {
             output(
-                [engine:text/format]("{captain} hesitates", captain=<captain>)
+                format("{captain} hesitates", captain=<captain>)
             )
             wait(2)
         }
         if ($listening) {
             output(
-                [engine:text/format]("`{captain}`: Er.. she *might*.. give ya a discount...", captain=<captain>)
+                format("`{captain}`: Er.. she *might*.. give ya a discount...", captain=<captain>)
             )
             wait(3)
         }
         if ($listening) {
             output(
-                [engine:text/format]("`{captain}`: Ya know what, 'ow bout ya take this jus'n case.", captain=<captain>)
+                format("`{captain}`: Ya know what, 'ow bout ya take this jus'n case.", captain=<captain>)
             )
             wait(3)
         }
     } else {
         if ($listening) {
             output(
-                [engine:text/format]("`{captain}`: Oh, and 'ere, Ya migh' find more use for this than me.", captain=<captain>)
+                format("`{captain}`: Oh, and 'ere, Ya migh' find more use for this than me.", captain=<captain>)
             )
             wait(3)
         }
     }
     if ($listening) {
         output(
-            [engine:text/format]("{captain} hands you a small bag of coins\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
+            format("{captain} hands you a small bag of coins\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
         )
         wait(2)
     }
@@ -114,28 +114,28 @@ if ($listening) {
 @pattern: "2" # {
     if ($listening) {
         output(
-            [engine:text/format]("`{captain}`: We're almost to `Emberhollow`, you'd better get up.", captain=<captain>)
+            format("`{captain}`: We're almost to `Emberhollow`, you'd better get up.", captain=<captain>)
         )
         wait(6)
     }
     if (<num_players> == 0) {
         if ($listening) {
             output(
-                [engine:text/format]("`{captain}`: Oh, If you `find yourself at the Inn`, will you give this to `Phyyra` for me?", captain=<captain>)
+                format("`{captain}`: Oh, If you `find yourself at the Inn`, will you give this to `Phyyra` for me?", captain=<captain>)
             )
             wait(2)
         }
     } else {
         if ($listening) {
             output(
-                [engine:text/format]("`{captain}`: Here's a little something to help you on your travels.", captain=<captain>)
+                format("`{captain}`: Here's a little something to help you on your travels.", captain=<captain>)
             )
             wait(3)
         }
     }
     if ($listening) {
         output(
-            [engine:text/format]("{captain} hands you a small sack of coins.\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
+            format("{captain} hands you a small sack of coins.\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
         )
         wait(2)
     }
@@ -143,45 +143,45 @@ if ($listening) {
 @pattern: "3" # {
     if ($listening) {
         output(
-            [engine:text/format]("`{captain}`: {player}, Welcome to `Emberhollow`!", captain=<captain>, player=<#player.name>)
+            format("`{captain}`: {player}, Welcome to `Emberhollow`!", captain=<captain>, player=<#player.name>)
         )
         wait(3.5)
     }
     if (<num_players> == 0) {
         if ($listening) {
             output(
-                [engine:text/format]("`{captain}`: Once we land, I suggest you `find the Inn`, It's a good place to stay.", captain=<captain>)
+                format("`{captain}`: Once we land, I suggest you `find the Inn`, It's a good place to stay.", captain=<captain>)
             )
             wait(6)
         }
         if ($listening) {
             output(
-                [engine:text/format]("`{captain}`: Here, this'll get you a room for a few days.", captain=<captain>)
+                format("`{captain}`: Here, this'll get you a room for a few days.", captain=<captain>)
             )
             wait(4)
         }
         if ($listening) {
             output(
-                [engine:text/format]("{captain} hands you a small pouch with some coins in it\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
+                format("{captain} hands you a small pouch with some coins in it\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
             )
             wait(4)
         }
         if ($listening) {
             output(
-                [engine:text/format]("`{captain}`: Oh, and the Innkeeper's name is `Phyyra`. if you can't find her, ask around.", captain=<captain>)
+                format("`{captain}`: Oh, and the Innkeeper's name is `Phyyra`. if you can't find her, ask around.", captain=<captain>)
             )
             wait(4)
         }
     } else {
         if ($listening) {
             output(
-                [engine:text/format]("`{captain}`: Good luck, kid! Here's something for your travels.", captain=<captain>)
+                format("`{captain}`: Good luck, kid! Here's something for your travels.", captain=<captain>)
             )
             wait()
         }
         if ($listening) {
             output(
-                [engine:text/format]("{captain} hands you a small pouch with some coins in it\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>), g=<g>, s=<s>, c=<c>
+                format("{captain} hands you a small pouch with some coins in it\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>), g=<g>, s=<s>, c=<c>
             )
             wait(4)
         }
@@ -191,25 +191,25 @@ if ($listening) {
 @pattern: "4" # {
     if ($listening) {
         output(
-            [engine:text/format]("`{captain}`: Well, I got ya ter `Emberhollow` didn' I.", captain=<captain>)
+            format("`{captain}`: Well, I got ya ter `Emberhollow` didn' I.", captain=<captain>)
         )
         wait(3)
     }
     if ($listening) {
         output(
-            [engine:text/format]("`{captain}`: I 'spose I owe ya fer savin me from that beast on the way 'ere.", captain=<captain>)
+            format("`{captain}`: I 'spose I owe ya fer savin me from that beast on the way 'ere.", captain=<captain>)
         )
         wait(3.5)
     }
     if ($listening) {
         output(
-            [engine:text/format]("{captain} hands you a bag of coins\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
+            format("{captain} hands you a bag of coins\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
         )
         wait(3)
     }
-    if ($listening and <num_players> == 0) {
+    if ($listening and <num_players> == 0) {1
         output(
-            [engine:text/format]("`{captain}`: If ya want meh advice, go `find Phyyra at the Inn`, that money'll pay for a few nights stay.", captain=<captain>)
+            format("`{captain}`: If ya want meh advice, go `find Phyyra at the Inn`, that money'll pay for a few nights stay.", captain=<captain>)
         )
         wait(4)
     }
@@ -230,10 +230,6 @@ output("the boat pulls into port, and you step off the boat.")
 
 wait(2)
 
-output("The dock you're standing on extends to the `left` and `right`, they border a collection of buildings on the frozen waters.
-To the `right` is a small hill, with a lighthouse atop it.
-To the `left` is what looks like the heart of the town.")
-output("(hint: `highlighted` words are typically used as action keywords)")
 [engine:player/set_location]("emberhollow:rooms/docks/roads/road_4")
 
 

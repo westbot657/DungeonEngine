@@ -850,10 +850,14 @@ class EngineScript:
                 return "[engine:text/length]("
             elif t == "wait(":
                 return "[engine:time/wait]("
+            elif t == "interact(":
+                return "[engine:interaction/interact]("
+            elif t == "match(":
+                return "[engine:text/match]("
             else:
                 return t
 
-        return re.sub(r"(?:\"(?:\\.|[^\"])*\"|(?:for *<[^>]+> *in *<[^>]+>)|(?:for *<[^>]+>, *<[^>]+> *in *<[^>]+>)|(<[^>]+>(?:::(?:\"(?:\\.|[^\"])+\"|<[^>]+>|\$[^:]+))+)|\b(?:output|combat_output|format|join|input|length|wait)\()", repl, text)
+        return re.sub(r"(?:\"(?:\\.|[^\"])*\"|(?:for *<[^>]+> *in *<[^>]+>)|(?:for *<[^>]+>, *<[^>]+> *in *<[^>]+>)|(<[^>]+>(?:::(?:\"(?:\\.|[^\"])+\"|<[^>]+>|\$[^:]+))+)|\b(?:output|combat_output|format|join|input|length|wait|interact|match)\()", repl, text)
 
     def getScript(self):
         if not self.compiled_script:

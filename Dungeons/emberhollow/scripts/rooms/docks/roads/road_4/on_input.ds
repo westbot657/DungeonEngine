@@ -1,12 +1,20 @@
 
 
-[engine:text/match](<#text>)
-@pattern: "start" # {
-    [engine:interaction/interact](".exit")
-}
+// [engine:text/match](<#text>)
+// @pattern: "start" # {
+//     [engine:interaction/interact](".exit")
+// }
 
 [engine:text/match](<#dungeon.stage>)
 @pattern: "tutorial" # {
+
+    [engine:text/match](<#text>)
+    @pattern: "left" # {
+        [engine:interaction/interact](".tutorial_left")
+    }
+    @pattern: "right" # {
+        [engine:interaction/interact](".tutorial_right")
+    }
 
 }
 

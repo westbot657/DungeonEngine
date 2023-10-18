@@ -11,7 +11,7 @@
 {
     $macro1 = "Long piece of text that will be used in multiple places, and storing it as a macro is more efficient than a variable, which has to be evaluated during runtime"
 
-    pass
+    pass // pass is ignored by the compiler, but exists anyways
 
     // macro1 is accessed elsewhere within this scope, but never re-assigned
 
@@ -19,7 +19,7 @@
 
 // bad ways to assign a macro:
 {
-    if (pass) {
+    if (<x> == <y>) {
         $macro1 = "some piece of text"
         // A
     } else {
@@ -29,7 +29,7 @@
     pass
 
     // macro1 is accessed later, however it will always have the value: "some other piece of text"
-    // however, if macro1 is accessed at "A", it will have the value "some piece of text"
+    // however, if macro1 is accessed at "A", it will have the value: "some piece of text"
 }
 
 // functions:
@@ -124,6 +124,48 @@
     }
 
 }
+
+
+// shorthand expressions:
+{
+    [engine:player/message]("...")
+    // can be re-written as:
+    output("...")
+
+
+    [engine:list/for_each](<list>, "element") {}
+    // can also be written as:
+    for <element> in <list> {}
+
+
+    [engine:dict/for_each](<dict>, "key", "value") {}
+    // ->
+    for <key>, <value> in <dict> {}
+
+
+    [engine:time/wait]()
+    [engine:text/format]()
+    [engine:text/length]() // and [engine:list/length], etc...
+    [engine:text/join]()
+    [engine:combat/message]()
+    [engine:player/get_input]()
+    // can be written as:
+    wait()
+    format()
+    length()
+    join()
+    combat_output()
+    input()
+
+
+    [engine:dict/access](<dict>, "key1")
+    // ->
+    <dict>::"key1"
+
+
+
+}
+
 
 
 

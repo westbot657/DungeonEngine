@@ -1,12 +1,18 @@
 
+
+/*//
 [engine:player/message](
 "Location Directory:
 │ (temporary): `start`"
 )
+//*/
 
 [engine:text/match](<#dungeon.stage>)
 @pattern: "tutorial" # {
-
+    output("The dock you're standing on extends to the `left` and `right`, they border a collection of buildings on the frozen waters.
+To the `right` is a small hill, with a lighthouse atop it.
+To the `left` is a path that leads further into town")
+    output("(hint: `highlighted` words are typically used as action keywords)")
 }
 
 

@@ -9,6 +9,7 @@
 
     output("You walk up the path into town, and arrive at a junction/crossroads/intersection")
 
+    interact(".tutorial_up")
 
 }
 

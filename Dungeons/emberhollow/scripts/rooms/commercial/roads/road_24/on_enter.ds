@@ -1,0 +1,8 @@
+
+
+
+match(<#dungeon.stage>)
+@pattern: "tutorial" # {
+    output("")
+}
+

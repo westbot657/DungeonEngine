@@ -1,5 +1,25 @@
 {
     "name": "Cliffside Path",
-    "interactions": [],
-    "events": {}
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "tutorial_3_5",
+            "target": "emberhollow:rooms/docks/roads/road_5",
+            "travel_message": ""
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "tutorial_2_14",
+            "target": "emberhollow:rooms/commercial/roads/road_14",
+            "travel_message": ""
+        }
+    ],
+    "events": {
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/commercial/roads/road_24/on_enter"
+        },
+        "on_input": {
+            "#script": "emberhollow/scripts/rooms/commercial/roads/road_24/on_input"
+        }
+    }
 }

@@ -3,6 +3,12 @@
 
 match(<#dungeon.stage>)
 @pattern: "tutorial" # {
-    output("")
+
+    output("You walk up the path into town, and arrive at fork in the road.")
+
+    wait(3)
+
+    output("You can see a `sign` with arrows pointing left and right")
+
 }
 

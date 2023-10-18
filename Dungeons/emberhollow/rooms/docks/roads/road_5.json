@@ -3,8 +3,8 @@
     "interactions": [
         {
             "type": "engine:interactable/passage",
-            "id": "tutorial_up",
-            "target": "emberhollow:rooms/commercial/roads/road_",
+            "id": "tutorial_2_24",
+            "target": "emberhollow:rooms/commercial/roads/road_24",
             "travel_message": "[TODO: road_5 tutorial_up travel_message]"
         }
     ],

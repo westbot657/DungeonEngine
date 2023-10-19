@@ -9,30 +9,42 @@ match(<#dungeon.stage>)
 
         wait(2)
 
-        output("Pointing `right` reads:
-│ `Inn`
-│ Market
-│ History Museum
-│ ")
+        output(join(
+            "Pointing `right` reads:",
+            "│ `Inn`",
+            "│ Market",
+            "│ History Museum",
+            "│ ",
+            seperator="\n"
+        ))
 
-        output("Pointing `left` reads:
-│ Town Hall
-│ Police Station
-│ ")
+        wait(2)
+
+        output(join(
+            "Pointing `left` reads:",
+            "│ Town Hall",
+            "│ Police Station",
+            "│ ",
+            seperator="\n"
+        ))
 
     }
     @pattern: "\b(?:right|inn)\b" # {
 
         output("You take the right path.")
 
+        wait(1)
 
+        interact(".tutorial_2_14")
 
     }
     @pattern: "\b(?:left)\b" # {
 
         output("You take the left path.")
 
-        
+        wait(1)
+
+        interact(".tutorial_2_23")
 
     } 
 

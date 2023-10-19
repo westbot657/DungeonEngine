@@ -12,6 +12,12 @@
             "id": "tutorial_2_14",
             "target": "emberhollow:rooms/commercial/roads/road_14",
             "travel_message": ""
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "tutorial_2_23",
+            "target": "emberhollow:rooms/commercial/roads/road_23",
+            "travel_message": ""
         }
     ],
     "events": {

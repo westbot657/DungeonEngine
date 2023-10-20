@@ -12,6 +12,7 @@
     "environment": {},
     "data": {
         "stage": "tutorial",
-        "player_ids": []
+        "player_ids": [],
+        "tutorial_combat_complete": false
     }
 }

@@ -10,10 +10,10 @@
 
     [engine:text/match](<#text>)
     @pattern: "left" # {
-        [engine:interaction/interact](".tutorial_left")
+        [engine:interaction/interact](".road_3_5")
     }
     @pattern: "right" # {
-        [engine:interaction/interact](".tutorial_right")
+        [engine:interaction/interact](".road_3_3")
     }
 
 }

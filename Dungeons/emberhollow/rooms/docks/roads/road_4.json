@@ -3,21 +3,21 @@
     "interactions": [
         {
             "type": "engine:interactable/passage",
-            "id": "exit",
-            "target": "world:rooms/start",
+            "id": "road_3_5",
+            "target": "emberhollow:rooms/commercial/roads/road_5",
             "travel_message": ""
         },
         {
             "type": "engine:interactable/passage",
-            "id": "tutorial_left",
-            "target": "emberhollow:rooms/commercial/roads/road_5",
-            "travel_message": "You head left."
+            "id": "road_3_3",
+            "target": "emberhollow:rooms/residential/roads/road_3",
+            "travel_message": ""
         },
         {
             "type": "engine:interactable/passage",
-            "id": "tutorial_right",
-            "target": "emberhollow:rooms/residential/roads/road_1",
-            "travel_message": "You head right."
+            "id": "road_3_6",
+            "target": "emberhollow:rooms/residential/roads/road_6",
+            "travel_message": ""
         }
     ],
     "events": {

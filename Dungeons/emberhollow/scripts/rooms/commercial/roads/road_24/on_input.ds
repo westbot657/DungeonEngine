@@ -35,7 +35,7 @@ match(<#dungeon.stage>)
 
         wait(1)
 
-        interact(".tutorial_2_14")
+        interact(".road_2_14")
 
     }
     @pattern: "\b(?:left)\b" # {
@@ -44,7 +44,7 @@ match(<#dungeon.stage>)
 
         wait(1)
 
-        interact(".tutorial_2_23")
+        interact(".road_2_23")
 
     } 
 

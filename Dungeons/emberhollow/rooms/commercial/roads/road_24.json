@@ -3,20 +3,26 @@
     "interactions": [
         {
             "type": "engine:interactable/passage",
-            "id": "tutorial_3_5",
+            "id": "road_3_5",
             "target": "emberhollow:rooms/docks/roads/road_5",
             "travel_message": ""
         },
         {
             "type": "engine:interactable/passage",
-            "id": "tutorial_2_14",
+            "id": "road_2_14",
             "target": "emberhollow:rooms/commercial/roads/road_14",
             "travel_message": ""
         },
         {
             "type": "engine:interactable/passage",
-            "id": "tutorial_2_23",
+            "id": "road_2_23",
             "target": "emberhollow:rooms/commercial/roads/road_23",
+            "travel_message": ""
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_25",
+            "target": "emberhollow:rooms/commercial/roads/road_25",
             "travel_message": ""
         }
     ],

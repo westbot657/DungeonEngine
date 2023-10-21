@@ -1,6 +1,19 @@
 {
     "name": "Docks - East walkway",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_25",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_25"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_2",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_2"
+        }
+    ],
     "events": {
         "on_enter": {
             "#script": "emberhollow/scripts/rooms/docks/roads/road_1/on_enter"

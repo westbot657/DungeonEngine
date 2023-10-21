@@ -1,5 +1,18 @@
 {
     "name": "The Dragon's Alley",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_10",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_10"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_12",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_12"
+        }
+    ],
     "events": {}
 }

@@ -1,5 +1,18 @@
 {
     "name": "Road 3-13",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_12",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_12"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_14",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_14"
+        }
+    ],
     "events": {}
 }

@@ -1,5 +1,30 @@
 {
     "name": "Road 3-10",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_8",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_8"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_9",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_9"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_11",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_11"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_12",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_12"
+        }
+    ],
     "events": {}
 }

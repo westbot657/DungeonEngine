@@ -1,5 +1,30 @@
 {
     "name": "Plank Street",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_3",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_3"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_4",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_4"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_7",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_7"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_8",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_8"
+        }
+    ],
     "events": {}
 }

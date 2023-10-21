@@ -1,5 +1,24 @@
 {
     "name": "Western Market Boardwalk",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_2",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_2"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_4",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_4"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_6",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_6"
+        }
+    ],
     "events": {}
 }

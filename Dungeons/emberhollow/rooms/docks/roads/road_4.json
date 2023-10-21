@@ -4,20 +4,26 @@
         {
             "type": "engine:interactable/passage",
             "id": "road_3_5",
-            "target": "emberhollow:rooms/commercial/roads/road_5",
+            "target": "emberhollow:rooms/docks/roads/road_5",
             "travel_message": ""
         },
         {
             "type": "engine:interactable/passage",
             "id": "road_3_3",
-            "target": "emberhollow:rooms/residential/roads/road_3",
+            "target": "emberhollow:rooms/docks/roads/road_3",
             "travel_message": ""
         },
         {
             "type": "engine:interactable/passage",
             "id": "road_3_6",
-            "target": "emberhollow:rooms/residential/roads/road_6",
+            "target": "emberhollow:rooms/docks/roads/road_6",
             "travel_message": ""
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_7",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_7"
         }
     ],
     "events": {

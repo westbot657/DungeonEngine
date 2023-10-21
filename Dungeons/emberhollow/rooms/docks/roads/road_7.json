@@ -1,5 +1,30 @@
 {
     "name": "Outside the Docking Station",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_4",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_4"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_5",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_5"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_6",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_6"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_8",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_8"
+        }
+    ],
     "events": {}
 }

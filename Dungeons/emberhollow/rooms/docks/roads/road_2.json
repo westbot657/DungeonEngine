@@ -1,5 +1,18 @@
 {
     "name": "Eastern Market Boardwalk",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_1",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_1"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_3",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_3"
+        }
+    ],
     "events": {}
 }

@@ -19,7 +19,6 @@
             "target": "world:rooms/start",
             "travel_message": "You leave the test dungeon"
         }
-        
     ],
     "events": {
         "on_enter": {

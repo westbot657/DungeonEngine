@@ -27,21 +27,33 @@
                                     "type": "engine:weapon",
                                     "parent": "engine:weapons/sword"
                                 },
-                                "cost": [1, 1, 0]
+                                "cost": [
+                                    1,
+                                    1,
+                                    0
+                                ]
                             },
                             {
                                 "item": {
                                     "type": "engine:weapon",
                                     "parent": "engine:weapons/shortsword"
                                 },
-                                "cost": [0, 8, 0]
+                                "cost": [
+                                    0,
+                                    8,
+                                    0
+                                ]
                             },
                             {
                                 "item": {
                                     "type": "engine:weapon",
                                     "parent": "engine:weapons/dagger"
                                 },
-                                "cost": [0, 5, 0]
+                                "cost": [
+                                    0,
+                                    5,
+                                    0
+                                ]
                             }
                         ]
                     },
@@ -53,14 +65,22 @@
                                     "type": "engine:weapon",
                                     "parent": "engine:weapon/bow"
                                 },
-                                "cost": [0, 8, 5]
+                                "cost": [
+                                    0,
+                                    8,
+                                    5
+                                ]
                             },
                             {
                                 "item": {
                                     "type": "engine:weapon",
                                     "parent": "engine:weapon/crossbow"
                                 },
-                                "cost": [2, 0, 0]
+                                "cost": [
+                                    2,
+                                    0,
+                                    0
+                                ]
                             }
                         ]
                     },
@@ -72,11 +92,15 @@
                         "entries": [
                             {
                                 "item": {
-                                    "type":"engine:item",
+                                    "type": "engine:item",
                                     "parent": "engine:items/stick",
                                     "count": 20
                                 },
-                                "cost": [0, 1, 2]
+                                "cost": [
+                                    0,
+                                    1,
+                                    2
+                                ]
                             }
                         ]
                     }

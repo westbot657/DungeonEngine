@@ -1,5 +1,30 @@
 {
     "name": "By The Library",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_26",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_26"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_27",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_27"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_1",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_1"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_2",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_2"
+        }
+    ],
     "events": {}
 }

@@ -6,6 +6,12 @@
             "id": "exit",
             "target": "world:rooms/start",
             "travel_message": "You walk away from the front gate of Emberhollow"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_0",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_0"
         }
     ],
     "events": {

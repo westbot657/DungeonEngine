@@ -1,5 +1,42 @@
 {
     "name": "Artisan Road",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_6",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_6"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_13",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_13"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_21",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_21"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_23",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_23"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_24",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_24"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_29",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_29"
+        }
+    ],
     "events": {}
 }

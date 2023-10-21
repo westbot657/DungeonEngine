@@ -1,5 +1,36 @@
 {
     "name": "In Front of The School",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_24",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_24"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_25",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_25"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_28",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_28"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_1",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_1"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_2",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_2"
+        }
+    ],
     "events": {}
 }

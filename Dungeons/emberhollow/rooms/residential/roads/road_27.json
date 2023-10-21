@@ -1,5 +1,18 @@
 {
     "name": "By The Church",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_23",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_23"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_28",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_28"
+        }
+    ],
     "events": {}
 }

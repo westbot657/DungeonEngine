@@ -1,5 +1,30 @@
 {
     "name": "Bakery Street",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_6",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_6"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_13",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_13"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_22",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_22"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_27",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_27"
+        }
+    ],
     "events": {}
 }

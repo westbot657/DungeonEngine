@@ -1,5 +1,12 @@
 {
     "name": "Back Alley",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_29",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_29"
+        }
+    ],
     "events": {}
 }

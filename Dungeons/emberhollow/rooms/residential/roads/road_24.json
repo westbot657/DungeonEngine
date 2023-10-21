@@ -1,5 +1,30 @@
 {
     "name": "Traveler's Lane",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_21",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_21"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_22",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_22"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_25",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_25"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_26",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_26"
+        }
+    ],
     "events": {}
 }

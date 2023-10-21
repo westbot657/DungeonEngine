@@ -1,5 +1,30 @@
 {
     "name": "Road 1-14",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_10",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_10"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_13",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_13"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_15",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_15"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_18",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_18"
+        }
+    ],
     "events": {}
 }

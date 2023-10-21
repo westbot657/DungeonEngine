@@ -1,5 +1,24 @@
 {
     "name": "Hillbase Pathway",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_24",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_24"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_26",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_26"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_3_1",
+            "travel_message": "",
+            "target": "emberhollow:rooms/docks/roads/road_1"
+        }
+    ],
     "events": {}
 }

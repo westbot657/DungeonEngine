@@ -1,5 +1,24 @@
 {
     "name": "Path to The Forge",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_22",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_22"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_26",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_26"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_28",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_28"
+        }
+    ],
     "events": {}
 }

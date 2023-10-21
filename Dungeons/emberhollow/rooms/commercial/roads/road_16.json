@@ -1,5 +1,30 @@
 {
     "name": "In Front of The Bar",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_3",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_3"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_15",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_15"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_17",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_17"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_19",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_19"
+        }
+    ],
     "events": {}
 }

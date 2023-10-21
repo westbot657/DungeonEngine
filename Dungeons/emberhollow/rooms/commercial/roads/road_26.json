@@ -1,5 +1,18 @@
 {
     "name": "Dragon's Walkway",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_22",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_22"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_27",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_27"
+        }
+    ],
     "events": {}
 }

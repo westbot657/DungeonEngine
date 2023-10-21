@@ -1,5 +1,18 @@
 {
     "name": "Entrance to the Inn",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_4",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_4"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_6",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_6"
+        }
+    ],
     "events": {}
 }

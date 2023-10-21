@@ -1,5 +1,36 @@
 {
     "name": "In Front of Telecomms",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_10",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_10"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_11",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_11"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_21",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_21"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_22",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_22"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_23",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_23"
+        }
+    ],
     "events": {}
 }

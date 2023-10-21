@@ -1,5 +1,12 @@
 {
     "name": "Outside The Forge",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_28",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_28"
+        }
+    ],
     "events": {}
 }

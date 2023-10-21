@@ -1,5 +1,36 @@
 {
     "name": "In Front of The Town Hall",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_7",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_7"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_9",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_9"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_20",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_20"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_21",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_21"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_22",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_22"
+        }
+    ],
     "events": {}
 }

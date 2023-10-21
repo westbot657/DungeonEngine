@@ -1,5 +1,12 @@
 {
     "name": "The Path to The Mines",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_17",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_17"
+        }
+    ],
     "events": {}
 }

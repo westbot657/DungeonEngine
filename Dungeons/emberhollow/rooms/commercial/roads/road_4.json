@@ -1,5 +1,30 @@
 {
     "name": "In Front of The History Museum",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_0",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_0"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_1",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_1"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_6",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_6"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_5",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_5"
+        }
+    ],
     "events": {}
 }

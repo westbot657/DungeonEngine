@@ -1,5 +1,24 @@
 {
     "name": "By The Water Refinery",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_3",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_3"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_16",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_16"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_18",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_18"
+        }
+    ],
     "events": {}
 }

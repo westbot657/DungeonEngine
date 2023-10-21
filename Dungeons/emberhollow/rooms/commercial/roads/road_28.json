@@ -1,5 +1,18 @@
 {
     "name": "The Frozen Forge Pass",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_27",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_27"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_29",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_29"
+        }
+    ],
     "events": {}
 }

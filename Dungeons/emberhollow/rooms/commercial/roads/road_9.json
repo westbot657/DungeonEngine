@@ -1,5 +1,18 @@
 {
     "name": "Behind the Tavern and Inn",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_7",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_7"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_10",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_10"
+        }
+    ],
     "events": {}
 }

@@ -1,5 +1,18 @@
 {
     "name": "The Path of The Wizard",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_15",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_15"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_16",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_16"
+        }
+    ],
     "events": {}
 }

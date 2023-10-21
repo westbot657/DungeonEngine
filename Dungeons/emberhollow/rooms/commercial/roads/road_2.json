@@ -1,5 +1,30 @@
 {
     "name": "South Parkside",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_3",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_3"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_1",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_1"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_28",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_28"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_1_26",
+            "travel_message": "",
+            "target": "emberhollow:rooms/residential/roads/road_26"
+        }
+    ],
     "events": {}
 }

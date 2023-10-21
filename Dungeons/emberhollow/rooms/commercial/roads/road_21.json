@@ -1,5 +1,24 @@
 {
     "name": "The Forgotten Street",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_10",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_10"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_20",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_20"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_22",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_22"
+        }
+    ],
     "events": {}
 }

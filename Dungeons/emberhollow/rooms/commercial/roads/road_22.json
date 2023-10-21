@@ -1,5 +1,36 @@
 {
     "name": "Behind Telecomms",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_10",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_10"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_20",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_20"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_21",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_21"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_26",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_26"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_27",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_27"
+        }
+    ],
     "events": {}
 }

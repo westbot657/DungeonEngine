@@ -1,5 +1,24 @@
 {
     "name": "Southwest Parkside",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_3",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_3"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_12",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_12"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_14",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_14"
+        }
+    ],
     "events": {}
 }

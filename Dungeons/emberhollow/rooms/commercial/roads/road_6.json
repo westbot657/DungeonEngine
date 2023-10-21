@@ -1,5 +1,30 @@
 {
     "name": "North Parkside",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_4",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_4"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_5",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_5"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_7",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_7"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_8",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_8"
+        }
+    ],
     "events": {}
 }

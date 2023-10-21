@@ -1,5 +1,30 @@
 {
     "name": "In Front of The Tavern",
-    "interactions": [],
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_6",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_6"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_8",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_8"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_9",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_9"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_10",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_10"
+        }
+    ],
     "events": {}
 }

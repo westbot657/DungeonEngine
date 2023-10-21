@@ -26,5 +26,9 @@
             "target": "emberhollow:rooms/residential/roads/road_26"
         }
     ],
-    "events": {}
+    "events": {
+        "on_input": {
+            "#script": "emberhollow/scripts/rooms/commercial/roads/road_2/on_input"
+        }
+    }
 }

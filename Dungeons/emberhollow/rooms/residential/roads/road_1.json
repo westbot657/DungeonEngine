@@ -20,5 +20,9 @@
             "target": "emberhollow:rooms/commercial/roads/road_0"
         }
     ],
-    "events": {}
+    "events": {
+        "on_input": {
+            "#script": "emberhollow/scripts/rooms/residential/roads/road_1/on_input"
+        }
+    }
 }

@@ -1,5 +1,12 @@
 {
     "name": "The Prisoner's Path of Shame",
     "interactions": [],
-    "events": {}
+    "events": {
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/commercial/roads/road_30/on_enter"
+        },
+        "on_input": {
+            "#script": "emberhollow/scripts/rooms/commercial/roads/road_30/on_input"
+        }
+    }
 }

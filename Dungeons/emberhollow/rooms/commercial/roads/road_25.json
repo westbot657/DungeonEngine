@@ -14,5 +14,12 @@
             "target": "emberhollow:rooms/docks/roads/road_5"
         }
     ],
-    "events": {}
+    "events": {
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/commercial/roads/road_25/on_enter"
+        },
+        "on_input": {
+            "#script": "emberhollow/scripts/rooms/commercial/roads/road_25/on_input"
+        }
+    }
 }

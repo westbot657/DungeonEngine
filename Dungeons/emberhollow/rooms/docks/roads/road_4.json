@@ -30,7 +30,7 @@
         "on_enter": {
             "#script": "emberhollow/scripts/rooms/docks/roads/road_4/on_enter"
         },
-        "on_input":{
+        "on_input": {
             "#script": "emberhollow/scripts/rooms/docks/roads/road_4/on_input"
         }
     }

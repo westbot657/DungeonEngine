@@ -3,10 +3,10 @@
     "interactions": [],
     "events": {
         "on_enter": {
-            "#script": "emberhollow/scripts/rooms/boats/spawn_boat/on_enter"
+            "#script": "emberhollow/scripts/rooms/boats/spawn_boat/spawn/on_enter"
         },
         "on_input": {
-            "#script": "emberhollow/scripts/rooms/boats/spawn_boat/on_input"
+            "#script": "emberhollow/scripts/rooms/boats/spawn_boat/spawn/on_input"
         }
     }
 }

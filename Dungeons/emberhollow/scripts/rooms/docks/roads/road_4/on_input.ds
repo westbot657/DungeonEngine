@@ -5,15 +5,15 @@
 //     [engine:interaction/interact](".exit")
 // }
 
-[engine:text/match](<#dungeon.stage>)
+match(<#dungeon.stage>)
 @pattern: "tutorial" # {
 
-    [engine:text/match](<#text>)
+    match(<#text>)
     @pattern: "left" # {
-        [engine:interaction/interact](".road_3_5")
+        interact(".road_3_5")
     }
     @pattern: "right" # {
-        [engine:interaction/interact](".road_3_3")
+        interact(".road_3_3")
     }
 
 }

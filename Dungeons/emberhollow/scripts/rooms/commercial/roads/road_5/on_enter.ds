@@ -1,1 +1,10 @@
 // on_enter script
+
+match(<#dungeon.stage>)
+@pattern: "tutorial" # {
+
+    if (not <#dungeon.tutorial_combat_complete>) {
+        
+    }
+    
+}

@@ -1,7 +1,8 @@
 
 
 [engine:text/match](<#dungeon.stage>)
-@pattern: "tutorial" # {
+// skip tutorial stage for inputs
+@pattern: "idk" # {
     
 }
 

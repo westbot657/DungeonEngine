@@ -1,1 +1,12 @@
 // on_enter script
+
+match(<#dungeon.stage>)
+@pattern: "tutorial" # {
+
+    output("As the road curves to the right, you see a sign for the `Inn`, pointing to the right of another fork in the road.")
+    
+    wait(4)
+
+    interact(".road_2_6")
+
+}

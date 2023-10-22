@@ -1,0 +1,29 @@
+
+match(<#dungeon.stage>)
+@pattern: "tutorial" # {
+    
+    if (<#dungeon.waiting_for_name>) {
+
+        match(<#text>)
+        @pattern: " *(?:[Ii]'m|[Ii] *am|[Mm]y *name(?:'s| *is)) *(?P<name>.*)" # {
+            <name> = [engine:text/strip](<name>)
+            <#dungeon.tutorial_ran_said_name> = true
+            if ([engine:text/fuzzy_match]([engine:text/set_case](<name>, "lower"), [engine:text/set_case](<#player.name>), 0.80)) {
+                output(format("`Syllia` (cheerfully): Nice to meet you, {player}!", player=<#player.name>))
+                wait(2)
+                output("Come on, I'll get mom to give you a room at the Inn for distracting those jerks for me!")
+                [engine:player/set_tag]("emberhollow_reputation", [engine:player/get_tag]("emberhollow_reputation") + 1)
+                <#dungeon.stage> = "tutorial_2"
+                wait(4)
+                interact(".road_2_5")
+
+            } else {
+                output("`Syllia` (skeptically): Hmmmmm... that sounds made up to me.")
+                wait(3)
+            }
+
+        }
+
+    }
+
+}

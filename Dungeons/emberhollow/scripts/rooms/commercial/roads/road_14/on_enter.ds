@@ -3,7 +3,11 @@
 match(<#dungeon.stage>)
 @pattern: "tutorial" # {
 
-    
+    output("Walking down the right path, you see 2 roads branch off to the right.")
+
+    wait(3)
+
+    interact(".road_2_12")
 
 }
 

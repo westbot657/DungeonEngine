@@ -1,0 +1,78 @@
+{
+    "respawn_point": "emberhollow:rooms/commercial/roads/road_5",
+    "data": {},
+    "enemies": [
+        {
+            "parent": "engine:enemies/thief",
+            "id": "thief-1",
+            "name": "Elanil",
+            "max_health": 40,
+            "events": {
+                "@start": {
+                    "on_attacked": {
+                        "functions": [
+                            {
+                                "#call": "$combat:enemy_health_check",
+                                "parameters": {
+                                    "target_health": 32
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "parent": "engine:enemies/thief",
+            "id": "thief-2",
+            "name": "Kymil",
+            "max_health": 35,
+            "events": {
+                "@start": {
+                    "on_attacked": {
+                        "functions": [
+                            {
+                                "#call": "$combat:enemy_health_check",
+                                "parameters": {
+                                    "target_health": 28
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ],
+    "sequence": {
+        "@start": {
+            "functions": [
+                {
+                    "function": "engine:combat/spawn",
+                    "enemies": [
+                        "thief-1",
+                        "thief-2"
+                    ]
+                }
+            ]
+        },
+        "thief-1-health-check-32": {
+            "functions": [
+                {
+                    "function": "engine:combat/trigger",
+                    "trigger": "end"
+                }
+            ]
+        },
+        "thief-2-health-check-28": {
+            "functions": [
+                {
+                    "function": "engine:combat/trigger",
+                    "trigger": "end"
+                }
+            ]
+        },
+        "end": {
+            "#script": "emberhollow/combats/tutorial_combat/end"
+        }
+    }
+}

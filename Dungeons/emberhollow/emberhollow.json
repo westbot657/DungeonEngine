@@ -13,6 +13,10 @@
     "data": {
         "stage": "tutorial",
         "player_ids": [],
-        "tutorial_combat_complete": false
+        "tutorial_combat_complete": false,
+        "tutorial_combat_ran_away": false,
+        "tutorial_ran_said_name": false,
+        "annoyed_syllia": [],
+        "tutorial_waiting_for_name": false
     }
 }

@@ -1,0 +1,64 @@
+{
+    "name": "Park",
+    "interactions": [
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_1",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_1"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_2",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_2"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_3",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_3"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_4",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_4"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_5",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_5"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_6",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_6"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_8",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_8"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_12",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_12"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "road_2_13",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/roads/road_13"
+        }
+    ],
+    "events": {
+        "on_enter": {
+            "#script": "emberhollow/scripts/rooms/commercial/park/on_enter"
+        }
+    }
+}

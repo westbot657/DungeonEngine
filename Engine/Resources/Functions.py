@@ -57,6 +57,8 @@ except ImportError:
 
 from typing import Any
 
+from difflib import SequenceMatcher
+
 import random, math, re, json, time
 
 """
@@ -2138,6 +2140,54 @@ class Engine_Text_Format(LoaderFunction):
         for key, val in options.items():
             opts.update({key: str(val)})
         return text.format(**opts)
+
+class Engine_Text_Strip(LoaderFunction):
+    id = Identifier("engine", "text/", "strip")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 1,
+        "args": {
+            "text": "required parameter",
+            "chars": "optional parameter"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if "text" in args: return cls.strip
+        return None
+
+    @staticmethod
+    def strip(text:str, chars=None):
+        return text.strip(chars)
+
+class Engine_Text_FuzzyMatch(LoaderFunction):
+    id = Identifier("engine", "text/", "fuzzy_match")
+
+    script_flags = {
+        "required_args": 3,
+        "optional_args": 0,
+        "args": {
+            "string1": "required_parameter",
+            "string2": "required_parameter",
+            "ratio": "required_parameter"
+        }
+    }
+
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "string1": str(),
+                "string2": str(),
+                "ratio": int()|float()
+            }: return cls.fuzzy_match
+            case _: return None
+
+    @staticmethod
+    def fuzzy_match(string1:str, string2:str, ratio:int|float):
+        return SequenceMatcher(a=string1, b=string2).ratio() >= ratio
 
 class Engine_Text_Substring(LoaderFunction):
     id = Identifier("engine", "text/", "substring")

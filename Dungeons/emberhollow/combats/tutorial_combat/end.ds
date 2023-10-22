@@ -1,0 +1,8 @@
+
+combat_output("`Kymil`: C'mon Elanil, let's get outta here!")
+wait(2)
+combat_output("Kymil and Elanil run away.")
+
+[engine:combat/despawn]("thief-1", "thief-2")
+// I hope this properly ends the combat...
+

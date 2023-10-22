@@ -1,1 +1,34 @@
 // on_input script
+
+match(<#dungeon.stage>, "fullmatch")
+@pattern: "tutorial" # {
+
+    if (not <#dungeon.tutorial_combat_complete>) {
+        
+        match(<#text>, "search")
+        @pattern: "help" # {
+            // combat
+        }
+        @pattern: "run" # {
+            <#dungeon.tutorial_combat_ran_away> = true
+            <#dungeon.tutorial_combat_complete> = true
+            output("You turn and run.")
+            wait(0.7)
+            output("\"WAIT!!\" the girl shouts. She runs after you into the heavily wooded park.")
+            wait(2)
+            output("You run for a short time, and then duck behind a large tree.")
+            wait(3)
+            output("You can see Elanil and the other elf staring into the woods for a few seconds, before they turn and head left, turn a corner, and disappear.")
+            wait(6)
+            output("`girl`: Why'd you run?")
+            wait(0.5)
+            output("`girl`: You have weapons, you totally coulda taken them!")
+            wait(1.2)
+            output("`girl`: I'm `Syllia`! What's your name?\n│ (say your name)")
+            interact(".park")
+        }
+    }
+}
+@pattern: "tutorial_2" # {
+
+}

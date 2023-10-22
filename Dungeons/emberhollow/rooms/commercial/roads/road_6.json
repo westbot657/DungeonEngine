@@ -24,6 +24,12 @@
             "id": "road_2_8",
             "travel_message": "",
             "target": "emberhollow:rooms/commercial/roads/road_8"
+        },
+        {
+            "type": "engine:interactable/passage",
+            "id": "park",
+            "travel_message": "",
+            "target": "emberhollow:rooms/commercial/park"
         }
     ],
     "events": {

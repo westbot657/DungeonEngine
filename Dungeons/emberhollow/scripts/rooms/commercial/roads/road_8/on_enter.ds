@@ -3,7 +3,7 @@
 match(<#dungeon.stage>)
 @pattern: "tutorial" # {
 
-    output("As the road curves to the right, you see a sign for the `Inn`, pointing to the right of another fork in the road.")
+    output("The road curves to the right, you can see a sign for the `Inn` in the distance.")
     
     wait(4)
 

@@ -3,14 +3,16 @@
 match(<#dungeon.stage>)
 @pattern: "tutorial" # {
 
-    output("Further down, you start walking past a park on the right.")
+    output("Further down the road, A forrested park comes into view")
 
-    wait(2)
+    wait(3)
 
-    output("You continue straight past a street to the left, as you continue forward.")
+    output("You continue straight past a road to the left, as you continue forward.")
 
     wait(3)
 
     interact(".road_2_8")
 
 }
+
+

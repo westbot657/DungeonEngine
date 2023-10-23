@@ -10,6 +10,9 @@ match(<#dungeon.stage>)
 
     match(<#text>)
     @pattern: "left" # {
+
+        output("You head left.")
+
         interact(".road_3_5")
     }
     @pattern: "right" # {

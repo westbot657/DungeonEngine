@@ -4,18 +4,18 @@ match(<#dungeon.stage>)
 
     wait(0.7)
     output("\"WAIT!!\" the girl shouts. She runs after you into the heavily wooded park.")
-    wait(2)
+    wait(3)
     output("You run for a short time, and then duck behind a large tree.")
     wait(3)
     output("You can see Elanil and the other elf staring into the woods for a few seconds, before they turn and head left, turn a corner, and disappear.")
-    wait(6)
+    wait(5)
     output("`girl`: Why'd you run?")
     wait(0.5)
     output("`girl`: You have weapons, you totally coulda taken them!")
     wait(1.2)
     output("`girl`: I'm `Syllia`! What's your name?\n│ (say your name)")
 
-    <#dungeon.waiting_for_name> = true
+    <#dungeon.tutorial_waiting_for_name> = true
     wait(20)
 
     if (not <#dungeon.tutorial_ran_said_name>) {
@@ -24,7 +24,7 @@ match(<#dungeon.stage>)
         wait(10)
     }
     
-    <#dungeon.waiting_for_name> = false
+    <#dungeon.tutorial_waiting_for_name> = false
 
     if (not <#dungeon.tutorial_ran_said_name>) {
         output("`Syllia` (annoyed): Alright, I guess I'll just leave, since you don't want to talk.")

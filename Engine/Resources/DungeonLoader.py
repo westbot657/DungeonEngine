@@ -302,7 +302,7 @@ class DungeonLoader:
                 if isinstance(store, dict):
                     for key, value in store.items():
                         key: str
-                        if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
+                        if key.startswith(("%")): raise MemoryError(f"Cannot create a variable with prefix '%': '{key}'")
                         elif key.startswith("$"):
                             function_memory.store(key, value)
                         else:

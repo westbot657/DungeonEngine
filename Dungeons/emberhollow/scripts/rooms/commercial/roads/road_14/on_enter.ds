@@ -3,9 +3,9 @@
 match(<#dungeon.stage>)
 @pattern: "tutorial" # {
 
-    output("Walking down the right path, you see 2 roads branch off to the right.")
+    output("Walking down the path, you see 2 roads branch off to the right.")
 
-    wait(3)
+    wait(3.5)
 
     interact(".road_2_12")
 

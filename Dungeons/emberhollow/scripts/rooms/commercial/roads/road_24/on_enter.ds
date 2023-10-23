@@ -6,11 +6,11 @@ match(<#dungeon.stage>)
 
     output("You walk up the path into town, and arrive at fork in the road.")
 
-    wait(3)
+    wait(4)
 
     output("You can see a sign with arrows pointing left and right")
 
-    wait(2)
+    wait(2.5)
 
     output(join(
         "Pointing `right` reads:",
@@ -21,7 +21,7 @@ match(<#dungeon.stage>)
         seperator="\n"
     ))
 
-    wait(2)
+    wait(1)
 
     output(join(
         "Pointing `left` reads:",
@@ -32,4 +32,5 @@ match(<#dungeon.stage>)
     ))
 
 }
+
 

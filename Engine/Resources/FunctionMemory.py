@@ -123,7 +123,9 @@ class FunctionMemory:
 
                 elif prop.replace(".", "") in self.symbol_table:
                     return self._setProperty(self.symbol_table[prop.replace(".", "")], props, value)
-                
+            
+            elif name.startswith("#"):
+                raise MemoryError(f"Cannot create a variable with prefix '#': '{name}'")
             self.symbol_table.update({name: value})
     
     def _setProperty(self, obj, propertyTree:list, value):

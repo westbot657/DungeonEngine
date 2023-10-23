@@ -3,9 +3,9 @@
 match(<#dungeon.stage>)
 @pattern: "tutorial" # {
 
-    output("You get to the end of the walkway, and step down onto a cobbled path.")
+    output("You get to the end of the dock walkway and step down onto a cobbled path.")
 
-    wait(3)
+    wait(4.5)
 
     interact(".road_2_24")
 

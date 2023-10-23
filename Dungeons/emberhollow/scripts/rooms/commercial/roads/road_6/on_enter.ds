@@ -3,10 +3,10 @@
 match(<#dungeon.stage>)
 @pattern: "tutorial" # {
 
-    output("As you continue walking, you notice the windows of the Inn on your right, as you approach a side street marked by a sign: `The Inn`.")
+    output("You notice the windows of the Inn on your right, as you approach a side street marked by a sign: `The Inn`.")
 
     wait(6)
 
-    output("As you approcah the side street, you here a woman cry for `help`!\nwhat do you do?")
+    output("You here a girl cry for `help`!\nwhat do you do?")
     
 }

@@ -1,1 +1,12 @@
 // on_enter script
+
+match(<#dungeon.stage>)
+@pattern: "tutorial" # {
+    output("You go left, walking past a large building on the left.")
+    wait(3.5)
+    output("There's a sign at the end of the road, reading that the `Inn` is to the right")
+    wait(3.5)
+    interact(".road_2_11")
+}
+
+

@@ -14,16 +14,16 @@ match(<#dungeon.stage>)
                     0.80
                 )) {
                 output(format("`Syllia` (cheerfully): Nice to meet you, {player}!", player=<#player.name>))
-                wait(2)
+                // wait(2)
                 output("Come on, I'll get mom to give you a room at the Inn for distracting those jerks for me!")
                 [engine:player/set_tag]("emberhollow_reputation", [engine:player/get_tag]("emberhollow_reputation") + 1)
                 <#dungeon.stage> = "tutorial_2"
-                wait(4)
+                // wait(4)
                 interact(".road_2_5")
 
             } else {
                 output("`Syllia` (skeptically): Hmmmmm... that sounds made up to me.")
-                wait(3)
+                // wait(3)
             }
 
         }

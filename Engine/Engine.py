@@ -69,7 +69,7 @@ class Engine:
         self.combats: list[Combat] = []
         self.tasks: list[Generator] = []
         self.delays: list = []
-        self.delays2: list = []
+        # self.delays2: list = []
         self._player_input_categories = ["common", "global", "world"]
         self._frame_times = [1 for _ in range(60)]
         self._frame_start = 0
@@ -311,7 +311,8 @@ class Engine:
                 # self.players.pop(player.uuid)
 
             case EngineOperation.Wait():
-                self.delays2
+                pass
+                # self.delays2.append((time.time()+result.delay, player_id))
 
             case EngineOperation.Restart():
                 gen = self.input_queue[player_id][0]
@@ -373,7 +374,6 @@ class Engine:
                 if time.time() > delayed[0]:
                     self.delays.remove(delayed)
                     self.tasks.append(delayed[1])
-
 
             # run scheduled tasks
             while self.tasks:

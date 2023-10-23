@@ -309,6 +309,9 @@ class Engine:
 
                 # self.players.pop(player.uuid)
 
+            case EngineOperation.Wait():
+                ...
+
             case EngineOperation.Restart():
                 gen = self.input_queue[player_id][0]
                 self.input_queue[player_id][1] = gen
@@ -377,18 +380,25 @@ class Engine:
                 v = None
                 try:
                     while True:
+
                         v = task.send(None)
                         try:
                             # print("=== BASE ENGINE LEVEL ===")
-                            if isinstance(v[2], EngineOperation.Wait):
-                                # print("--- WAITING ---")
-                                self.delays.append((time.time()+v[2].delay, task))
-                                break
-                            self.evaluateResult(*v)
+                            if isinstance(v, (tuple, list)):
+                                if isinstance(v[2], EngineOperation.Wait):
+                                    # print("--- WAITING ---")
+                                    self.delays.append((time.time()+v[2].delay, task))
+                                    break
+                                self.evaluateResult(*v)
+                            # elif isinstance(v, EngineOperation.Wait):
+                            #     self.delays.append((time.time()+v.delay, task))
+                            #     break
                         except EngineError as e:
                             print(e)
                 except StopIteration as e:
                     Log["debug"]["engine"](f"Task completed: {task}  {v=}  {e.value=}")
+                except TypeError as e:
+                    pass
 
             for combat in self.combats.copy():
                 try:
@@ -451,10 +461,21 @@ class Engine:
                         v = res.send(None)
                         if isinstance(v, _EngineOperation):
                             #ret = yield v
+                            # if isinstance(v, EngineOperation.Wait):
+                            #     # print("--- WAITING ---")
+                            #     # self.input_queue.pop(player_id)
+                            #     self.delays.append((time.time()+v.delay, res))
+                            #     continue
                             self.evaluateResult(self._default_input_handler, res, v, player_id, text)
                             #v = res.send(ret)
                     except StopIteration as e:
                         if isinstance(e.value, _EngineOperation):
+                            # if isinstance(e.value, EngineOperation.Wait):
+                            #     # print("--- WAITING ---")
+                            #     e.value: EngineOperation.Wait
+                            #     # self.input_queue.pop(player_id)
+                            #     self.delays.append((time.time()+e.value.delay, res))
+                            #     continue
                             self.evaluateResult(self._default_input_handler, self.default_input_handler, e.value, player_id, text)
 
                     if isinstance(response_handler, Generator):
@@ -464,6 +485,11 @@ class Engine:
                                 raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
                             #print(result)
                             try:
+                                # if isinstance(result, EngineOperation.Wait):
+                                #     # print("--- WAITING ---")
+                                #     # self.input_queue.pop(player_id)
+                                #     self.delays.append((time.time()+result.delay, response_handler))
+                                #     continue
                                 self.evaluateResult(handler_getter, response_handler, result, player_id, text)
                             except EngineError as e:
                                 Log["ERROR"]["engine"](e)
@@ -474,6 +500,11 @@ class Engine:
                                 raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
                             #print(result)
                             try:
+                                # if isinstance(result, EngineOperation.Wait):
+                                #     # print("--- WAITING ---")
+                                #     # self.input_queue.pop(player_id)
+                                #     self.delays.append((time.time()+result.delay, response_handler))
+                                #     continue
                                 self.evaluateResult(handler_getter, response_handler, result, player_id, text)
                             except EngineError as e:
                                 Log["ERROR"]["engine"](e)
@@ -485,6 +516,11 @@ class Engine:
                                 raise EngineError(f"generator did not yield/return an EngineOperation! ({result})")
                             #print(result)
                             try:
+                                # if isinstance(result, EngineOperation.Wait):
+                                #     # print("--- WAITING ---")
+                                #     # self.input_queue.pop(player_id)
+                                #     self.delays.append((time.time()+result.delay, response_handler))
+                                #     continue
                                 self.evaluateResult(handler_getter, response_handler, result, player_id, text)
                             except EngineError as e:
                                 Log["ERROR"]["engine"](e)
@@ -498,6 +534,11 @@ class Engine:
                         if not isinstance(result, _EngineOperation):
                             raise EngineError(f"function did not return an EngineOperation! ({result})")
                         try:
+                            # if isinstance(result, EngineOperation.Wait):
+                            #     # print("--- WAITING ---")
+                            #     # self.input_queue.pop(player_id)
+                            #     self.delays.append((time.time()+result.delay, response_handler))
+                            #     continue
                             self.evaluateResult(handler_getter, response_handler, result, player_id, text)
                         except EngineError as e:
                             Log["ERROR"]["engine"](e)

@@ -4,31 +4,6 @@ match(<#dungeon.stage>)
 @pattern: "tutorial" # {
 
     match(<#text>, "search")
-    @pattern: "\bsign\b" # {
-        output("You walk over to the sign...")
-
-        wait(2)
-
-        output(join(
-            "Pointing `right` reads:",
-            "│ `Inn`",
-            "│ Market",
-            "│ History Museum",
-            "│ ",
-            seperator="\n"
-        ))
-
-        wait(2)
-
-        output(join(
-            "Pointing `left` reads:",
-            "│ Town Hall",
-            "│ Police Station",
-            "│ ",
-            seperator="\n"
-        ))
-
-    }
     @pattern: "\b(?:right|inn)\b" # {
 
         output("You take the right path.")

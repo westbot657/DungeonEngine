@@ -8,7 +8,28 @@ match(<#dungeon.stage>)
 
     wait(3)
 
-    output("You can see a `sign` with arrows pointing left and right")
+    output("You can see a sign with arrows pointing left and right")
+
+    wait(2)
+
+    output(join(
+        "Pointing `right` reads:",
+        "│ `Inn`",
+        "│ Market",
+        "│ History Museum",
+        "│ ",
+        seperator="\n"
+    ))
+
+    wait(2)
+
+    output(join(
+        "Pointing `left` reads:",
+        "│ Town Hall",
+        "│ Police Station",
+        "│ ",
+        seperator="\n"
+    ))
 
 }
 

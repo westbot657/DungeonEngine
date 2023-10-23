@@ -5,7 +5,7 @@
             "type": "engine:interactable/passage",
             "id": "road_2_24",
             "target": "emberhollow:rooms/commercial/roads/road_24",
-            "travel_message": "[TODO: road_5 -> road_2_24 travel_message]"
+            "travel_message": ""
         },
         {
             "type": "engine:interactable/passage",

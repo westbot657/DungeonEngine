@@ -204,7 +204,8 @@ class Combat(FunctionalElement):
             ".old_trigger": self.old_trigger,
             ".turn_order": self.turn_order,
             ".complete": self.complete,
-            ".respawn_point": self.respawn_point
+            ".respawn_point": self.respawn_point,
+            ".location": self.location
         }
         return d
 

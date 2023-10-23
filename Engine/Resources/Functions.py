@@ -1756,6 +1756,63 @@ class Engine_Location_Exists(LoaderFunction):
         except LocationError:
             return False
 
+class Engine_Location_GetDungeon(LoaderFunction):
+    id = Identifier("engine", "location/", "get_dungeon")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "location": "required parameter"
+        }
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "location": str()|Location()
+            }: return cls.get_dungeon
+            case _: return None
+
+    @staticmethod
+    def get_dungeon(function_memory:FunctionMemory, location:Location|str):
+        try:
+            return function_memory.getLocation(Location.fromString(location).dungeon)
+        except LocationError:
+            return None
+
+
+class Engine_Location_GetRoom(LoaderFunction):
+    id = Identifier("engine", "location/", "get_room")
+
+    script_flags = {
+        "required_args": 1,
+        "optional_args": 0,
+        "args": {
+            "location": "required parameter"
+        }
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        match args:
+            case {
+                "location": str()|Location()
+            }: return cls.get_room
+            case _: return None
+
+    @staticmethod
+    def get_room(function_memory:FunctionMemory, location:Location|str):
+        try:
+            if x := function_memory.getLocation(Location.fromString(location)):
+                if isinstance(x, Room):
+                    return x
+            return None
+        except LocationError:
+            return None
+
+
 # ^ Location ^ #
 
 ####XXX###############XXX####

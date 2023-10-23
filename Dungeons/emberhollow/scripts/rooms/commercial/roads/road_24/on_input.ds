@@ -8,8 +8,6 @@ match(<#dungeon.stage>)
 
         output("You take the right path.")
 
-        wait(1)
-
         interact(".road_2_14")
 
     }
@@ -17,11 +15,9 @@ match(<#dungeon.stage>)
 
         output("You take the left path.")
 
-        wait(1)
-
         interact(".road_2_23")
 
-    } 
+    }
 
 }
 

@@ -69,6 +69,7 @@ class Engine:
         self.combats: list[Combat] = []
         self.tasks: list[Generator] = []
         self.delays: list = []
+        self.delays2: list = []
         self._player_input_categories = ["common", "global", "world"]
         self._frame_times = [1 for _ in range(60)]
         self._frame_start = 0
@@ -310,7 +311,7 @@ class Engine:
                 # self.players.pop(player.uuid)
 
             case EngineOperation.Wait():
-                ...
+                self.delays2
 
             case EngineOperation.Restart():
                 gen = self.input_queue[player_id][0]

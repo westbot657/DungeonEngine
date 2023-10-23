@@ -3,11 +3,15 @@
 
 if (<.closed>) {
     if (<.closed_message>) {
-        output(format(<.closed_message>, shop_name=<.shop_name>))
+        output(
+            format(<.closed_message>, shop_name=<.shop_name>)
+        )
     }
 } else {
     if (<.enter_message>) {
-        output(format(<.enter_message>, shop_name=<.shop_name>, shopkeeper=<.shopkeeper>))
+        output(
+            format(<.enter_message>, shop_name=<.shop_name>, shopkeeper=<.shopkeeper>)
+        )
     }
     
     // restock if needed
@@ -17,7 +21,9 @@ if (<.closed>) {
     }
     if (length(<.current_stock>) == 0) {
         if (<.out_of_stock_message>) {
-            output(<.out_of_stock_message>, shop_name=<.shop_name>, shopkeeper=<.shopkeeper>)
+            output(
+                format(<.out_of_stock_message>, shop_name=<.shop_name>, shopkeeper=<.shopkeeper>)
+            )
         }
         return
     }
@@ -67,7 +73,9 @@ if (<.closed>) {
         [engine:text/match](<inp>)
         @pattern: "\b(exit|leave)\b" # {
             if (<.exit_message>) {
-                output(format(<.exit_message>, shop_name=<.shop_name>, shopkeeper=<.shopkeeper>))
+                output(
+                    format(<.exit_message>, shop_name=<.shop_name>, shopkeeper=<.shopkeeper>)
+                )
             }
             break
         }
@@ -77,18 +85,24 @@ if (<.closed>) {
             @pattern: [engine:text/set_case](<item>::"name", "lower") # {
 
                 if (<item>::"cost" >> <#player.currency>) {
-                    output(format("You do not have enough money to buy `{item}`", item=<item>::"name"))
+                    output(
+                        format("You do not have enough money to buy `{item}`", item=<item>::"name")
+                    )
                     break
                 }
 
                 // output()
-                <response> = input(format("Purchase `{item}` for `{cost}`? (yes/no)", item=<item>::"name", cost=<item>::"cost"))
+                <response> = input(
+                    format("Purchase `{item}` for `{cost}`? (yes/no)", item=<item>::"name", cost=<item>::"cost")
+                )
 
                 // output("got input!")
 
                 [engine:text/match](<response>)
                 @pattern: "[Yy](?:es)?" # {
-                    output(format("You purchased `{item}`!", item=<item>::"name"))
+                    output(
+                        format("You purchased `{item}`!", item=<item>::"name")
+                    )
                     [engine:player/give_game_object](<item>::"item")
                     [engine:list/remove](<.current_stock>, <item>)
 

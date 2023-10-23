@@ -1,7 +1,11 @@
 
 if (<.blocked>) {
-    output(<.blocked_message>)
+    if (<.blocked_message>) {
+        output(<.blocked_message>)
+    }
 } else {
-    output(<.travel_message>)
+    if (<.travel_message>) {
+        output(<.travel_message>)
+    }
     [engine:player/set_location](<.target>)
 }

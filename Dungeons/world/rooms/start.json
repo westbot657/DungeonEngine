@@ -2,7 +2,12 @@
     "name": "Start",
     "environment": {},
     "interactions": [
-        
+        {
+            "type": "engine:interactable/passage",
+            "id": "spawn_boat",
+            "target": "emberhollow:rooms/boats/spawn_boat",
+            "travel_message": ""
+        }
     ],
     "events": {
         "on_enter": {

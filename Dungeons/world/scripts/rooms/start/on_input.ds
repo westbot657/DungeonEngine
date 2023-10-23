@@ -66,7 +66,7 @@ $help2
 ))
 }
 @pattern: "\bstart\b" # {
-    [engine:player/set_location]("emberhollow:rooms/boats/spawn_boat/spawn")
+    interact(".spawn_boat")
 }
 @pattern: "go to (?P<dungeon_name>.*)" # {
     <dungeon_name> = [engine:text/set_case](<dungeon_name>, "lower")

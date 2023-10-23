@@ -62,6 +62,7 @@ atom : VARIABLE '=' expression
 expression : comp
            | MACRO '=' expression
            | MACRO
+           | PASS
 
 table : '%' '[' comma_expressions ']'
       | '%' '{' table_contents '}'

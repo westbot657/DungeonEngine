@@ -1,6 +1,6 @@
 // quick intro of arriving at emberhollow for a new life or smth
 
-<num_players> = [engine:list/length](<#dungeon.player_ids>)
+<num_players> = length(<#dungeon.player_ids>)
 
 [engine:list/append](<#dungeon.player_ids>, <#player.uid>)
 
@@ -9,6 +9,7 @@
 [engine:player/set_tag]("listening", true)
 
 $listening = [engine:player/get_tag]("listening")
+
 
 output("say `skip` to skip dialog")
 
@@ -39,8 +40,8 @@ if ($listening) {
 ])
 
 
-<g> = [engine:random/range](9, 11),
-<s> = [engine:random/range](5, 7),
+<g> = [engine:random/range](9, 11)
+<s> = [engine:random/range](5, 7)
 <c> = [engine:random/range](2, 9)
 
 
@@ -49,6 +50,10 @@ if ($listening) {
     wait(2)
 }
 
+/*
+
+
+*/
 
 
 [engine:text/match]([engine:random/choice](%["1", "2", "3", "4"]))
@@ -181,7 +186,7 @@ if ($listening) {
         }
         if ($listening) {
             output(
-                format("{captain} hands you a small pouch with some coins in it\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>), g=<g>, s=<s>, c=<c>
+                format("{captain} hands you a small pouch with some coins in it\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
             )
             wait(4)
         }
@@ -207,7 +212,7 @@ if ($listening) {
         )
         wait(3)
     }
-    if ($listening and <num_players> == 0) {1
+    if (($listening) and (<num_players> == 0)) {1
         output(
             format("`{captain}`: If ya want meh advice, go `find Phyyra at the Inn`, that money'll pay for a few nights stay.", captain=<captain>)
         )
@@ -231,6 +236,4 @@ output("the boat pulls into port, and you step off the boat.")
 wait(2)
 
 [engine:player/set_location]("emberhollow:rooms/docks/roads/road_4")
-
-
 

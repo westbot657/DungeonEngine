@@ -1,9 +1,4 @@
 {
-    "$goto_check": {
-        "#script": "world/scripts/goto_check"
-    },
-
-
     "$combat:enemy_health_check": {
         "#script": "world/scripts/combat/enemy_health_check"
     }

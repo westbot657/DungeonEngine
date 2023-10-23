@@ -2169,9 +2169,9 @@ class Engine_Text_FuzzyMatch(LoaderFunction):
         "required_args": 3,
         "optional_args": 0,
         "args": {
-            "string1": "required_parameter",
-            "string2": "required_parameter",
-            "ratio": "required_parameter"
+            "string1": "required parameter",
+            "string2": "required parameter",
+            "ratio": "required parameter"
         }
     }
 
@@ -2525,7 +2525,7 @@ class Engine_List_Append(LoaderFunction):
         "optional_args": -1,
         "args": {
             "list": "required parameter",
-            "elements": "*paramaters"
+            "elements": "*parameters"
         }
     }
 

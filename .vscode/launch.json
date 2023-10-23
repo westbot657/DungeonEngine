@@ -8,7 +8,7 @@
             "name": "Graphic Engine",
             "type": "python",
             "request": "launch",
-            "program": "./Engine/GraphicsEngine/GraphicEngine.py",
+            "program": "./GraphicsEngine/ui_library.py",
             "console": "integratedTerminal",
             "justMyCode": false
         },

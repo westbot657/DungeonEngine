@@ -51,3 +51,19 @@ class UnknownPlayerError(EngineError):
 class CurrencyError(EngineError):
     def __init__(self, *args):
         super().__init__("CurrencyError:", *args)
+
+class ScriptError(EngineError):
+    def __init__(self, *args):
+        super().__init__(f"ScriptError:", *args)
+
+class LexerError(ScriptError):
+    def __init__(self, *args):
+        self.args = args
+
+class ParserError(ScriptError):
+    def __init__(self, *args):
+        self.args = args
+
+class EOF(ScriptError):
+    def __init__(self, *args):
+        super().__init__(f"EOF:", *args)

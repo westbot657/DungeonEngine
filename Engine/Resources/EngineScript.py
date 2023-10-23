@@ -7,6 +7,7 @@ try:
     from .ply.ply import yacc
     from .Identifier import Identifier
     from .Logger import Log
+    from .EngineErrors import ScriptError, LexerError, ParserError
 except ImportError:
     from LoaderFunction import LoaderFunction
     from Functions import *
@@ -14,6 +15,7 @@ except ImportError:
     from ply.ply import yacc
     from Identifier import Identifier
     from Logger import Log
+    from EngineErrors import ScriptError, LexerError, ParserError
 import re, json, glob
 
 
@@ -45,16 +47,26 @@ t_POW = r"\*\*"
 t_ignore = " \t;~`"
 
 t_ignore_comment = r"\/\/.*"
-t_ignore_comment2 = r"(?<!\/)\/\*(\*[^/]|[^*])+\*\/"
+def t_comment2(t):
+    r"(?<!\/)\/\*(\*[^/]|[^*])+\*\/"
+    t.lexer.lineno += t.value.count("\n")
+    return None
 
 t_FUNCTION = r"\[([^:\[]+:)(([^\/\]\[]+\/)*)([^\[\]]+)\]"
 
 t_TAG = r"@[^\:]+\:"
 t_MACRO = r"\$[a-zA-Z_][a-zA-Z0-9_]*"
 
+# def t_pow(t):
+#     r'\*\*'
+#     t.type = "POW"
+    
+
+
+
 # Define a rule so we can track line numbers
 def t_newline(t):
-    r'\n+'
+    r'(?:\n+)'
     t.lexer.lineno += len(t.value)
 
 # Compute column.
@@ -76,6 +88,8 @@ def t_STRING(t):
         t.value = t.value[2:-1]
     else:
         t.value = t.value[1:-1]
+
+    t.lexer.lineno += t.value.count("\n")
 
     matches = list(re.finditer(r"\\.", t.value))
     matches.reverse()
@@ -155,9 +169,10 @@ def t_NUMBER(t):
 
 def t_error(t):
     
-    Log["ERROR"]["engine script"]("Illegal character '%s'" % t.value[0])
+    Log["ERROR"]["engine script"](f"Illegal character '{t.value[0]}'")
     # print(t)
-    t.lexer.skip(1)
+    raise LexerError(f"Illegal character '{t.value[0]}'", t)
+    # t.lexer.skip(1)
 
 lexer = lex.lex()
 
@@ -281,14 +296,14 @@ def p_function_call(p):
 
     for arg_name, condition in f_args.items():
         match condition:
-            case "required parameter":
+            case "required parameter"|"required_parameter"|"rp"|"required paramater"|"required_paramater":
                 parameters["args"].update({arg_name: ...})
-            case "*parameters":
+            case "*parameters"|"*params"|"*paramaters"|"*":
                 parameters["*args"].update({arg_name: []})
                 args_name = arg_name
-            case "optional parameter":
+            case "optional parameter"|"optional parameter"|"op"|"optional_parameter"|"optional_paramater":
                 parameters["kwargs"].update({arg_name: ...})
-            case "**parameters":
+            case "**parameters"|"**paramaters"|"**params"|"**":
                 parameters["**kwargs"].update({arg_name: {}})
                 kwargs_name = arg_name
             case "scope":
@@ -746,7 +761,8 @@ def p_expression_comp(p):
 
 def p_error(p):
     if p:
-        Log["ERROR"]["engine script"](f"Syntax error at '{p.value}' ({p.lineno}, {p.lexpos})")
+        Log["ERROR"]["engine script"](f"Syntax error at '{p.value}' (Position {p.lexpos})")
+        raise ParserError(f"Syntax error at '{p.value}'", p.lexpos)
     else:
         return {}
         # Log["ERROR"]["engine script"]("Syntax error at EOF")
@@ -757,6 +773,8 @@ parser = yacc.yacc()
 
 
 class EngineScript:
+
+    curr_text: str = ""
 
     _scripts = {}
     script_files: list = [] #glob.glob("**/*.dungeon_script", recursive=True) + glob.glob("**/*.ds", recursive=True)
@@ -817,13 +835,21 @@ class EngineScript:
 
         macros.clear()
 
-
-        self.compiled_script = parser.parse(self.script)
+        try:
+            self.compiled_script = parser.parse(self.script)
+        except LexerError as e:
+            n = "\n"
+            raise ScriptError(f"{e.args[0]} (Line {self.script[0:e.args[1].lexpos].count(n)+1}, Column {len(self.script[0:e.args[1].lexpos].rsplit(n, 1)[-1])})")
+        except ParserError as e:
+            n = "\n"
+            raise ScriptError(f"{e.args[0]} (Line {self.script[0:e.args[1]].count(n)+1}, Column {len(self.script[0:e.args[1]].rsplit(n, 1)[-1])})")
     
     def remove_syntax_sugar(self, text):
 
         def repl(match:re.Match):
             t: str = match.group()
+
+            # print(f"sub repl: {t} ({type(t)})")
 
             if m := re.match(r"(?:(?P<sugar>for *<(?P<value>[^>]+)> *in *(?P<list><[^>]+>)))", t):
                 d = m.groupdict()
@@ -837,7 +863,7 @@ class EngineScript:
                 dct = parts.pop(0)
                 return f"[engine:dict/access]({dct}, {', '.join(parts)})"
             elif t == "output(":
-                return "[engine:player/message](",
+                return "[engine:player/message]("
             elif t == "combat_output(":
                 return "[engine:combat/message]("
             elif t == "format(":
@@ -857,7 +883,7 @@ class EngineScript:
             else:
                 return t
 
-        return re.sub(r"(?:\"(?:\\.|[^\"])*\"|(?:for *<[^>]+> *in *<[^>]+>)|(?:for *<[^>]+>, *<[^>]+> *in *<[^>]+>)|(<[^>]+>(?:::(?:\"(?:\\.|[^\"])+\"|<[^>]+>|\$[^:]+))+)|\b(?:output|combat_output|format|join|input|length|wait|interact|match)\()", repl, text)
+        return re.sub(re.compile(r"(?:\"(?:\\.|[^\"])*\"|(?:for *<[^>]+> *in *<[^>]+>)|(?:for *<[^>]+>, *<[^>]+> *in *<[^>]+>)|(<[^>]+>(?:::(?:\"(?:\\.|[^\"])+\"|<[^>]+>|\$[^:]+))+)|\b(?:output|combat_output|format|join|input|length|wait|interact|match)\()"), repl, text)
 
     def getScript(self):
         if not self.compiled_script:
@@ -895,6 +921,6 @@ if __name__ == "__main__":
                 engine_script = EngineScript(input("file > "))
                 engine_script.compile()
 
-                print(json.dumps(engine_script.getScript(), indent=4))
+                print(json.dumps(engine_script.getScript(), indent=4, default=str))
             except Exception as e:
                 print(e)

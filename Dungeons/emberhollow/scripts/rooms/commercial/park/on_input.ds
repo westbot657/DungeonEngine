@@ -8,7 +8,11 @@ match(<#dungeon.stage>)
         @pattern: " *(?:[Ii]'m|[Ii] *am|[Mm]y *name(?:'s| *is)) *(?P<name>.*)" # {
             <name> = [engine:text/strip](<name>)
             <#dungeon.tutorial_ran_said_name> = true
-            if ([engine:text/fuzzy_match]([engine:text/set_case](<name>, "lower"), [engine:text/set_case](<#player.name>), 0.80)) {
+            if ([engine:text/fuzzy_match](
+                    [engine:text/set_case](<name>, "lower"),
+                    [engine:text/set_case](<#player.name>, "lower"),
+                    0.80
+                )) {
                 output(format("`Syllia` (cheerfully): Nice to meet you, {player}!", player=<#player.name>))
                 wait(2)
                 output("Come on, I'll get mom to give you a room at the Inn for distracting those jerks for me!")

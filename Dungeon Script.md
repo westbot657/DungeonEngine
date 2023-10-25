@@ -237,8 +237,8 @@ parameters : '(' param_element ')'
 tag_list : tag '#' scope tag_list
          | tag '#' scope
 
-param_element : expression ',' param_element
-              | expression ',' param_element_pos
+param_element : expression ',' param_element_pos
+              | expression ',' param_element
               | expression ','
               | expression
 

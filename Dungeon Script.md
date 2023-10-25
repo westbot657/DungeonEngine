@@ -20,8 +20,8 @@ variables            : "<local_variable>"
 macros               | "$macro_name"
 comparison operators : "a == b"
                      | "a != b"
-                     | "a >> b"
-                     | "a << b"
+                     | "a > b"
+                     | "a < b"
                      | "a <= b"
                      | "a >= b"
                      | "not a"
@@ -141,6 +141,11 @@ else_branch : ELSE scope
 
 ```
 
+
+---
+
+
+
 ## New Syntax Rules
 ```rust
 statements : statement statements
@@ -157,7 +162,6 @@ statement : BREAK
           | expression
 
 expression : comp
-           | macro
 
 if_statement : IF '(' expression ')' scope elif_branch
              | IF '(' expression ')' scope else_branch
@@ -217,6 +221,7 @@ atom : VARIABLE '=' expression
      | table
      | WORD
      | scope
+     | macro
      | function_call
 
 table : '%' '[' comma_expressions ']'

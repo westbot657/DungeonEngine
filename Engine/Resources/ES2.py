@@ -59,7 +59,6 @@ class EngineScript:
                 break
 
         self.script = ""
-        self.macros = {}
         self.line = 0
         self.col = 0
         self.lexpos = 0
@@ -85,8 +84,7 @@ class EngineScript:
             with open(self.script_file, "r+", encoding="utf-8") as f:
                 self.script = f.read()#self.remove_syntax_sugar(f.read())
 
-        self.macros.clear()
-
+        EngineScript.Macro.clear_macros()
 
         self.parse()
 
@@ -105,6 +103,28 @@ class EngineScript:
             r"[=\-+*/()&\[\]{},#%:|^]": "LITERAL",
             r"[\n~`\t; ]+": "ignore"
         }
+
+    class Macro:
+        _macro_mapping = {}
+        _macros = []
+        
+        def __init__(self, name:str, tree_ref:dict):
+            self.name = name
+            self.tree_ref = tree_ref
+            
+            EngineScript.Macro._macros.append(self)
+            
+        def new_macro(self, name, value):
+            self._macro_mapping.update({name: value})
+            
+        def evaluate(self, value):
+            self.tree_ref.update({self.name: value})
+
+        @classmethod
+        def clear_macros(cls):
+            cls._macros.clear()
+
+
 
     class Token:
         def __init__(self, es, value:str):
@@ -176,18 +196,18 @@ class EngineScript:
     def build(self, tokens:list):
         if tokens:
             try:
-                self.compiled_script = self.expressions(tokens)
+                self.compiled_script = self.statements(tokens)
             except EOF:
                 self.compiled_script = {}
 
-    def expressions(self, tokens:list):
+    def statements(self, tokens:list):
 
         a = {
             "functions": self.statement(tokens)["functions"]
         }
 
         try:
-            b = self.expressions(tokens)
+            b = self.statements(tokens)
         except EOF:
             b = None
 
@@ -206,46 +226,41 @@ class EngineScript:
                 tokens.pop(0)
                 try:
                     r = self.expression(tokens)
-                except:
+                except ScriptError:
                     r = None
                 
                 return r
 
+            elif tokens[0] == ("WORD", "pass"):
+                tokens.pop(0)
+                return None
+
             else:
                 try:
-                    return self.expression(tokens)
+                    return self.if_condition(tokens)
                 except:
                     try:
-                        return self.if_condition(tokens)
+                        return self.while_loop(tokens)
                     except:
                         try:
-                            return self.while_loop(tokens)
-                        except: pass
+                            return self.for_loop(tokens)
+                        except:
+                            try:
+                                return self.expression(tokens)
+                            except: pass
         else:
             raise EOF()
 
     def expression(self, tokens:list):
         # comp, MACRO = expression, MACRO, PASS
         if tokens:
-            if tokens[0] == ("WORD", "pass"):
-                return None
-            elif tokens[0].type == "MACRO":
-                tok = tokens.pop(0)
-                if tokens[0] == ("LITERAL", "="):
-                    tokens.pop(0)
-                    self.macros.update({tok.value: self.statement(tokens)})
-                else:
-                    if tok.value in self.macros:
-                        return self.macros[tok.value]
-                    raise ScriptError(f"Undefined macro: {tok!s}")
-            else:
-                tk = tokens.copy()
-                try:
-                    return self.comp(tokens)
-                except ScriptError:
-                    tokens.clear()
-                    tokens += tk
-                    raise
+            tk = tokens.copy()
+            try:
+                return self.comp(tokens)
+            except ScriptError as e:
+                tokens.clear()
+                tokens += tk
+                raise e
 
         else:
             raise EOF()
@@ -255,6 +270,7 @@ class EngineScript:
     def elif_branch(self, tokens): pass
     def else_branch(self, tokens): pass
     def while_loop(self, tokens): pass
+    def for_loop(self, tokens): pass
     def arith(self, tokens): pass
     def atom(self, tokens): pass
     def comma_expressions(self, tokens): pass
@@ -263,7 +279,13 @@ class EngineScript:
     def function_call(self, tokens): pass
     def table_contents(self, tokens): pass
     def parameters(self, tokens): pass
+    def param_element(self, tokens): pass
+    def tag(self, tokens): pass
     def tag_list(self, tokens): pass
+    
+    def macro(self, tokens): pass
+    def macro_args(self, tokens): pass
+    def macro_scope(self, tokens): pass
     
     def table_accessor(self, tokens):
         # accessor: <dict>[key1][key2]...
@@ -271,6 +293,9 @@ class EngineScript:
     def string_concat(self, tokens):
         # concat: "str1".."str2"
         pass
+
+
+
 
     def getScript(self):
         if not self.compiled_script:

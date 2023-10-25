@@ -92,7 +92,7 @@ class Weapon(GameObject):
         damage = 0
 
         if self.ammo_type is not AbstractAmmo._loaded["engine:ammo/none"]:
-            if (ammo := player.inventory.getPreferedEquip(self.ammo_type)) is not None:
+            if (ammo := player.inventory.getPreferedEquip(self.ammo_type, priority="last")) is not None:
                 ammo: Ammo
                 damage += ammo.bonus_damage.getNew(function_memory)
                 ammo.count -= 1

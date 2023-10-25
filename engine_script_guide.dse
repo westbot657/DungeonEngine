@@ -160,7 +160,7 @@
 
     [engine:dict/access](<dict>, "key1")
     // ->
-    <dict>::"key1"
+    <dict>["key1"]
 
 
 

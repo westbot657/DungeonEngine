@@ -31,6 +31,29 @@ class Item(GameObject):
 
         self.owner = None
 
+    def can_stack(self, other):
+        other: Item
+        return self.abstract is other.abstract and self.name == other.name and self.description == other.description and self.max_count == other.max_count and self.data == other.data
+
+    def stack(self, other) -> bool:
+        other: Item
+        """returns whether `other` should be deleted after trying to stack"""
+        if self.can_stack(other):
+            if self.max_count <= 0:
+                self.count += other.count
+                return True
+            
+            diff = self.max_count - self.count
+            
+            c = other.count
+            other.count = max(0, other.count - diff)
+            d = c - other.count
+            
+            self.count += d
+            
+            return other.count <= 0
+        return False
+
     def checkKeyword(self, keyword):
         return keyword.lower() in self.abstract.getKeywords()
 
@@ -79,7 +102,7 @@ class Item(GameObject):
     def postEvaluate(self, function_memory:FunctionMemory):
         ... # self.updateLocalVariables(function_memory.symbol_table)
 
-    def onUse(self, function_memory:FunctionMemory):
+    def onUse(self, function_memory:FunctionMemory, inventory):
 
         if on_use := self.events.get("on_use", None):
             self.prepFunctionMemory(function_memory)
@@ -110,6 +133,10 @@ class Item(GameObject):
                         v = ev.send(res)
                 except StopIteration as e:
                     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            if self.count <= 0:
+                inventory.removeObject(self)
+                inventory.consolidate()
+        
 
     def onExpended(self, function_memory:FunctionMemory):
         if on_expended := self.events.get("on_expended", None):

@@ -141,6 +141,117 @@ else_branch : ELSE scope
 
 ```
 
+## New Syntax Rules
+```rust
+statements : statement statements
+           | statement
+           | <none>
+
+statement : BREAK
+          | RETURN expression
+          | RETURN
+          | PASS
+          | if_statement
+          | while_loop
+          | for_loop
+          | expression
+
+expression : comp
+           | macro
+
+if_statement : IF '(' expression ')' scope elif_branch
+             | IF '(' expression ')' scope else_branch
+             | IF '(' expression ')' scope
+
+while_loop : WHILE '(' expression ')' scope
+
+for_loop : FOR variable ',' variable IN expression scope
+         | FOR variable IN expression scope
+
+scope : '{' statements '}'
+
+elif_branch : ELSEIF '(' expression ')' scope elif_branch
+            | ELSEIF '(' expression ')' scope else_branch
+            | ELSEIF '(' expression ')' scope
+
+else_branch : ELSE scope
+
+comp : NOT comp
+     | arith LT arith
+     | arith LE arith
+     | arith GT arith
+     | arith GE arith
+     | arith EE arith
+     | arith NE arith
+     | comp AND comp
+     | comp OR comp
+     | arith
+
+macro : MACRO '(' macro_args ')' '=' macro_scope
+      | MACRO '(' comma_expressions ')'
+      | MACRO '=' expression
+      | MACRO
+
+arith : atom '+' atom
+      | atom '-' atom
+      | atom '*' atom
+      | atom '/' atom
+      | atom
+
+macro_args : MACRO ',' macro_args
+           | MACRO
+
+macro_scope : '{' macro_statements '}'
+
+comma_expressions : expression ',' comma_expressions
+                  | expression ','
+                  | expression
+
+atom : VARIABLE '=' expression
+     | VARIABLE
+     | '-' atom
+     | '(' expression ')'
+     | NUMBER
+     | BOOLEAN
+     | STRING
+     | table
+     | WORD
+     | scope
+     | function_call
+
+table : '%' '[' comma_expressions ']'
+      | '%' '{' table_contents '}'
+
+function_call : FUNCTION parameters scope
+              | FUNCTION parameters tag_list
+              | FUNCTION parameters
+              | FUNCTION
+
+table_contents : expression ':' expression ',' table_contents
+               | expression ':' expression ','
+               | expression ':' expression
+
+parameters : '(' param_element ')'
+           | '(' ')'
+
+tag_list : tag '#' scope tag_list
+         | tag '#' scope
+
+param_element : expression ',' param_element
+              | expression ',' param_element_pos
+              | expression ','
+              | expression
+
+tag : TAG expression
+
+param_element_pos : WORD '=' expression ',' param_element_pos
+                  | WORD '=' expression ','
+                  | WORD '=' expression
+
+```
+
+
+
 
 ## Documentation
 

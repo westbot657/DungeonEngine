@@ -38,12 +38,36 @@ class Inventory(FunctionalElement):
         self.equips = {}
         self.defaults = {}
         self.function_memory = function_memory
+        self.slots = 50
         for key, abstract in Inventory._default_equips.items():
             self.defaults.update({key: abstract.createInstance(function_memory)})
             self.equips.update({key: self.defaults[key]})
 
     # def get_ui_data(self):
     #     return self
+
+    def consolidate(self):
+        
+        c = self.contents.copy()
+        c.reverse()
+        
+        while c:
+            i = c.pop(0)
+            
+            new = []
+            
+            for i2 in c:
+                if isinstance(i2, (Item, Ammo)):
+                    if i2.stack(i):
+                        self.unequipObject(i)
+                        break
+            else:
+                new.append(i)
+        
+        new.reverse()
+        
+        self.contents.clear()
+        self.contents += new
 
     def equip(self, objectType:str, gameObject:GameObject):
         if gameObject not in self.contents: self.contents.append(gameObject)
@@ -90,18 +114,22 @@ class Inventory(FunctionalElement):
         for game_object in self.contents:
             game_object.owner = parent
 
-    def getOfType(self, objectType:type|tuple[type]):
+    def getOfType(self, objectType:type|tuple[type], priority="first"):
         matches = []
-        for c in self.contents:
+        c2 = self.contents.copy()
+        if priority == "last":
+            c2.reverse()
+            
+        for c in c2:
             if isinstance(c, objectType):
                 matches.append(c)
         return matches
 
-    def getPreferedEquip(self, abstract_type:AbstractGameObject):
+    def getPreferedEquip(self, abstract_type:AbstractGameObject, priority="first"):
         for c in self.equips.values():
             if c.abstract.inherets_from(abstract_type):
                 return c
-        return self.getOfAbstractType(abstract_type)
+        return self.getOfAbstractType(abstract_type, priority)
 
     def containsGameObject(self, game_object:Identifier):
         for c in self.contents:
@@ -109,8 +137,12 @@ class Inventory(FunctionalElement):
                 return True
         return False
     
-    def getOfAbstractType(self, abstract_type:AbstractGameObject):
-        for c in self.contents:
+    def getOfAbstractType(self, abstract_type:AbstractGameObject, priority="first"):
+        c2 = self.contents.copy()
+        if priority == "last":
+            c2.reverse()
+            
+        for c in c2:
             if c.abstract.inherets_from(abstract_type):
                 return c
         return None

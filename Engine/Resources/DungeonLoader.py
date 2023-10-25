@@ -679,7 +679,7 @@ class DungeonLoader:
         item_name: str = groupdict["item_name"]
 
         found_item = False
-        for item in player.inventory.getOfType(Item):
+        for item in player.inventory.getOfType(Item, "last"):
             item: Item
             if item.name.lower().strip() == item_name.lower().strip():
                 found_item = True
@@ -690,7 +690,7 @@ class DungeonLoader:
                         "#player": player,
                         "#item": item
                     })
-                    return item.onUse(function_memory_1)
+                    return item.onUse(function_memory_1, player.inventory)
 
         if not found_item:
             if tool := player.inventory.getEquipped(Tool):
@@ -724,13 +724,6 @@ class DungeonLoader:
                 function_memory.engine.sendOutput(player, player._combat.fullStats(function_memory))
         else:
             function_memory.engine.sendOutput(player, "You are not in combat")
-
-    @TextPattern(r"\b(?P<keyword>[Yy]ell|[Ss]hout(?: out)?|[Ss]cream|[Ss]hriek)\b (?P<words>.*)", TextPattern.CheckType.SEARCH, ['common'])
-    @staticmethod
-    def checkTextYell(function_memory:FunctionMemory, player:Player, raw_text:str, groupdict:dict):
-        yell = groupdict['keyword']
-        words = groupdict['words'].upper()
-        function_memory.engine.sendOutput(player, f"You {yell} \"{words}\"")
 
     _element_types = {
         "engine:text": str,

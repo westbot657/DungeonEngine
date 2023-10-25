@@ -27,6 +27,29 @@ class Ammo(GameObject):
     def __repr__(self):
         return f"Ammo {self.name}: bonus-damage:{self.bonus_damage} max-count:{self.max_count}"
 
+
+    def can_stack(self, other):
+        other: Ammo
+        return self.abstract is other.abstract and self.name == other.name and self.description == other.description and self.max_count == other.max_count and self.bonus_damage == other.bonus_damage
+
+    def stack(self, other) -> bool:
+        other: Ammo
+        """returns whether `other` should be deleted after trying to stack"""
+        if self.can_stack(other):
+            if self.max_count <= 0:
+                self.count += other.count
+                return True
+            
+            diff = self.max_count - self.count
+            
+            c = other.count
+            other.count = max(0, other.count - diff)
+            d = c - other.count
+            
+            self.count += d
+            
+            return other.count <= 0
+
     def fullStats(self, function_memory:FunctionMemory, is_equipped=False):
         return f"{self.name} +{self.bonus_damage.fullDisplay(function_memory)}dmg {self.count}/{self.max_count}" + (f" \"{self.description}\"" if self.description else "") + (" [EQUIPPED]" if is_equipped else "")
 

@@ -48,9 +48,9 @@ if (<.closed>) {
             <output>,
             format(
                 "│ {name: >18} {amount: >4} : {cost}",
-                name=join("`", <item>::"name", "`", seperator=""),
-                amount=<item>::"amount",
-                cost=[engine:text/convert](<item>::"cost")
+                name=join("`", <item>["name"], "`", seperator=""),
+                amount=<item>["amount"],
+                cost=[engine:text/convert](<item>["cost"])
             ),
             seperator="\n"
         )
@@ -82,18 +82,18 @@ if (<.closed>) {
 
         for <item> in <.current_stock> {
             [engine:text/match]([engine:text/set_case](<inp>, "lower"), "fullmatch")
-            @pattern: [engine:text/set_case](<item>::"name", "lower") # {
+            @pattern: [engine:text/set_case](<item>["name"], "lower") # {
 
-                if (<item>::"cost" >> <#player.currency>) {
+                if (<item>["cost"] >> <#player.currency>) {
                     output(
-                        format("You do not have enough money to buy `{item}`", item=<item>::"name")
+                        format("You do not have enough money to buy `{item}`", item=<item>["name"])
                     )
                     break
                 }
 
                 // output()
                 <response> = input(
-                    format("Purchase `{item}` for `{cost}`? (yes/no)", item=<item>::"name", cost=<item>::"cost")
+                    format("Purchase `{item}` for `{cost}`? (yes/no)", item=<item>["name"], cost=<item>["cost"])
                 )
 
                 // output("got input!")
@@ -101,9 +101,9 @@ if (<.closed>) {
                 [engine:text/match](<response>)
                 @pattern: "[Yy](?:es)?" # {
                     output(
-                        format("You purchased `{item}`!", item=<item>::"name")
+                        format("You purchased `{item}`!", item=<item>["name"])
                     )
-                    [engine:player/give_game_object](<item>::"item")
+                    [engine:player/give_game_object](<item>["item"])
                     [engine:list/remove](<.current_stock>, <item>)
 
                     // ┌─ Test Shop ───────────────────────────────
@@ -113,9 +113,9 @@ if (<.closed>) {
                             <output>,
                             format(
                                 "│ {name: >18} {amount: >4} : {cost}",
-                                name=join("`", <item>::"name", "`", seperator=""),
-                                amount=<item>::"amount",
-                                cost=[engine:text/convert](<item>::"cost")
+                                name=join("`", <item>["name"], "`", seperator=""),
+                                amount=<item>["amount"],
+                                cost=[engine:text/convert](<item>["cost"])
                             ),
                             seperator="\n"
                         )

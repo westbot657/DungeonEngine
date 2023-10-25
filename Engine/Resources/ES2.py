@@ -252,8 +252,25 @@ class EngineScript:
 
     def comp(self, tokens): pass
     def if_condition(self, tokens): pass
+    def elif_branch(self, tokens): pass
+    def else_branch(self, tokens): pass
     def while_loop(self, tokens): pass
-
+    def arith(self, tokens): pass
+    def atom(self, tokens): pass
+    def comma_expressions(self, tokens): pass
+    def table(self, tokens): pass
+    def scope(self, tokens): pass
+    def function_call(self, tokens): pass
+    def table_contents(self, tokens): pass
+    def parameters(self, tokens): pass
+    def tag_list(self, tokens): pass
+    
+    def table_accessor(self, tokens):
+        # accessor: <dict>[key1][key2]...
+        pass
+    def string_concat(self, tokens):
+        # concat: "str1".."str2"
+        pass
 
     def getScript(self):
         if not self.compiled_script:

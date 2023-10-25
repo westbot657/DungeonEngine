@@ -82,7 +82,7 @@ class DynamicValue(FunctionalElement):
 
     def __eq__(self, other):
         if isinstance(other, DynamicValue):
-            return self is other
+            return self.raw_data == other.raw_data
         return self.raw_data == other
 
     def __ne__(self, other):

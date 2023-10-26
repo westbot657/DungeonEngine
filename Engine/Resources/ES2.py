@@ -98,6 +98,7 @@ class EngineScript:
             r"(\"(\\.|[^\"\\])*\"|\'(\\.|[^\'\\])*\')": "STRING",
             r"\<[^<> ]+\>": "VARIABLE",
             r"(<=|>=|<|>|==|!=)": "COMP",
+            r"(if|elif|else|while|for|in|and|not|or|true|false|none)": "KEYWORD",
             r"[a-zA-Z_][a-zA-Z0-9_]*": "WORD",
             r"(\d+(\.\d+)?|\.\d+)": "NUMBER",
             r"[=\-+*/()&\[\]{},#%:|^]": "LITERAL",
@@ -131,7 +132,7 @@ class EngineScript:
             es: EngineScript
             self.value = value
 
-            for pattern, token_type in EngineScript._patterns:
+            for pattern, token_type in EngineScript._patterns.items():
                 if re.fullmatch(pattern, self.value):
                     self.type = token_type
                     break
@@ -187,9 +188,11 @@ class EngineScript:
 
     def parse(self):
 
-        tokens = [EngineScript.Token(self, t) for t in re.finditer("(?:"+"|".join(self._patterns.keys())+")", self.script)]
+        tokens = [EngineScript.Token(self, t.group()) for t in re.finditer("(?:"+"|".join(self._patterns.keys())+")", self.script)]
 
         tokens = [t for t in tokens if t.type not in ["ignore"]]
+
+        print(tokens)
 
         self.build(tokens)
 
@@ -283,7 +286,40 @@ class EngineScript:
     def while_loop(self, tokens): pass
     def for_loop(self, tokens): pass
     def arith(self, tokens): pass
-    def atom(self, tokens): pass
+    def mult(self, tokens): pass
+    def pow(self, tokens): pass
+    def concat(self, tokens): pass
+    def access(self, tokens): pass
+    def atom(self, tokens:list[Token]):
+        if tokens:
+            if tokens[0].type == "VARIABLE":
+                var_name = tokens.pop(0).value[1:-1]
+                if tokens:
+                    if tokens[0] == ("LITERAL", "="):
+                        tokens.pop(0)
+                        
+            elif tokens[0] == ("LITERAL", "-"):
+                ...
+            elif tokens[0] == ("LITERAL", "("):
+                ...
+            elif tokens[0].type == "NUMBER":
+                ...
+            elif tokens[0].type == "BOOLEAN":
+                ...
+            elif tokens[0].type == "STRING":
+                ...
+            elif tokens[0] == ("LITERAL", "%"):
+                ... # table
+            elif tokens[0] == ("LITERAL", "{"):
+                ... # scope
+            elif tokens[0].type == "MACRO":
+                ... # macro
+            elif tokens[0].type == "WORD":
+                ... # short-hand function
+            elif tokens[0].type == "FUNCTION":
+                ... # function
+        else:
+            raise EOF()
     def comma_expressions(self, tokens): pass
     def table(self, tokens): pass
     def scope(self, tokens): pass
@@ -300,9 +336,6 @@ class EngineScript:
     
     def table_accessor(self, tokens):
         # accessor: <dict>[key1][key2]...
-        pass
-    def string_concat(self, tokens):
-        # concat: "str1".."str2"
         pass
 
 
@@ -342,12 +375,12 @@ if __name__ == "__main__":
 
         while True:
 
-            try:
-                engine_script = EngineScript(input("file > "))
-                engine_script.compile()
+            # try:
+            engine_script = EngineScript(input("file > "))
+            engine_script.compile()
 
-                print(json.dumps(engine_script.getScript(), indent=4, default=str))
-            except Exception as e:
-                print(e)
+            print(json.dumps(engine_script.getScript(), indent=4, default=str))
+            # except Exception as e:
+            #     print("\n".join(e.args))
 
 

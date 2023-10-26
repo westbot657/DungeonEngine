@@ -256,6 +256,63 @@ param_element_pos : WORD '=' expression ',' param_element_pos
 ```
 
 
+### rules...
+```rust
+
+statements : statement statements
+
+statement : BREAK
+          | RETURN expression?
+          | PASS
+          | if_statement
+          | while_loop
+          | for_loop
+          | expression
+
+expression : comp
+
+if_statement : IF '(' expression ')' scope (ELIF '(' expression ')' scope)* (ELSE scope)?
+
+while_loop : WHILE '(' expression ')' scope
+
+for_loop : FOR VARIABLE (',' VARIABLE)? IN expression scope
+
+comp : NOT comp
+     | arith (LT|LE|EE|NE|GT|GE) arith
+     | comp (AND|OR) comp
+     | arith
+
+scope : '{' statements '}'
+
+arith : mult (('+'|'-') mult)?
+
+mult : pow (('*'|'/') pow)?
+
+pow : concat (POW concat)?
+
+concat : access (CONCAT access)?
+
+access : atom (key_list)?
+
+atom : VARIABLE ('=' expression|key_list)?
+     | '-' atom
+     | '(' expression ')'
+     | NUMBER
+     | BOOLEAN
+     | STRING
+     | table
+     | WORD
+     | scope
+     | macro
+     | function_call
+
+key_list : ('[' expression ']')+
+
+```
+
+
+
+
 
 
 ## Documentation

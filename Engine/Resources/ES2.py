@@ -1,4 +1,4 @@
-# pylint: disable=[W,R,C]
+# pylint: disable=[W,R,C,assignment-from-no-return]
 
 # This is attampt 2 at a Engine Script parser but with syntax error position finding
 
@@ -265,7 +265,18 @@ class EngineScript:
         else:
             raise EOF()
 
-    def comp(self, tokens): pass
+    def comp(self, tokens):
+        if tokens:
+            tk = tokens.copy()
+            try:
+                a1 = self.arith(tokens)
+                
+            except ScriptError as e:
+                tokens.clear()
+                tokens += tk
+                
+        else:
+            raise EOF()
     def if_condition(self, tokens): pass
     def elif_branch(self, tokens): pass
     def else_branch(self, tokens): pass

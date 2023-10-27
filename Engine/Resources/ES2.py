@@ -130,6 +130,7 @@ class EngineScript:
     class Token:
         def __init__(self, es, value:str):
             es: EngineScript
+            self.es: EngineScript = es
             self.value = value
 
             for pattern, token_type in EngineScript._patterns.items():
@@ -175,7 +176,7 @@ class EngineScript:
             if isinstance(other, EngineScript.Token):
                 return self.type == other.type and self.value == other.value
             elif isinstance(other, tuple):
-                return self.type == other[0] and self.value == other[1]
+                return self.type == other[0] and (self.value in other[1] if isinstance(other[1], (tuple, list)) else self.value == other[1])
 
         def __str__(self):
             if self.line_start == self.line_end:
@@ -185,6 +186,16 @@ class EngineScript:
 
         def __repr__(self):
             return f"{self.type}: {self!s}"
+    
+        def unexpected(self):
+
+            if self.line_start == self.line_end:
+                err_disp = self.es.script.split("\n")[self.line_start]
+                err_disp += f"\n{' ':> {self.col_start}}{'^'*(min(self.col_end-self.col_start, len(err_disp)-self.col_start))}"
+            else:
+                err_disp = ""
+
+            return ScriptError(f"Unexpected token at Line {self.line_start}, Column {self.col_start}: {self.value!r}:\n{err_disp}")
 
     def parse(self):
 
@@ -268,15 +279,43 @@ class EngineScript:
         else:
             raise EOF()
 
-    def comp(self, tokens):
+    def comp(self, tokens:list[Token]):
         if tokens:
-            tk = tokens.copy()
-            try:
-                a1 = self.arith(tokens)
-                
-            except ScriptError as e:
-                tokens.clear()
-                tokens += tk
+            if tokens[0] == ("LITERAL", "not"):
+                tokens.pop(0)
+
+                # tk = tokens.copy()
+                c = self.comp(tokens)
+
+                if c.get("function", None) == "engine:logic/compare":
+                    c.pop("function")
+                return {
+                    "function": "engine:logic/compare",
+                    "not": c
+                }
+
+            else:
+                tk = tokens.copy()
+                try:
+                    a = self.arith(tokens)
+
+                    if tokens[0] == ("WORD", ("<=", "<", ">", ">=", "==", "!=")):
+                        t = tokens.pop(0)
+
+                        a2 = self.arith(tokens)
+                    
+                    else:
+                        return a
+
+                except ScriptError:
+                    tokens.clear()
+                    tokens += tk
+                    try:
+                        ...
+                    except ScriptError as e:
+                        tokens.clear()
+                        tokens += tk
+                        raise e
                 
         else:
             raise EOF()
@@ -318,6 +357,8 @@ class EngineScript:
                 ... # short-hand function
             elif tokens[0].type == "FUNCTION":
                 ... # function
+            else:
+                raise tokens[0].unexpected()
         else:
             raise EOF()
     def comma_expressions(self, tokens): pass

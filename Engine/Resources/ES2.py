@@ -7,17 +7,17 @@ try:
     from .Functions import *
     from .Identifier import Identifier
     from .Logger import Log
-    from .EngineErrors import ScriptError, EOF
+    from .EngineErrors import FinalScriptError, ScriptError, EOF
 except ImportError:
     from LoaderFunction import LoaderFunction
     from Functions import *
     from Identifier import Identifier
     from Logger import Log
-    from EngineErrors import ScriptError, EOF
+    from EngineErrors import FinalScriptError, ScriptError, EOF
 
 import re, glob, json
 
-
+from typing import Any
 
 
 class EngineScript:
@@ -195,7 +195,16 @@ class EngineScript:
             else:
                 err_disp = ""
 
-            return ScriptError(f"Unexpected token at Line {self.line_start}, Column {self.col_start}: {self.value!r}:\n{err_disp}")
+            return ScriptError(f"Unexpected token at Line {self.line_start}, Column {self.col_start}: {self.value!r}:\n\n{err_disp}")
+
+        def expected(self, actual):
+            if self.line_start == self.line_end:
+                err_disp = self.es.script.split("\n")[self.line_start]
+                err_disp += f"\n{' ':> {self.col_start}}{'^'*(min(self.col_end-self.col_start, len(err_disp)-self.col_start))}"
+            else:
+                err_disp = ""
+            
+            return ScriptError(f"Expected '{actual}' at Line {self.line_start}, Column {self.col_start}, got {self.value!r} instead.\n\n{err_disp}")
 
     def parse(self):
 
@@ -265,12 +274,12 @@ class EngineScript:
         else:
             raise EOF()
 
-    def expression(self, tokens:list):
+    def expression(self, tokens:list[Token]) -> dict:
         # comp, MACRO = expression, MACRO, PASS
         if tokens:
             tk = tokens.copy()
             try:
-                return self.comp(tokens)
+                return self.andor(tokens)
             except ScriptError as e:
                 tokens.clear()
                 tokens += tk
@@ -279,7 +288,32 @@ class EngineScript:
         else:
             raise EOF()
 
-    def comp(self, tokens:list[Token]):
+    def andor(self, tokens:list[Token]) -> dict:
+        
+        if tokens:
+            a = self.comp(tokens)
+            
+            if tokens[0] == ("KEYWORD", ("and", "or")):
+                t = tokens.pop(0)
+                
+                try:
+                    a2 = self.andor(tokens)
+                    
+                    if a.get("function", None) == "engine:logic/compare":
+                        a.pop("function")
+                    if a2.get("function", None) == "engine:logic/compare":
+                        a2.pop("function")
+                        
+                    return {t.value: [a, a2]}
+                    
+                except ScriptError as e:
+                    raise FinalScriptError(*e.args)
+            
+        else:
+            raise EOF()
+        
+        
+    def comp(self, tokens:list[Token]) -> dict:
         if tokens:
             if tokens[0] == ("LITERAL", "not"):
                 tokens.pop(0)
@@ -299,37 +333,45 @@ class EngineScript:
                 try:
                     a = self.arith(tokens)
 
-                    if tokens[0] == ("WORD", ("<=", "<", ">", ">=", "==", "!=")):
+                    if tokens[0] == ("COMP", ("<=", "<", ">", ">=", "==", "!=")):
                         t = tokens.pop(0)
 
-                        a2 = self.arith(tokens)
+                        try:
+                            a2 = self.arith(tokens)
+                            
+                            if a.get("function", None) == "engine:logic/compare":
+                                a.pop("function")
+                            if a2.get("function", None) == "engine:logic/compare":
+                                a2.pop("function")
+                                
+                            return {t.value: [a, a2]}
+                            
+                            
+                        except ScriptError as e:
+                            raise FinalScriptError(*e.args, *t.unexpected().args) # the comparison was present, which means there is a syntax error
+                        
                     
                     else:
                         return a
 
-                except ScriptError:
+                except ScriptError as e:
                     tokens.clear()
                     tokens += tk
-                    try:
-                        ...
-                    except ScriptError as e:
-                        tokens.clear()
-                        tokens += tk
-                        raise e
+                    raise e
                 
         else:
             raise EOF()
-    def if_condition(self, tokens): pass
-    def elif_branch(self, tokens): pass
-    def else_branch(self, tokens): pass
-    def while_loop(self, tokens): pass
-    def for_loop(self, tokens): pass
-    def arith(self, tokens): pass
-    def mult(self, tokens): pass
-    def pow(self, tokens): pass
-    def concat(self, tokens): pass
-    def access(self, tokens): pass
-    def atom(self, tokens:list[Token]):
+    def if_condition(self, tokens) -> dict: pass
+    def elif_branch(self, tokens) -> dict: pass
+    def else_branch(self, tokens) -> dict: pass
+    def while_loop(self, tokens) -> dict: pass
+    def for_loop(self, tokens) -> dict: pass
+    def arith(self, tokens) -> dict: pass
+    def mult(self, tokens) -> dict: pass
+    def pow(self, tokens) -> dict: pass
+    def concat(self, tokens) -> dict: pass
+    def access(self, tokens) -> dict: pass
+    def atom(self, tokens:list[Token]) -> Any:
         if tokens:
             if tokens[0].type == "VARIABLE":
                 var_name = tokens.pop(0).value[1:-1]
@@ -338,9 +380,28 @@ class EngineScript:
                         tokens.pop(0)
                         
             elif tokens[0] == ("LITERAL", "-"):
-                ...
+                tokens.pop(0)
+                a = self.atom(tokens)
+                
+                if isinstance(a, dict):
+                    if a.get("function", None) == "engine:math/solve":
+                        a.pop("function")
+                return {
+                    "function": "engine:math/solve",
+                    "multiply": [-1, a]
+                }
+                
             elif tokens[0] == ("LITERAL", "("):
-                ...
+                tokens.pop(0)
+                a = self.expression(tokens)
+                if tokens:
+                    if tokens[0] == ("LITERAL", ")"):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected(")")
+                else:
+                    raise EOF()
+                    
             elif tokens[0].type == "NUMBER":
                 ...
             elif tokens[0].type == "BOOLEAN":
@@ -361,21 +422,21 @@ class EngineScript:
                 raise tokens[0].unexpected()
         else:
             raise EOF()
-    def comma_expressions(self, tokens): pass
-    def table(self, tokens): pass
-    def scope(self, tokens): pass
-    def function_call(self, tokens): pass
-    def table_contents(self, tokens): pass
-    def parameters(self, tokens): pass
-    def param_element(self, tokens): pass
-    def tag(self, tokens): pass
-    def tag_list(self, tokens): pass
+    def comma_expressions(self, tokens) -> dict: pass
+    def table(self, tokens) -> dict: pass
+    def scope(self, tokens) -> dict: pass
+    def function_call(self, tokens) -> dict: pass
+    def table_contents(self, tokens) -> dict: pass
+    def parameters(self, tokens) -> dict: pass
+    def param_element(self, tokens) -> dict: pass
+    def tag(self, tokens) -> dict: pass
+    def tag_list(self, tokens) -> dict: pass
     
-    def macro(self, tokens): pass
-    def macro_args(self, tokens): pass
-    def macro_scope(self, tokens): pass
+    def macro(self, tokens) -> dict: pass
+    def macro_args(self, tokens) -> dict: pass
+    def macro_scope(self, tokens) -> dict: pass
     
-    def table_accessor(self, tokens):
+    def table_accessor(self, tokens) -> dict:
         # accessor: <dict>[key1][key2]...
         pass
 

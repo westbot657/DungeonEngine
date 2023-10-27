@@ -56,6 +56,10 @@ class ScriptError(EngineError):
     def __init__(self, *args):
         super().__init__(f"ScriptError:", *args)
 
+class FinalScriptError(EngineError):
+    def __init__(self, *args):
+        super().__init__(*args)
+
 class LexerError(ScriptError):
     def __init__(self, *args):
         self.args = args

@@ -269,7 +269,7 @@ statement : BREAK
           | for_loop
           | expression
 
-expression : comp
+expression : andor
 
 if_statement : IF '(' expression ')' scope (ELIF '(' expression ')' scope)* (ELSE scope)?
 
@@ -277,10 +277,10 @@ while_loop : WHILE '(' expression ')' scope
 
 for_loop : FOR VARIABLE (',' VARIABLE)? IN expression scope
 
+andor : comp ((AND|OR) andor)?
+
 comp : NOT comp
      | arith (LT|LE|EE|NE|GT|GE) arith
-     | comp (AND|OR) comp
-     | arith
 
 scope : '{' statements '}'
 

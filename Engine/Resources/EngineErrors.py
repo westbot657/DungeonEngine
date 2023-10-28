@@ -1,6 +1,8 @@
 # pylint: disable=[W,R,C,import-error]
 
-class EngineError(Exception): pass
+class EngineError(Exception):
+    def __repr__(self):
+        return "\n".join(self.args)
 
 class EngineBreak(Exception): pass
 
@@ -55,11 +57,14 @@ class CurrencyError(EngineError):
 class ScriptError(EngineError):
     def __init__(self, *args):
         super().__init__(f"ScriptError:", *args)
+    def __repr__(self):
+        return "\n".join(self.args)
 
 class FinalScriptError(EngineError):
     def __init__(self, *args):
         super().__init__(*args)
-
+    def __repr__(self):
+        return "\n".join(self.args)
 class LexerError(ScriptError):
     def __init__(self, *args):
         self.args = args

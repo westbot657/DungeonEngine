@@ -290,7 +290,7 @@ mult : pow (('*'|'/') pow)?
 
 pow : concat (POW concat)?
 
-concat : access (CONCAT access)?
+concat : access (CONCAT access)? (CONCATSEP access)?
 
 access : atom (key_list)?
 

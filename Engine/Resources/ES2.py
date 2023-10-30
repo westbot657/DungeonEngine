@@ -1137,12 +1137,34 @@ class EngineScript:
         else:
             raise EOF()
 
-    def tag(self, tokens:list[Token]) -> dict: pass
-    def tag_list(self, tokens:list[Token]) -> dict: pass
+    def tag(self, tokens:list[Token]) -> dict:
+        if tokens:
+            if tokens[0].type == "TAG":
+                tag = tokens.pop(0).value
+
+                e = self.expression(tokens)
+
+                return {tag: e}
+
+        else:
+            raise EOF()
+    def tag_list(self, tokens:list[Token]) -> dict:
+        if tokens:
+            data = {}
+
+            while True:
+                if tokens[0].type == "TAG":
+                    data.update(self.tag(tokens))
+                else:
+                    break
+            return data
+
+        else:
+            raise EOF()
     
     def macro(self, tokens:list[Token]) -> dict: pass
     def macro_args(self, tokens:list[Token]) -> dict: pass
-    def macro_scope(self, tokens:list[Token]) -> dict: pass
+    def macro_statements(self, tokens:list[Token]) -> dict: pass
 
 
     def getScript(self):

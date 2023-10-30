@@ -46,6 +46,7 @@ class EngineScript:
             self._init_(script_file)
             EngineScript._scripts.update({script_file: self})
             return self
+        
 
     def _init_(self, script_file):
         self.script_file = script_file
@@ -64,6 +65,9 @@ class EngineScript:
         self.lexpos = 0
         self.compiled_script = {}
         self._tokens = []
+        
+        self.macros = {}
+        self.macro_functions = []
 
     @classmethod
     def preCompileAll(cls):
@@ -84,7 +88,7 @@ class EngineScript:
             with open(self.script_file, "r+", encoding="utf-8") as f:
                 self.script = f.read()#self.remove_syntax_sugar(f.read())
 
-        EngineScript.Macro.clear_macros()
+        self.macros.clear()
 
         self.parse()
 
@@ -106,28 +110,6 @@ class EngineScript:
             r"[=\-+*/()&\[\]{},#%:|^]": "LITERAL",
             r"[\n~`\t; ]+": "ignore"
         }
-
-    class Macro:
-        _macro_mapping = {}
-        _macros = []
-        
-        def __init__(self, name:str, tree_ref:dict):
-            self.name = name
-            self.tree_ref = tree_ref
-            
-            EngineScript.Macro._macros.append(self)
-            
-        def new_macro(self, name, value):
-            self._macro_mapping.update({name: value})
-            
-        def evaluate(self, value):
-            self.tree_ref.update({self.name: value})
-
-        @classmethod
-        def clear_macros(cls):
-            cls._macros.clear()
-
-
 
     class Token:
         def __init__(self, es, value:str):
@@ -174,6 +156,9 @@ class EngineScript:
                     match:re.Match
                     self.value = self.value[0:match.start()] + replacements.get(match.group(), match.group()) + self.value[match.end():]
 
+
+        
+
         def __eq__(self, other):
             if isinstance(other, EngineScript.Token):
                 return self.type == other.type and self.value == other.value
@@ -199,14 +184,64 @@ class EngineScript:
 
             return ScriptError(f"Unexpected token at Line {self.line_start+1}, Column {self.col_start+1}: {self.value!r}:\n\n{err_disp}")
 
-        def expected(self, actual):
+        def expected(self, actual, do_quotes=True):
             if self.line_start == self.line_end:
                 err_disp = self.es.script.split("\n")[self.line_start]
                 err_disp += f"\n{' '*self.col_start}{'^'*(min(self.col_end-self.col_start, len(err_disp)-self.col_start))}"
             else:
                 err_disp = ""
+            q = "'" if do_quotes else ""
+            return FinalScriptError(f"Expected {q}{actual}{q} at Line {self.line_start+1}, Column {self.col_start+1}, got {self.value!r} instead.\n\n{err_disp}")
+
+        def get_location(self):
+            return f"Line {self.line_start+1}, Column {self.col_start+1}"
+    
+    class Macro:
+        __slots__ = ["name"]
+        def __init__(self, name):
+            self.name = name
+    
+    class MacroFunction:
+        def __init__(self, es, name, args, code):
+            self.es: EngineScript = es
+            self.name = name
+            self.args = args
+            self.code = code
+            self._macros = {}
+        
+        def compile(self, arg_values, macro_token):
+            macro_token: EngineScript.Token
+            if len(arg_values) > len(self.args):
+                raise ScriptError(f"Too many args passed into macro at {macro_token.get_location()}")
+            elif len(arg_values) < len(self.args):
+                raise ScriptError(f"Too few args passed into macro at {macro_token.get_location()}")
             
-            return FinalScriptError(f"Expected '{actual}' at Line {self.line_start+1}, Column {self.col_start+1}, got {self.value!r} instead.\n\n{err_disp}")
+            macros = {}
+            
+            for k, v in zip(self.args, arg_values):
+                macros.update({k: v})
+                
+            return self.deep_replace(self.code, macros)
+
+
+        def deep_replace(self, obj:Any, repls:dict):
+            if isinstance(obj, EngineScript.Macro):
+                if obj.name in repls:
+                    return repls[obj.name]
+                elif obj.name in self.es.macros:
+                    return self.es.macros[obj.name]
+                raise FinalScriptError(f"Undefined macro: '{obj.name}' in macro function")
+            elif isinstance(obj, dict):
+                out = {}
+                for k, v in obj.items():
+                    out.update({k: self.deep_replace(v, repls)})
+                return out
+            elif isinstance(obj, list):
+                return [self.deep_replace(v, repls) for v in obj]
+            else:
+                return obj
+
+
 
     def parse(self):
 
@@ -220,6 +255,7 @@ class EngineScript:
         print(tokens)
 
         self.build(tokens)
+        
 
     def build(self, tokens:list[Token]):
         if tokens:
@@ -533,8 +569,154 @@ class EngineScript:
                 raise tokens[0].unexpected()
         else:
             raise EOF()
-    def while_loop(self, tokens:list[Token]) -> dict: raise ScriptError()
-    def for_loop(self, tokens:list[Token]) -> dict: raise ScriptError()
+    def while_loop(self, tokens:list[Token]) -> dict:
+        if tokens:
+            if tokens[0] == ("KEYWORD", "while"):
+                tokens.pop(0)
+                
+                if tokens:
+                    if tokens[0] == ("LITERAL", "("):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected("(")
+                else:
+                    raise EOF()
+                
+                e = self.expression(tokens)
+                
+                if tokens:
+                    if tokens[0] == ("LITERAL", ")"):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected(")")
+                else:
+                    raise EOF()
+
+                if tokens:
+                    if tokens[0] == ("LITERAL", "{"):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected("{")
+                else:
+                    raise EOF()
+                
+                r = self.statements(tokens)
+                
+                if tokens:
+                    if tokens[0] == ("LITERAL", "}"):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected("}")
+                else:
+                    raise EOF()
+                
+                return {
+                    "function": "engine:control/while",
+                    "condition": e,
+                    "run": r
+                }
+                
+        else:
+            raise EOF()
+    def for_loop(self, tokens:list[Token]) -> dict:
+        if tokens:
+            if tokens[0] == ("KEYWORD", "for"):
+                tokens.pop(0)
+                
+                if tokens:
+                    if tokens[0].type == "VARIABLE":
+                        v = tokens.pop(0).value[1:-1]
+                    else:
+                        raise tokens[0].expected("variable", False)
+                else:
+                    raise EOF()
+                
+                if tokens:
+                    if tokens[0] == ("LITERAL", ","): # dictionary for-loop?
+                        tokens.pop(0)
+                        
+                        if tokens:
+                            if tokens[0].type == "VARIABLE":
+                                v2 = tokens.pop(0).value[1:-1]
+                            else:
+                                raise tokens[0].expected("variable", False)
+                        else:
+                            raise EOF()
+                        
+                        if tokens:
+                            if tokens[0] == ("KEYWORD", "in"):
+                                tokens.pop(0)
+                                
+                                d = self.expression(tokens)
+                                
+                                if tokens:
+                                    if tokens[0] == ("LITERAL", "{"):
+                                        tokens.pop(0)
+                                    else:
+                                        raise tokens[0].expected("{")
+                                else:
+                                    raise EOF()
+                                
+                                r = self.statements(tokens)
+                                
+                                if tokens:
+                                    if tokens[0] == ("LITERAL", "}"):
+                                        tokens.pop(0)
+                                    else:
+                                        raise tokens[0].expected("}")
+                                else:
+                                    raise EOF()
+                                
+                                return {
+                                    "function": "engine:dict/for_each",
+                                    "key_name": v,
+                                    "value_name": v2,
+                                    "dict": d,
+                                    "run": r
+                                }
+                                
+                                
+                            else:
+                                raise tokens[0].expected("in")
+                        else:
+                            raise EOF()
+                        
+                    elif tokens[0] == ("KEYWORD", "in"): # list for-loop
+                        tokens.pop(0)
+                        
+                        l = self.expression(tokens)
+                        
+                        if tokens:
+                            if tokens[0] == ("LITERAL", "{"):
+                                tokens.pop(0)
+                            else:
+                                raise tokens[0].expected("{")
+                        else:
+                            raise EOF()
+                        
+                        r = self.statements(tokens)
+                        
+                        if tokens:
+                            if tokens[0] == ("LITERAL", "}"):
+                                tokens.pop(0)
+                            else:
+                                raise tokens[0].expected("}")
+                        else:
+                            raise EOF()
+                        
+                        return {
+                            "function": "engine:list/for_each",
+                            "list": l,
+                            "element_name": v,
+                            "run": r
+                        }
+                        
+                    else:
+                        raise tokens[0].expected("',' or 'in'", False)
+                else:
+                    raise EOF()
+        else:
+            raise EOF()
     def arith(self, tokens:list[Token]) -> dict:
         # print("arith")
         if tokens:
@@ -803,7 +985,49 @@ class EngineScript:
         else:
             raise EOF()
 
-    def table(self, tokens:list[Token]) -> dict: pass
+    def table(self, tokens:list[Token]) -> dict:
+        if tokens:
+            if tokens[0] == ("LITERAL", "%"):
+                tokens.pop(0)
+                
+                if tokens:
+                    if tokens[0] == ("LITERAL", "["):
+                        tokens.pop(0)
+                        
+                        l = self.comma_expressions(tokens)
+                        
+                        if tokens:
+                            if tokens[0] == ("LITERAL", "]"):
+                                tokens.pop(0)
+                            else:
+                                raise tokens[0].expected("]")
+                        else:
+                            raise EOF()
+                        
+                        return l
+                        
+                    elif tokens[0] == ("LITERAL", "{"):
+                        tokens.pop(0)
+                        
+                        l = self.table_contents(tokens)
+                        
+                        if tokens:
+                            if tokens[0] == ("LITERAL", "}"):
+                                tokens.pop(0)
+                            else:
+                                raise tokens[0].expected("}")
+                        else:
+                            raise EOF()
+
+                        return l
+                        
+                    else:
+                        raise tokens[0].expected("'{' or '['", False)
+                else:
+                    raise EOF()
+                        
+        else:
+            raise EOF()
 
     shorthand = {
         "output": "[engine:player/message]",
@@ -1057,7 +1281,40 @@ class EngineScript:
         return data
 
     def table_contents(self, tokens:list[Token]) -> dict:
-        ...
+        if tokens:
+            table = {}
+            
+            while tokens:
+                if tokens[0].type in ("STRING", "NUMBER", "BOOLEAN"):
+                    key = tokens.pop(0).value
+                else:
+                    raise tokens[0].expected("string, number, or boolean", False)
+                
+                if tokens:
+                    if tokens[0] == ("LITERAL", ":"):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected(":")
+                else:
+                    raise EOF()
+                
+                val = self.expression(tokens)
+                
+                table.update({key: val})
+                
+                if tokens:
+                    if tokens[0] == ("LITERAL", ","):
+                        tokens.pop(0)
+                    elif tokens[0] == ("LITERAL", "}"):
+                        return table
+                    else:
+                        raise tokens[0].expected("',' or '}'", False)
+                else:
+                    raise EOF()
+                
+        else:
+            raise EOF()
+        
     def parameters(self, tokens:list[Token]) -> dict:
         if tokens:
             if tokens[0] == ("LITERAL", "("):
@@ -1162,7 +1419,15 @@ class EngineScript:
         else:
             raise EOF()
     
-    def macro(self, tokens:list[Token]) -> dict: pass
+    def macro(self, tokens:list[Token]) -> dict:
+        if tokens:
+            if tokens[0].type == "MACRO":
+                macro = tokens.pop(0).value
+                
+            else:
+                raise tokens[0].unexpected()
+        else:
+            raise EOF()
     def macro_args(self, tokens:list[Token]) -> dict: pass
     def macro_statements(self, tokens:list[Token]) -> dict: pass
 

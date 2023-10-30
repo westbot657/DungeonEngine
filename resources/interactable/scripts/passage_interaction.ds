@@ -1,17 +1,5 @@
 
 
-$macro($arg1, $arg2) {
-    $arg1
-
-    $arg2
-
-    output(<x>)
-}
-
-
-
-$macro(<v> = 5, {output("hi") <x> = input()})
-
 if (<.blocked>) {
     if (<.blocked_message>) {
         output(<.blocked_message>)

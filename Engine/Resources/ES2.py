@@ -273,9 +273,12 @@ class EngineScript:
                 s = self.statement(tokens, ignore_macro)
                 if s is not None:
                     a.append(s)
-            except ScriptError:
+            except ScriptError as e:
+                print("\n".join(e.args))
+                print(tokens[0:min(len(tokens), 5)])
                 break
 
+        print(f"STATEMENTS: {a}")
         return {
             "functions": a
         }
@@ -395,10 +398,12 @@ class EngineScript:
                         try:
                             a2 = self.arith(tokens, ignore_macro)
                             
-                            if a.get("function", None) == "engine:logic/compare":
-                                a.pop("function")
-                            if a2.get("function", None) == "engine:logic/compare":
-                                a2.pop("function")
+                            if isinstance(a, dict):
+                                if a.get("function", None) == "engine:logic/compare":
+                                    a.pop("function")
+                            if isinstance(a2, dict):
+                                if a2.get("function", None) == "engine:logic/compare":
+                                    a2.pop("function")
                                 
                             return {t.value: [a, a2]}
                             
@@ -946,7 +951,6 @@ class EngineScript:
             elif tokens[0] == ("KEYWORD", "none"):
                 return None
             elif tokens[0] == ("LITERAL", "%"):
-                tokens.pop(0)
                 return self.table(tokens, ignore_macro)
             elif tokens[0] == ("LITERAL", "{"):
                 tokens.pop(0)
@@ -1000,7 +1004,7 @@ class EngineScript:
         if tokens:
             if tokens[0] == ("LITERAL", "%"):
                 tokens.pop(0)
-                
+                print("\n\nmay be table\n\n")
                 if tokens:
                     if tokens[0] == ("LITERAL", "["):
                         tokens.pop(0)
@@ -1259,6 +1263,7 @@ class EngineScript:
         if len(p) == 4:
             d = p[3]
             if isinstance(d, dict): # scope
+                print(parameters, d)
                 parameters["scope"] = d["scope"]
             else: # tags
                 tag_list = d
@@ -1412,7 +1417,34 @@ class EngineScript:
 
                 e = self.expression(tokens, ignore_macro)
 
-                return {tag: e}
+                if tokens:
+                    if tokens[0] == ("LITERAL", "#"):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected("#")
+                else:
+                    raise EOF()
+                
+                if tokens:
+                    if tokens[0] == ("LITERAL", "{"):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected("{")
+                else:
+                    raise EOF()
+
+                s = self.statements(tokens, ignore_macro)
+
+                if tokens:
+                    print(tokens)
+                    if tokens[0] == ("LITERAL", "}"):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected("}")
+                else:
+                    raise EOF()
+
+                return {tag: e, "scope": s}
 
         else:
             raise EOF()

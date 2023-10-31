@@ -55,168 +55,76 @@ if ($listening) {
 
 */
 
+$out($message, $wait_time) {
+    if ($listening) {
+        output(
+            format($message, captain=<captain>)
+        )
+        wait($wait_time)
+    }
+}
+
+$outd($message, $wait_time) {
+    if ($listening) {
+        output(
+            format($message, captain=<captain>, player=<#player.name>)
+        )
+        wait($wait_time)
+    }
+}
+
+$outm($message) {
+    if ($listening) {
+        output(
+            format($message, captain=<captain>, g=<g>, s=<s>, c=<c>)
+        )
+        wait($wait_time)
+    }
+}
 
 [engine:text/match]([engine:random/choice](%["1", "2", "3", "4"]))
 @pattern: "1" # {
-    if ($listening) {
-        output(
-            format("`{captain}`: Well *{player}*, there it is!", captain=<captain>, player=<#player.name>)
-        )
-        wait(3)
-    }
-    if ($listening) {
-        output(
-            format("`{captain}`: `Emberhollow`.", captain=<captain>)
-        )
-        wait(8)
-    }
-    if ($listening) {
-        output(
-            format("`{captain}`: And as I prob'ly won' be see'n ya again, I wish ya best 'o luck on yer travels kid.", captain=<captain>)
-        )
-        wait(6)
-    }
+    $outd("`{captain}`: Well *{player}*, there it is!", 3)
+    $out("`{captain}`: `Emberhollow`.", 8)
+    $out("`{captain}`: And as I prob'ly won' be see'n ya again, I wish ya best 'o luck on yer travels kid.", 6)
     if (<num_players> == 0) {
-        if ($listening) {
-            output(
-                format("`{captain}`: Though, Ya aught'a `find the Inn`.\nI know the Inn-keeper family, `Phyrra`'ll take care of ya! just tell 'er I sent ya, and she migh' give ya a discount.", captain=<captain>)
-            )
-            wait(7)
-        }
-        if ($listening) {
-            output(
-                format("{captain} hesitates", captain=<captain>)
-            )
-            wait(2)
-        }
-        if ($listening) {
-            output(
-                format("`{captain}`: Er.. she *might*.. give ya a discount...", captain=<captain>)
-            )
-            wait(3)
-        }
-        if ($listening) {
-            output(
-                format("`{captain}`: Ya know what, 'ow bout ya take this jus'n case.", captain=<captain>)
-            )
-            wait(3)
-        }
+        $out("`{captain}`: Though, Ya aught'a `find the Inn`.\nI know the Inn-keeper family, `Phyrra`'ll take care of ya! just tell 'er I sent ya, and she migh' give ya a discount.", 7)
+        $out("{captain} hesitates", 2)
+        $out("`{captain}`: Er.. she *might*.. give ya a discount...", 3)
+        $out("`{captain}`: Ya know what, 'ow bout ya take this jus'n case.", 3)
     } else {
-        if ($listening) {
-            output(
-                format("`{captain}`: Oh, and 'ere, Ya migh' find more use for this than me.", captain=<captain>)
-            )
-            wait(3)
-        }
-    }
-    if ($listening) {
-        output(
-            format("{captain} hands you a small bag of coins\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
-        )
-        wait(2)
-    }
+        $out("`{captain}`: Oh, and 'ere, Ya migh' find more use for this than me.", 3)
+    } // this bracket is expected at '$out' above, caused by tag or if/else?
+
+    $outm("{captain} hands you a small bag of coins\n(+{g} Gold  {s} Silver  {c} Copper)", 2)
 }
 @pattern: "2" # {
-    if ($listening) {
-        output(
-            format("`{captain}`: We're almost to `Emberhollow`, you'd better get up.", captain=<captain>)
-        )
-        wait(6)
-    }
+    $out("`{captain}`: We're almost to `Emberhollow`, you'd better get up.", 6)
     if (<num_players> == 0) {
-        if ($listening) {
-            output(
-                format("`{captain}`: Oh, If you `find yourself at the Inn`, will you give this to `Phyyra` for me?", captain=<captain>)
-            )
-            wait(2)
-        }
+        $out("`{captain}`: Oh, If you `find yourself at the Inn`, will you give this to `Phyyra` for me?", 2)
     } else {
-        if ($listening) {
-            output(
-                format("`{captain}`: Here's a little something to help you on your travels.", captain=<captain>)
-            )
-            wait(3)
-        }
+        $out("`{captain}`: Here's a little something to help you on your travels.", 3)
     }
-    if ($listening) {
-        output(
-            format("{captain} hands you a small sack of coins.\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
-        )
-        wait(2)
-    }
+    $outm("{captain} hands you a small sack of coins.\n(+{g} Gold  {s} Silver  {c} Copper)", 2)
 }
 @pattern: "3" # {
-    if ($listening) {
-        output(
-            format("`{captain}`: {player}, Welcome to `Emberhollow`!", captain=<captain>, player=<#player.name>)
-        )
-        wait(3.5)
-    }
+    $outd("`{captain}`: {player}, Welcome to `Emberhollow`!", 3.5)
     if (<num_players> == 0) {
-        if ($listening) {
-            output(
-                format("`{captain}`: Once we land, I suggest you `find the Inn`, It's a good place to stay.", captain=<captain>)
-            )
-            wait(6)
-        }
-        if ($listening) {
-            output(
-                format("`{captain}`: Here, this'll get you a room for a few days.", captain=<captain>)
-            )
-            wait(4)
-        }
-        if ($listening) {
-            output(
-                format("{captain} hands you a small pouch with some coins in it\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
-            )
-            wait(4)
-        }
-        if ($listening) {
-            output(
-                format("`{captain}`: Oh, and the Innkeeper's name is `Phyyra`. if you can't find her, ask around.", captain=<captain>)
-            )
-            wait(4)
-        }
+        $out("`{captain}`: Once we land, I suggest you `find the Inn`, It's a good place to stay.", 6)
+        $out("`{captain}`: Here, this'll get you a room for a few days.", 4)
+        $outm("{captain} hands you a small pouch with some coins in it\n(+{g} Gold  {s} Silver  {c} Copper)", 4)
+        $out("`{captain}`: Oh, and the Innkeeper's name is `Phyyra`. if you can't find her, ask around.", 4)
     } else {
-        if ($listening) {
-            output(
-                format("`{captain}`: Good luck, kid! Here's something for your travels.", captain=<captain>)
-            )
-            wait()
-        }
-        if ($listening) {
-            output(
-                format("{captain} hands you a small pouch with some coins in it\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
-            )
-            wait(4)
-        }
+        $out("`{captain}`: Good luck, kid! Here's something for your travels.", 4)
+        $outm("{captain} hands you a small pouch with some coins in it\n(+{g} Gold  {s} Silver  {c} Copper)", 4)
     }
-
 }
 @pattern: "4" # {
-    if ($listening) {
-        output(
-            format("`{captain}`: Well, I got ya ter `Emberhollow` didn' I.", captain=<captain>)
-        )
-        wait(3)
-    }
-    if ($listening) {
-        output(
-            format("`{captain}`: I 'spose I owe ya fer savin me from that beast on the way 'ere.", captain=<captain>)
-        )
-        wait(3.5)
-    }
-    if ($listening) {
-        output(
-            format("{captain} hands you a bag of coins\n(+{g} Gold  {s} Silver  {c} Copper)", captain=<captain>, g=<g>, s=<s>, c=<c>)
-        )
-        wait(3)
-    }
-    if (($listening) and (<num_players> == 0)) {1
-        output(
-            format("`{captain}`: If ya want meh advice, go `find Phyyra at the Inn`, that money'll pay for a few nights stay.", captain=<captain>)
-        )
-        wait(4)
+    $out("`{captain}`: Well, I got ya ter `Emberhollow` didn' I.", 3)
+    $out("`{captain}`: I 'spose I owe ya fer savin me from that beast on the way 'ere.", 3.5)
+    $outm("{captain} hands you a bag of coins\n(+{g} Gold  {s} Silver  {c} Copper)", 3)
+    if (<num_players> == 0) {
+        $out("`{captain}`: If ya want meh advice, go `find Phyyra at the Inn`, that money'll pay for a few nights stay.", 4)
     }
 }
 

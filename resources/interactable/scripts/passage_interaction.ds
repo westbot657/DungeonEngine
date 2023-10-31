@@ -1,5 +1,4 @@
 
-
 if (<.blocked>) {
     if (<.blocked_message>) {
         output(<.blocked_message>)

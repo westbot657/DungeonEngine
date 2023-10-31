@@ -252,7 +252,7 @@ class EngineScript:
 
         tokens = [t for t in tokens if t.type not in ["ignore"]]
 
-        print(tokens)
+        # print(tokens)
 
         self.build(tokens)
         
@@ -617,6 +617,9 @@ class EngineScript:
                     "condition": e,
                     "run": r
                 }
+
+            else:
+                raise ScriptError()
                 
         else:
             raise EOF()
@@ -717,6 +720,8 @@ class EngineScript:
                         raise tokens[0].expected("',' or 'in'", False)
                 else:
                     raise EOF()
+            else:
+                raise ScriptError()
         else:
             raise EOF()
     def arith(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
@@ -809,7 +814,7 @@ class EngineScript:
     def concat(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         # print("concat")
         if tokens:
-            a = self.access(tokens)
+            a = self.access(tokens, ignore_macro)
 
             if tokens:
                 if tokens[0] == ("CONCAT", ".."):
@@ -930,6 +935,7 @@ class EngineScript:
                         raise tokens[0].expected(")")
                 else:
                     raise EOF()
+                return a
                     
             elif tokens[0].type == "NUMBER":
                 return tokens.pop(0).value
@@ -960,9 +966,11 @@ class EngineScript:
                         raise tokens[0].expected("}")
                 else:
                     raise EOF()
+
+                return a
                 
             elif tokens[0].type == "MACRO":
-                return self.macro(tokens)
+                return self.macro(tokens, ignore_macro)
             elif tokens[0].type == "WORD":
                 return self.function_call(tokens, ignore_macro)
             elif tokens[0].type == "FUNCTION":
@@ -1431,6 +1439,7 @@ class EngineScript:
                 if tokens[0] == ("LITERAL", "("): # def/call
                     tokens.pop(0)
                     
+                    # print(f"macro def? tokens: {tokens}")
                     if tokens:
                         if tokens[0] == ("LITERAL", ")"):
                             raise FinalScriptError(f"Macro functions must have at least one arg. Otherwise, use an expression macro instead of a function macro.\n'{macro_name}' at {macro.get_location()}")
@@ -1454,6 +1463,8 @@ class EngineScript:
                                 else:
                                     raise tokens[0].expected("macro argument", False)
                             
+
+
                             if tokens:
                                 if tokens[0] == ("LITERAL", "{"):
                                     tokens.pop(0)
@@ -1480,6 +1491,14 @@ class EngineScript:
                                 raise FinalScriptError(f"Macro function is not defined: '{macro_name}' at {macro.get_location()}")
                     
                             es = self.comma_expressions(tokens)
+
+                            if tokens:
+                                if tokens[0] == ("LITERAL", ")"):
+                                    tokens.pop(0)
+                                else:
+                                    raise tokens[0].expected(")")
+                            else:
+                                raise EOF()
                             
                             return self.macro_functions[macro_name].compile(es, macro)
                             

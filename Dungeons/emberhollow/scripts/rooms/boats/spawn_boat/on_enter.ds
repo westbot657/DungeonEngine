@@ -4,30 +4,12 @@
 
 [engine:list/append](<#dungeon.player_ids>, <#player.uid>)
 
-
-
 [engine:player/set_tag]("listening", true)
 
 $listening = [engine:player/get_tag]("listening")
 
-
 output("say `skip` to skip dialog")
 
-/*
-
-if ($listening) {
-    output("")
-}
-
-
-if ($listening) {
-    output(
-        format("`{captain}`: ", captain=<captain>)
-    )
-    wait()
-}
-
-*/
 <captain> = [engine:random/choice](%[
     "Captain Jack", // <-- best captain tbh
     "Captain Hagmar",
@@ -39,22 +21,14 @@ if ($listening) {
     "Captain Shaundyl"
 ])
 
-
 <g> = [engine:random/range](9, 11)
 <s> = [engine:random/range](5, 7)
 <c> = [engine:random/range](2, 9)
-
 
 if ($listening) {
     output("*you find yourself on a boat. You can see docks and a town in the distance*")
     wait(2)
 }
-
-/*
-
-
-*/
-
 $out($message, $wait_time) {
     if ($listening) {
         output(
@@ -63,7 +37,6 @@ $out($message, $wait_time) {
         wait($wait_time)
     }
 }
-
 $outd($message, $wait_time) {
     if ($listening) {
         output(
@@ -72,7 +45,6 @@ $outd($message, $wait_time) {
         wait($wait_time)
     }
 }
-
 $outm($message, $wait_time) {
     if ($listening) {
         output(
@@ -95,9 +67,8 @@ $outm($message, $wait_time) {
     } else {
         $out("`{captain}`: Oh, and 'ere, Ya migh' find more use for this than me.", 3)
     }
-
     $outm("{captain} hands you a small bag of coins\n(+{g} Gold  {s} Silver  {c} Copper)", 2)
-} // this bracket is expected at the '$outm' above, caused by if/else or tag probably
+}
 @pattern: "2" # {
     $out("`{captain}`: We're almost to `Emberhollow`, you'd better get up.", 6)
     if (<num_players> == 0) {
@@ -128,10 +99,7 @@ $outm($message, $wait_time) {
     }
 }
 
-
-
 [engine:player/give_money](<g>, <s>, <c>)
-
 
 if ($listening) {
     wait(2)
@@ -144,4 +112,3 @@ output("the boat pulls into port, and you step off the boat.")
 wait(2)
 
 [engine:player/set_location]("emberhollow:rooms/docks/roads/road_4")
-

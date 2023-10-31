@@ -73,7 +73,7 @@ $outd($message, $wait_time) {
     }
 }
 
-$outm($message) {
+$outm($messag0e, $wait_time) {
     if ($listening) {
         output(
             format($message, captain=<captain>, g=<g>, s=<s>, c=<c>)
@@ -94,10 +94,10 @@ $outm($message) {
         $out("`{captain}`: Ya know what, 'ow bout ya take this jus'n case.", 3)
     } else {
         $out("`{captain}`: Oh, and 'ere, Ya migh' find more use for this than me.", 3)
-    } // this bracket is expected at '$out' above, caused by tag or if/else?
+    }
 
     $outm("{captain} hands you a small bag of coins\n(+{g} Gold  {s} Silver  {c} Copper)", 2)
-}
+} // this bracket is expected at the '$outm' above, caused by if/else or tag probably
 @pattern: "2" # {
     $out("`{captain}`: We're almost to `Emberhollow`, you'd better get up.", 6)
     if (<num_players> == 0) {

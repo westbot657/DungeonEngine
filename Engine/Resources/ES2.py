@@ -326,8 +326,7 @@ class EngineScript:
                             try:
                                 return self.expression(tokens, ignore_macro)
                             except ScriptError as e:
-                                # print(e)
-                                raise tokens[0].unexpected()
+                                raise ScriptError(*e.args, "\n", *tokens[0].unexpected().args)
         else:
             raise EOF()
 
@@ -472,7 +471,7 @@ class EngineScript:
                             func.update({"false": e2})
 
                         except ScriptError as e:
-                            pass
+                            print(f"IF STATEMENT: ERROR: {e.args}")
                         
                         return func
 
@@ -562,7 +561,7 @@ class EngineScript:
                 s = self.statements(tokens, ignore_macro)
                 
                 if tokens:
-                    print(f"ELSE TOKENS: {tokens}")
+                    # print(f"ELSE TOKENS: {tokens}")
                     if tokens[0] == ("LITERAL", "}"):
                         tokens.pop(0)
                     else:
@@ -1005,7 +1004,7 @@ class EngineScript:
         if tokens:
             if tokens[0] == ("LITERAL", "%"):
                 tokens.pop(0)
-                print("\n\nmay be table\n\n")
+                # print("\n\nmay be table\n\n")
                 if tokens:
                     if tokens[0] == ("LITERAL", "["):
                         tokens.pop(0)
@@ -1264,7 +1263,7 @@ class EngineScript:
         if len(p) == 4:
             d = p[3]
             if isinstance(d, dict): # scope
-                print(parameters, d)
+                # print(parameters, d)
                 parameters["scope"] = d["scope"]
             else: # tags
                 tag_list = d

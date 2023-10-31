@@ -562,6 +562,7 @@ class EngineScript:
                 s = self.statements(tokens, ignore_macro)
                 
                 if tokens:
+                    print(f"ELSE TOKENS: {tokens}")
                     if tokens[0] == ("LITERAL", "}"):
                         tokens.pop(0)
                     else:
@@ -1446,15 +1447,19 @@ class EngineScript:
 
                 return {tag: e, "scope": s}
 
+            else:
+                pass
+
         else:
             raise EOF()
     def tag_list(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         if tokens:
             data = {}
 
-            while True:
+            while tokens:
                 if tokens[0].type == "TAG":
-                    data.update(self.tag(tokens, ignore_macro))
+                    t = self.tag(tokens, ignore_macro)
+                    data.update(t)
                 else:
                     break
             return data

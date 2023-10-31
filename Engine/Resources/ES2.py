@@ -212,9 +212,9 @@ class EngineScript:
         def compile(self, arg_values, macro_token):
             macro_token: EngineScript.Token
             if len(arg_values) > len(self.args):
-                raise ScriptError(f"Too many args passed into macro at {macro_token.get_location()}")
+                raise FinalScriptError(f"Too many args passed into macro at {macro_token.get_location()}")
             elif len(arg_values) < len(self.args):
-                raise ScriptError(f"Too few args passed into macro at {macro_token.get_location()}")
+                raise FinalScriptError(f"Too few args passed into macro at {macro_token.get_location()}")
             
             macros = {}
             

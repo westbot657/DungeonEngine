@@ -73,7 +73,7 @@ $outd($message, $wait_time) {
     }
 }
 
-$outm($messag0e, $wait_time) {
+$outm($message, $wait_time) {
     if ($listening) {
         output(
             format($message, captain=<captain>, g=<g>, s=<s>, c=<c>)

@@ -274,8 +274,8 @@ class EngineScript:
                 if s is not None:
                     a.append(s)
             except ScriptError as e:
-                print("\n".join(e.args))
-                print(tokens[0:min(len(tokens), 5)])
+                # print("\n".join(e.args))
+                # print(tokens[0:min(len(tokens), 5)])
                 break
 
         # print(f"STATEMENTS: {a}")
@@ -1050,7 +1050,7 @@ class EngineScript:
             try:
                 e = [self.expression(tokens, ignore_macro)]
             except ScriptError as e:
-                print("\n\ncomma expressions:\n", e.args)
+                # print("\n\ncomma expressions:\n", e.args)
                 return []
 
             while tokens:
@@ -1531,7 +1531,7 @@ class EngineScript:
                 else:
                     break
 
-            print(f"TAG LIST: {data}")
+            # print(f"TAG LIST: {data}")
             return data
 
         else:
@@ -1670,12 +1670,12 @@ if __name__ == "__main__":
 
         while True:
 
-            # try:
+            try:
                 engine_script = EngineScript(input("file > "))
                 engine_script.compile()
 
                 print(json.dumps(engine_script.getScript(), indent=4, default=str))
-            # except Exception as e:
-            #     print("\n".join(e.args))
+            except Exception as e:
+                print("\n".join(e.args))
 
 

@@ -179,7 +179,7 @@
 $macro2($arg1, $arg2) {
     <x> = $arg1 - $arg2
     <y> = $arg2 ** $arg1
-    output(<x>..<y>::", ")
+    output(<x>..<y>::", ") // join syntax: str1..str2..strN::seperator
 }
 
 // call:

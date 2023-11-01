@@ -143,6 +143,11 @@
     for <key>, <value> in <dict> {}
 
 
+    while (true) {}
+
+
+
+
     [engine:time/wait]()
     [engine:text/format]()
     [engine:text/length]() // and [engine:list/length], etc...
@@ -167,6 +172,22 @@
 }
 
 
+
+// macro functions:
+
+// definition:
+$macro2($arg1, $arg2) {
+    <x> = $arg1 - $arg2
+    <y> = $arg2 ** $arg1
+    output(<x>..<y>::", ")
+}
+
+// call:
+$macro2(5, (4 * 6) + 7)
+// basically compiles to:
+<x> = 5 - ((4 * 6) + 7)
+<y> = ((4 * 6) + 7) ** 5
+output(<x>..<y>::", ")
 
 
 

@@ -1333,7 +1333,6 @@ class EngineScript:
                 #parameters["tags"] = tag_list
                 tags = parameters.get("tags")
                 for v, d in tags.items():
-                    print(f"tag items: {v}, {d}")
                     data_ = {v: []}
 
                     for tag in tag_list:
@@ -1523,14 +1522,16 @@ class EngineScript:
             raise EOF()
     def tag_list(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         if tokens:
-            data = {}
+            data = []
 
             while tokens:
                 if tokens[0].type == "TAG":
                     t = self.tag(tokens, ignore_macro)
-                    data.update(t)
+                    data.append(t)
                 else:
                     break
+
+            print(f"TAG LIST: {data}")
             return data
 
         else:

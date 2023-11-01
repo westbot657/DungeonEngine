@@ -41,28 +41,32 @@ if (<.closed>) {
     │ 10 Gold  5 Silver  5 Copper
     */
 
-    <output> = format("```less\n┌─ {shop_name} {c:─<{w}}", shop_name=<.shop_name>, c="─", w=max(1, (40-length(<.shop_name>))))
-    for <item> in <.current_stock> {
-        //         `Sword`
+    $shop_display = {
+        <output> = format("```less\n┌─ {shop_name} {c:─<{w}}", shop_name=<.shop_name>, c="─", w=max(1, (40-length(<.shop_name>))))
+        for <item> in <.current_stock> {
+            //         `Sword`
+            <output> = join(
+                <output>,
+                format(
+                    "│ {name: >18} {amount: >4} : {cost}",
+                    name=join("`", <item>["name"], "`", seperator=""),
+                    amount=<item>["amount"],
+                    cost=[engine:text/convert](<item>["cost"])
+                ),
+                seperator="\n"
+            )
+        }
         <output> = join(
             <output>,
-            format(
-                "│ {name: >18} {amount: >4} : {cost}",
-                name=join("`", <item>["name"], "`", seperator=""),
-                amount=<item>["amount"],
-                cost=[engine:text/convert](<item>["cost"])
-            ),
+            format("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 40-length(<#player.name>))),
+            format("│ {money}", money=<#player.currency>),
+            "│ say `exit` to leave the shop\n```",
             seperator="\n"
         )
+        output(<output>)
     }
-    <output> = join(
-        <output>,
-        format("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 40-length(<#player.name>))),
-        format("│ {money}", money=<#player.currency>),
-        "│ say `exit` to leave the shop\n```",
-        seperator="\n"
-    )
-    output(<output>)
+
+    $shop_display
 
     // check inputs
 
@@ -84,7 +88,7 @@ if (<.closed>) {
             [engine:text/match]([engine:text/set_case](<inp>, "lower"), "fullmatch")
             @pattern: [engine:text/set_case](<item>["name"], "lower") # {
 
-                if (<item>["cost"] >> <#player.currency>) {
+                if (<item>["cost"] > <#player.currency>) {
                     output(
                         format("You do not have enough money to buy `{item}`", item=<item>["name"])
                     )
@@ -106,28 +110,7 @@ if (<.closed>) {
                     [engine:player/give_game_object](<item>["item"])
                     [engine:list/remove](<.current_stock>, <item>)
 
-                    // ┌─ Test Shop ───────────────────────────────
-                    <output> = format("```less\n┌─ {shop_name} {c:─<{w}}", shop_name=<.shop_name>, c="─", w=max(1, (40-length(<.shop_name>))))
-                    for <item> in <.current_stock> {
-                        <output> = join(
-                            <output>,
-                            format(
-                                "│ {name: >18} {amount: >4} : {cost}",
-                                name=join("`", <item>["name"], "`", seperator=""),
-                                amount=<item>["amount"],
-                                cost=[engine:text/convert](<item>["cost"])
-                            ),
-                            seperator="\n"
-                        )
-                    }
-                    <output> = join(
-                        <output>,
-                        format("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 40-length(<#player.name>))),
-                        format("│ {money}", money=<#player.currency>),
-                        "│ say `exit` to leave the shop\n```",
-                        seperator="\n"
-                    )
-                    output(<output>)
+                    $shop_display
 
                     break
 

@@ -104,7 +104,7 @@ class EngineScript:
             r"\<[^<> ]+\>": "VARIABLE",
             r"(<=|>=|<|>|==|!=)": "COMP",
             r"(\.\.|::)": "CONCAT",
-            r"\b(if|elif|else|while|for|in|and|not|or|true|false|none)\b": "KEYWORD",
+            r"\b(if|elif|else|while|for|in|and|not|or|true|false|none|min|max)\b": "KEYWORD",
             r"[a-zA-Z_][a-zA-Z0-9_]*": "WORD",
             r"(\d+(\.\d+)?|\.\d+)": "NUMBER",
             r"\*\*": "POW",
@@ -278,7 +278,7 @@ class EngineScript:
                 print(tokens[0:min(len(tokens), 5)])
                 break
 
-        print(f"STATEMENTS: {a}")
+        # print(f"STATEMENTS: {a}")
         return {
             "functions": a
         }
@@ -373,14 +373,16 @@ class EngineScript:
     def comp(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         # print("comp")
         if tokens:
-            if tokens[0] == ("LITERAL", "not"):
+            # print(tokens[0:min(5,len(tokens))])
+            if tokens[0] == ("KEYWORD", "not"):
                 tokens.pop(0)
 
                 # tk = tokens.copy()
                 c = self.comp(tokens, ignore_macro)
 
-                if c.get("function", None) == "engine:logic/compare":
-                    c.pop("function")
+                if isinstance(c, dict):
+                    if c.get("function", None) == "engine:logic/compare":
+                        c.pop("function")
                 return {
                     "function": "engine:logic/compare",
                     "not": c
@@ -404,7 +406,7 @@ class EngineScript:
                                 if a2.get("function", None) == "engine:logic/compare":
                                     a2.pop("function")
                                 
-                            return {t.value: [a, a2]}
+                            return {"function": "engine:math/solve", t.value: [a, a2]}
                             
                             
                         except ScriptError as e:
@@ -471,7 +473,8 @@ class EngineScript:
                             func.update({"false": e2})
 
                         except ScriptError as e:
-                            print(f"IF STATEMENT: ERROR: {e.args}")
+                            # print(f"IF STATEMENT: ERROR: {e.args}")
+                            pass
                         
                         return func
 
@@ -917,7 +920,7 @@ class EngineScript:
                     else:
                         return {"#ref": var_name}
                 else:
-                    raise EOF()
+                    return {"#ref": var_name}
             elif tokens[0] == ("LITERAL", "-"):
                 tokens.pop(0)
                 a = self.atom(tokens, ignore_macro)
@@ -950,6 +953,64 @@ class EngineScript:
                 return tokens.pop(0).value
             elif tokens[0] == ("KEYWORD", "none"):
                 return None
+            elif tokens[0] == ("KEYWORD", "min"):
+                tokens.pop(0)
+                if tokens:
+                    if tokens[0] == ("LITERAL", "("):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected("(")
+                else:
+                    raise EOF()
+                
+                ms = self.comma_expressions(tokens, ignore_macro)
+
+                if tokens:
+                    if tokens[0] == ("LITERAL", ")"):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected(")")
+                else:
+                    raise EOF()
+                
+                for m in ms:
+                    if isinstance(m, dict):
+                        if m.get("function", None) == "engine:math/solve":
+                            m.pop("function")
+                
+                return {
+                    "function": "engine:math/solve",
+                    "min": ms
+                }
+            elif tokens[0] == ("KEYWORD", "max"):
+                tokens.pop(0)
+                if tokens:
+                    if tokens[0] == ("LITERAL", "("):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected("(")
+                else:
+                    raise EOF()
+                
+                ms = self.comma_expressions(tokens, ignore_macro)
+
+                if tokens:
+                    if tokens[0] == ("LITERAL", ")"):
+                        tokens.pop(0)
+                    else:
+                        raise tokens[0].expected(")")
+                else:
+                    raise EOF()
+                
+                for m in ms:
+                    if isinstance(m, dict):
+                        if m.get("function", None) == "engine:math/solve":
+                            m.pop("function")
+                
+                return {
+                    "function": "engine:math/solve",
+                    "max": ms
+                }
             elif tokens[0] == ("LITERAL", "%"):
                 return self.table(tokens, ignore_macro)
             elif tokens[0] == ("LITERAL", "{"):
@@ -986,7 +1047,11 @@ class EngineScript:
     def comma_expressions(self, tokens:list[Token], ignore_macro:bool=False) -> list:
 
         if tokens:
-            e = [self.expression(tokens, ignore_macro)]
+            try:
+                e = [self.expression(tokens, ignore_macro)]
+            except ScriptError as e:
+                print("\n\ncomma expressions:\n", e.args)
+                return []
 
             while tokens:
                 if tokens[0] == ("LITERAL", ","):
@@ -995,8 +1060,6 @@ class EngineScript:
                     return e
                 
                 e.append(self.expression(tokens, ignore_macro))
-            
-
         else:
             raise EOF()
 
@@ -1061,9 +1124,9 @@ class EngineScript:
         if tokens:
             if tokens[0].type == "WORD":
                 func = self.shorthand.get(tokens[0].value, None)
-                tokens.pop(0)
+                f = tokens.pop(0)
                 if func is None:
-                    raise FinalScriptError(f"No function short-hand for '{func}' defined")
+                    raise FinalScriptError(f"No function short-hand for '{tokens[0].value}' defined\nat {f.get_location()}")
             elif tokens[0].type == "FUNCTION":
                 func = tokens[0].value
                 tokens.pop(0)
@@ -1270,6 +1333,7 @@ class EngineScript:
                 #parameters["tags"] = tag_list
                 tags = parameters.get("tags")
                 for v, d in tags.items():
+                    print(f"tag items: {v}, {d}")
                     data_ = {v: []}
 
                     for tag in tag_list:
@@ -1337,6 +1401,12 @@ class EngineScript:
                 tokens.pop(0)
             else:
                 raise tokens[0].expected("(")
+            
+            if tokens:
+                if tokens[0] == ("LITERAL", ")"):
+                    tokens.pop(0)
+                    return []
+
             p = self.param_element(tokens, ignore_macro=ignore_macro)
 
             if tokens:
@@ -1413,7 +1483,7 @@ class EngineScript:
     def tag(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         if tokens:
             if tokens[0].type == "TAG":
-                tag = tokens.pop(0).value
+                tag = tokens.pop(0).value[1:-1]
 
                 e = self.expression(tokens, ignore_macro)
 
@@ -1436,7 +1506,7 @@ class EngineScript:
                 s = self.statements(tokens, ignore_macro)
 
                 if tokens:
-                    print(tokens)
+                    # print(tokens)
                     if tokens[0] == ("LITERAL", "}"):
                         tokens.pop(0)
                     else:

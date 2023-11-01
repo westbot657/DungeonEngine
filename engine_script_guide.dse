@@ -75,8 +75,8 @@
 {
     if (<x> == 5) {
         // valid comparisons are:
-        // << : less than
-        // >> : greater than
+        // < : less than
+        // > : greater than
         // <= : less or equal to
         // >= : greater or equal to
         // == : equal to
@@ -85,7 +85,7 @@
         // or
         // not
         pass
-    } elif (<x> >> 5) {
+    } elif (<x> > 5) {
         pass
     } else {
         pass 

@@ -1,6 +1,4 @@
 
-
-
 if (<.closed>) {
     if (<.closed_message>) {
         output(
@@ -13,8 +11,7 @@ if (<.closed>) {
             format(<.enter_message>, shop_name=<.shop_name>, shopkeeper=<.shopkeeper>)
         )
     }
-    
-    // restock if needed
+
     if ([engine:time/check](<.restock_time>) or (not <.initial_stock>)) {
         <.initial_stock> = true
         <.current_stock> = [engine:interaction/get_shop_stock](<.stock>)
@@ -28,51 +25,31 @@ if (<.closed>) {
         return
     }
 
-    // display shop contents
-
-    // [engine:log/debug](<w>)
-    /*
-    ┌─ The Armory ──────────────────────────────────────────────────
-    │          Lightning Arrow   x4 : 2 Gold  5 Copper
-    │               Fire Arrow  x16 : 1 Gold
-    │               Long Sword      : 1 Gold  5 Silver
-    │                    Stick  x12 : 5 Copper
-    ├─ Weston ──────────────────────────────────────────────────────
-    │ 10 Gold  5 Silver  5 Copper
-    */
-
     $shop_display = {
         <output> = format("```less\n┌─ {shop_name} {c:─<{w}}", shop_name=<.shop_name>, c="─", w=max(1, (40-length(<.shop_name>))))
         for <item> in <.current_stock> {
-            //         `Sword`
-            <output> = join(
-                <output>,
-                format(
-                    "│ {name: >18} {amount: >4} : {cost}",
-                    name=join("`", <item>["name"], "`", seperator=""),
-                    amount=<item>["amount"],
-                    cost=[engine:text/convert](<item>["cost"])
-                ),
-                seperator="\n"
+            <output> = <output>,
+            ..format(
+                "│ {name: >18} {amount: >4} : {cost}",
+                name="`"..<item>["name"].."`"::"",
+                amount=<item>["amount"],
+                cost=[engine:text/convert](<item>["cost"])
             )
+            ::"\n"
         }
-        <output> = join(
-            <output>,
-            format("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 40-length(<#player.name>))),
-            format("│ {money}", money=<#player.currency>),
-            "│ say `exit` to leave the shop\n```",
-            seperator="\n"
-        )
+        
+        <output> = <output>
+        ..format("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 40-length(<#player.name>)))
+        ..format("│ {money}", money=<#player.currency>)
+        .."│ say `exit` to leave the shop\n```"
+        ::"\n"
         output(<output>)
     }
 
     $shop_display
 
-    // check inputs
-
     while (true) {
         <inp> = input()
-
 
         [engine:text/match](<inp>)
         @pattern: "\b(exit|leave)\b" # {
@@ -94,13 +71,9 @@ if (<.closed>) {
                     )
                     break
                 }
-
-                // output()
                 <response> = input(
                     format("Purchase `{item}` for `{cost}`? (yes/no)", item=<item>["name"], cost=<item>["cost"])
                 )
-
-                // output("got input!")
 
                 [engine:text/match](<response>)
                 @pattern: "[Yy](?:es)?" # {
@@ -113,12 +86,8 @@ if (<.closed>) {
                     $shop_display
 
                     break
-
                 }
-
             }
         }
-
     }
-
 }

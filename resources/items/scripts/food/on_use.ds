@@ -1,12 +1,5 @@
 
 [engine:player/heal](<#item.heal_amount>)
 output(
-    join(
-        "You ate `",
-        <#item.name>,
-        "`, healing you by *",
-        <#item.heal_amount>,
-        "* hp!",
-        seperator=""
-    )
+    "You ate `"..<#item.name>.."`, healing you by *"..<#item.heal_amount>.."* hp!"::""
 )

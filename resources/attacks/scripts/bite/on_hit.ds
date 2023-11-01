@@ -1,7 +1,7 @@
 
 output(
     [engine:random/choice](%[
-        join("`", <#enemy.name>,"` bites `",<target.name>,"`, dealing ",<damage>," damage",seperator=""),
-        join("`", <#enemy.name>,"` takes a bite at `",<target.name>,"` and deals ",<damage>," damage",seperator="")
+        "`"..<#enemy.name>.."` bites `"..<target.name>.."`, dealing "..<damage>," damage"::"",
+        "`"..<#enemy.name>.."` takes a bite at `"..<target.name>.."` and deals "..<damage>.." damage"::""
     ])
 )

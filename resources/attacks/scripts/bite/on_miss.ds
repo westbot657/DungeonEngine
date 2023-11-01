@@ -1,7 +1,7 @@
 
 output(
     [engine:random/choice](%[
-        join(<#enemy.name>,"bites",<target.name>,"but doesn't do any damage"),
-        join(<#enemy.name>,"takes a bite at",<target.name>,"but misses")
+        <#enemy.name>.."bites"..<target.name>.."but doesn't do any damage",
+        <#enemy.name>.."takes a bite at"..<target.name>.."but misses"
     ])
 )

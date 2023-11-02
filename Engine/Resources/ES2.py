@@ -24,7 +24,7 @@ def stringify(shorthand:dict, dct:dict|str, path="") -> list:
         out = []
         for k, _v in dct.items():
             v = stringify(shorthand, _v, (path+"."+k).strip("."))
-            out += [f"{k}\\.{x}" for x in v if x]
+            out += [f"{k}\\.{x}" if x else k for x in v]
         return out
     elif isinstance(dct, str):
         shorthand.update({path: dct})
@@ -40,7 +40,7 @@ def class_functions(shorthand):
             "next_turn": "[engine:combat/next_turn]",
             "spawn": "[engine:combat/spawn]",
             "despawn": "[engine:combat/despawn]",
-            "message": "[engine:combat/message]"
+            "output": "[engine:combat/message]"
         },
         "variable": {
             "exists": "[engine:variable/is_defined]",
@@ -59,8 +59,8 @@ def class_functions(shorthand):
     }
     
     x = f"\\b({'|'.join(stringify(shorthand, funcs))})\\b"
-    print(x)
-    print(shorthand)
+    # print(x)
+    # print(shorthand)
     return x
 
 class EngineScript:
@@ -174,7 +174,7 @@ class EngineScript:
             r"(\.\.|::)": "CONCAT",
             r"\b(if|elif|else|while|for|in|and|not|or|true|false|none|min|max)\b": "KEYWORD",
             class_functions(shorthand): "WORD",
-            r"[a-zA-Z_][a-zA-Z0-9_]*": "WORD",
+            r"[a-zA-Z_][a-zA-Z0-9_\.]*": "WORD",
             r"(\d+(\.\d+)?|\.\d+)": "NUMBER",
             r"\*\*": "POW",
             r"[=\-+*/()&\[\]{},#%:|^]": "LITERAL",

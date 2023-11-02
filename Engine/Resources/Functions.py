@@ -2561,18 +2561,26 @@ class Engine_List_Pop(LoaderFunction):
     id = Identifier("engine", "list/", "pop")
 
     script_flags = {
-        "required_args": 0,
+        "required_args": 2,
         "optional_args": 0,
-        "args": {}
+        "args": {
+            "list": "rp",
+            "index": "rp"
+        }
     }
     
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
         match args:
+            case {
+                "list": list(),
+                "index": int()
+            }: return cls.pop
             case _: return None
     @staticmethod
-    def _(function_memory:FunctionMemory, ):
-        return
+    def pop(function_memory:FunctionMemory, **kwargs):
+        # TODO: error handling if index is out of bounds?
+        return kwargs["list"].pop(kwargs["index"])
     
 class Engine_List_Append(LoaderFunction):
     id = Identifier("engine", "list/", "append")
@@ -3705,6 +3713,28 @@ class Engine_Variable_IsDefined(LoaderFunction):
             return True
         except MemoryError:
             return False
+
+class Engine_Variable_Store(LoaderFunction):
+    id = Identifier("engine", "variable/", "store")
+    
+    script_flags = {
+        "required_args": 2,
+        "optional_args": 0,
+        "args": {
+            "var_name": "rp",
+            "value": "rp"
+        }
+    }
+    
+    @classmethod
+    def check(cls, function_memory:FunctionMemory, args:dict):
+        if "var_name" in args and "value" in args:
+            return cls.store
+        return None
+
+    @staticmethod
+    def store(function_memory:FunctionMemory, var_name, value):
+        return function_memory.store(var_name, value)
 
 # ^ Variable ^ #
 

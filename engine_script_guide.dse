@@ -159,7 +159,7 @@
     format()
     length()
     join()
-    combat_output()
+    combat.output()
     input()
 
 

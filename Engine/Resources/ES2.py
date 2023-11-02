@@ -19,6 +19,49 @@ import re, glob, json
 
 from typing import Any
 
+def stringify(shorthand:dict, dct:dict|str, path="") -> list:
+    if isinstance(dct, dict):
+        out = []
+        for k, _v in dct.items():
+            v = stringify(shorthand, _v, (path+"."+k).strip("."))
+            out += [f"{k}\\.{x}" for x in v if x]
+        return out
+    elif isinstance(dct, str):
+        shorthand.update({path: dct})
+        return [None]
+        # return [dct]
+
+def class_functions(shorthand):
+    funcs = {
+        "combat": {
+            "start": "[engine:combat/start]",
+            "get": "[engine:combat/get]",
+            "trigger": "[engine:combat/trigger]",
+            "next_turn": "[engine:combat/next_turn]",
+            "spawn": "[engine:combat/spawn]",
+            "despawn": "[engine:combat/despawn]",
+            "message": "[engine:combat/message]"
+        },
+        "variable": {
+            "exists": "[engine:variable/is_defined]",
+            "store": "[engine:variable/store]"
+        },
+        "debug": {
+            "log": "[engine:log/debug]",
+            "breakpoint": "[engine:debug/breakpoint]",
+            "memory": "[engine:debug/memory]"
+        },
+        "time": {
+            "get": "[engine:time/get]",
+            "check": "[engine:time/check]",
+            "wait": "[engine:time/wait]"
+        }
+    }
+    
+    x = f"\\b({'|'.join(stringify(shorthand, funcs))})\\b"
+    print(x)
+    print(shorthand)
+    return x
 
 class EngineScript:
 
@@ -93,18 +136,44 @@ class EngineScript:
 
         self.parse()
 
+
+    shorthand = {
+        "output": "[engine:player/message]",
+        "wait": "[engine:time/wait]",
+        "format": "[engine:text/format]",
+        "input": "[engine:player/get_input]",
+        "length": "[engine:text/length]",
+        "interact": "[engine:interaction/interact]",
+        "match": "[engine:text/match]",
+        "join": "[engine:text/join]",
+        "substring": "[engine:text/substring]",
+        "fuzzymatch": "[engine:text/fuzzy_match]",
+        "replace": "[engine:text/replace]",
+        "replace_pattern": "[engine:text/replace_pattern]",
+        "strip": "[engine:text/strip]",
+        "pop": "[engine:list/pop]",
+        "append": "[engine:list/append]",
+        "subset": "[engine:list/subset]",
+        "raise": "[engine:control/raise_error]",
+        "call": "[engine:control/call]",
+        "play_sound": "[engine:sound/play]"
+    }
+
+
+
     _patterns = {
             r"\/\/.*": "ignore",
             r"(?<!\/)\/\*(\*[^/]|[^*])+\*\/": "ignore",
+            r"(\"(\\.|[^\"\\])*\"|\'(\\.|[^\'\\])*\')": "STRING",
             r"\[([^:\[]+:)(([^\/\]\[]+\/)*)([^\[\]]+)\]": "FUNCTION",
             r"@[^\:]+\:": "TAG",
             r"\$[a-zA-Z_][a-zA-Z0-9_]*": "MACRO",
             r"\b(true|false)\b": "BOOLEAN",
-            r"(\"(\\.|[^\"\\])*\"|\'(\\.|[^\'\\])*\')": "STRING",
             r"\<[^<> ]+\>": "VARIABLE",
             r"(<=|>=|<|>|==|!=)": "COMP",
             r"(\.\.|::)": "CONCAT",
             r"\b(if|elif|else|while|for|in|and|not|or|true|false|none|min|max)\b": "KEYWORD",
+            class_functions(shorthand): "WORD",
             r"[a-zA-Z_][a-zA-Z0-9_]*": "WORD",
             r"(\d+(\.\d+)?|\.\d+)": "NUMBER",
             r"\*\*": "POW",
@@ -274,10 +343,16 @@ class EngineScript:
                 ast.update({"false": {}})
             out = {}
             for k, v in ast.items():
-                out.update({k: self.cleanup(v)})
+                x = self.cleanup(v)
+                out.update({k: x})
             return out
         elif isinstance(ast, list):
-            return [self.cleanup(l) for l in ast]
+            lst = []
+            for l in ast:
+                x = self.cleanup(l)
+                if not any(x == h for h in (None, {})):
+                    lst.append(x)
+            return lst
         return ast
 
     def statements(self, tokens:list[Token], ignore_macro:bool=False):
@@ -1122,19 +1197,6 @@ class EngineScript:
                         
         else:
             raise EOF()
-
-    shorthand = {
-        "output": "[engine:player/message]",
-        "combat_output": "[engine:combat/message]",
-        "wait": "[engine:time/wait]",
-        "format": "[engine:text/format]",
-        "input": "[engine:player/get_input]",
-        "length": "[engine:text/length]",
-        "interact": "[engine:interaction/interact]",
-        "match": "[engine:text/match]",
-        "join": "[engine:text/join]"
-    }
-
     def function_call(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         # print("function call")
         if tokens:
@@ -1142,7 +1204,7 @@ class EngineScript:
                 func = self.shorthand.get(tokens[0].value, None)
                 f = tokens.pop(0)
                 if func is None:
-                    raise FinalScriptError(f"No function short-hand for '{tokens[0].value}' defined\nat {f.get_location()}")
+                    raise FinalScriptError(f"No function short-hand for '{f.value}' defined\nat {f.get_location()}")
             elif tokens[0].type == "FUNCTION":
                 func = tokens[0].value
                 tokens.pop(0)
@@ -1633,10 +1695,9 @@ class EngineScript:
                         raise EOF()
                     
                 elif tokens[0] == ("LITERAL", "="): # assign
+                    tokens.pop(0)
                     if ignore_macro:
                         raise FinalScriptError(f"Cannot define a macro within a macro function! at {macro.get_location()}")
-                    
-                    tokens.pop(0)
                     
                     e = self.expression(tokens)
                     
@@ -1684,7 +1745,9 @@ if __name__ == "__main__":
             engine_script = EngineScript(f)
             engine_script.compile()
             print(json.dumps(engine_script.getScript(), indent=4))
-        except Exception as e:
+        except FinalScriptError as e:
+            print(e)
+        except ScriptError as e:
             print(e)
     else:
 
@@ -1695,7 +1758,9 @@ if __name__ == "__main__":
                 engine_script.compile()
 
                 print(json.dumps(engine_script.getScript(), indent=4, default=str))
-            except Exception as e:
+            except FinalScriptError as e:
+                print("\n".join(e.args))
+            except ScriptError as e:
                 print("\n".join(e.args))
 
 

@@ -260,9 +260,25 @@ class EngineScript:
     def build(self, tokens:list[Token]):
         if tokens:
             try:
-                self.compiled_script = self.statements(tokens)
+                self.compiled_script = self.cleanup(self.statements(tokens))
             except EOF:
                 self.compiled_script = {}
+
+    def cleanup(self, ast):
+        if isinstance(ast, dict):
+            if "functions" in ast and ast["functions"] == []:
+                ast.pop("functions")
+            if "true" in ast and ast["true"] == {"functions": []}:
+                ast.update({"true": {}})
+            if "false" in ast and ast["false"] == {"functions": []}:
+                ast.update({"false": {}})
+            out = {}
+            for k, v in ast.items():
+                out.update({k: self.cleanup(v)})
+            return out
+        elif isinstance(ast, list):
+            return [self.cleanup(l) for l in ast]
+        return ast
 
     def statements(self, tokens:list[Token], ignore_macro:bool=False):
         # print("statements")
@@ -1219,6 +1235,7 @@ class EngineScript:
                     scope_name = arg_name
                 case "tags":
                     tags = func.script_flags.get("tags")
+                    # print(f"TAGS: {tags}")
                     parameters["tags"].update({
                         arg_name: {
                             "tag": tags["tag"],
@@ -1326,8 +1343,11 @@ class EngineScript:
         if len(p) == 4:
             d = p[3]
             if isinstance(d, dict): # scope
-                # print(parameters, d)
-                parameters["scope"] = d["scope"]
+                # print(f"PARAMS: {parameters}\n\nD: {d}")
+                if "scope" in d:
+                    parameters["scope"] = d["scope"]
+                else:
+                    parameters["scope"] = d
             else: # tags
                 tag_list = d
                 #parameters["tags"] = tag_list

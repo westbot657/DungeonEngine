@@ -29,7 +29,7 @@
 		},
 		{
 			"name": "operator.dungeon_script",
-			"match": "\\b(\\-|\\+|/|\\*|min|max|length|format|output|combat_output|input|join|wait|interact|match)\\b"
+			"match": "\\b(\\-|\\+|/|\\*|([a-zA-Z_][a-zA-Z0-9_\\.]*(?=\\()))\\b"
 		},
 		{
 			"name": "constant.other.dungeon_script",

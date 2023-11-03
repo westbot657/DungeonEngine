@@ -32,7 +32,7 @@ try:
     from .AbstractInteractable import AbstractInteractable, Interactable
     from .Entity import Entity
     from .DynamicValue import DynamicValue
-    from .EngineScript import EngineScript
+    from .ES2 import EngineScript
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -65,7 +65,7 @@ except ImportError:
     from AbstractInteractable import AbstractInteractable, Interactable
     from Entity import Entity
     from DynamicValue import DynamicValue
-    from EngineScript import EngineScript
+    from ES2 import EngineScript
 
 
 from typing import Any, Generator

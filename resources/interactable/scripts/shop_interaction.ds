@@ -28,7 +28,7 @@ if (<.closed>) {
     $shop_display = {
         <output> = format("```less\n┌─ {shop_name} {c:─<{w}}", shop_name=<.shop_name>, c="─", w=max(1, (40-length(<.shop_name>))))
         for <item> in <.current_stock> {
-            <output> = <output>,
+            <output> = <output>
             ..format(
                 "│ {name: >18} {amount: >4} : {cost}",
                 name="`"..<item>["name"].."`"::"",
@@ -37,7 +37,7 @@ if (<.closed>) {
             )
             ::"\n"
         }
-        
+
         <output> = <output>
         ..format("├─ {player} {c:─<{w}}", player=<#player.name>, c="─", w=max(1, 40-length(<#player.name>)))
         ..format("│ {money}", money=<#player.currency>)

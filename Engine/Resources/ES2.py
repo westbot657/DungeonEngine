@@ -166,7 +166,7 @@ class EngineScript:
             r"\/\/.*": "ignore",
             r"(?<!\/)\/\*(\*[^/]|[^*])+\*\/": "ignore",
             r"(\"(\\.|[^\"\\])*\"|\'(\\.|[^\'\\])*\')": "STRING",
-            r"\[([^:\[]+:)(([^\/\]\[]+\/)*)([^\[\]]+)\]": "FUNCTION",
+            "\\[([^:\\[\n]+:)(([^\n\\/\\]\\[]+\\/)*)([^\n\\[\\]]+)\\]": "FUNCTION",
             r"@[^\:]+\:": "TAG",
             r"\$[a-zA-Z_][a-zA-Z0-9_]*": "MACRO",
             r"\b(true|false)\b": "BOOLEAN",
@@ -447,21 +447,22 @@ class EngineScript:
         if tokens:
             a = self.comp(tokens, ignore_macro)
             
-            if tokens[0] == ("KEYWORD", ("and", "or")):
-                t = tokens.pop(0)
-                
-                try:
-                    a2 = self.andor(tokens, ignore_macro)
+            if tokens:
+                if tokens[0] == ("KEYWORD", ("and", "or")):
+                    t = tokens.pop(0)
                     
-                    if a.get("function", None) == "engine:logic/compare":
-                        a.pop("function")
-                    if a2.get("function", None) == "engine:logic/compare":
-                        a2.pop("function")
+                    try:
+                        a2 = self.andor(tokens, ignore_macro)
                         
-                    return {t.value: [a, a2]}
-                    
-                except ScriptError as e:
-                    raise FinalScriptError(*e.args)
+                        if a.get("function", None) == "engine:logic/compare":
+                            a.pop("function")
+                        if a2.get("function", None) == "engine:logic/compare":
+                            a2.pop("function")
+                            
+                        return {t.value: [a, a2]}
+                        
+                    except ScriptError as e:
+                        raise FinalScriptError(*e.args)
             return a
         else:
             raise EOF()
@@ -489,26 +490,29 @@ class EngineScript:
                 try:
                     a = self.arith(tokens, ignore_macro)
 
-                    if tokens[0] == ("COMP", ("<=", "<", ">", ">=", "==", "!=")):
-                        t = tokens.pop(0)
+                    if tokens:
+                        if tokens[0] == ("COMP", ("<=", "<", ">", ">=", "==", "!=")):
+                            t = tokens.pop(0)
 
-                        try:
-                            a2 = self.arith(tokens, ignore_macro)
-                            
-                            if isinstance(a, dict):
-                                if a.get("function", None) == "engine:logic/compare":
-                                    a.pop("function")
-                            if isinstance(a2, dict):
-                                if a2.get("function", None) == "engine:logic/compare":
-                                    a2.pop("function")
+                            try:
+                                a2 = self.arith(tokens, ignore_macro)
                                 
-                            return {"function": "engine:math/solve", t.value: [a, a2]}
+                                if isinstance(a, dict):
+                                    if a.get("function", None) == "engine:logic/compare":
+                                        a.pop("function")
+                                if isinstance(a2, dict):
+                                    if a2.get("function", None) == "engine:logic/compare":
+                                        a2.pop("function")
+                                    
+                                return {"function": "engine:math/solve", t.value: [a, a2]}
+                                
+                                
+                            except ScriptError as e:
+                                raise FinalScriptError(*e.args, *t.unexpected().args) # the comparison was present, which means there is a syntax error
                             
-                            
-                        except ScriptError as e:
-                            raise FinalScriptError(*e.args, *t.unexpected().args) # the comparison was present, which means there is a syntax error
                         
-                    
+                        else:
+                            return a
                     else:
                         return a
 
@@ -1756,7 +1760,12 @@ if __name__ == "__main__":
         while True:
 
             try:
-                engine_script = EngineScript(input("file > "))
+                x = input("file > ")
+                if x == "all":
+                    EngineScript.load()
+                    EngineScript.preCompileAll()
+                    break
+                engine_script = EngineScript(x)
                 engine_script.compile()
 
                 print(json.dumps(engine_script.getScript(), indent=4, default=str))

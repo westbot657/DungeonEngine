@@ -1,7 +1,7 @@
 
 output(
     [engine:random/choice](%[
-        "`"..<#enemy.name>.."` bites `"..<target.name>.."`, dealing "..<damage>," damage"::"",
+        "`"..<#enemy.name>.."` bites `"..<target.name>.."`, dealing "..<damage>.." damage"::"",
         "`"..<#enemy.name>.."` takes a bite at `"..<target.name>.."` and deals "..<damage>.." damage"::""
     ])
 )

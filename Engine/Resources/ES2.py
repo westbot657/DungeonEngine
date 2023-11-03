@@ -65,6 +65,12 @@ def class_functions(shorthand):
 
 class EngineScript:
 
+    __slots__ = [
+        "script", "line", "col", "lexpos",
+        "compiled_script", "_tokens", "macros",
+        "macro_functions", "script_file"
+    ]
+
     _scripts = {}
     script_files: list = []
 
@@ -89,7 +95,6 @@ class EngineScript:
             self._init_(script_file)
             EngineScript._scripts.update({script_file: self})
             return self
-        
 
     def _init_(self, script_file):
         self.script_file = script_file
@@ -121,7 +126,6 @@ class EngineScript:
             es.compile()
         Log["loadup"]["engine script"]("all scripts compiled")
 
-
     def setRawScript(self, script):
         self.script = script
         self.compile(ignore_file=True)
@@ -135,7 +139,6 @@ class EngineScript:
         self.macro_functions.clear()
 
         self.parse()
-
 
     shorthand = {
         "output": "[engine:player/message]",
@@ -159,8 +162,6 @@ class EngineScript:
         "play_sound": "[engine:sound/play]"
     }
 
-
-
     _patterns = {
             r"\/\/.*": "ignore",
             r"(?<!\/)\/\*(\*[^/]|[^*])+\*\/": "ignore",
@@ -182,6 +183,11 @@ class EngineScript:
         }
 
     class Token:
+        __slots__ = [
+            "es", "value", "type",
+            "line_start", "line_end",
+            "col_start", "col_end"
+        ]
         def __init__(self, es, value:str):
             es: EngineScript
             self.es: EngineScript = es
@@ -265,13 +271,16 @@ class EngineScript:
 
         def get_location(self):
             return f"Line {self.line_start+1}, Column {self.col_start+1}"
-    
+
     class Macro:
         __slots__ = ["name"]
         def __init__(self, name):
             self.name = name
-    
+
     class MacroFunction:
+        __slots__ = [
+            "es", "name", "args", "code"
+        ]
         def __init__(self, es, name, args, code):
             self.es: EngineScript = es
             self.name = name
@@ -310,8 +319,6 @@ class EngineScript:
             else:
                 return obj
 
-
-
     def parse(self):
 
         self.line = 0
@@ -324,7 +331,6 @@ class EngineScript:
         # print(tokens)
 
         self.build(tokens)
-        
 
     def build(self, tokens:list[Token]):
         if tokens:
@@ -459,8 +465,7 @@ class EngineScript:
             return a
         else:
             raise EOF()
-        
-        
+
     def comp(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         # print("comp")
         if tokens:
@@ -1722,13 +1727,10 @@ class EngineScript:
             self.compile()
         return self.compiled_script
 
-
     @classmethod
     def unload(cls):
         cls._scripts.clear()
         cls.script_files.clear()
-
-
 
 if __name__ == "__main__":
 

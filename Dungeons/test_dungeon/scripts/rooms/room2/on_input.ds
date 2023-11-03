@@ -2,15 +2,15 @@
 
 
 // generated interaction code:
-[engine:text/match]([engine:text/set_case](<#text>, "lower"), "search")
+match([engine:text/set_case](<#text>, "lower"), "search")
 @pattern: "start" # {
-    [engine:interaction/interact](".start_passage")
+    interact(".start_passage")
 }
 @pattern: "4" # {
-    [engine:interaction/interact](".room4_door")
+    interact(".room4_door")
 }
 @pattern: "shop" # {
-    [engine:interaction/interact](".shop")
+    interact(".shop")
 }
 
 

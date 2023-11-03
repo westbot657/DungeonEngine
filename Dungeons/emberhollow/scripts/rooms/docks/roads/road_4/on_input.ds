@@ -1,8 +1,8 @@
 
 
-// [engine:text/match](<#text>)
+// match(<#text>)
 // @pattern: "start" # {
-//     [engine:interaction/interact](".exit")
+//     interact(".exit")
 // }
 
 match(<#dungeon.stage>)

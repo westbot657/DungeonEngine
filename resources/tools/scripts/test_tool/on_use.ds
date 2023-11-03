@@ -11,7 +11,7 @@
 <item.name> = "Excaliber"
 <item.description> = "A perfectly normal sword"
 
-// [engine:player/message](<item>)
+// output(<item>)
 
 
 

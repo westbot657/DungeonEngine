@@ -1,11 +1,11 @@
 
-[engine:text/match]([engine:text/set_case](<#text>, "lower"))
+match([engine:text/set_case](<#text>, "lower"))
 @pattern: "entrance" # {
-    [engine:interaction/interact](".entrance")
+    interact(".entrance")
 }
 @pattern: "shrine" # {
-    [engine:interaction/interact](".shrine")
+    interact(".shrine")
 }
 @pattern: "sword" # {
-    [engine:interaction/interact](".rusty_sword")
+    interact(".rusty_sword")
 }

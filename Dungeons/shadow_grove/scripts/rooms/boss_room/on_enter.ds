@@ -1,23 +1,19 @@
 
 
 
-<combat> = [engine:combat/get]("shadow_grove:combats/boss_combat")
+<combat> = combat.get("shadow_grove:combats/boss_combat")
 
 
 
-if (<.combat.complete>){
-    [engine:player/message](
-        [engine:text/join](
+if (<combat.complete>){
+    output(
         "as you step inside, the room feels free and clean with the Ent gone."
-        )
     )
 } else {
-    [engine:player/message](
-        [engine:text/join](
+    output(
         "as you step inside, an overwelming presure of shadow and dread falls over you, you see the Shadow Ent's looming form in the darkenss as it shifts around to gaze dow nat you."
-        )
     )
 }
 
 
-[engine:combat/start](<combat>)
+combat.start(<combat>)

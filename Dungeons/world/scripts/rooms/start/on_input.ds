@@ -12,10 +12,9 @@ $help2 =
 "
 
 
-[engine:text/match](<#text>)
+match(<#text>)
 @pattern: "[Hh][Ee][Ll][Pp] *[Uu][Ii]" # {
-    [engine:player/message]( // this is the UI help section
-[engine:text/join](
+output( // this is the UI help section
 "
 *═══ UI help ════════════════════════════════════════════*
 Press the `+ NEW PLAYER` Button to create
@@ -36,13 +35,12 @@ The Log tab lets you see the game log. Mainly useful
 for debugging a dungeon
 
 
-_─── General keyword functions: ─────────────────────────_",
+_─── General keyword functions: ─────────────────────────_"..
 $help2
-))
+)
 }
 @pattern: "[Hh][Ee][Ll][Pp] *[Cc][Mm][Dd]" # {
-    [engine:player/message]( // this is the console help section
-[engine:text/join](
+    output( // this is the console help section
 "
 ═══ CMD help ═══════════════════════════════════════════
 Type `[0]: engine:new-player <id> <name>`
@@ -61,19 +59,17 @@ message with `[<id>]:` including a space after it.
 this id prefix will not be shown in any of the following
 examples, but is still required
 
-─── General keyword functions: ─────────────────────────",
+─── General keyword functions: ─────────────────────────"..
 $help2
-))
+)
 }
-@pattern: "\bstart\b" # {
+@pattern: "\\bstart\\b" # {
     interact(".spawn_boat")
 }
 @pattern: "go to (?P<dungeon_name>.*)" # {
     <dungeon_name> = [engine:text/set_case](<dungeon_name>, "lower")
 
-    [engine:dict/for_each](<%dungeons>, "key", "value") {
-
-        // [engine:log/debug]([engine:text/join](<key>, <value.name>), "goto check")
+    for <key>, <value> in <%dungeons> {
 
         if (
             ((<dungeon_name> == [engine:text/set_case](<value.name>, "lower"))

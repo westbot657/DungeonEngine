@@ -1,7 +1,7 @@
 // Start on_enter script
 
-[engine:player/message]("You walk into the entrance of the test dungeon")
+output("You walk into the entrance of the test dungeon")
 
-// [engine:time/wait](2.5)
+// wait(2.5)
 
-// [engine:player/message]("Waited 2.5 sec?")
+// output("Waited 2.5 sec?")

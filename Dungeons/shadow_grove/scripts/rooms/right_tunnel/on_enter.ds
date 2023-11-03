@@ -1,26 +1,24 @@
 $m1 = "the tunnel is an overgrown passage leading from the `entrance` to the `shrine`."
 
 
-<combat> = [engine:combat/get]("shadow_grove:combats/right_tunnel_combat")
+<combat> = combat.get("shadow_grove:combats/right_tunnel_combat")
 
 
 
 if (<combat.complete> and <.red_fruit.loot.amount> > 0) {
-    [engine:player/message](
-        [engine:text/join](
-            $m1, "you see ",
-            <.red_fruit.loot.amount>,
-            " small red `fruit`s growing from the broken corpses of the vine creatures", 
-            seperator=""
-        )
+    output(
+        $m1.."you see "..
+        <.red_fruit.loot.amount>..
+        " small red `fruit`s growing from the broken corpses of the vine creatures"
+        ::""
     )
 
 } else {
-    [engine:player/message]($m1)
+    output($m1)
 
 }
 
-[engine:combat/start](<combat>)
+combat.start(<combat>)
 
 
 

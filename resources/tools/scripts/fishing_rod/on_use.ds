@@ -9,7 +9,7 @@
     }
 }) {
     [engine:tool/cancel_use]()
-    [engine:player/message]("You can't fish here!")
+    output("You can't fish here!")
 }
 
 [engine:control/check_predicate](%{
@@ -41,12 +41,12 @@
                         },
                         "functions": {
                             [engine:player/give_game_object]("engine:items/fish", 1)
-                            [engine:player/message]("You caught a fish!")
+                            output("You caught a fish!")
                         }
                     },
                     %{
                         "functions": {
-                            [engine:player/message]("You didn't catch anything")
+                            output("You didn't catch anything")
                         }
                     }
                 ]

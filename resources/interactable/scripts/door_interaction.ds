@@ -4,7 +4,7 @@ if (<.locked>) {
 } else {
     $response = input(<.open_message>)
 
-    [engine:text/match]($response)
+    match($response)
     @pattern: <%text/pattern/yes> # {
         output(<.travel_message>)
         [engine:player/set_location](<.target>)

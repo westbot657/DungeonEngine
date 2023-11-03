@@ -2,7 +2,7 @@
 [engine:enemy/damage](<#damage>)
 
 
-[engine:player/message](
+output(
     "You attack `"
     ..<#enemy.name>
     .."`, dealing "
@@ -14,11 +14,9 @@
 if (<#enemy.health> <= 0) {
     [engine:combat/kill_enemy](<.uid>)
 
-    [engine:combat/message](
-        [engine:text/join](
-            "`"..<#enemy.name>.."` has been defeated."
-            ::""
-        )
+    output(
+        "`"..<#enemy.name>.."` has been defeated."
+        ::""
     )
 
 }
@@ -26,7 +24,7 @@ if (<#enemy.health> <= 0) {
 
 
 
-[engine:combat/next_turn]
+combat.next_turn()
 
 
 // [engine:debug/memory]

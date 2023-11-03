@@ -5,30 +5,22 @@ $m1 = "You enter the Dark Shrine of the grove. you see the `left` and `right` tu
 $m2 = ", and a large door with the faided emblem of the Shadow Ent carved on it"
 
 if (<.ritual_dagger.picked_up> and <.bark_armor.picked_up>) {
-    [engine:player/message](
-        [engine:text/join](
-            $m1, $m2
-        )
+    output(
+        $m1..$m2::""
     )
 } elif (<.ritual_dagger.picked_up> and (not <.bark_armor.picked_up>)) {
-    [engine:player/message](
-        [engine:text/join](
-            $m1, " with a suit of old bark `armor` laying on it", $m2,
-            seperator=""
-        )
+    output(
+        $m1.." with a suit of old bark `armor` laying on it"..$m2
+        ::""
     )
 } elif ((not <.ritual_dagger.picked_up>) and <.bark_armor.picked_up>) {
-    [engine:player/message](
-        [engine:text/join](
-            $m1, " with an old ritual `dagger` laying on it", $m2,
-            seperator=""
-        )
+    output(
+        $m1.." with an old ritual `dagger` laying on it"..$m2
+        ::""
     )
 } else {
-    [engine:player/message](
-        [engine:text/join](
-            $m1, " with an old ritual `dagger` and an old suit of bark `armor` laying on it", $m2,
-            seperator=""
-        )
+    output(
+        $m1.." with an old ritual `dagger` and an old suit of bark `armor` laying on it"..$m2
+        ::""
     )
 }

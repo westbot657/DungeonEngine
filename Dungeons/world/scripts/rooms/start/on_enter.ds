@@ -1,13 +1,5 @@
-// send the player to a random spawn location!
 
-
-// [engine:sound/play]("./resources/sounds/.wav")
-
-/* lore stuff/tutorial
-
-*/
-
-[engine:player/message](
+output(
 "Welcome to:
 *═══ Insert Dungeon Name Here! ═══*
 _────── Version Alpha-3.0.0 ──────_
@@ -21,9 +13,3 @@ type `start` to start your adventure when ready.
 
 "
 )
-
-// <spawn> = [engine:random/choice](<.spawn_points>)
-
-// [engine:player/set_location](<spawn>)
-
-

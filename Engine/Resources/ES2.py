@@ -19,6 +19,8 @@ import re, glob, json
 
 from typing import Any
 
+import warnings
+
 def stringify(shorthand:dict, dct:dict|str, path="") -> list:
     if isinstance(dct, dict):
         out = []
@@ -333,13 +335,17 @@ class EngineScript:
         self.build(tokens)
 
     def build(self, tokens:list[Token]):
+        t = bool(tokens)
         if tokens:
             try:
                 self.compiled_script = self.cleanup(self.statements(tokens))
             except EOF:
                 self.compiled_script = {}
+        if t and self.compiled_script == {}:
+            print(f"Warning:\n    File '{self.script_file}' contained code that compiled to nothing.")
 
     def cleanup(self, ast):
+        # print(f"CLEANUP: {ast}")
         if isinstance(ast, dict):
             if "functions" in ast and ast["functions"] == []:
                 ast.pop("functions")
@@ -1211,6 +1217,7 @@ class EngineScript:
         if tokens:
             if tokens[0].type == "WORD":
                 func = self.shorthand.get(tokens[0].value, None)
+                # print(f"SHORTHAND: {func}")
                 f = tokens.pop(0)
                 if func is None:
                     raise FinalScriptError(f"No function short-hand for '{f.value}' defined\nat {f.get_location()}")
@@ -1247,7 +1254,8 @@ class EngineScript:
                     p3 = self.tag_list(tokens)
                 else:
                     return self.validate_function(p)
-            else: raise EOF()
+            else:
+                return self.validate_function(p)
 
             p.append(p3)
             return self.validate_function(p)
@@ -1766,7 +1774,7 @@ if __name__ == "__main__":
                     EngineScript.preCompileAll()
                     break
                 engine_script = EngineScript(x)
-                engine_script.compile()
+                # engine_script.compile()
 
                 print(json.dumps(engine_script.getScript(), indent=4, default=str))
             except FinalScriptError as e:

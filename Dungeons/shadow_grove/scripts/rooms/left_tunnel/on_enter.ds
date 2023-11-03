@@ -2,16 +2,11 @@ $m1 = "the tunnel is an overgrown passage leading from the `entrance` to the `sh
 
 
 if (not <.rusty_sword.picked_up>) {
-    [engine:player/message](
-        [engine:text/join](
-            $m1, ".", 
-            seperator=""
-        )
+    output(
+        $m1.."."::""
     )
 } else {
-    [engine:player/message](
-        [engine:text/join](
-            $m1, "and clutching a rusted `sword`."
-        )
+    output(
+        $m1.."and clutching a rusted `sword`."
     )
 }

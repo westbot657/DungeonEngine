@@ -1,5 +1,5 @@
 
-[engine:text/match](<#dungeon.stage>)
+match(<#dungeon.stage>)
 @pattern: "tutorial" # {
 
 }

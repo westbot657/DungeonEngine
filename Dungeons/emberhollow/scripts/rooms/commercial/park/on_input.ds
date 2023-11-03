@@ -6,9 +6,9 @@ match(<#dungeon.stage>)
 
         match(<#text>)
         @pattern: " *(?:[Ii]'m|[Ii] *am|[Mm]y *name(?:'s| *is)) *(?P<name>.*)" # {
-            <name> = [engine:text/strip](<name>)
+            <name> = strip(<name>)
             <#dungeon.tutorial_ran_said_name> = true
-            if ([engine:text/fuzzy_match](
+            if (fuzzy_match(
                     [engine:text/set_case](<name>, "lower"),
                     [engine:text/set_case](<#player.name>, "lower"),
                     0.80

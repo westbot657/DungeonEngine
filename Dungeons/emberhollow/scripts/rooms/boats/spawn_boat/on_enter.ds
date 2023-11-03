@@ -2,7 +2,7 @@
 
 <num_players> = length(<#dungeon.player_ids>)
 
-[engine:list/append](<#dungeon.player_ids>, <#player.uid>)
+append(<#dungeon.player_ids>, <#player.uid>)
 
 [engine:player/set_tag]("listening", true)
 
@@ -54,7 +54,7 @@ $outm($message, $wait_time) {
     }
 }
 
-[engine:text/match]([engine:random/choice](%["1", "2", "3", "4"]))
+match([engine:random/choice](%["1", "2", "3", "4"]))
 @pattern: "1" # {
     $outd("`{captain}`: Well *{player}*, there it is!", 3)
     $out("`{captain}`: `Emberhollow`.", 8)

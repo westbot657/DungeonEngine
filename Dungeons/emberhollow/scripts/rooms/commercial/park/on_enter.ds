@@ -32,7 +32,7 @@ match(<#dungeon.stage>)
         output("`Syllia` (quitely): coward")
         wait(1.5)
         output("Syllia walks back towards the `Inn`")
-        [engine:list/append](<#dungeon.annoyed_syllia>, <#player.uid>)
+        append(<#dungeon.annoyed_syllia>, <#player.uid>)
         wait(2)
         output("")
     }

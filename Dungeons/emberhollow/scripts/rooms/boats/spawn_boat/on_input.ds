@@ -1,7 +1,7 @@
 
-[engine:text/match](<#text>)
+match(<#text>)
 @pattern: "skip" # {
     [engine:player/set_tag]("listening", false)
-    [engine:player/message]("Skipping dialog...")
+    output("Skipping dialog...")
 }
 

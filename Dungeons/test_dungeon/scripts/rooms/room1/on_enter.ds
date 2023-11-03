@@ -1,6 +1,6 @@
 // Room 1 on_enter script
 
 
-[engine:combat/start]("test_dungeon:combats/test_combat")
+combat.start("test_dungeon:combats/test_combat")
 
 

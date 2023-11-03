@@ -1,4 +1,0 @@
-
-
-[engine:player/message]([engine:text/format](<farewell>, shopkeeper=<shopkeeper>, player=<#player.name>))
-

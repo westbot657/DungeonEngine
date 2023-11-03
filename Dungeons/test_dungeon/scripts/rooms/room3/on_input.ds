@@ -2,9 +2,9 @@
 
 
 // generated interaction code:
-[engine:text/match]([engine:text/set_case](<#text>, "lower"), "search")
+match([engine:text/set_case](<#text>, "lower"), "search")
 @pattern: "1" # {
-    [engine:interaction/interact](".room1_passage")
+    interact(".room1_passage")
 }
 
 

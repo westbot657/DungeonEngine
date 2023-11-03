@@ -1,7 +1,7 @@
 
 
 
-[engine:player/message]("You walk up to the gate of Emberhollow")
+output("You walk up to the gate of Emberhollow")
 
 
 

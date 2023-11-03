@@ -12,7 +12,7 @@ if (<.closed>) {
         )
     }
 
-    if ([engine:time/check](<.restock_time>) or (not <.initial_stock>)) {
+    if (time.check(<.restock_time>) or (not <.initial_stock>)) {
         <.initial_stock> = true
         <.current_stock> = [engine:interaction/get_shop_stock](<.stock>)
     }
@@ -51,7 +51,7 @@ if (<.closed>) {
     while (true) {
         <inp> = input()
 
-        [engine:text/match](<inp>)
+        match(<inp>)
         @pattern: "\b(exit|leave)\b" # {
             if (<.exit_message>) {
                 output(
@@ -62,7 +62,7 @@ if (<.closed>) {
         }
 
         for <item> in <.current_stock> {
-            [engine:text/match]([engine:text/set_case](<inp>, "lower"), "fullmatch")
+            match([engine:text/set_case](<inp>, "lower"), "fullmatch")
             @pattern: [engine:text/set_case](<item>["name"], "lower") # {
 
                 if (<item>["cost"] > <#player.currency>) {
@@ -75,7 +75,7 @@ if (<.closed>) {
                     format("Purchase `{item}` for `{cost}`? (yes/no)", item=<item>["name"], cost=<item>["cost"])
                 )
 
-                [engine:text/match](<response>)
+                match(<response>)
                 @pattern: "[Yy](?:es)?" # {
                     output(
                         format("You purchased `{item}`!", item=<item>["name"])

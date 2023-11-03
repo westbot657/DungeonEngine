@@ -1,11 +1,9 @@
 
 if (<#enemy.health> <= <target_health>) {
-    [engine:combat/trigger](
-        [engine:text/join](
-            <#enemy.uid>,
-            "health-check",
-            <target_health>,
-            seperator="-"
-        )
+    combat.trigger(
+        <#enemy.uid>
+        .."health-check"
+        ..<target_health>
+        ::"-"
     )
 }

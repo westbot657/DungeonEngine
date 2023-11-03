@@ -1,7 +1,7 @@
 
 
 /*//
-[engine:player/message](
+output(
 "Location Directory:
 │ (temporary): `start`"
 )

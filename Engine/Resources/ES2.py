@@ -19,8 +19,6 @@ import re, glob, json
 
 from typing import Any
 
-import warnings
-
 def stringify(shorthand:dict, dct:dict|str, path="") -> list:
     if isinstance(dct, dict):
         out = []

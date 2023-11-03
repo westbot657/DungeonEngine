@@ -152,7 +152,7 @@ class EngineScript:
         "match": "[engine:text/match]",
         "join": "[engine:text/join]",
         "substring": "[engine:text/substring]",
-        "fuzzymatch": "[engine:text/fuzzy_match]",
+        "fuzzy_match": "[engine:text/fuzzy_match]",
         "replace": "[engine:text/replace]",
         "replace_pattern": "[engine:text/replace_pattern]",
         "strip": "[engine:text/strip]",

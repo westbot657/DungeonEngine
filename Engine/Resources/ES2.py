@@ -68,7 +68,9 @@ class EngineScript:
     __slots__ = [
         "script", "line", "col", "lexpos",
         "compiled_script", "_tokens", "macros",
-        "macro_functions", "script_file"
+        "macro_functions", "script_file", "summary",
+        "external_variables", "context_hints",
+        "defined_vars"
     ]
 
     _scripts = {}
@@ -97,7 +99,7 @@ class EngineScript:
             return self
 
     def _init_(self, script_file):
-        self.script_file = script_file
+        self.script_file: str = script_file
 
         for f in self.script_files:
             if f.replace("\\", "/").endswith(f"{script_file.replace('.dungeon_script', '').replace('.ds', '')}.dungeon_script".replace("\\", "/")):
@@ -112,8 +114,53 @@ class EngineScript:
         self.col = 0
         self.lexpos = 0
         self.compiled_script = {}
+        self.context_hints = []
         self._tokens = []
-        
+        self.summary = []
+        self.external_variables = {
+            "%dungeons": "global constant",
+            "%text/pattern/yes": "global constant",
+            "%text/pattern/no": "global constant",
+            "%players": "global constant"
+        }
+        self.defined_vars = {}
+
+        if self.script_file.endswith(("on_input.ds", "on_input.dungeon_script")):
+            self.external_variables.update({
+                "#player": ["on_input script"],
+                "#text": ["on_input script"],
+                "#room": ["on_input script"],
+                "#dungeon": ["on_input script"]
+            })
+        if self.script_file.endswith(("on_enter.ds", "on_enter.dungeon_script")):
+            self.external_variables.update({
+                "#player": ["on_enter script"],
+                "#room": ["on_enter script"],
+                "#dungeon": ["on_enter script"]
+            })
+        if self.script_file.endswith(("on_exit.ds", "on_exit.dungeon_script")):
+            self.external_variables.update({
+                "#player": ["on_exit script"],
+                "#room": ["on_exit script"],
+                "#dungeon": ["on_exit script"]
+            })
+        if self.script_file.endswith(("on_use.ds", "on_use.dungeon_script")):
+            self.external_variables.update({
+                "#player": ["on_use script"]
+            })
+            if re.search(r"items/", self.script_file):
+                self.external_variables.update({
+                    "#item": ["item on_use script"]
+                })
+            elif re.search(r"tools/", self.script_file):
+                self.external_variables.update({
+                    "#tool": ["tool on_use script"]
+                })
+        if re.search(r"combats?/", self.script_file):
+            self.external_variables.update({
+                "#combat": ["assumed combat script"]
+            })
+
         self.macros: dict[str, Any] = {}
         self.macro_functions: dict[str, EngineScript.MacroFunction] = {}
 
@@ -163,24 +210,25 @@ class EngineScript:
     }
 
     _patterns = {
-            r"\/\/.*": "ignore",
-            r"(?<!\/)\/\*(\*[^/]|[^*])+\*\/": "ignore",
-            r"(\"(\\.|[^\"\\])*\"|\'(\\.|[^\'\\])*\')": "STRING",
-            "\\[([^:\\[\n]+:)(([^\n\\/\\]\\[]+\\/)*)([^\n\\[\\]]+)\\]": "FUNCTION",
-            r"@[^\:]+\:": "TAG",
-            r"\$[a-zA-Z_][a-zA-Z0-9_]*": "MACRO",
-            r"\b(true|false)\b": "BOOLEAN",
-            r"\<[^<> ]+\>": "VARIABLE",
-            r"(<=|>=|<|>|==|!=)": "COMP",
-            r"(\.\.|::)": "CONCAT",
-            r"\b(if|elif|else|while|for|in|and|not|or|true|false|none|min|max)\b": "KEYWORD",
-            class_functions(shorthand): "WORD",
-            r"[a-zA-Z_][a-zA-Z0-9_\.]*": "WORD",
-            r"(\d+(\.\d+)?|\.\d+)": "NUMBER",
-            r"\*\*": "POW",
-            r"[=\-+*/()&\[\]{},#%:|^]": "LITERAL",
-            r"[\n~`\t; ]+": "ignore"
-        }
+        r"\/\/.*": "ignore",
+        r"(?<!\/)\/\*(\*[^/]|[^*])+\*\/": "ignore",
+        r"\#\!.*": "context_hint",
+        r"(\"(\\.|[^\"\\])*\"|\'(\\.|[^\'\\])*\')": "STRING",
+        "\\[([^:\\[\n]+:)(([^\n\\/\\]\\[]+\\/)*)([^\n\\[\\]]+)\\]": "FUNCTION",
+        r"@[^\:]+\:": "TAG",
+        r"\$[a-zA-Z_][a-zA-Z0-9_]*": "MACRO",
+        r"\b(true|false)\b": "BOOLEAN",
+        r"\<[^<> ]+\>": "VARIABLE",
+        r"(<=|>=|<|>|==|!=)": "COMP",
+        r"(\.\.|::)": "CONCAT",
+        r"\b(if|elif|else|while|for|in|and|not|or|true|false|none|min|max)\b": "KEYWORD",
+        class_functions(shorthand): "WORD",
+        r"[a-zA-Z_][a-zA-Z0-9_\.]*": "WORD",
+        r"(\d+(\.\d+)?|\.\d+)": "NUMBER",
+        r"\*\*": "POW",
+        r"[=\-+*/()&\[\]{},#%:|^]": "LITERAL",
+        r"[\n~`\t; ]+": "ignore"
+    }
 
     class Token:
         __slots__ = [
@@ -196,6 +244,54 @@ class EngineScript:
             for pattern, token_type in EngineScript._patterns.items():
                 if re.fullmatch(pattern, self.value):
                     self.type = token_type
+                    if token_type == "context_hint":
+                        match self.value:
+                            case "#!combat-script":
+                                if "#combat" in self.es.external_variables:
+                                    self.es.external_variables["#combat"].append("combat script tag")
+                                else:
+                                    self.es.external_variables.update({"#combat": ["combat script tag"]})
+                            case "#!enter-script":
+                                if "#player" in self.es.external_variables:
+                                    self.es.external_variables["#player"].append("enter script tag")
+                                else:
+                                    self.es.external_variables.update({"#player": ["enter script tag"]})
+                                if "#room" in self.es.external_variables:
+                                    self.es.external_variables["#room"].append("enter script tag")
+                                else:
+                                    self.es.external_variables.update({"#room": ["enter script tag"]})
+                            case "#!input-script":
+                                if "#player" in self.es.external_variables:
+                                    self.es.external_variables["#player"].append("input script tag")
+                                else:
+                                    self.es.external_variables.update({"#player": ["input script tag"]})
+                                if "#text" in self.es.external_variables:
+                                    self.es.external_variables["#text"].append("input script tag")
+                                else:
+                                    self.es.external_variables.update({"#tag": ["input script tag"]})
+                            case "#!exit-script":
+                                if "#player" in self.es.external_variables:
+                                    self.es.external_variables["#player"].append("exit script tag")
+                                else:
+                                    self.es.external_variables.update({"#player": ["exit script tag"]})
+                            case "#!item-use-script":
+                                if "#player" in self.es.external_variables:
+                                    self.es.external_variables["#player"].append("item use script")
+                                else:
+                                    self.es.external_variables.update({"#player": ["item use script tag"]})
+                                if "#item" in self.es.external_variables:
+                                    self.es.external_variables["#item"].append("item use script tag")
+                                else:
+                                    self.es.external_variables.update({"#item": ["item use script tag"]})
+                            case "#!tool-use-script":
+                                if "#player" in self.es.external_variables:
+                                    self.es.external_variables["#player"].append("tool use script tag")
+                                else:
+                                    self.es.external_variables.update({"#player": ["tool use script tag"]})
+                                if "#tool" in self.es.external_variables:
+                                    self.es.external_variables["#tool"].append("tool use script tag")
+                                else:
+                                    self.es.external_variables.update({"#tool": ["tool use script tag"]})
                     break
             
             self.line_start = es.line
@@ -231,9 +327,6 @@ class EngineScript:
                 for match in matches:
                     match:re.Match
                     self.value = self.value[0:match.start()] + replacements.get(match.group(), match.group()) + self.value[match.end():]
-
-
-        
 
         def __eq__(self, other):
             if isinstance(other, EngineScript.Token):
@@ -319,6 +412,26 @@ class EngineScript:
             else:
                 return obj
 
+    def get_summary(self):
+        return "\n".join(self.summary)
+
+    def register_variable(self, var_name, token, ctx=""):
+        if var_name in self.external_variables:
+            self.summary.append(f"Redefinition of external variable {token!s} {ctx}")
+            self.defined_vars.update({var_name: self.external_variables.pop(var_name)})
+        elif var_name in self.defined_vars:
+            self.summary.append(f"Redefinition of local variable {token!s} {ctx}")
+        else:
+            self.summary.append(f"Definition of {token!s} {ctx}")
+
+    def reference_variable(self, var_name, token, ctx=""):
+        if var_name in self.external_variables:
+            self.summary.append(f"Reference of externally defined variable {token!s} {ctx}")
+        elif var_name in self.defined_vars:
+            self.summary.append(f"Reference of locally defined variable {token!s} {ctx}")
+        else:
+            self.summary.append(f"Reference of untracked variable {token!s} {ctx}")
+
     def parse(self):
 
         self.line = 0
@@ -326,7 +439,7 @@ class EngineScript:
 
         tokens = [EngineScript.Token(self, t.group()) for t in re.finditer("(?:"+"|".join(self._patterns.keys())+")", self.script)]
 
-        tokens = [t for t in tokens if t.type not in ["ignore"]]
+        tokens = [t for t in tokens if t.type not in ["ignore", "context_hint"]]
 
         # print(tokens)
 
@@ -738,11 +851,13 @@ class EngineScript:
     def for_loop(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         if tokens:
             if tokens[0] == ("KEYWORD", "for"):
-                tokens.pop(0)
+                for_token = tokens.pop(0)
                 
                 if tokens:
                     if tokens[0].type == "VARIABLE":
-                        v = tokens.pop(0).value[1:-1]
+                        var = tokens.pop(0)
+                        v = var.value[1:-1]
+                        self.register_variable(v, var, f"(for loop at {for_token.get_location()})")
                     else:
                         raise tokens[0].expected("variable", False)
                 else:
@@ -754,7 +869,10 @@ class EngineScript:
                         
                         if tokens:
                             if tokens[0].type == "VARIABLE":
-                                v2 = tokens.pop(0).value[1:-1]
+                                var2 = tokens.pop(0)
+                                v2 = var2.value[1:-1]
+                                self.register_variable(v2, var2, f"(for loop at {for_token.get_location()})")
+
                             else:
                                 raise tokens[0].expected("variable", False)
                         else:
@@ -1012,18 +1130,23 @@ class EngineScript:
         # print("atom")
         if tokens:
             if tokens[0].type == "VARIABLE":
-                var_name = tokens.pop(0).value[1:-1]
+                var = tokens.pop(0)
+                var_name = var.value[1:-1]
                 if tokens:
                     if tokens[0] == ("LITERAL", "="):
                         tokens.pop(0)
 
                         e = self.expression(tokens, ignore_macro)
 
+                        self.register_variable(var_name, var)
                         return {"#store": {var_name: e}}
 
                     else:
+                        self.reference_variable(var_name, var)
                         return {"#ref": var_name}
                 else:
+                    self.reference_variable(var_name, var)
+
                     return {"#ref": var_name}
             elif tokens[0] == ("LITERAL", "-"):
                 tokens.pop(0)
@@ -1775,6 +1898,7 @@ if __name__ == "__main__":
                 # engine_script.compile()
 
                 print(json.dumps(engine_script.getScript(), indent=4, default=str))
+                print(engine_script.get_summary())
             except FinalScriptError as e:
                 print("\n".join(e.args))
             except ScriptError as e:

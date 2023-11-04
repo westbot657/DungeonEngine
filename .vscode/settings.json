@@ -1,6 +1,4 @@
 {
-    "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true,
     "python.analysis.typeCheckingMode": "off",
     "workbench.colorTheme": "Default Dark Modern"
 }

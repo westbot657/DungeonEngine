@@ -10,6 +10,10 @@
 			"include": "#comments"
 		},
 		{
+			"name": "context_hint.dungeon_script",
+			"match": "\\#\\!.*"
+		},
+		{
 			"include": "#strings"
 		},
 		{

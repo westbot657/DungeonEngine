@@ -116,6 +116,13 @@ class EngineScript:
         self.compiled_script = {}
         self.context_hints = []
         self._tokens = []
+        
+        self.setup()
+
+        self.macros: dict[str, Any] = {}
+        self.macro_functions: dict[str, EngineScript.MacroFunction] = {}
+
+    def setup(self):
         self.summary = []
         self.external_variables = {
             "%dungeons": "global constant",
@@ -161,9 +168,6 @@ class EngineScript:
                 "#combat": ["assumed combat script"]
             })
 
-        self.macros: dict[str, Any] = {}
-        self.macro_functions: dict[str, EngineScript.MacroFunction] = {}
-
     @classmethod
     def preCompileAll(cls):
         Log["loadup"]["engine script"]("loading and compiling scripts")
@@ -182,6 +186,7 @@ class EngineScript:
             with open(self.script_file, "r+", encoding="utf-8") as f:
                 self.script = f.read()#self.remove_syntax_sugar(f.read())
 
+        self.setup()
         self.macros.clear()
         self.macro_functions.clear()
 

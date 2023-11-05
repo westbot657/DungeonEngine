@@ -1904,6 +1904,7 @@ if __name__ == "__main__":
 
                 print(json.dumps(engine_script.getScript(), indent=4, default=str))
                 print(engine_script.get_summary())
+                EngineScript._scripts.pop(engine_script.script_file)
             except FinalScriptError as e:
                 print("\n".join(e.args))
             except ScriptError as e:

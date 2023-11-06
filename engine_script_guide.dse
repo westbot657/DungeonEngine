@@ -189,5 +189,30 @@ $macro2(5, (4 * 6) + 7)
 <y> = ((4 * 6) + 7) ** 5
 output(<x>..<y>::", ")
 
+// context hints:
+#!this is technically a context hint (though not a useful one)
+
+#! and this also works as a comment; // but you should really just use these
+
+// existing hints:
+#!enter-script
+#!input-script
+#!exit-script
+#!interaction-script
+#!item-use-script
+#!tool-use-script
+#!combat-script
+
+// and this special hint:
+// #!type: data type - variable name
+// ie:
+#!type: engine:player - my_player_variable;
+
+// hints can optionally end with ';' to be inserted mid-expression:
+for <player> #!type: engine:player - player; in <%players> {
+    // note that this space here  ^  is necessary, but no other spaces in this hint are needed
+    // (the space determines the end of the data type)
+    // the hint does not need to be immediately next to an untracked variable, it can be anywhere in the code
+}
 
 

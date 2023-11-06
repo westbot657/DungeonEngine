@@ -226,7 +226,7 @@ class EngineScript:
                         "currency": "engine:currency"
                     }.items():
                         self.external_variables.update({
-                            f"{var_name}.{k}": [f"property of Player object"]
+                            f"{var_name}.{k}": [f"property of Player"]
                         })
                         self.populate_variables(f"{var_name}.{k}", v)
                 case "engine:loot_table":
@@ -238,7 +238,7 @@ class EngineScript:
                         "room": "engine:text"
                     }.items():
                         self.external_variables.update({
-                            f"{var_name}.{k}": [f"property of Location object"]
+                            f"{var_name}.{k}": [f"property of Location"]
                         })
                         self.populate_variables(f"{var_name}.{k}", v)
                         
@@ -246,15 +246,31 @@ class EngineScript:
                 case "engine:position":
                     ...
                 case "engine:inventory":
-                    ...
+                    for k, v in {}.items():
+                        self.external_variables.update({
+                            f"{var_name}.{k}": [f"property of Inventory"]
+                        })
+                        self.populate_variables(f"{var_name}.{k}", v)
                 case "engine:status_effects":
                     ...
                 case "engine:currency":
-                    ...
+                    for k, v in {}.items():
+                        self.external_variables.update({
+                            f"{var_name}.{k}": [f"property of Currency"]
+                        })
+                        self.populate_variables(f"{var_name}.{k}", v)
                 case "engine:attack":
-                    ...
+                    for k, v in {}.items():
+                        self.external_variables.update({
+                            f"{var_name}.{k}": [f"property of Attack"]
+                        })
+                        self.populate_variables(f"{var_name}.{k}", v)
                 case "engine:game_object":
-                    ...
+                    for k, v in {}.items():
+                        self.external_variables.update({
+                            f"{var_name}.{k}": [f"property of GameObject"]
+                        })
+                        self.populate_variables(f"{var_name}.{k}", v)
                 case _: pass
 
     @classmethod

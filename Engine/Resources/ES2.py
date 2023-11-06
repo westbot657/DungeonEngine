@@ -167,6 +167,95 @@ class EngineScript:
             self.external_variables.update({
                 "#combat": ["assumed combat script"]
             })
+        
+        
+        # check room json file for interaction objects 
+        if os.path.exists(path := re.sub(r"\/(on_input|on_enter|on_exit)\.(ds|dungeon_script)", ".json", self.script_file.replace("scripts/", ""))):
+            with open(path, "r+", encoding="utf-8") as f:
+                try:
+                    data = json.load(f)
+                    for inter in data["interactions"]:
+                        if "id" in inter:
+                            self.external_variables.update({
+                                f".{inter['id']}": ["definition in room's json file"]
+                            })
+                except: pass
+        # check if file is an interaction file
+        if os.path.exists(path := self.script_file.replace("scripts/", "").replace("_interaction.ds", ".json")):
+            with open(path, "r+", encoding="utf-8") as f:
+                try:
+                    data: dict[str, dict[str, Any]] = json.load(f)
+                    if "fields" in data:
+                        for k, v in data["fields"].items():
+                            self.external_variables.update({
+                                f".{k}": ["definition in interaction's json file"]
+                            })
+                except: pass
+        # check parent dungeon json file
+        if "scripts/rooms/" in self.script_file:
+            path = self.script_file.split("/scripts/rooms/")[0]
+            path = path + "/" + path.rsplit("/", 1)[-1] + ".json"
+            if os.path.exists(path):
+                with open(path, "r+", encoding="utf-8") as f:
+                    try:
+                        data: dict[str, Any|dict[str, Any]] = json.load(f)
+                        if "data" in data:
+                            for k, v in data["data"].items():
+                                self.external_variables.update({
+                                    f"#dungeon.{k}": ["definition in dungeon's json file"]
+                                })
+                    except: pass
+    
+    def populate_variables(self, var_name:str, data_type=...):
+        if var_name.count(".") > 4: # this will stop circular parent loops from going too long
+            return
+        if data_type is not ...:
+            match data_type:
+                case "engine:player":
+                    for k, v in {
+                        "uid": "engine:number",
+                        "name": "engine:text",
+                        "max_health": "engine:number",
+                        "health": "engine:number",
+                        "inventory": "engine:inventory",
+                        "status_effects": "engine:status_effects",
+                        "in_combat": "engine:boolean",
+                        "location": "engine:location",
+                        "position": "engine:position",
+                        "last_location": "engine:location",
+                        "currency": "engine:currency"
+                    }.items():
+                        self.external_variables.update({
+                            f"{var_name}.{k}": [f"property of Player object"]
+                        })
+                        self.populate_variables(f"{var_name}.{k}", v)
+                case "engine:loot_table":
+                    ...
+                case "engine:location":
+                    for k, v in {
+                        "dungeon": "engine:text",
+                        "room_path": "engine:text",
+                        "room": "engine:text"
+                    }.items():
+                        self.external_variables.update({
+                            f"{var_name}.{k}": [f"property of Location object"]
+                        })
+                        self.populate_variables(f"{var_name}.{k}", v)
+                        
+                        
+                case "engine:position":
+                    ...
+                case "engine:inventory":
+                    ...
+                case "engine:status_effects":
+                    ...
+                case "engine:currency":
+                    ...
+                case "engine:attack":
+                    ...
+                case "engine:game_object":
+                    ...
+                case _: pass
 
     @classmethod
     def preCompileAll(cls):

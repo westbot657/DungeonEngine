@@ -32,6 +32,13 @@ class Location:
         self.room_path = location.room_path
         self.room = location.room
 
+    def getLocalVariables(self):
+        return {
+            ".dungeon": self.dungeon,
+            ".room_path": self.room_path,
+            ".room": self.room
+        }
+
     def __eq__(self, other):
         if isinstance(other, str):
             try:

@@ -70,7 +70,7 @@ class EngineScript:
         "compiled_script", "_tokens", "macros",
         "macro_functions", "script_file", "summary",
         "external_variables", "context_hints",
-        "defined_vars"
+        "defined_vars", "do_summary"
     ]
 
     _scripts = {}
@@ -80,7 +80,7 @@ class EngineScript:
     def load(cls):
         cls.script_files = glob.glob("**/*.dungeon_script", recursive=True) + glob.glob("**/*.ds", recursive=True)
 
-    def __new__(cls, script_file):
+    def __new__(cls, script_file, do_summary=False):
 
         for f in cls.script_files:
             if f.replace("\\", "/").endswith(f"{script_file.replace('.dungeon_script', '').replace('.ds', '')}.dungeon_script".replace("\\", "/")):
@@ -94,12 +94,12 @@ class EngineScript:
             return EngineScript._scripts[script_file]
         else:
             self = super().__new__(cls)
-            self._init_(script_file)
-            EngineScript._scripts.update({script_file: self})
+            self._init_(script_file, do_summary)
+            EngineScript._scripts.update({script_file.replace("\\", "/"): self})
             return self
 
-    def _init_(self, script_file):
-        self.script_file: str = script_file
+    def _init_(self, script_file, do_summary=False):
+        self.script_file: str = script_file.replace("\\", "/")
 
         for f in self.script_files:
             if f.replace("\\", "/").endswith(f"{script_file.replace('.dungeon_script', '').replace('.ds', '')}.dungeon_script".replace("\\", "/")):
@@ -116,6 +116,7 @@ class EngineScript:
         self.compiled_script = {}
         self.context_hints = []
         self._tokens = []
+        self.do_summary = do_summary
         
         self.setup()
 
@@ -123,12 +124,13 @@ class EngineScript:
         self.macro_functions: dict[str, EngineScript.MacroFunction] = {}
 
     def setup(self):
+        if not self.do_summary: return
         self.summary = []
         self.external_variables = {
-            "%dungeons": "global constant",
-            "%text/pattern/yes": "global constant",
-            "%text/pattern/no": "global constant",
-            "%players": "global constant"
+            "%dungeons": ["global constant"],
+            "%text/pattern/yes": ["global constant"],
+            "%text/pattern/no": ["global constant"],
+            "%players": ["global constant"]
         }
         self.defined_vars = {}
 
@@ -167,7 +169,19 @@ class EngineScript:
             self.external_variables.update({
                 "#combat": ["assumed combat script"]
             })
+        if re.search(r"_interaction\.(ds|dungeon_script)", self.script_file):
+            self.external_variables.update({
+                "#player": ["assumed interaction script"]
+            })
         
+        if "#player" in self.external_variables:
+            self.populate_variables("#player", "engine:player")
+        if "#item" in self.external_variables:
+            self.populate_variables("#item", "engine:game_object")
+        if "#tool" in self.external_variables:
+            self.populate_variables("#tool", "engine:game_object")
+        if "#combat" in self.external_variables:
+            self.populate_variables("#combat", "engine:combat")
         
         # check room json file for interaction objects 
         if os.path.exists(path := re.sub(r"\/(on_input|on_enter|on_exit)\.(ds|dungeon_script)", ".json", self.script_file.replace("scripts/", ""))):
@@ -177,24 +191,34 @@ class EngineScript:
                     for inter in data["interactions"]:
                         if "id" in inter:
                             self.external_variables.update({
-                                f".{inter['id']}": ["definition in room's json file"]
+                                f".{inter['id']}": ["defined in room's json file"]
                             })
                 except: pass
         # check if file is an interaction file
-        if os.path.exists(path := self.script_file.replace("scripts/", "").replace("_interaction.ds", ".json")):
+        path = self.script_file.replace("scripts/", "").replace("_interaction.ds", ".json")
+        # print(f"path? : {path}")
+        if os.path.exists(path):
             with open(path, "r+", encoding="utf-8") as f:
                 try:
                     data: dict[str, dict[str, Any]] = json.load(f)
                     if "fields" in data:
                         for k, v in data["fields"].items():
                             self.external_variables.update({
-                                f".{k}": ["definition in interaction's json file"]
+                                f".{k}": ["field defined in interaction's json file"]
+                            })
+                            self.populate_variables(f".{k}", v["type"])
+                    if "data" in data:
+                        for k in data["data"].keys():
+                            self.external_variables.update({
+                                f".{k}": ["data defined in interaction's json file"]
                             })
                 except: pass
+                
         # check parent dungeon json file
         if "scripts/rooms/" in self.script_file:
             path = self.script_file.split("/scripts/rooms/")[0]
             path = path + "/" + path.rsplit("/", 1)[-1] + ".json"
+            # print(f"\n\nPATH?: {path}\n\n")
             if os.path.exists(path):
                 with open(path, "r+", encoding="utf-8") as f:
                     try:
@@ -202,11 +226,22 @@ class EngineScript:
                         if "data" in data:
                             for k, v in data["data"].items():
                                 self.external_variables.update({
-                                    f"#dungeon.{k}": ["definition in dungeon's json file"]
+                                    f"#dungeon.{k}": ["defined in dungeon's json file"]
                                 })
                     except: pass
     
+    def populate_local_variables(self, var_name:str, data_type=...):
+        if not self.do_summary: return
+        temp = self.external_variables
+        self.external_variables = self.defined_vars
+        
+        self.populate_variables(var_name, data_type)
+        
+        self.defined_vars = self.external_variables
+        self.external_variables = temp
+    
     def populate_variables(self, var_name:str, data_type=...):
+        if not self.do_summary: return
         if var_name.count(".") > 4: # this will stop circular parent loops from going too long
             return
         if data_type is not ...:
@@ -246,31 +281,99 @@ class EngineScript:
                 case "engine:position":
                     ...
                 case "engine:inventory":
-                    for k, v in {}.items():
-                        self.external_variables.update({
-                            f"{var_name}.{k}": [f"property of Inventory"]
-                        })
-                        self.populate_variables(f"{var_name}.{k}", v)
+                    pass
+                    # for k, v in {
+                    # }.items():
+                    #     self.external_variables.update({
+                    #         f"{var_name}.{k}": [f"property of Inventory"]
+                    #     })
+                    #     self.populate_variables(f"{var_name}.{k}", v)
                 case "engine:status_effects":
                     ...
                 case "engine:currency":
-                    for k, v in {}.items():
+                    for k, v in {
+                            "gold": "engine:number",
+                            "silver": "engine:number",
+                            "copper": "engine:number"
+                        }.items():
                         self.external_variables.update({
                             f"{var_name}.{k}": [f"property of Currency"]
                         })
                         self.populate_variables(f"{var_name}.{k}", v)
                 case "engine:attack":
-                    for k, v in {}.items():
+                    for k, v in {
+                            "name": "engine:text",
+                            "damage": "engine:number",
+                            "range": "engine:number",
+                            "accuracy": "engine:number"
+                        }.items():
                         self.external_variables.update({
                             f"{var_name}.{k}": [f"property of Attack"]
                         })
                         self.populate_variables(f"{var_name}.{k}", v)
                 case "engine:game_object":
-                    for k, v in {}.items():
+                    for k, v in {
+                            "name": "engine:text",
+                            "description": "engine:text"
+                        }.items():
                         self.external_variables.update({
                             f"{var_name}.{k}": [f"property of GameObject"]
                         })
                         self.populate_variables(f"{var_name}.{k}", v)
+                    for k, v in {
+                            "count": "engine:number",
+                            "max_count": "engine:number"
+                        }.items():
+                        self.external_variables.update({
+                            f"{var_name}.{k}": [f"property of Item/Ammo"]
+                        })
+                        self.populate_variables(f"{var_name}.{k}", v)
+                    for k, v in {
+                            "bonus_damage": "engine:number"
+                        }.items():
+                        self.external_variables.update({
+                            f"{var_name}.{k}": [f"property of Ammo"]
+                        })
+                        self.populate_variables(f"{var_name}.{k}", v)
+                    for k, v in {
+                            "durability": "engine:number",
+                            "max_durability": "engine:number"
+                        }.items():
+                        self.external_variables.update({
+                            f"{var_name}.{k}": [f"property of Weapon/Armor"]
+                        })
+                        self.populate_variables(f"{var_name}.{k}", v)
+                    for k, v in {
+                            "damage_reduction": "engine:number"
+                        }.items():
+                        self.external_variables.update({
+                            f"{var_name}.{k}": [f"property of Armor"]
+                        })
+                        self.populate_variables(f"{var_name}.{k}", v)
+                    for k, v in {
+                            "range": "engine:number",
+                            "ammo_type": "engine:text"
+                        }.items():
+                        self.external_variables.update({
+                            f"{var_name}.{k}": [f"property of Weapon"]
+                        })
+                        self.populate_variables(f"{var_name}.{k}", v)
+                case "engine:combat":
+                    for k, v in {
+                            "enemies": "engine:list",
+                            "players": "engine:list",
+                            "current_turn": "engine:number",
+                            "turn": "engine:entity",
+                            "last_trigger": "engine:text",
+                            "old_trigger": "engine:text",
+                            "turn_order": "engine:list",
+                            "complete": "engine.boolean",
+                            "respawn_point": "engine:location",
+                            "location": "engine:location"
+                        }.items():
+                        self.external_variables.update({
+                            f"{var_name}.{k}": [f"property of Combat"]
+                        })
                 case _: pass
 
     @classmethod
@@ -322,7 +425,7 @@ class EngineScript:
     _patterns = {
         r"\/\/.*": "ignore",
         r"(?<!\/)\/\*(\*[^/]|[^*])+\*\/": "ignore",
-        r"\#\!.*": "context_hint",
+        "\\#\\![^\n;]*;?": "context_hint",
         r"(\"(\\.|[^\"\\])*\"|\'(\\.|[^\'\\])*\')": "STRING",
         "\\[([^:\\[\n]+:)(([^\n\\/\\]\\[]+\\/)*)([^\n\\[\\]]+)\\]": "FUNCTION",
         r"@[^\:]+\:": "TAG",
@@ -355,53 +458,74 @@ class EngineScript:
                 if re.fullmatch(pattern, self.value):
                     self.type = token_type
                     if token_type == "context_hint":
+                        if not self.es.do_summary: break
                         match self.value:
                             case "#!combat-script":
                                 if "#combat" in self.es.external_variables:
                                     self.es.external_variables["#combat"].append("combat script tag")
                                 else:
                                     self.es.external_variables.update({"#combat": ["combat script tag"]})
+                                    self.es.populate_variables("#combat", "engine:combat")
                             case "#!enter-script":
                                 if "#player" in self.es.external_variables:
                                     self.es.external_variables["#player"].append("enter script tag")
                                 else:
                                     self.es.external_variables.update({"#player": ["enter script tag"]})
+                                    self.es.populate_variables("#player", "engine:player")
                                 if "#room" in self.es.external_variables:
                                     self.es.external_variables["#room"].append("enter script tag")
                                 else:
                                     self.es.external_variables.update({"#room": ["enter script tag"]})
+                                    # self.es.populate_variables("#", "engine:")
                             case "#!input-script":
                                 if "#player" in self.es.external_variables:
                                     self.es.external_variables["#player"].append("input script tag")
                                 else:
                                     self.es.external_variables.update({"#player": ["input script tag"]})
+                                    self.es.populate_variables("#player", "engine:player")
                                 if "#text" in self.es.external_variables:
                                     self.es.external_variables["#text"].append("input script tag")
                                 else:
                                     self.es.external_variables.update({"#tag": ["input script tag"]})
+                                    # self.es.populate_variables("#", "engine:")
                             case "#!exit-script":
                                 if "#player" in self.es.external_variables:
                                     self.es.external_variables["#player"].append("exit script tag")
                                 else:
                                     self.es.external_variables.update({"#player": ["exit script tag"]})
+                                    self.es.populate_variables("#player", "engine:player")
                             case "#!item-use-script":
                                 if "#player" in self.es.external_variables:
                                     self.es.external_variables["#player"].append("item use script")
                                 else:
                                     self.es.external_variables.update({"#player": ["item use script tag"]})
+                                    self.es.populate_variables("#player", "engine:player")
                                 if "#item" in self.es.external_variables:
                                     self.es.external_variables["#item"].append("item use script tag")
                                 else:
                                     self.es.external_variables.update({"#item": ["item use script tag"]})
+                                    self.es.populate_variables("#item", "engine:game_object")
                             case "#!tool-use-script":
                                 if "#player" in self.es.external_variables:
                                     self.es.external_variables["#player"].append("tool use script tag")
                                 else:
                                     self.es.external_variables.update({"#player": ["tool use script tag"]})
+                                    self.es.populate_variables("#player", "engine:player")
                                 if "#tool" in self.es.external_variables:
                                     self.es.external_variables["#tool"].append("tool use script tag")
                                 else:
                                     self.es.external_variables.update({"#tool": ["tool use script tag"]})
+                                    self.es.populate_variables("#tool", "engine:game_object")
+                            case "#!interaction-script":
+                                if "#player" in self.es.external_variables:
+                                    self.es.external_variables["#player"].append("interaction script tag")
+                                else:
+                                    self.es.external_variables.update({"#player": ["interaction script tag"]})
+                                    self.es.populate_variables("#player", "engine:player")
+                            case _:
+                                if m := re.match(r"\#\!type: *(?P<type>[^ ]+) +\- *(?P<var>[^;\n]*);?", self.value):
+                                    d = m.groupdict()
+                                    self.es.populate_local_variables(d["var"], d["type"])
                     break
             
             self.line_start = es.line
@@ -523,24 +647,33 @@ class EngineScript:
                 return obj
 
     def get_summary(self):
-        return "\n".join(self.summary)
+        width = max(*[len(x) for x in self.external_variables.keys()], *[len(x) for x in self.defined_vars.keys()]) + 1
+        pre =  [f"{k: >{width}} │ " + "; ".join(x) for k, x in self.external_variables.items()]
+        pre += [f"{k: >{width}} │ " + "; ".join(x) for k, x in self.defined_vars.items()]
+        return "\n".join(pre + self.summary)
 
     def register_variable(self, var_name, token, ctx=""):
+        if not self.do_summary: return
+        
         if var_name in self.external_variables:
-            self.summary.append(f"Redefinition of external variable {token!s} {ctx}")
+            self.summary.append(f"\033[38;2;200;100;0mRedefinition of external variable {token!s} {ctx}\033[0m")
             self.defined_vars.update({var_name: self.external_variables.pop(var_name)})
         elif var_name in self.defined_vars:
-            self.summary.append(f"Redefinition of local variable {token!s} {ctx}")
+            self.summary.append(f"\033[38;2;200;200;20mRedefinition of local variable {token!s} {ctx}\033[0m")
+            self.defined_vars[var_name].append(f"Redefined in script at {token.get_location()}")
         else:
-            self.summary.append(f"Definition of {token!s} {ctx}")
+            self.summary.append(f"\033[38;2;50;200;50mDefinition of {token!s} {ctx}\033[0m")
+            self.defined_vars.update({var_name: [f"Defined in script at {token.get_location()}"]})
 
     def reference_variable(self, var_name, token, ctx=""):
+        if not self.do_summary: return
+        
         if var_name in self.external_variables:
-            self.summary.append(f"Reference of externally defined variable {token!s} {ctx}")
+            self.summary.append(f"\033[38;2;50;200;50mReference of externally defined variable {token!s} {ctx}\033[0m")
         elif var_name in self.defined_vars:
-            self.summary.append(f"Reference of locally defined variable {token!s} {ctx}")
+            self.summary.append(f"\033[38;2;50;200;50mReference of locally defined variable {token!s} {ctx}\033[0m")
         else:
-            self.summary.append(f"Reference of untracked variable {token!s} {ctx}")
+            self.summary.append(f"\033[38;2;200;20;20mReference of untracked variable {token!s} {ctx}\033[0m")
 
     def parse(self):
 
@@ -1253,10 +1386,17 @@ class EngineScript:
 
                     else:
                         self.reference_variable(var_name, var)
+                        if var_name.startswith("$"):
+                            return {"#call": var_name}
+                        elif var_name.startswith("/$"):
+                            return {"#ref": var_name[1:]}
                         return {"#ref": var_name}
                 else:
                     self.reference_variable(var_name, var)
-
+                    if var_name.startswith("$"):
+                        return {"#call": var_name}
+                    elif var_name.startswith("/$"):
+                        return {"#ref": var_name[1:]}
                     return {"#ref": var_name}
             elif tokens[0] == ("LITERAL", "-"):
                 tokens.pop(0)
@@ -1676,16 +1816,20 @@ class EngineScript:
                     data.update(data_)
 
         for n, v in parameters["args"].items():
-            data.update({n: v})
+            if v is not ...:
+                data.update({n: v})
         for n, vs in parameters["*args"].items():
-            data.update({n: vs})
+            if vs is not ...:
+                data.update({n: vs})
         for n, v in parameters["kwargs"].items():
             if v is not ...:
                 data.update({n: v})
         for n, vs in parameters["**kwargs"].items():
-            data.update({n: vs})
+            if vs is not ...:
+                data.update({n: vs})
         for n, s in parameters["scope"].items():
-            data.update({scope_name: s})
+            if s is not ...:
+                data.update({scope_name: s})
 
         return data
 
@@ -2004,7 +2148,7 @@ if __name__ == "__main__":
                     EngineScript.load()
                     EngineScript.preCompileAll()
                     break
-                engine_script = EngineScript(x)
+                engine_script = EngineScript(x, True)
                 # engine_script.compile()
 
                 print(json.dumps(engine_script.getScript(), indent=4, default=str))

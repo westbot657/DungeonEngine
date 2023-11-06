@@ -11,7 +11,7 @@
 		},
 		{
 			"name": "context_hint.dungeon_script",
-			"match": "\\#\\!.*"
+			"match": "\\#\\![^\n;]*;?"
 		},
 		{
 			"include": "#strings"

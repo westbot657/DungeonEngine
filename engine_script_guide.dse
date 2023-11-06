@@ -49,7 +49,7 @@
     // note: there are certain globals that will be pre-defined depending on the context of a script
     <#global1> = "they're just like normal variables"
     
-    <#player> // this is a pre-defined variable, used in almost every script if not all of them.
+    <#player> // this is a pre-defined variable, used in almost every script.
     // This is how you reference the player, for instance, in a script that runs when the player gives input, or enters or exits a room
     <#player.name> // more complex variables (classes, basically) have attributes
 
@@ -148,18 +148,18 @@
 
 
 
-    [engine:time/wait]()
-    [engine:text/format]()
-    [engine:text/length]() // and [engine:list/length], etc...
-    [engine:text/join]()
-    [engine:combat/message]()
+    [engine:time/wait](1)
+    [engine:text/format]("")
+    [engine:text/length]("") // and [engine:list/length], etc...
+    [engine:text/join]("")
+    [engine:combat/message]("")
     [engine:player/get_input]()
     // can be written as:
-    wait()
-    format()
-    length()
-    join()
-    combat.output()
+    wait(1)
+    format("")
+    length("")
+    join("")
+    combat.output("")
     input()
 
 

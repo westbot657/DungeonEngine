@@ -1,3 +1,4 @@
+#!interaction-script
 
 if (<.closed>) {
     if (<.closed_message>) {

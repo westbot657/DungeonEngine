@@ -1,7 +1,11 @@
+#!interaction-script
 
 if ((not <.picked_up>)) { // once inventory has a space limit, add check for it here
 
     <obj> = [engine:player/give_game_object](<.loot>)
+    #!type: engine:game_object - obj;
+    // this tells the compiler that 'obj' is of type game_object,
+    // telling it that <obj.name> is not unknown
     <.picked_up> = true
 
     output(

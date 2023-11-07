@@ -2454,10 +2454,10 @@ class Engine_Dict_Access(LoaderFunction):
 
     @staticmethod
     def access(function_memory:FunctionMemory, **kwargs):
-        dct: dict = kwargs["dict"]
+        dct: dict|list = kwargs["dict"]
         path: list[str] = kwargs["keys"]
 
-        p = dct
+        p = dct.copy()
         while path:
             try:
                 p = p[path.pop(0)]
@@ -2544,18 +2544,24 @@ class Engine_List_Subset(LoaderFunction):
     id = Identifier("engine", "list/", "subset")
 
     script_flags = {
-        "required_args": 0,
-        "optional_args": 0,
-        "args": {}
+        "required_args": 2,
+        "optional_args": 1,
+        "args": {
+            "list": "rp",
+            "start": "rp",
+            "end": "op"
+        }
     }
     
     @classmethod
     def check(cls, function_memory:FunctionMemory, args:dict):
-        match args:
-            case _: return None
+        if "list" in args and "start" in args: return cls.subset
     @staticmethod
-    def _(function_memory:FunctionMemory, ):
-        return
+    def subset(function_memory:FunctionMemory, **kwargs):
+        lst: list = kwargs["list"]
+        start: int = int(kwargs["start"])
+        end: int = int(kwargs["end"])
+        return lst[start:end]
     
 class Engine_List_Pop(LoaderFunction):
     id = Identifier("engine", "list/", "pop")

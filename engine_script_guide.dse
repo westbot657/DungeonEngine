@@ -4,215 +4,86 @@
 
 
 
-// macro assignment
-// note: macros are evaluated at compile time, and should NOT be used as variables.
+// keywords:
+for ... in ... {} // only used to iterate through lists or dicts (for now at least)
+while (...) {} // a normal while loop
+if (...) {}
+elif (...) {}
+else {}
+return ... // used to return early from your script or a function, can optionally have an expression after to be returned
+break // breaks from a for/while loop, ending iteration early
+pass // does nothing
 
-// good ways to assign a macro:
-{
-    $macro1 = "Long piece of text that will be used in multiple places, and storing it as a macro is more efficient than a variable, which has to be evaluated during runtime"
+// constant values:
+true
+false
+none
 
-    pass // pass is ignored by the compiler, but exists anyways
+// math operators:
++  // add
+-  // subtract
+*  // multiply
+/  // divide
+** // exponent
 
-    // macro1 is accessed elsewhere within this scope, but never re-assigned
+// comparison operators:
+>  // greater than
+>= // greater or equal
+== // equal to
+<  // less than
+<= // less or equal
+!= // not equal
+not
+or
+and
 
+
+// variable syntax:
+
+/// defining a variable:
+<num> = 5
+
+/// defining a list:
+<list> = %[
+    "0",
+    "1",
+    "2"
+]
+/// accessing a list:
+<i> = <list>[0]
+
+<sub_list> = subset(<list>, 1, 2) // returns %["1", "2"]
+
+/// defining a dict:
+<dict> = %{
+    "key": "value",
+    "key2": "value2"
 }
-
-// bad ways to assign a macro:
-{
-    if (<x> == <y>) {
-        $macro1 = "some piece of text"
-        // A
-    } else {
-        $macro1 = "some other piece of text"
-    }
-
-    pass
-
-    // macro1 is accessed later, however it will always have the value: "some other piece of text"
-    // however, if macro1 is accessed at "A", it will have the value: "some piece of text"
-}
-
-// functions:
-{
-    [engine:player/message]("some message to send to the player") // 
-}
+/// accessing a dict:
+<i> = <dict>["key2"]
 
 
-// variable assignment and reference:
+// different kinds of variables:
 
-{
-    // normal variables:
-    <my_variable> = "some string"
-    <var2> = 2
+<local_variable>
+<#global_variable>
+<%global/constant> // this variable can not be re-assigned
+<$function_variable> // this calls the function named 'function_variable' (if it exists)
+</$funtion_code_variable> // this references the compiled code of 'function_variable' (if it exists)
 
-    // global variables:
-    // note: there are certain globals that will be pre-defined depending on the context of a script
-    <#global1> = "they're just like normal variables"
-    
-    <#player> // this is a pre-defined variable, used in almost every script.
-    // This is how you reference the player, for instance, in a script that runs when the player gives input, or enters or exits a room
-    <#player.name> // more complex variables (classes, basically) have attributes
+<local_variable.attribute> // some variables can have attributes (more complex vars like player or combat)
+<local_variable.attribute?> // optional var. If local_variable doesn't have the attribute 'attribute', it returns none
 
-    // constants:
-    <%text/pattern/yes> // this stores a regular expression, used to check for some form of "yes" in text
-    // constants cannot be assigned to
-
-    // functions:
-    <$some_function> = { // note: functions, once defined, can be called from any script
-        [engine:player/message](<#msg>) // note that <#msg> has never been defined, it is intended to be defined before this function is called, as parameters cannot be passed to script-defined functions
-
-    }
-
-
-    <#msg> = "some text to send to the player"
-    <$some_function> // this calls the function, even though it looks like it simply references it
-    </$some_function> // use this to reference the function's code, rather than calling the function
-    
-}
-
-
-// if statements:
-{
-    if (<x> == 5) {
-        // valid comparisons are:
-        // < : less than
-        // > : greater than
-        // <= : less or equal to
-        // >= : greater or equal to
-        // == : equal to
-        // != : not equal to
-        // and
-        // or
-        // not
-        pass
-    } elif (<x> > 5) {
-        pass
-    } else {
-        pass 
-    }
-}
-
-// functions:
-{
-
-    // function call with no parameters:
-    [engine:control/break]
-    // or
-    [engine:control/break]()
-
-    // function call with parameters:
-    [engine:player/message]("Hello!")
-
-    // function call with code scope:
-    [engine:list/for_each](<some_list>, "element") {
-        [engine:player/message](<element>)
-    }
-
-    // function call with tags
-    [engine:text/match](<some_text>)
-    @pattern: "some *regex" # {
-        pass
-    }
-    @pattern: "something else" # {
-        pass
-    }
-    @pattern: [engine:text/join]("a", "b", "c", seperator=", ") # { // the "#" is used to avoid ambiguity on whether the following scope is part of [engine:text/join], or the tag's scope
-        pass
-    }
-    @pattern: "..." # {
-        pass
-    }
-
-}
-
-
-// shorthand expressions:
-{
-    [engine:player/message]("...")
-    // can be re-written as:
-    output("...")
-
-
-    [engine:list/for_each](<list>, "element") {}
-    // can also be written as:
-    for <element> in <list> {}
-
-
-    [engine:dict/for_each](<dict>, "key", "value") {}
-    // ->
-    for <key>, <value> in <dict> {}
-
-
-    while (true) {}
+<local.attr1.attr2?.attr3>
+// attr2 is marked as optional,
+// if local or local.attr1 is not defined, an error will occur,
+// if attr2 or any sub-attribute after it is undefined, `none` will be returned
 
 
 
 
-    [engine:time/wait](1)
-    [engine:text/format]("")
-    [engine:text/length]("") // and [engine:list/length], etc...
-    [engine:text/join]("")
-    [engine:combat/message]("")
-    [engine:player/get_input]()
-    // can be written as:
-    wait(1)
-    format("")
-    length("")
-    join("")
-    combat.output("")
-    input()
-
-
-    [engine:dict/access](<dict>, "key1")
-    // ->
-    <dict>["key1"]
 
 
 
-}
-
-
-
-// macro functions:
-
-// definition:
-$macro2($arg1, $arg2) {
-    <x> = $arg1 - $arg2
-    <y> = $arg2 ** $arg1
-    output(<x>..<y>::", ") // join syntax: str1..str2..strN::seperator
-}
-
-// call:
-$macro2(5, (4 * 6) + 7)
-// basically compiles to:
-<x> = 5 - ((4 * 6) + 7)
-<y> = ((4 * 6) + 7) ** 5
-output(<x>..<y>::", ")
-
-// context hints:
-#!this is technically a context hint (though not a useful one)
-
-#! and this also works as a comment; // but you should really just use these
-
-// existing hints:
-#!enter-script
-#!input-script
-#!exit-script
-#!interaction-script
-#!item-use-script
-#!tool-use-script
-#!combat-script
-
-// and this special hint:
-// #!type: data type - variable name
-// ie:
-#!type: engine:player - my_player_variable;
-
-// hints can optionally end with ';' to be inserted mid-expression:
-for <player> #!type: engine:player - player; in <%players> {
-    // note that this space here  ^  is necessary, but no other spaces in this hint are needed
-    // (the space determines the end of the data type)
-    // the hint does not need to be immediately next to an untracked variable, it can be anywhere in the code
-}
 
 

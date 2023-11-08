@@ -4587,8 +4587,10 @@ class GameObjectEditor(UIElement): # this may need to be split into dedicated ed
 
 # class RoomEditor(UIElement): # Visual
 
-# class DungeonEditor(UIElement): # Visual
-
+class DungeonEditor(UIElement): # Visual
+    def __init__(self, dungeon):
+        self.dungeon = dungeon
+        self.rooms = []
 # class BlockCodeEditor(UIElement): # Visual # save this for last, it's a whole project on it's own
 
 

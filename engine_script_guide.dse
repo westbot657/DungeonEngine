@@ -69,7 +69,7 @@ and
 <#global_variable>
 <%global/constant> // this variable can not be re-assigned
 <$function_variable> // this calls the function named 'function_variable' (if it exists)
-</$funtion_code_variable> // this references the compiled code of 'function_variable' (if it exists)
+</$funtion_variable> // this references the compiled code of 'function_variable' (if it exists)
 
 <local_variable.attribute> // some variables can have attributes (more complex vars like player or combat)
 <local_variable.attribute?> // optional var. If local_variable doesn't have the attribute 'attribute', it returns none

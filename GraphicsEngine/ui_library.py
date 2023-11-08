@@ -19,11 +19,15 @@ from mergedeep import merge
 from ctypes import windll, WINFUNCTYPE, POINTER
 from ctypes.wintypes import BOOL, HWND, RECT
 
-import warnings
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=DeprecationWarning)
-    import imp
+# import pkgutil
+# import warnings
+# with warnings.catch_warnings():
+#     warnings.filterwarnings("ignore", category=DeprecationWarning)
+#     import imp
+import importlib
+from importlib.machinery import SourceFileLoader
 from pypresence import Presence
+
 
 from win32api import GetMonitorInfo, MonitorFromPoint
 from pygame._sdl2.video import Window
@@ -4280,7 +4284,7 @@ class GameApp(UIElement):
         RPCD["state"] = random.choice([
             "Playing strategicaly (maybe? idk lmao)",
             "Having Fun! (hopefully)",
-            "¯\_(ツ)_/¯",
+            "¯\\_(ツ)_/¯",
             "<Insert goofy message here>"
         ])
         self.set_page("inv")
@@ -5496,7 +5500,7 @@ if __name__ == "__main__":
         from Engine import Engine
     except:
         sys.path.append("./Engine")
-        _Engine = imp.load_source("Engine", "Engine/Engine.py")
+        _Engine = SourceFileLoader("Engine", "./Engine/Engine.py").load_module()
         Engine = _Engine.Engine
 
     io_hook = IOHook()

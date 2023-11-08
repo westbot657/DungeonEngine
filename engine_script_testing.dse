@@ -1,0 +1,8 @@
+
+$macro1($a, $b, $c) {
+    $a = $b + $c // assign variable at $a?
+}
+
+$macro1(<x>, 2, 4)
+
+$macro1(<y>, 4, 5)

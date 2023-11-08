@@ -600,9 +600,10 @@ class EngineScript:
             return f"Line {self.line_start+1}, Column {self.col_start+1}"
 
     class Macro:
-        __slots__ = ["name"]
-        def __init__(self, name):
+        __slots__ = ["name", "token"]
+        def __init__(self, name, token=None):
             self.name = name
+            self.token = token
 
     class MacroFunction:
         __slots__ = [
@@ -626,10 +627,10 @@ class EngineScript:
             for k, v in zip(self.args, arg_values):
                 macros.update({k: v})
                 
-            return self.deep_replace(self.code, macros)
+            return self.deep_replace(self.code, macros, macro_token)
 
 
-        def deep_replace(self, obj:Any, repls:dict):
+        def deep_replace(self, obj:Any, repls:dict, macro_call_token):
             if isinstance(obj, EngineScript.Macro):
                 if obj.name in repls:
                     return repls[obj.name]
@@ -639,10 +640,18 @@ class EngineScript:
             elif isinstance(obj, dict):
                 out = {}
                 for k, v in obj.items():
-                    out.update({k: self.deep_replace(v, repls)})
+                    if isinstance(k, EngineScript.Macro):
+                        if k.name in repls:
+                            r = repls[k.name]
+                            if isinstance(r, dict) and ((v2 := r.get("#ref", None)) is not None):
+                                out.update({v2: self.deep_replace(v, repls, macro_call_token)})
+                            else:
+                                raise FinalScriptError(f"Macro at {k.token.get_location()} does not describe a variable, so cannot be assigned a value. Called at {macro_call_token.get_location()}")
+                    else:
+                        out.update({k: self.deep_replace(v, repls, macro_call_token)})
                 return out
             elif isinstance(obj, list):
-                return [self.deep_replace(v, repls) for v in obj]
+                return [self.deep_replace(v, repls, macro_call_token) for v in obj]
             else:
                 return obj
 
@@ -2089,16 +2098,21 @@ class EngineScript:
                 elif tokens[0] == ("LITERAL", "="): # assign
                     tokens.pop(0)
                     if ignore_macro:
-                        raise FinalScriptError(f"Cannot define a macro within a macro function! at {macro.get_location()}")
+                        e = self.expression(tokens, True)
+                        return {
+                            "#store": {
+                                EngineScript.Macro(macro_name, macro): e
+                            }
+                        }
+                        
                     
                     e = self.expression(tokens)
-                    
                     self.macros.update({macro_name: e})
                     return None
                     
                 else: # ref
                     if ignore_macro:
-                        return EngineScript.Macro(macro_name)
+                        return EngineScript.Macro(macro_name, macro)
                     if macro_name in self.macros:
                         return self.macros[macro_name]
                     raise FinalScriptError(f"Undefined macro '{macro_name}' at {macro.get_location()}")

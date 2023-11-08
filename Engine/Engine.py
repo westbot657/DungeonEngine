@@ -416,7 +416,7 @@ class Engine:
                             except EngineError as e:
                                 Log["ERROR"]["engine"](e)
                         else:
-                            Log["WARNING"]["engine"](f"\combat returned non-engine operation??")
+                            Log["WARNING"]["engine"](f"combat returned non-engine operation??")
                 except StopIteration:
                     self.combats.remove(combat)
 

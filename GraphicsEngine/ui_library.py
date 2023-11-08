@@ -5500,7 +5500,7 @@ if __name__ == "__main__":
         from Engine import Engine
     except:
         sys.path.append("./Engine")
-        _Engine = SourceFileLoader("Engine", "./Engine/Engine.py").load_module()
+        _Engine = SourceFileLoader("Engine", "./Engine/Engine.py").load_module() # pylint: disable=no-value-for-parameter
         Engine = _Engine.Engine
 
     io_hook = IOHook()

@@ -3,11 +3,14 @@
 # ConsoleRunner.py: Comment out `os.system('')`
 # Logger.py: Line 70: set to `print(out)`
 py -3.10 -O -m PyInstaller "Insert Dungeon Name Here vs.spec"
+py -3.12 -O -m PyInstaller "Insert Dungeon Name Here vs.spec"
 
 # ConsoleRunner.py: Uncomment `os.system('')`
 # Logger.py: Line 70: set to `print(out)`
 py -3.10 -O -m PyInstaller "Insert Dungeon Name Here cmd.spec"
+py -3.12 -O -m PyInstaller "Insert Dungeon Name Here cmd.spec"
 
 # ConsoleRunner.py: Comment out `os.system('')`
 # Logger.py: Line 70: set to `print(out.encode())`
 py -3.10 -O -m PyInstaller "Insert Dungeon Name Here external.spec"
+py -3.12 -O -m PyInstaller "Insert Dungeon Name Here external.spec"

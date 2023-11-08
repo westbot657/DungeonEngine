@@ -67,7 +67,7 @@ class _Log:
         if self.engine:
             self.engine.sendOutput("log", out)
         else:
-            print(out.encode()) # NOTE: print(out) for CMD version. print(out.encode()) for discord version
+            print(out)#.encode()) # NOTE: print(out) for CMD version. print(out.encode()) for discord version
         
         if self._file:
             self._file.write(re.sub("\033\\[(?:\\d+;?)*m", "", f"{out}\n"))

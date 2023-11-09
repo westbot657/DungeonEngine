@@ -1,0 +1,16 @@
+{
+    "map": [
+        {
+            "room": "emberhollow:rooms/docks/roads/road_4",
+            "shape": "polygon",
+            "points": [
+                [771, 810],
+                [782, 804],
+                [808, 899],
+                [837, 892],
+                [843, 903],
+                [797, 914]
+            ]
+        }
+    ]
+}

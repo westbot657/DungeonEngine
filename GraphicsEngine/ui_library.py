@@ -2125,6 +2125,8 @@ class Poly3D(UIElement):
                     surface = pygame.Surface((width, height), pygame.SRCALPHA, 32)
 
                     pygame.draw.polygon(surface,self.mod_color(v1, v2, v3), [(x1-minX, y1-minY), (x2-minX, y2-minY), (x3-minX, y3-minY)])
+                    
+                    # surface = pygame.transform.scale(surface, [2+surface.get_width(), 2+surface.get_height()])
                     # print(f"SURFACE: at {minX}, {minY} ({width}x{height})")
                     self.surfaces.append(((v1[2] + v2[2] + v3[2])/3, surface, minX, minY))
 
@@ -4781,18 +4783,18 @@ class GameApp(UIElement):
                 if max(v[0] for v in poly3d.vertices) >= 800:
                     poly3d.data["move"] = "left"
 
-        img = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\redstone_lamp.png")
-        img2 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\redstone_lamp_on.png")
-        img3 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\piston_side_sticky.png")
-        img4 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\comparator.png")
-        img5 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\observer_top.png")
-        img6 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\hopper_inside_side.png")
+        # img = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\redstone_lamp.png")
+        # img2 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\redstone_lamp_on.png")
+        # img3 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\piston_side_sticky.png")
+        # img4 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\comparator.png")
+        # img5 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\observer_top.png")
+        # img6 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\hopper_inside_side.png")
 
         self.children += [
             Poly3D.cube(
                 position=(0, 0, 200),
                 size=50,
-                color=[0, 0, 0],
+                color=[0, 0, 200],
                 rotations=[(0, 40, 0), (35, 0, 0)],
                 controllers=[rotater],#, color_shifter],
                 data={
@@ -4801,14 +4803,14 @@ class GameApp(UIElement):
                     # "b_shift": "up",
                     "origin": [0, 0, 200]
                 },
-                texture_mapping = Poly3D.cube_map(None, img, img2, img3, img4, img5, img6)
+                # texture_mapping = Poly3D.cube_map(None, img, img2, img3, img4, img5, img6)
             ),
             Poly3D.cylinder(
                 position=(-200, 0, 200),
                 radius=50,
                 length=100,
                 color=[0, 200, 0],
-                subdivisions=30,
+                subdivisions=20,
                 rotations=[(35, 0, 0)],
                 controllers=[rotater],
                 data={

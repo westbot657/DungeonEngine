@@ -7,10 +7,12 @@ from typing import Any
 # from pydub import AudioSegment
 # from pydub.playback import play
 import simpleaudio as sa
-import warnings
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=DeprecationWarning)
-    import imp
+# import warnings
+# with warnings.catch_warnings():
+#     warnings.filterwarnings("ignore", category=DeprecationWarning)
+#     import imp
+import importlib
+from importlib.machinery import SourceFileLoader
 # import glob
 
 # if getattr(sys, 'frozen', False):
@@ -55,7 +57,7 @@ os.system('') # this fixes console ansi colors for some reason # NOTE: comment o
 #             file.write(t)
 
 try:
-    _IOHook = imp.load_source("IOHook", "./IOHook.py")
+    _IOHook = SourceFileLoader("IOHook", "./IOHook.py").load_module() # pylint: disable=no-value-for-parameter
     IOHook = _IOHook.IOHook
 
 except ImportError as e:

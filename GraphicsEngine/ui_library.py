@@ -2043,6 +2043,45 @@ class Poly3D(UIElement):
         
         return cls(vertices, invert_tris(tris), color, controllers, data, texture_mapping)
 
+    @classmethod
+    def extrude_polygon(cls, polygon:Polygon, height:int, rotations=None, controllers:list=None, data:dict=None, texture_mapping:list=None):
+        vertices = []
+        tris = []
+        
+        points = [(p.x, p.y) for p in polygon.mesh.copy()]
+        
+        mx = sum(p[0] for p in points) / len(points)
+        my = sum(p[1] for p in points) / len(points)
+        
+        # slice list to put furthest point from middle at beginning of list
+        furthest = (0, 0) # (distance, index)
+        i = 0
+        for p in points:
+            d = math.sqrt(((p[0]-mx) ** 2) + ((p[1]-my) ** 2))
+            if d > furthest[0]:
+                furthest = (d, i)
+            i += 1
+        
+        pre = points[0:furthest[1]]
+        points = points[len(pre):] + pre
+        
+        
+        
+        h = height/2
+        direction = "cc"
+        fully_defined = []
+        
+        op = 0
+        mp = 1
+        ep = 2
+        
+        while True:
+            p1 = points[op]
+            p2 = points[mp]
+            p3 = points[ep]
+        
+        
+
     def __init__(self, vertices, tris, color, controllers:list=None, data:dict=None, texture_mapping:list=None):
         """
         texture mapping:
@@ -2092,6 +2131,21 @@ class Poly3D(UIElement):
 
         return x, y
 
+    def check_rotation(self, p1, p2, p3, mp="center"):
+        x1, y1 = p1
+        x2, y2 = p2
+        x3, y3 = p3
+        if mp == "center":
+            mx = (x1 + x2 + x3) / 3
+            my = (y1 + y2 + y3) / 3
+        else:
+            mx, my = mp
+        
+        r1 = math.degrees(math.atan2(y1 - my, x1 - mx))
+        r2 = math.degrees(math.atan2(y2 - my, x2 - mx))
+        r3 = math.degrees(math.atan2(y3 - my, x3 - mx))
+        
+        return "c" if (r1 > r2 > r3 or r2 > r3 > r1 or r3 > r1 > r2 ) else "cc"
 
     def calc_render(self):
         if self.color:
@@ -4743,7 +4797,7 @@ class GameApp(UIElement):
         # ))
 
         def rotater(poly3d):
-            poly3d.vertices = [rotate3D(poly3d.data["origin"], v, [(-35, 0, 0), (0, -40, 0), (0, 0.2, 0), (0, 40, 0), (35, 0, 0)]) for v in poly3d.vertices]
+            poly3d.vertices = [rotate3D(poly3d.data["origin"], v, poly3d.data["rotations"]) for v in poly3d.vertices]
 
         def color_shifter(poly3d):
             if poly3d.data["r_shift"] == "up":
@@ -4795,13 +4849,14 @@ class GameApp(UIElement):
                 position=(0, 0, 200),
                 size=50,
                 color=[0, 0, 200],
-                rotations=[(0, 40, 0), (35, 0, 0)],
+                rotations=[(10, 0, 0)],
                 controllers=[rotater],#, color_shifter],
                 data={
                     # "r_shift": "none",
                     # "g_shift": "down",
                     # "b_shift": "up",
-                    "origin": [0, 0, 200]
+                    "origin": [0, 0, 200],
+                    "rotations": [(0, 0.2, 0)]
                 },
                 # texture_mapping = Poly3D.cube_map(None, img, img2, img3, img4, img5, img6)
             ),
@@ -4814,7 +4869,8 @@ class GameApp(UIElement):
                 rotations=[(35, 0, 0)],
                 controllers=[rotater],
                 data={
-                    "origin": [-200, 0, 200]
+                    "origin": [-200, 0, 200],
+                    "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
                 }
             ),
             Poly3D.sphere(
@@ -4825,7 +4881,8 @@ class GameApp(UIElement):
                 rotations=[(90, 0, 0)],
                 controllers=[rotater],
                 data={
-                    "origin": [0, -100, 200]
+                    "origin": [0, -100, 200],
+                    "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
                 }
             )
             # Poly3D.cube(

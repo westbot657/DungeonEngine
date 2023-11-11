@@ -2228,6 +2228,7 @@ class Poly3D(UIElement):
         self.data = data or {}
         self.texture_mapping = texture_mapping or []
 
+
     def mod_color(self, v1, v2, v3, color=None) -> tuple:
         color = color or self.color
         x0, y0, z0 = v1
@@ -2245,9 +2246,28 @@ class Poly3D(UIElement):
 
         # print(normal)
 
-        pre = ((normal[0]+self.light_angle[0]) + (normal[1]+self.light_angle[1]) + (normal[1]+self.light_angle[2]))
-        #print(pre)
-        lighting_diff = abs(pre/3) #if pre != 0 else 0
+        dot = ((normal[0]*self.light_angle[0]) + (normal[1]*self.light_angle[1]) + (normal[2]*self.light_angle[2]))
+        mag1 = math.sqrt(normal[0]**2 + normal[1]**2 + normal[2]**2)
+        mag2 = math.sqrt(self.light_angle[0]**2 + self.light_angle[1]**2 + self.light_angle[2]**2)
+
+        d = mag1*mag2
+
+        try:
+            if d != 0:
+
+                diff = dot/d
+
+                angle = math.degrees(math.acos(diff))
+            else:
+                print("LIGTHING ERROR: d == 0!!")
+        except Exception as e:
+            print(f"{d=}, {dot=}, {mag1=}, {mag2=}, {normal=}, {dot/d=}, {diff=}")
+            raise
+
+        lighting_diff = (angle/180)
+
+        # print(pre)
+        # lighting_diff = abs(pre/3) #if pre != 0 else 0
         # lighting_diff = max(abs(normal[0]-self.light_angle[0]), abs(normal[1]-self.light_angle[0]), abs(normal[1]-self.light_angle[0]))
 
         # print(lighting_diff)

@@ -37,7 +37,7 @@ from pypresence import Presence
 
 
 from win32api import GetMonitorInfo, MonitorFromPoint
-from pygame._sdl2.video import Window
+from pygame._sdl2.video import Window, Texture
 
 
 client_id = "1149136139341541446"
@@ -244,6 +244,8 @@ def quad_to_tris(quad):
 def invert_tris(tris):
     return [(t[2], t[1], t[0]) for t in tris]
 
+def angle_between(p1, p2):
+    return math.degrees(math.atan2(p2[1] - p1[1], p2[0] - p1[0]))
 
 def warp(surf: pygame.Surface,
          warp_pts,
@@ -278,16 +280,15 @@ def warp(surf: pygame.Surface,
 
     # find the bounding box of warp points
     # (this gives the size and position of the final output surface).
-    min_x, max_x = float('inf'), -float('inf')
-    min_y, max_y = float('inf'), -float('inf')
-    for p in quad:
-        min_x, max_x = min(min_x, p[0]), max(max_x, p[0])
-        min_y, max_y = min(min_y, p[1]), max(max_y, p[1])
+    min_x = min(p[0] for p in quad)
+    max_x = max(p[0] for p in quad)
+    min_y = min(p[1] for p in quad)
+    max_y = max(p[1] for p in quad)
     warp_bounding_box = pygame.Rect(float(min_x), float(min_y),
-                                    float(max_x - min_x),
-                                    float(max_y - min_y))
+                                    float(max_x - min_x + 10),
+                                    float(max_y - min_y + 10))
 
-    shifted_quad = [(p[0] - min_x, p[1] - min_y) for p in quad]
+    shifted_quad = [(p[0] - min_x + 5, p[1] - min_y + 5) for p in quad]
     dst_corners = numpy.float32(shifted_quad)
 
     mat = cv2.getPerspectiveTransform(src_corners, dst_corners)
@@ -311,9 +312,14 @@ def warp(surf: pygame.Surface,
     else:
         out.set_colorkey(surf.get_colorkey())
 
+    pixel_rect = out.get_bounding_rect()
+    # print(pixel_rect)
+    # # trimmed_surface = pygame.Surface(pixel_rect.size, pygame.SRCALPHA, 32)
+    # # trimmed_surface.blit(out, (0, 0), pixel_rect)
+    # out = pygame.transform.chop(out, pixel_rect)
+
     # XXX swap x and y once again...
-    return out, pygame.Rect(warp_bounding_box.y, warp_bounding_box.x,
-                            warp_bounding_box.h, warp_bounding_box.w)
+    return out, pixel_rect #pygame.Rect(warp_bounding_box.y, warp_bounding_box.x, warp_bounding_box.h, warp_bounding_box.w)
 
 
 class UIElement:
@@ -1884,7 +1890,6 @@ class Polygon(UIElement):
                 #     if self.point_displays:
                 #         self.point_displays.clear()
                 #         continue
-                    
                 elif key == "$→":
                     if pygame.K_LALT in editor.keys: # rotate
                         degrees = 45 if pygame.K_LSHIFT in editor.keys else 1 if pygame.K_LCTRL in editor.keys else 10
@@ -2044,7 +2049,7 @@ class Poly3D(UIElement):
         return cls(vertices, invert_tris(tris), color, controllers, data, texture_mapping)
 
     @classmethod
-    def extrude_polygon(cls, polygon:Polygon, height:int, rotations=None, controllers:list=None, data:dict=None, texture_mapping:list=None):
+    def extrude_polygon(cls, position, polygon:Polygon, height:int, color, rotations=None, controllers:list=None, data:dict=None, texture_mapping:list=None):
         vertices = []
         tris = []
         
@@ -2054,33 +2059,161 @@ class Poly3D(UIElement):
         my = sum(p[1] for p in points) / len(points)
         
         # slice list to put furthest point from middle at beginning of list
-        furthest = (0, 0) # (distance, index)
-        i = 0
+        # furthest = (0, 0) # (distance, index)
+        # i = 0
+        # for p in points:
+        #     d = math.sqrt(((p[0]-mx) ** 2) + ((p[1]-my) ** 2))
+        #     if d > furthest[0]:
+        #         furthest = (d, i)
+        #     i += 1
+        
+        # pre = points[0:furthest[1]]
+        # points = points[len(pre):] + pre
+        h = height/2
+        
+        # iterate points for extrusion
+        i = -1
         for p in points:
-            d = math.sqrt(((p[0]-mx) ** 2) + ((p[1]-my) ** 2))
-            if d > furthest[0]:
-                furthest = (d, i)
+            prev = points[i]
+
+            v1 = (p[0], -h, p[1])
+            v2 = (p[0], h, p[1])
+            v3 = (prev[0], -h, prev[1])
+            v4 = (prev[0], h, prev[1])
+
+            if v1 in vertices:
+                v1i = vertices.index(v1)
+            else:
+                vertices.append(v1)
+                v1i = len(vertices)-1
+
+            if v2 in vertices:
+                v2i = vertices.index(v2)
+            else:
+                vertices.append(v2)
+                v2i = len(vertices)-1
+            
+            if v3 in vertices:
+                v3i = vertices.index(v3)
+            else:
+                vertices.append(v3)
+                v3i = len(vertices)-1
+            
+            if v4 in vertices:
+                v4i = vertices.index(v4)
+            else:
+                vertices.append(v4)
+                v4i = len(vertices)-1
+
+            tris += [
+                (v3i, v1i, v2i),
+                (v4i, v3i, v2i)
+            ]
+
             i += 1
         
-        pre = points[0:furthest[1]]
-        points = points[len(pre):] + pre
-        
-        
-        
-        h = height/2
-        direction = "cc"
-        fully_defined = []
+        # generate polygon surface mesh
         
         op = 0
         mp = 1
-        ep = 2
-        
-        while True:
+        ep = len(points)-1
+        fails = 0
+
+        while len(points) >= 3:
             p1 = points[op]
             p2 = points[mp]
             p3 = points[ep]
+
+            r1 = angle_between(p1, p2)
+            r2 = angle_between(p1, p3)
         
-        
+            while r1 < 0: r1 += 360
+            while r1 >= 360: r1 -= 360
+
+            while r2 < 0: r2 += 360
+            while r2 >= 360: r2 -= 360
+
+            # dr = abs(r2-r1)
+
+            pol = Poly((p1, p2, p3))
+            contained = any([pol.contains_properly(Point(*p)) for p in points if p not in [p1, p2, p3]])
+
+            c = (pol.intersection(polygon.poly).area / pol.area) if pol.area else False
+
+            # print(dr, c, points)
+
+            if (not contained) and (c == 1): #and (dr < 180) :
+                v11 = (p1[0], -h, p1[1])
+                v12 = (p1[0], h, p1[1])
+                v21 = (p2[0], -h, p2[1])
+                v22 = (p2[0], h, p2[1])
+                v31 = (p3[0], -h, p3[1])
+                v32 = (p3[0], h, p3[1])
+
+                if v11 in vertices:
+                    v11i = vertices.index(v11)
+                else:
+                    vertices.append(v11)
+                    v11i = len(vertices)-1
+                
+                if v12 in vertices:
+                    v12i = vertices.index(v12)
+                else:
+                    vertices.append(v12)
+                    v12i = len(vertices)-1
+
+                if v21 in vertices:
+                    v21i = vertices.index(v21)
+                else:
+                    vertices.append(v21)
+                    v21i = len(vertices)-1
+
+                if v22 in vertices:
+                    v22i = vertices.index(v22)
+                else:
+                    vertices.append(v22)
+                    v22i = len(vertices)-1
+
+                if v31 in vertices:
+                    v31i = vertices.index(v31)
+                else:
+                    vertices.append(v31)
+                    v31i = len(vertices)-1
+
+                if v32 in vertices:
+                    v32i = vertices.index(v32)
+                else:
+                    vertices.append(v32)
+                    v32i = len(vertices)-1
+                
+                tris += [
+                    (v31i, v21i, v11i),
+                    (v12i, v22i, v32i)
+                ]
+                points.remove(p1)
+                # fails = -op
+                op = 0
+                mp = 1
+                ep = len(points)-1
+            else:
+                op += 1
+                mp += 1
+                ep += 1
+
+                if op >= len(points): op = 0
+                if mp >= len(points): mp = 0
+                if ep >= len(points): ep = 0
+                # fails += 1
+
+                # if fails > len(points):
+                #     break
+
+
+        vertices = [(v[0]+position[0], v[1]+position[1], v[2]+position[2]) for v in vertices]
+        vertices = rotate3DV(position, vertices, rotations or [])
+
+
+        return cls(vertices, tris, color, controllers, data, texture_mapping)
 
     def __init__(self, vertices, tris, color, controllers:list=None, data:dict=None, texture_mapping:list=None):
         """
@@ -2095,7 +2228,8 @@ class Poly3D(UIElement):
         self.data = data or {}
         self.texture_mapping = texture_mapping or []
 
-    def mod_color(self, v1, v2, v3) -> tuple:
+    def mod_color(self, v1, v2, v3, color=None) -> tuple:
+        color = color or self.color
         x0, y0, z0 = v1
         x1, y1, z1 = v2
         x2, y2, z2 = v3
@@ -2118,8 +2252,8 @@ class Poly3D(UIElement):
 
         # print(lighting_diff)
 
-        c = (int(self.color[0] * lighting_diff), int(self.color[1] * lighting_diff), int(self.color[2] * lighting_diff))
-        c = [min(max(0, _c), 255) for _c in c]
+        c = (int(color[0] * lighting_diff), int(color[1] * lighting_diff), int(color[2] * lighting_diff))
+        c = [min(max(0, _c), 255) for _c in c] + ([color[3]] if len(color) == 4 else [])
         # print(c)
         return c
 
@@ -2129,9 +2263,10 @@ class Poly3D(UIElement):
         x = ((px-cx) * (((pz+self.dist)-cz)/(pz+self.dist))) + cx
         y = ((py-cy) * (((pz+self.dist)-cz)/(pz+self.dist))) + cy
 
-        return x, y
+        return int(x), int(y)
 
-    def check_rotation(self, p1, p2, p3, mp="center"):
+    @classmethod
+    def check_rotation(cls, p1, p2, p3, mp="center"):
         x1, y1 = p1
         x2, y2 = p2
         x3, y3 = p3
@@ -2197,6 +2332,8 @@ class Poly3D(UIElement):
                 v3 = self.vertices[quad[2]]
                 v4 = self.vertices[quad[3]]
 
+                color = [0, 0, 0, min(max(0, 255-self.mod_color(v1, v2, v3, [127, 127, 127])[0]), 255)]
+
                 x1, y1 = self.project_point(v1)
                 x2, y2 = self.project_point(v2)
                 x3, y3 = self.project_point(v3)
@@ -2210,9 +2347,15 @@ class Poly3D(UIElement):
                 r3 = math.degrees(math.atan2(y3 - my, x3 - mx))
                 r4 = math.degrees(math.atan2(y4 - my, x4 - mx))
 
-                if (r1 > r2 > r3 > r4 or r2 > r3 > r4 > r1 or r3 > r4 > r1 > r2 or r4 > r1 > r2 > r3) and all(self.cam_position[2] < a for a in [v1[2], v2[2], v3[2], v4[2]]):
-                    out, pos = warp(surface, [(x1, y1), (x2, y2), (x3, y3), (x4, y4)], False)
-                    s2.append(((v1[2] + v2[2] + v3[2] + v4[2])/4, out, min(x1, x2, x3, x4), min(y1, y2, y3, y4)))
+                s = pygame.Surface(surface.get_size(), pygame.SRCALPHA, 32)
+                s.blit(surface, (0, 0))
+                _s = pygame.Surface(surface.get_size(), pygame.SRCALPHA, 32)
+                _s.fill(color)
+                s.blit(_s, (0, 0))
+
+                if (r1 > r2 > r3 > r4 or r2 > r3 > r4 > r1 or r3 > r4 > r1 > r2 or r4 > r1 > r2 > r3) and all(self.cam_position[2] < a for a in [v1[2], v2[2], v3[2], v4[2]]) and Poly(((x1, y1), (x2, y2), (x3, y3), (x4, y4))).area >= 80:
+                    out, pos = warp(s, [(x1, y1), (x2, y2), (x3, y3), (x4, y4)], False)
+                    s2.append(((v1[2] + v2[2] + v3[2] + v4[2])/4, out, int(min(x1, x2, x3, x4))-pos[0], int(min(y1, y2, y3, y4))-pos[1]))
             s2.sort(
                 key=lambda a: a[0]
             )
@@ -4796,95 +4939,142 @@ class GameApp(UIElement):
         #     draggable_points=True
         # ))
 
-        def rotater(poly3d):
-            poly3d.vertices = [rotate3D(poly3d.data["origin"], v, poly3d.data["rotations"]) for v in poly3d.vertices]
+        # def rotater(poly3d):
+        #     poly3d.vertices = [rotate3D(poly3d.data["origin"], v, poly3d.data["rotations"]) for v in poly3d.vertices]
 
-        def color_shifter(poly3d):
-            if poly3d.data["r_shift"] == "up":
-                poly3d.color[0] += 1
-                if poly3d.color[0] >= 255:
-                    poly3d.data["r_shift"] = "down"
-            elif poly3d.data["r_shift"] == "down":
-                poly3d.color[0] -= 1
-                if poly3d.color[0] <= 0:
-                    poly3d.data["r_shift"] = "up"
+        # def color_shifter(poly3d):
+        #     if poly3d.data["r_shift"] == "up":
+        #         poly3d.color[0] += 1
+        #         if poly3d.color[0] >= 255:
+        #             poly3d.data["r_shift"] = "down"
+        #     elif poly3d.data["r_shift"] == "down":
+        #         poly3d.color[0] -= 1
+        #         if poly3d.color[0] <= 0:
+        #             poly3d.data["r_shift"] = "up"
             
-            if poly3d.data["g_shift"] == "up":
-                poly3d.color[1] += 1
-                if poly3d.color[1] >= 255:
-                    poly3d.data["g_shift"] = "down"
-            elif poly3d.data["g_shift"] == "down":
-                poly3d.color[1] -= 1
-                if poly3d.color[1] <= 0:
-                    poly3d.data["g_shift"] = "up"
+        #     if poly3d.data["g_shift"] == "up":
+        #         poly3d.color[1] += 1
+        #         if poly3d.color[1] >= 255:
+        #             poly3d.data["g_shift"] = "down"
+        #     elif poly3d.data["g_shift"] == "down":
+        #         poly3d.color[1] -= 1
+        #         if poly3d.color[1] <= 0:
+        #             poly3d.data["g_shift"] = "up"
             
-            if poly3d.data["b_shift"] == "up":
-                poly3d.color[2] += 1
-                if poly3d.color[2] >= 255:
-                    poly3d.data["b_shift"] = "down"
-            elif poly3d.data["b_shift"] == "down":
-                poly3d.color[2] -= 1
-                if poly3d.color[2] <= 0:
-                    poly3d.data["b_shift"] = "up"
+        #     if poly3d.data["b_shift"] == "up":
+        #         poly3d.color[2] += 1
+        #         if poly3d.color[2] >= 255:
+        #             poly3d.data["b_shift"] = "down"
+        #     elif poly3d.data["b_shift"] == "down":
+        #         poly3d.color[2] -= 1
+        #         if poly3d.color[2] <= 0:
+        #             poly3d.data["b_shift"] = "up"
 
-        def mover(poly3d):
-            if poly3d.data["move"] == "left":
-                poly3d.vertices = [(v[0]-1, *v[1:3]) for v in poly3d.vertices]
-                if min(v[0] for v in poly3d.vertices) <= -800:
-                    poly3d.data["move"] = "right"
-            elif poly3d.data["move"] == "right":
-                poly3d.vertices = [(v[0]+1, *v[1:3]) for v in poly3d.vertices]
-                if max(v[0] for v in poly3d.vertices) >= 800:
-                    poly3d.data["move"] = "left"
+        # def mover(poly3d):
+        #     if poly3d.data["move"] == "left":
+        #         poly3d.vertices = [(v[0]-1, *v[1:3]) for v in poly3d.vertices]
+        #         if min(v[0] for v in poly3d.vertices) <= -800:
+        #             poly3d.data["move"] = "right"
+        #     elif poly3d.data["move"] == "right":
+        #         poly3d.vertices = [(v[0]+1, *v[1:3]) for v in poly3d.vertices]
+        #         if max(v[0] for v in poly3d.vertices) >= 800:
+        #             poly3d.data["move"] = "left"
 
         # img = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\redstone_lamp.png")
         # img2 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\redstone_lamp_on.png")
         # img3 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\piston_side_sticky.png")
-        # img4 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\comparator.png")
+        # img4 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\piston_bottom_sticky.png")
         # img5 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\observer_top.png")
         # img6 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\hopper_inside_side.png")
 
-        self.children += [
-            Poly3D.cube(
-                position=(0, 0, 200),
-                size=50,
-                color=[0, 0, 200],
-                rotations=[(10, 0, 0)],
-                controllers=[rotater],#, color_shifter],
-                data={
-                    # "r_shift": "none",
-                    # "g_shift": "down",
-                    # "b_shift": "up",
-                    "origin": [0, 0, 200],
-                    "rotations": [(0, 0.2, 0)]
-                },
-                # texture_mapping = Poly3D.cube_map(None, img, img2, img3, img4, img5, img6)
-            ),
-            Poly3D.cylinder(
-                position=(-200, 0, 200),
-                radius=50,
-                length=100,
-                color=[0, 200, 0],
-                subdivisions=20,
-                rotations=[(35, 0, 0)],
-                controllers=[rotater],
-                data={
-                    "origin": [-200, 0, 200],
-                    "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
-                }
-            ),
-            Poly3D.sphere(
-                position=(0, -100, 200),
-                radius=50,
-                subdivisions=18,
-                color=[255, 127, 0],
-                rotations=[(90, 0, 0)],
-                controllers=[rotater],
-                data={
-                    "origin": [0, -100, 200],
-                    "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
-                }
-            )
+        # self.children += [
+            # Polygon(
+            #     [
+            #         Point(100, 50),
+            #         Point(50, 35),
+            #         Point(-35, 35),
+            #         Point(-35, 7.5),
+            #         Point(50, 7.5),
+            #         Point(50, -50),
+            #         Point(-50, -50),
+            #         Point(-50, -35),
+            #         Point(35, -35),
+            #         Point(35, -7.5),
+            #         Point(-50, -7.5),
+            #         Point(-50, 50)
+            #     ],
+            #     (0, 200, 20),
+            #     draggable=True,
+            #     draggable_points=True
+            # )
+            # Poly3D.cube(
+            #     position=(0, 0, -600),
+            #     size=6,
+            #     color=[0, 0, 0, 0],
+            #     rotations=[(35, 0, 0)],
+            #     controllers=[rotater],#, color_shifter],
+            #     data={
+            #         # "r_shift": "none",
+            #         # "g_shift": "down",
+            #         # "b_shift": "up",
+            #         "origin": [0, 0, -600],
+            #         "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
+            #     },
+            #     texture_mapping = Poly3D.cube_map(None, img4, *([img3]*4), img)
+            # ),
+            # Poly3D.cylinder(
+            #     position=(-200, 0, 200),
+            #     radius=50,
+            #     length=100,
+            #     color=[0, 200, 0],
+            #     subdivisions=20,
+            #     rotations=[(35, 0, 0)],
+            #     controllers=[rotater],
+            #     data={
+            #         "origin": [-200, 0, 200],
+            #         "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
+            #     }
+            # ),
+            # Poly3D.sphere(
+            #     position=(0, -100, 200),
+            #     radius=50,
+            #     subdivisions=18,
+            #     color=[255, 127, 0],
+            #     rotations=[(90, 0, 0)],
+            #     controllers=[rotater],
+            #     data={
+            #         "origin": [0, -100, 200],
+            #         "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
+            #     }
+            # ),
+            # Poly3D.extrude_polygon(
+            #     (200, 0, 200),
+            #     Polygon(
+            #         [
+            #             Point(50, 50),
+            #             Point(50, 35),
+            #             Point(-35, 35),
+            #             Point(-35, 7.5),
+            #             Point(50, 7.5),
+            #             Point(50, -50),
+            #             Point(-50, -50),
+            #             Point(-50, -35),
+            #             Point(35, -35),
+            #             Point(35, -7.5),
+            #             Point(-50, -7.5),
+            #             Point(-50, 50)
+            #         ],
+            #         (0, 200, 20)
+            #     ),
+            #     20,
+            #     [200, 200, 10],
+            #     [(0, 40, 0), (-35, 0, 0)],
+            #     controllers=[rotater],
+            #     data={
+            #         "origin": [200, 0, 200],
+            #         "rotations": [(1, 1, 0)]
+            #     }
+            # ),
             # Poly3D.cube(
             #     (200, 0, -100),
             #     50,
@@ -4911,7 +5101,7 @@ class GameApp(UIElement):
             #         "origin": [-150, 0, -150]
             #     }
             # ),
-        ]
+        # ]
 
         
 

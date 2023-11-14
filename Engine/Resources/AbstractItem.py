@@ -8,6 +8,7 @@ try:
     from .EngineDummy import Engine
     from .AbstractGameObject import AbstractGameObject
     from .Logger import Log
+    from .Loader import Loader
 except ImportError:
     from Identifier import Identifier
     from Item import Item
@@ -16,6 +17,7 @@ except ImportError:
     from EngineDummy import Engine
     from AbstractGameObject import AbstractGameObject
     from Logger import Log
+    from Loader import Loader
 
 import glob, json, re, random
 from mergedeep import merge
@@ -127,8 +129,7 @@ class AbstractItem(AbstractGameObject):
         for file in files:
             file: str
             Log["loadup"]["abstract"]["item"](f"loading AbstractItem from '{file}'")
-            with open(file, "r+", encoding="utf-8") as f:
-                data = json.load(f)
+            data = Loader.load(file)
             
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})

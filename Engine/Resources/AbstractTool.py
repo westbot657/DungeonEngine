@@ -8,6 +8,7 @@ try:
     from .AbstractGameObject import AbstractGameObject
     from .DynamicValue import DynamicValue
     from .Logger import Log
+    from .Loader import Loader
 except ImportError:
     from Identifier import Identifier
     from Tool import Tool
@@ -16,6 +17,7 @@ except ImportError:
     from AbstractGameObject import AbstractGameObject
     from DynamicValue import DynamicValue
     from Logger import Log
+    from Loader import Loader
 
 import glob, json, random
 
@@ -120,8 +122,7 @@ class AbstractTool(AbstractGameObject):
         for file in files:
             file: str
             Log["loadup"]["abstract"]["tool"](f"loading AbstractTool from '{file}'")
-            with open(file, "r+", encoding="utf-8") as f:
-                data = json.load(f)
+            data = Loader.load(file)
 
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})

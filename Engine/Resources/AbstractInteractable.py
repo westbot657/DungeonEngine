@@ -9,6 +9,7 @@ try:
     from .EngineOperation import _EngineOperation
     from .Logger import Log
     from .Util import Util
+    from .Loader import Loader
 except ImportError:
     from Location import Location
     from Identifier import Identifier
@@ -18,6 +19,7 @@ except ImportError:
     from EngineOperation import _EngineOperation
     from Logger import Log
     from Util import Util
+    from Loader import Loader
 
 from typing import Any
 
@@ -151,8 +153,7 @@ class AbstractInteractable:
         for file in files:
             file: str
             Log["loadup"]["abstract"]["interactable"](f"loading AbstractInteractable from '{file}'")
-            with open(file, "r+", encoding="utf-8") as f:
-                data = json.load(f)
+            data = Loader.load(file)
             
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})

@@ -8,6 +8,7 @@ try:
     from .DynamicValue import DynamicValue
     from .Logger import Log
     from .FunctionMemory import FunctionMemory
+    from .Loader import Loader
 except ImportError:
     from Identifier import Identifier
     from AbstractGameObject import AbstractGameObject
@@ -16,6 +17,7 @@ except ImportError:
     from DynamicValue import DynamicValue
     from Logger import Log
     from FunctionMemory import FunctionMemory
+    from Loader import Loader
 
 import glob, json, random
 
@@ -109,8 +111,7 @@ class AbstractAttack(AbstractGameObject):
         for file in files:
 
             Log["loadup"]["abstract"]["attack"](f"loading AbstractAttack from '{file}'")
-            with open(file, "r+", encoding="utf-8") as f:
-                data = json.load(f)
+            data = Loader.load(file)
 
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})

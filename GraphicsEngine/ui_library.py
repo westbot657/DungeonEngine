@@ -727,18 +727,21 @@ class MultilineText(UIElement):
         return self.content.split("\n")
 
     def _refresh_surfaces(self):
-        self.surfaces.clear()
+        # self.surfaces.clear()
         self._text_width = 0
         self._text_height = 0
+        sl = []
         for line in self.get_lines():
             s = self.font.render(line or " ", True, (0, 0, 0))
             a, b = s.get_size()
             s = pygame.Surface([a+5, b], pygame.SRCALPHA)
             # s.fill(tuple(self.text_bg_color))
-            self.surfaces.append(s)
+            sl.append(s)
             self._text_width = max(self._text_width, s.get_width(), self.min_width)
             self._text_height += s.get_height()
         self._text_height = max(self._text_height, self.min_height)
+        
+        self.surfaces = sl
 
     def set_colored_content(self, text:str):
         self.content = re.sub(r"\033\[(\d+;?)*m", "", text)
@@ -1721,6 +1724,20 @@ class Polygon(UIElement):
                     self.parent_poly.children.remove(self)
                     editor._focused_object = None
 
+    @classmethod
+    def load(cls, data:dict):
+        return cls([Point(a, b) for a, b in data["mesh"]], data["color"], **data["options"])
+
+    def save(self):
+        return {
+            "mesh": [[a.x, a.y] for a in self.mesh],
+            "color": list(self.color),
+            "options": {
+                "draggable_points": self.draggable_points,
+                "draggable": self.draggable,
+            }
+        }
+
     def __init__(self, mesh:list[Point], color:Color|tuple|int=TEXT_COLOR, **options):
         """
         Args:
@@ -1943,8 +1960,6 @@ class Polygon(UIElement):
                         self.mesh += new
                         self.refresh()
 
-# $cmd: Poly3D.light_angle=[0,0,0]
-
 class Poly3D(UIElement):
     FOV = 90 # degrees
     width = 1280
@@ -1953,7 +1968,7 @@ class Poly3D(UIElement):
     # dist = math.sin(math.radians(90-(FOV/2)))*(width/2)
     dist = (math.sin(math.radians(90-(FOV/2))) * (width/2)) / (math.sin(math.radians(FOV/2)))
     cam_position = [0, 0, -dist]
-    light_angle = [1, 1, -6] # x, y, z vector
+    light_angle = [2, 2, 3] # x, y, z vector
 
     # print(f"{dist=}")
 
@@ -3765,6 +3780,47 @@ class Tie(UIElement):
         elif hasattr(self.controller, "height"):
             self.child.height = self.controller.height
 
+class Link(UIElement):
+    """
+    A Better version of the `Tie` class
+    """
+    __slots__ = [
+        "parent", "child",
+        "parent_attr", "parent_method",
+        "child_attr", "child_method",
+        "link_handler"
+    ]
+    def __init__(self, parent, child, *, parent_attr=None, child_attr=None, parent_method=None, child_method=None, link_handler=None):
+        """
+        parent and child can be any object.  
+        
+        parent_attr/child_attr should be an attribute to reference/assign on the parent/child  
+        
+        parent_method (incompatible with parent_attr) is the name of a value getter that takes 1 arg: editor  
+        child_method (incompatible with child_attr) is the name of a value setter that takes 2 args: editor, value  
+        
+        link handler is passed the value from parent_attr/parent_method, and the return is used for the child_attr/child_method
+        """
+        self.parent = parent
+        self.child = child
+        if parent_attr and parent_method: raise ValueError("cannot assign parent attr and method. please choose one")
+        if child_attr and child_method: raise ValueError("cannot assign child attr and method. please choose one")
+        self.parent_attr = parent_attr
+        self.child_attr = child_attr
+        self.parent_method = parent_method
+        self.child_method = child_method
+        self.link_handler = link_handler
+        if self.link_handler is None: self.link_handler = lambda a: a
+    
+    def _event(self, editor, X, Y):
+        if self.parent_attr and hasattr(self.parent, self.parent_attr): val = getattr(self.parent, self.parent_attr)
+        elif self.parent_method and hasattr(self.parent, self.parent_method): val = getattr(self.parent, self.parent_method)(editor)
+        val = self.link_handler(val)
+        if self.child_attr and hasattr(self.child, self.child_attr): setattr(self.child, self.child_attr, val)
+        elif self.child_method and hasattr(self.child, self.child_method): getattr(self.child, self.child_method)(editor, val)
+
+    def _update(self, editor, X, Y): pass
+
 class ContextTree(UIElement):
     
     global_tree = None
@@ -4160,7 +4216,6 @@ class Popup(UIElement):
         
         self.bg._event(editor, X+self.x, Y+self.y)
         self.mask._event(editor, X, Y)
-        
 
 class Editor:
     def __init__(self, engine, io_hook, width=1280, height=720) -> None:
@@ -5030,7 +5085,7 @@ class GameApp(UIElement):
             # Poly3D.cube(
             #     position=(0, 0, -600),
             #     size=6,
-            #     color=[0, 0, 0, 0],
+            #     color=[0, 0, 127],
             #     rotations=[(35, 0, 0)],
             #     controllers=[rotater],#, color_shifter],
             #     data={
@@ -5040,7 +5095,7 @@ class GameApp(UIElement):
             #         "origin": [0, 0, -600],
             #         "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
             #     },
-            #     texture_mapping = Poly3D.cube_map(None, img4, *([img3]*4), img)
+            #     # texture_mapping = Poly3D.cube_map(None, img4, *([img3]*4), img)
             # ),
             # Poly3D.cylinder(
             #     position=(-200, 0, 200),
@@ -5601,11 +5656,16 @@ class GameObjectEditor(UIElement): # this may need to be split into dedicated ed
 # class RoomEditor(UIElement): # Visual
 
 class DungeonEditor(UIElement): # Visual
+    
     def __init__(self, dungeon):
         self.dungeon = dungeon
         self.rooms = []
-# class BlockCodeEditor(UIElement): # Visual # save this for last, it's a whole project on it's own
+        self.namespace_edit = MultilineTextBox(60, 30, 200, 20, "[namespace]", single_line=True)
+        self.name_edit = MultilineTextBox(60, 50, 200, 20, "[dungeon name]", single_line=True)
+        
+        
 
+# class BlockCodeEditor(UIElement): # Visual # save this for last, it's a whole project on it's own
 
 # Debug Editors:
 
@@ -6506,6 +6566,8 @@ class IOHook:
         self.game_app.log_scrollable.offsetY = -(self.game_app.log_output._text_height - (self.game_app.log_output.min_height - 20))
 
         self.engine.handleInput(player_id, text)
+
+# os.system("\"C:\\Program Files\\Blender Foundation\\Blender 3.6\\blender-launcher.exe\"")
 
 if __name__ == "__main__":
     # from threading import Thread

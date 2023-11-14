@@ -1953,7 +1953,8 @@ class Poly3D(UIElement):
     # dist = math.sin(math.radians(90-(FOV/2)))*(width/2)
     dist = (math.sin(math.radians(90-(FOV/2))) * (width/2)) / (math.sin(math.radians(FOV/2)))
     cam_position = [0, 0, -dist]
-    light_angle = [1, 1, -6] # x, y, z vector
+    light_angle = [2, 1, 3] # x, y, z vector
+    brightness = [200, 200, 200] # for images
 
     # print(f"{dist=}")
 
@@ -2352,7 +2353,7 @@ class Poly3D(UIElement):
                 v3 = self.vertices[quad[2]]
                 v4 = self.vertices[quad[3]]
 
-                color = [0, 0, 0, min(max(0, 255-self.mod_color(v1, v2, v3, [127, 127, 127])[0]), 255)]
+                color = [0, 0, 0, min(max(0, 255-self.mod_color(v1, v2, v3, self.brightness)[0]), 255)]
 
                 x1, y1 = self.project_point(v1)
                 x2, y2 = self.project_point(v2)
@@ -5000,6 +5001,9 @@ class GameApp(UIElement):
         #         if max(v[0] for v in poly3d.vertices) >= 800:
         #             poly3d.data["move"] = "left"
 
+        # def light_rotater(poly3d:Poly3D):
+        #     Poly3D.light_angle = rotate3D((0, 0, 0), Poly3D.light_angle, (0, 1, 0))
+
         # img = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\redstone_lamp.png")
         # img2 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\redstone_lamp_on.png")
         # img3 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\piston_side_sticky.png")
@@ -5008,65 +5012,65 @@ class GameApp(UIElement):
         # img6 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\hopper_inside_side.png")
 
         # self.children += [
-            # Polygon(
-            #     [
-            #         Point(100, 50),
-            #         Point(50, 35),
-            #         Point(-35, 35),
-            #         Point(-35, 7.5),
-            #         Point(50, 7.5),
-            #         Point(50, -50),
-            #         Point(-50, -50),
-            #         Point(-50, -35),
-            #         Point(35, -35),
-            #         Point(35, -7.5),
-            #         Point(-50, -7.5),
-            #         Point(-50, 50)
-            #     ],
-            #     (0, 200, 20),
-            #     draggable=True,
-            #     draggable_points=True
-            # )
-            # Poly3D.cube(
-            #     position=(0, 0, -600),
-            #     size=6,
-            #     color=[0, 0, 0, 0],
-            #     rotations=[(35, 0, 0)],
-            #     controllers=[rotater],#, color_shifter],
-            #     data={
-            #         # "r_shift": "none",
-            #         # "g_shift": "down",
-            #         # "b_shift": "up",
-            #         "origin": [0, 0, -600],
-            #         "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
-            #     },
-            #     texture_mapping = Poly3D.cube_map(None, img4, *([img3]*4), img)
-            # ),
-            # Poly3D.cylinder(
-            #     position=(-200, 0, 200),
-            #     radius=50,
-            #     length=100,
-            #     color=[0, 200, 0],
-            #     subdivisions=20,
-            #     rotations=[(35, 0, 0)],
-            #     controllers=[rotater],
-            #     data={
-            #         "origin": [-200, 0, 200],
-            #         "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
-            #     }
-            # ),
-            # Poly3D.sphere(
-            #     position=(0, -100, 200),
-            #     radius=50,
-            #     subdivisions=18,
-            #     color=[255, 127, 0],
-            #     rotations=[(90, 0, 0)],
-            #     controllers=[rotater],
-            #     data={
-            #         "origin": [0, -100, 200],
-            #         "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
-            #     }
-            # ),
+        #     # Polygon(
+        #     #     [
+        #     #         Point(100, 50),
+        #     #         Point(50, 35),
+        #     #         Point(-35, 35),
+        #     #         Point(-35, 7.5),
+        #     #         Point(50, 7.5),
+        #     #         Point(50, -50),
+        #     #         Point(-50, -50),
+        #     #         Point(-50, -35),
+        #     #         Point(35, -35),
+        #     #         Point(35, -7.5),
+        #     #         Point(-50, -7.5),
+        #     #         Point(-50, 50)
+        #     #     ],
+        #     #     (0, 200, 20),
+        #     #     draggable=True,
+        #     #     draggable_points=True
+        #     # )
+        #     Poly3D.cube(
+        #         position=(0, 0, -600),
+        #         size=6,
+        #         color=[0, 0, 0, 0],
+        #         rotations=[(35, 0, 0)],
+        #         controllers=[rotater],#, light_rotater],#, color_shifter],
+        #         data={
+        #             # "r_shift": "none",
+        #             # "g_shift": "down",
+        #             # "b_shift": "up",
+        #             "origin": [0, 0, -600],
+        #             "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
+        #         },
+        #         texture_mapping = Poly3D.cube_map(None, img4, *([img3]*4), img)
+        #     ),
+        #     Poly3D.cylinder(
+        #         position=(-200, 0, 200),
+        #         radius=50,
+        #         length=100,
+        #         color=[0, 200, 0],
+        #         subdivisions=20,
+        #         rotations=[(35, 0, 0)],
+        #         controllers=[rotater],
+        #         data={
+        #             "origin": [-200, 0, 200],
+        #             "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
+        #         }
+        #     ),
+        #     Poly3D.sphere(
+        #         position=(0, -100, 200),
+        #         radius=50,
+        #         subdivisions=18,
+        #         color=[255, 127, 0],
+        #         rotations=[(90, 0, 0)],
+        #         controllers=[rotater],
+        #         data={
+        #             "origin": [0, -100, 200],
+        #             "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
+        #         }
+        #     )
             # Poly3D.extrude_polygon(
             #     (200, 0, 200),
             #     Polygon(

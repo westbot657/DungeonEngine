@@ -8,12 +8,14 @@ try:
     from .Identifier import Identifier
     from .Logger import Log
     from .EngineErrors import FinalScriptError, ScriptError, EOF
+    from .Loader import Loader
 except ImportError:
     from LoaderFunction import LoaderFunction
     from Functions import *
     from Identifier import Identifier
     from Logger import Log
     from EngineErrors import FinalScriptError, ScriptError, EOF
+    from Loader import Loader
 
 import re, glob, json
 
@@ -391,8 +393,9 @@ class EngineScript:
 
     def compile(self, ignore_file=False):
         if not ignore_file:
-            with open(self.script_file, "r+", encoding="utf-8") as f:
-                self.script = f.read()#self.remove_syntax_sugar(f.read())
+            self.script = Loader.read(self.script_file)
+            # with open(self.script_file, "r+", encoding="utf-8") as f:
+            #     self.script = f.read()#self.remove_syntax_sugar(f.read())
 
         self.setup()
         self.macros.clear()

@@ -697,7 +697,8 @@ class MultilineText(UIElement):
     __slots__ = [
         "x", "y", "min_width", "min_height", "content",
         "colored_content", "text_color", "text_bg_color",
-        "font", "surfaces", "_text_width", "_text_height"
+        "font", "surfaces", "_text_width", "_text_height",
+        "surface"
     ]
     
     def __init__(self, x:int, y:int, min_width:int=1, min_height:int=1, content:str="", text_color:Color|tuple|int=TEXT_COLOR, text_bg_color:Color|tuple|int=TEXT_BG_COLOR, text_size=TEXT_SIZE):
@@ -713,6 +714,7 @@ class MultilineText(UIElement):
         self.text_bg_color = Color.color(text_bg_color)
         self.font = pygame.font.Font(FONT, text_size)
         self.surfaces = []
+        self.surface = None
 
         self._text_width = self.min_width
         self._text_height = self.min_height
@@ -740,6 +742,8 @@ class MultilineText(UIElement):
             self._text_width = max(self._text_width, s.get_width(), self.min_width)
             self._text_height += s.get_height()
         self._text_height = max(self._text_height, self.min_height)
+        
+        # self.surface = pygame.Surface((self._text_width, self._text_height), pygame.SRCALPHA, 32)
         
         self.surfaces = sl
 
@@ -784,6 +788,9 @@ class MultilineText(UIElement):
         self._refresh_surfaces()
         data = self.format_text(self.content, self.text_color)
 
+        surf = pygame.Surface((self._text_width, self._text_height), pygame.SRCALPHA, 32)
+        # print(s.get_size())
+        h = 0
         for line, surface in zip(data, self.surfaces):
             x = 1
             for col, segment in line:
@@ -791,6 +798,14 @@ class MultilineText(UIElement):
                 s = self.font.render(segment, True, tuple(col))
                 surface.blit(s, (x, 0))
                 x += s.get_width()
+                
+            surf.blit(surface, (0, h))
+            h += surface.get_height()
+        
+        self.surface = surf
+            
+        
+        
 
     def set_content(self, content:str=""):
         self.content = content
@@ -816,10 +831,12 @@ class MultilineText(UIElement):
         if self.text_bg_color:
             editor.screen.fill(tuple(self.text_bg_color), (X+self.x-1, Y+self.y-1, w+2, h+2))
 
-        h = 0
-        for s in self.surfaces:
-            editor.screen.blit(s, (X+self.x, Y+self.y+h))
-            h += s.get_height()
+        if self.surface:
+            editor.screen.blit(self.surface, (X+self.x, Y+self.y))
+        # h = 0
+        # for s in self.surfaces:
+        #     editor.screen.blit(s, (X+self.x, Y+self.y+h))
+        #     h += s.get_height()
 
 class TextBox(UIElement):
     
@@ -6460,7 +6477,7 @@ class IOHook:
                     c2 = 255 - c1
 
                     return f"\033[38;2;255;255;255m[\033[38;2;100;250;100m{g[0]}\033[38;2;250;100;100m{g[1]}\033[38;2;255;255;255m] \033[38;2;{int(c2)};{int(c1)};0m{a}\033[38;2;255;255;255m/\033[38;2;255;255;255m{b}\033[0m"
-            elif (m := re.match(r"```(?P<lang>json|md|ds|dungeon_script|ascii)?(?:\\.|[^`])*```", t)):
+            elif (m := re.match(r"```(?P<lang>json|md|ds|dungeon_script|ascii|less)?(?:\\.|[^`])*```", t)):
                 d = m.groupdict()
                 lang = d["lang"]
                 text = t[3+len(lang or ""):-3]
@@ -6470,6 +6487,8 @@ class IOHook:
                     return FileEditor.md_colors(None, text)
                 elif lang in ["ds", "dungeon_script"]:
                     return FileEditor.ds_colors(None, text)
+                elif lang == "less":
+                    return self.color_text(text)
                 else:
                     return self.ascii_colors(text)
                 # return f"\033[38;2;200;200;200m{text}\033[0m"

@@ -12,6 +12,7 @@ try:
     from .Location import Location
     from .Environment import Environment
     from .Map import Map
+    from .Loader import Loader
 except ImportError:
     from Room import Room
     from Identifier import Identifier
@@ -24,6 +25,7 @@ except ImportError:
     from Location import Location
     from Environment import Environment
     from Map import Map
+    from Loader import Loader
 
 import glob, json, re
 
@@ -145,8 +147,9 @@ class AbstractRoom:
         for file in files:
             file: str
             Log["loadup"]["abstract"]["room"](f"loading AbstractRoom from '{file}'")
-            with open(file, "r+", encoding="utf-8") as f:
-                data = json.load(f)
+            # with open(file, "r+", encoding="utf-8") as f:
+            #     data = json.load(f)
+            data = Loader.load(file)
             
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})

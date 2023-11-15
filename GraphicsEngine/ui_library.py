@@ -4404,7 +4404,6 @@ class Editor:
             # print(self._hovering)
             pygame.display.update()
 
-
 class DebugApp(UIElement):
     def __init__(self, code_editor, editor):
         ... # This is ambitious
@@ -4414,7 +4413,6 @@ class DebugApp(UIElement):
     
     def _event(self, editor, X, Y):
         ...
-
 
 class GameApp(UIElement):
     
@@ -5505,7 +5503,6 @@ class GameApp(UIElement):
         if self.player is not None:
             self.player_health_bar._update(editor, X, Y)
 
-
 # Dungeon Building Editors:
 
 class FileEditor(UIElement):
@@ -5663,7 +5660,6 @@ class GameObjectEditor(UIElement): # this may need to be split into dedicated ed
     def _event(self, editor, X, Y):
         ...
 
-
 # class StatusEffectEditor(UIElement): # Visual
 
 # class AttackEditor(UIElement): # Visual
@@ -5683,8 +5679,6 @@ class DungeonEditor(UIElement): # Visual
         self.rooms = []
         self.namespace_edit = MultilineTextBox(60, 30, 200, 20, "[namespace]", single_line=True)
         self.name_edit = MultilineTextBox(60, 50, 200, 20, "[dungeon name]", single_line=True)
-        
-        
 
 # class BlockCodeEditor(UIElement): # Visual # save this for last, it's a whole project on it's own
 
@@ -5693,7 +5687,6 @@ class DungeonEditor(UIElement): # Visual
 # class PlayerEditor(UIElement):
 
 # class InventoryEditor(UIElement):
-
 
 class Opener:
     def __init__(self, sub_app, file_path, editor):
@@ -5917,7 +5910,6 @@ class EditorApp(UIElement):
         
         for child in self.children:
             child._update(editor, X, Y)
-
 
 class CodeEditor(UIElement):
     

@@ -1983,7 +1983,8 @@ class Poly3D(UIElement):
     # dist = math.sin(math.radians(90-(FOV/2)))*(width/2)
     dist = (math.sin(math.radians(90-(FOV/2))) * (width/2)) / (math.sin(math.radians(FOV/2)))
     cam_position = [0, 0, -dist]
-    light_angle = [2, 2, 3] # x, y, z vector
+    light_angle = [2, 1, 3] # x, y, z vector
+    brightness = [200, 200, 200] # for images
 
     # print(f"{dist=}")
 
@@ -2382,7 +2383,7 @@ class Poly3D(UIElement):
                 v3 = self.vertices[quad[2]]
                 v4 = self.vertices[quad[3]]
 
-                color = [0, 0, 0, min(max(0, 255-self.mod_color(v1, v2, v3, [127, 127, 127])[0]), 255)]
+                color = [0, 0, 0, min(max(0, 255-self.mod_color(v1, v2, v3, self.brightness)[0]), 255)]
 
                 x1, y1 = self.project_point(v1)
                 x2, y2 = self.project_point(v2)
@@ -4401,7 +4402,6 @@ class Editor:
             # print(self._hovering)
             pygame.display.update()
 
-
 class DebugApp(UIElement):
     def __init__(self, code_editor, editor):
         ... # This is ambitious
@@ -4411,7 +4411,6 @@ class DebugApp(UIElement):
     
     def _event(self, editor, X, Y):
         ...
-
 
 class GameApp(UIElement):
     
@@ -5070,6 +5069,9 @@ class GameApp(UIElement):
         #         if max(v[0] for v in poly3d.vertices) >= 800:
         #             poly3d.data["move"] = "left"
 
+        # def light_rotater(poly3d:Poly3D):
+        #     Poly3D.light_angle = rotate3D((0, 0, 0), Poly3D.light_angle, (0, 1, 0))
+
         # img = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\redstone_lamp.png")
         # img2 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\redstone_lamp_on.png")
         # img3 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\piston_side_sticky.png")
@@ -5499,7 +5501,6 @@ class GameApp(UIElement):
         if self.player is not None:
             self.player_health_bar._update(editor, X, Y)
 
-
 # Dungeon Building Editors:
 
 class FileEditor(UIElement):
@@ -5657,7 +5658,6 @@ class GameObjectEditor(UIElement): # this may need to be split into dedicated ed
     def _event(self, editor, X, Y):
         ...
 
-
 # class StatusEffectEditor(UIElement): # Visual
 
 # class AttackEditor(UIElement): # Visual
@@ -5723,7 +5723,6 @@ class DungeonEditor(UIElement): # Visual
 # class PlayerEditor(UIElement):
 
 # class InventoryEditor(UIElement):
-
 
 class Opener:
     def __init__(self, sub_app, file_path, editor):
@@ -5947,7 +5946,6 @@ class EditorApp(UIElement):
         
         for child in self.children:
             child._update(editor, X, Y)
-
 
 class CodeEditor(UIElement):
     

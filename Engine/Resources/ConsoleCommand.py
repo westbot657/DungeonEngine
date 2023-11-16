@@ -55,45 +55,6 @@ class ConsoleCommand:
             if len(s) == 1: return s + [""]
             return s
 
-    # @classmethod
-    # def _parse_number(cls, text) -> tuple[int|float, str]:
-    #     num = ""
-    #     while True:
-    #         if len(text) == 0:
-    #             break
-    #         if text[0] in "0123456789":
-    #             num += text[0]
-    #             text = text[1:]
-    #         elif text[0] == ".":
-    #             if "." not in num:
-    #                 num += "."
-    #                 text = text[1:]
-    #             else:
-    #                 raise ParseError("number cannot contain '.' twice")
-    #         elif text[0] == " ":
-    #             break
-    #         else:
-    #             raise ParseError("numbers cannot contain letters")
-
-    #     if "." in num:
-    #         return float(num), text
-    #     return int(num), text
-
-    # @classmethod
-    # def _parse_word(cls, engine, text):
-    #     word, text = text.split(" ", 1)
-    #     if word == "true":
-    #         return True, text
-    #     if word == "false":
-    #         return False, text
-    #     try:
-    #         i = Identifier.fromString(word)
-    #         if s := engine.loader.searchFor(i):
-    #             return s
-    #     except IdentifierError:
-    #         pass
-
-
     @classmethod
     def _parse_args(cls, function_memory, arg_tree:dict|None, text:str) -> list|None:
         engine = function_memory.engine

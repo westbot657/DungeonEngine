@@ -12,6 +12,7 @@ try:
     from .Location import Location
     from .FunctionMemory import FunctionMemory
     from .Util import Util
+    from .Loader import Loader
 except ImportError:
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
@@ -24,6 +25,7 @@ except ImportError:
     from Location import Location
     from FunctionMemory import FunctionMemory
     from Util import Util
+    from Loader import Loader
 
 import glob, json, re
 
@@ -202,8 +204,7 @@ class AbstractEnemy:
         for file in files:
             file: str
             Log["loadup"]["abstract"]["enemy"](f"loading AbstractEnemy from '{file}'")
-            with open(file, "r+", encoding="utf-8") as f:
-                data = json.load(f)
+            data = Loader.load(file)
 
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})

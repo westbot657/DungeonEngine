@@ -7,54 +7,15 @@ from typing import Any
 # from pydub import AudioSegment
 # from pydub.playback import play
 import simpleaudio as sa
-# import warnings
-# with warnings.catch_warnings():
-#     warnings.filterwarnings("ignore", category=DeprecationWarning)
-#     import imp
 import importlib
 from importlib.machinery import SourceFileLoader
 # import glob
 
-# if getattr(sys, 'frozen', False):
-#     # If the application is run as a bundle, the PyInstaller bootloader
-#     # extends the sys module by a flag frozen=True and sets the app 
-#     # path into variable _MEIPASS'.
-#     application_path = sys._MEIPASS
-# else:
-#     application_path = os.path.dirname(os.path.abspath(__file__))
-
-
-# sys.path.append(application_path)
-# print(f"PATH: {application_path} {sys.path}")
 
 from Engine import Engine
 
 
 os.system('') # this fixes console ansi colors for some reason # NOTE: comment out when compiling VS version, it causes windows to think the exe is a virus
-
-# VOLUME_MOD = 0
-
-# if not os.path.exists("./Dungeons/"):
-
-#     os.mkdir("./Dungeons/")
-#     os.mkdir("./Dungeons/world/")
-
-#     x = glob.glob("./DungeonSource/**/*", recursive=True)
-
-#     for f in x:
-#         bits = f.replace("\\", "/").replace("DungeonSource", "Dungeons").split("/")[0:-1]
-#         p = bits.pop(0) + "/"
-
-#         for b in bits:
-#             p += b + "/"
-#             if not os.path.exists(p):
-#                 os.mkdir(p)
-        
-#         with open(f, "r", encoding="utf-8") as file:
-#             t = file.read()
-        
-#         with open(f.replace("DungeonSource", "Dungeons"), "w", encoding="utf-8") as file:
-#             file.write(t)
 
 try:
     _IOHook = SourceFileLoader("IOHook", "./IOHook.py").load_module() # pylint: disable=no-value-for-parameter

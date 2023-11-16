@@ -10,6 +10,7 @@ try:
     from .Location import Location
     from .Position import Position
     from .Logger import Log
+    from .Loader import Loader
 except ImportError:
     from Combat import Combat
     from Identifier import Identifier
@@ -20,6 +21,7 @@ except ImportError:
     from Location import Location
     from Position import Position
     from Logger import Log
+    from Loader import Loader
 
 import glob, json, re
 
@@ -97,8 +99,7 @@ class AbstractCombat:
         for file in files:
             file: str
             Log["loadup"]["abstract"]["combat"](f"loading AbstractCombat from '{file}'")
-            with open(file, "r+", encoding="utf-8") as f:
-                data = json.load(f)
+            data = Loader.load(file)
             
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})

@@ -12,6 +12,7 @@ try:
     from .Util import Util
     from .Location import Location
     from .Map import Map
+    from .Loader import Loader
 except ImportError:
     from Dungeon import Dungeon
     from Identifier import Identifier
@@ -24,6 +25,7 @@ except ImportError:
     from Util import Util
     from Location import Location
     from Map import Map
+    from Loader import Loader
 
 
 import glob, json, re
@@ -88,8 +90,7 @@ class AbstractDungeon:
         Log["debug"]["dungeon"](f"dungeons: {", ".join(files)}")
 
         for file in files:
-            with open(file, "r+", encoding="utf-8") as f:
-                data = json.load(f)
+            data = Loader.load(file)
 
             Id = Identifier("dungeon", "", file.replace("\\", "/").rsplit("/", 1)[1].rsplit(".", 1)[0])
             Log["debug"]["abstract"]["dungeon"](f"dungeon id: {Id.full()}")

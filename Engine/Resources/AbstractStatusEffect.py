@@ -8,6 +8,7 @@ try:
     from .StatusEffectCause import StatusEffectCause
     from .FunctionMemory import FunctionMemory
     from .Logger import Log
+    from .Loader import Loader
 except ImportError:
     from StatusEffect import StatusEffect
     from EngineErrors import InvalidObjectError
@@ -16,6 +17,7 @@ except ImportError:
     from StatusEffectCause import StatusEffectCause
     from FunctionMemory import FunctionMemory
     from Logger import Log
+    from Loader import Loader
 
 
 import glob, json, re
@@ -113,8 +115,7 @@ class AbstractStatusEffect:
         for file in files:
             file: str
             Log["loadup"]["abstract"]["status effect"](f"loading AbstractStatusEffect from '{file}'")
-            with open(file, "r+", encoding="utf-8") as f:
-                data = json.load(f)
+            data = Loader.load(file)
             
             Id = Identifier.fromFile(file)
             cls._loaded.update({Id.full(): cls(Id, data)})

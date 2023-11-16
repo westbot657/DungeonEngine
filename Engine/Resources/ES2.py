@@ -222,15 +222,14 @@ class EngineScript:
             path = path + "/" + path.rsplit("/", 1)[-1] + ".json"
             # print(f"\n\nPATH?: {path}\n\n")
             if os.path.exists(path):
-                with open(path, "r+", encoding="utf-8") as f:
-                    try:
-                        data: dict[str, Any|dict[str, Any]] = json.load(f)
-                        if "data" in data:
-                            for k, v in data["data"].items():
-                                self.external_variables.update({
-                                    f"#dungeon.{k}": ["defined in dungeon's json file"]
-                                })
-                    except: pass
+                try:
+                    data: dict[str, Any|dict[str, Any]] = Loader.load(f)
+                    if "data" in data:
+                        for k, v in data["data"].items():
+                            self.external_variables.update({
+                                f"#dungeon.{k}": ["defined in dungeon's json file"]
+                            })
+                except: pass
     
     def populate_local_variables(self, var_name:str, data_type=...):
         if not self.do_summary: return

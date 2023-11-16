@@ -7,6 +7,7 @@ try:
     from .EngineOperation import EngineOperation, _EngineOperation
     from .Util import Util
     from .FunctionMemory import FunctionMemory
+    from .Loader import Loader
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
@@ -14,6 +15,7 @@ except ImportError:
     from EngineOperation import EngineOperation, _EngineOperation
     from Util import Util
     from FunctionMemory import FunctionMemory
+    from Loader import Loader
 
 from enum import Enum, auto
 

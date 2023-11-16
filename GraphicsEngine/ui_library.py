@@ -3,43 +3,41 @@
 # pygame UI Library
 
 import pygame
-#import PIL
+
+# useful utils
+from enum import Enum, auto
+from mergedeep import merge
 import time
 import pyperclip
 import re
 import os
 import sys
-import mouse
 import random
 import json
 import math
+
+# 3D rendering
 import cv2
 import numpy
 from meshpy import geometry
-#from io import BytesIO
-from enum import Enum, auto
-
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon as Poly
 
-from mergedeep import merge
-from ctypes import windll, WINFUNCTYPE, POINTER
-from ctypes.wintypes import BOOL, HWND, RECT
-
-# import pkgutil
-# import warnings
-# with warnings.catch_warnings():
-#     warnings.filterwarnings("ignore", category=DeprecationWarning)
-#     import imp
+# used to import the game engine with code
 import importlib
 from importlib.machinery import SourceFileLoader
+
+# discord presence for game
 from pypresence import Presence
 
-
+# Things needed to move and resize pygame window
+import mouse
+from ctypes import windll, WINFUNCTYPE, POINTER
+from ctypes.wintypes import BOOL, HWND, RECT
 from win32api import GetMonitorInfo, MonitorFromPoint
 from pygame._sdl2.video import Window, Texture
 
-
+# discord presence application id
 client_id = "1149136139341541446"
 
 class fake_presence:
@@ -5674,13 +5672,49 @@ class GameObjectEditor(UIElement): # this may need to be split into dedicated ed
 
 class DungeonEditor(UIElement): # Visual
     
-    def __init__(self, dungeon):
-        self.dungeon = dungeon
-        self.rooms = []
-        self.namespace_edit = MultilineTextBox(60, 30, 200, 20, "[namespace]", single_line=True)
-        self.name_edit = MultilineTextBox(60, 50, 200, 20, "[dungeon name]", single_line=True)
+    class Dungeon(UIElement):
+        def __init__(self, dungeon_editor, dungeon):
+            self.dungeon_editor = dungeon_editor
+            self.dungeon = dungeon
+            self.rooms = []
+            # self.namespace_edit = MultilineTextBox(60, 30, 200, 20, "[namespace]", single_line=True)
+            # self.name_edit = MultilineTextBox(60, 50, 200, 20, "[dungeon name]", single_line=True)
+            self.x = 0
+            self.y = 0
+            self.children = []
+            
+        def _event(self, editor, X, Y):
+            c = self.children.copy()
+            c.reverse()
+            for _c in c:
+                _c._event(editor, X+self.x, Y+self.y)
         
+        def _update(self, editor, X, Y):
+            for c in self.children:
+                c._update(editor, X+self.x, Y+self.y)
+
+    def __init__(self):
+        self.active = None
+        self.selectors = []
         
+        # wanted features:
+        #   add/remove/modify dungeon variables
+        #   add/remove/modify dungeons
+        #   add/remove/modify rooms
+        #   modify dungeon namespace
+        #   drag and drop to set variables
+        #   rooms drawn with Polygons, can be modifed, and can be linked to other rooms easily
+        #     room linking:
+        #       a passage/door block with 1-2 leads
+        #       merging of 1-lead passages/doors
+        #       splitting of 2-lead passage/door into 2 1-lead passages/doors
+        #   pop-out code editor panels for scripts (if at all possible, these panels should not be bound to the app window)
+        
+    def _event(self, editor, X, Y):
+        ...
+    
+    def _update(self, editor, X, Y):
+        ...
 
 # class BlockCodeEditor(UIElement): # Visual # save this for last, it's a whole project on it's own
 
@@ -6438,6 +6472,14 @@ class CodeEditor(UIElement):
             self.game_app._event(editor, X, Y)
         elif self.active_app == "editor":
             self.editor_app._event(editor, X, Y)
+
+class PopoutWindow(UIElement):
+    
+    def __init__(self, size:tuple[int, int], content:dict, pygame_window_args:tuple=..., pygame_window_kwargs:dict=...):
+        if pygame.display.get_init():
+            ... # launch sub-process
+        else:
+            ... # create window, parse content, and run a mainloop
 
 class IOHook:
     def __init__(self):

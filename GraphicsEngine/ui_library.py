@@ -5503,6 +5503,7 @@ class GameApp(UIElement):
 
 # Dungeon Building Editors:
 
+
 class FileEditor(UIElement):
     
     def __init__(self, x, y, width, height, file_location, file_name, editor):
@@ -5947,6 +5948,245 @@ class EditorApp(UIElement):
         for child in self.children:
             child._update(editor, X, Y)
 
+
+class WindowFrame(UIElement):
+    def __init__(self, width, height, editor):
+        self.resolution = [width, height]
+        self.children = []
+        self.editor = editor
+        self.hover_color = (50, 50, 50)
+        self.click_button = (70, 70, 70)
+        
+        self.window_drag_offset = None
+        self.selected_drag = ""
+        self.drag_offset = 0
+        
+        self._recent_window_pos = (int((1920 - (1920*2/4))/2), int((1080 - (1080*2/4))/2))
+        # print(self._recent_window_pos)
+        self._recent_window_size = (1920*2/4, 1080*2/4)
+        
+        
+        self.bottom_drag = Box(5, height-5, width-10, 5, (24, 24, 24))
+        self.children.append(self.bottom_drag)
+
+        self.bottom_right_drag = Box(width-5, height-5, 5, 5, (24, 24, 24))
+        self.children.append(self.bottom_right_drag)
+        
+        self.bottom_left_drag = Box(0, height-5, 5, 5, (24, 24, 24))
+        self.children.append(self.bottom_left_drag)
+        
+        self.left_drag = Box(0, 20, 5, height-25, (24, 24, 24))
+        self.children.append(self.left_drag)
+        
+        self.right_drag = Box(width-5, 20, 5, height-25, (24, 24, 24))
+        self.children.append(self.right_drag)
+
+        self.top_bar_line = Box(0, 20, width, 1, (70, 70, 70))
+        self.children.append(self.top_bar_line)
+        
+        self.bottom_bar = Box(5, height-20, width-10, 15, (24, 24, 24))
+        self.children.append(self.bottom_bar)
+        
+        self.bottom_bar_line = Box(0, height-21, width, 1, (70, 70, 70))
+        self.children.append(self.bottom_bar_line)
+        
+        self.top_bar = Box(0, 0, width, 20, Color(24, 24, 24))
+        self.children.append(self.top_bar)
+        
+        self.top_bar_icon = Image(f"{PATH}/dungeon_game_icon.png", 2, 2, 16, 16)
+        self.children.append(self.top_bar_icon)
+        
+        
+        self.minimize_button = Button(width-(26*3), 0, 26, 20, " ─ ", (24, 24, 24), hover_color=(70, 70, 70))
+        self.minimize_button.on_left_click = self.minimize
+        self.children.append(self.minimize_button)
+        
+        self._is_fullscreen = False
+        self._fullscreen = Image(f"{PATH}/full_screen.png", 0, 0, 26, 20)
+        self._fullscreen_hovered = Image(f"{PATH}/full_screen_hovered.png", 0, 0, 26, 20)
+        self._shrinkscreen = Image(f"{PATH}/shrink_window.png", 0, 0, 26, 20)
+        self._shrinkscreen_hovered = Image(f"{PATH}/shrink_window_hovered.png", 0, 0, 26, 20)
+
+        self.fullscreen_toggle = Button(width-(26*2), 0, 26, 20, "", self._fullscreen, hover_color=self._fullscreen_hovered)
+        self.fullscreen_toggle.on_left_click = self.toggle_fullscreen
+        self.children.append(self.fullscreen_toggle)
+        
+        self._close = Image(f"{PATH}/close_button.png", 0, 0, 26, 20)
+        self._close_hovered = Image(f"{PATH}/close_button_hovered.png", 0, 0, 26, 20)
+        
+        self.close_button = Button(width-26, 0, 26, 20, "", self._close, hover_color=self._close_hovered)
+        self.close_button.on_left_click = self.close_window
+        self.children.append(self.close_button)
+
+    def minimize(self, *_, **__):
+        # RPC.update(details="Made the window smol 4 some reason", state="¯\_(ツ)_/¯")
+        pygame.display.iconify()
+
+    def get_screen_pos(self, editor):
+        mx, my = mouse.get_position()
+        # rx, ry = editor.mouse_pos
+        # # print(f"mouse: ({mx}, {my}) -> ({rx}, {ry})  ({mx-rx}, {my-ry})")
+        # return mx-rx, my-ry
+    
+        hwnd = pygame.display.get_wm_info()["window"]
+
+        prototype = WINFUNCTYPE(BOOL, HWND, POINTER(RECT))
+        paramflags = (1, "hwnd"), (2, "lprect")
+
+        GetWindowRect = prototype(("GetWindowRect", windll.user32), paramflags)
+
+        rect = GetWindowRect(hwnd)
+        return rect.left, rect.top
+
+    def set_fullscreen(self, editor):
+        monitor_info = GetMonitorInfo(MonitorFromPoint((0,0)))
+        work_area = monitor_info.get("Work")
+        editor.width, editor.height = work_area[2:4]
+        editor.set_window_location(0, 0)
+        
+        self._update_layout(editor)
+
+    def toggle_fullscreen(self, editor):
+        if self._is_fullscreen:
+            self.fullscreen_toggle.bg_color = self.fullscreen_toggle._bg_color = self._fullscreen
+            self.fullscreen_toggle.hover_color = self._fullscreen_hovered
+            editor.width, editor.height = self._recent_window_size
+            self.top_bar.hovered = False
+            self.window_drag_offset = None
+            # editor.mouse[0] = editor.previous_mouse[0] = False
+            # editor.set_window_location(-1920, -1080)
+            editor.set_window_location(*self._recent_window_pos)
+            
+            # print(self._recent_window_pos)
+            self._update_layout(editor)
+        else:
+            self.fullscreen_toggle.bg_color = self.fullscreen_toggle._bg_color = self._shrinkscreen
+            self.fullscreen_toggle.hover_color = self._shrinkscreen_hovered
+            self.top_bar.hovered = False
+            self.window_drag_offset = None
+            self._recent_window_pos = self.get_screen_pos(editor)
+            self._recent_window_size = (editor.width, editor.height)
+            self.set_fullscreen(editor)
+            # editor.mouse[0] = False
+            # editor.previous_mouse[0] = False
+        self._is_fullscreen = not self._is_fullscreen
+
+    def close_window(self, editor):
+        editor.running = False
+        editor.engine.stop()
+        pygame.display.quit()
+        pygame.quit()
+        sys.exit()
+
+    def _update(self, editor, X, Y):
+        # print(editor._focused_object)
+        
+        for child in self.children:
+            child._update(editor, X, Y)
+
+        # if self.active_app == "game":
+        #     self.game_app._update2(editor, X, Y)
+
+    def _update_layout(self, editor):
+        
+        pygame.display.set_mode((editor.width, editor.height), pygame.RESIZABLE | pygame.NOFRAME)
+        
+        self.top_bar.width = editor.width
+        self.bottom_drag.width = editor.width-10
+        self.bottom_drag.y = self.bottom_left_drag.y = self.bottom_right_drag.y = editor.height-5
+        self.bottom_right_drag.x = self.right_drag.x = editor.width-5
+        self.right_drag.height = self.left_drag.height = editor.height - 25
+        self.bottom_bar_line.y = editor.height-21
+        self.bottom_bar_line.width = self.top_bar_line.width = editor.width
+        self.bottom_bar.width = editor.width-10
+        self.bottom_bar.y = editor.height-20
+        
+        # self.app_bar.height = self.app_line.height = editor.height - 42
+        
+        self.minimize_button.x = editor.width - (26*3)
+        self.fullscreen_toggle.x = editor.width - (26*2)
+        self.close_button.x = editor.width - 26
+
+    def _event(self, editor:Editor, X, Y):
+        if (self.top_bar.hovered and editor.mouse[0] and (not editor.previous_mouse[0])):
+            self.window_drag_offset = editor.mouse_pos
+        elif (editor.mouse[0] and self.window_drag_offset):
+            x, y = mouse.get_position()
+            x -= self.window_drag_offset[0]
+            y -= self.window_drag_offset[1]
+            editor.set_window_location(x, y)
+        elif (not editor.mouse[0]) and editor.previous_mouse[0]:
+            x, y = mouse.get_position()
+            
+            if y == 0:
+                self._is_fullscreen = True
+                self._recent_window_size = (editor.width, editor.height)
+                self._recent_window_pos = self.get_screen_pos(editor)
+                
+                self.set_fullscreen(editor)
+            
+            self.window_drag_offset = None
+
+        rmx, rmy = mouse.get_position()
+        rsx, rsy = self.get_screen_pos(editor)
+        # print(rmx, rmy, rsx, rsy)
+
+        if self.bottom_drag.hovered:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZENS)
+            
+            if editor.mouse[0] and (not editor.previous_mouse[0]):
+                self.selected_drag = "bottom_drag"
+            
+        elif self.left_drag.hovered:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZEWE)
+            
+            if editor.mouse[0] and (not editor.previous_mouse[0]):
+                self.selected_drag = "left_drag"
+                self.drag_offset = (rsx + editor.width, rsy)
+                
+        elif self.right_drag.hovered:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZEWE)
+            
+            if editor.mouse[0] and (not editor.previous_mouse[0]):
+                self.selected_drag = "right_drag"
+            
+        elif self.bottom_left_drag.hovered:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZENESW)
+            if editor.mouse[0] and (not editor.previous_mouse[0]):
+                self.selected_drag = "bottom_left_drag"
+                self.drag_offset = (rsx + editor.width, rsy)
+        elif self.bottom_right_drag.hovered:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZENWSE)
+            if editor.mouse[0] and (not editor.previous_mouse[0]):
+                self.selected_drag = "bottom_right_drag"
+        elif not editor.override_cursor:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+
+        if self.selected_drag in ["bottom_drag", "bottom_right_drag", "bottom_left_drag"]:
+            # print(rmy, rsy, rmy-rsy)
+            # print(f"rmy:{rmy} - rsy:{rsy} = {rmy-rsy}")
+            editor.height = max(425, rmy - rsy)
+            # print(editor.height)
+            self._update_layout(editor)
+        if self.selected_drag in ["left_drag", "bottom_left_drag"]:
+            editor.set_window_location(min (rmx, self.drag_offset[0]-100), self.drag_offset[1])
+            editor.width = max(800, self.drag_offset[0] - rmx)
+            # print(editor.width)
+            self._update_layout(editor)
+        if self.selected_drag in ["right_drag", "bottom_right_drag"]:
+            # print(f"rmx:{rmx} - rsx:{rsx} = {rmx-rsx}")
+            editor.width = max(800, rmx - rsx)
+            self._update_layout(editor)
+
+
+        if (not editor.mouse[0]) and editor.previous_mouse[0]:
+            self.selected_drag = ""
+            
+        _c = self.children.copy()
+        _c.reverse()
+        for child in _c:
+            child._event(editor, X, Y)
+
 class CodeEditor(UIElement):
     
     def __init__(self, width, height, editor):
@@ -6138,8 +6378,10 @@ class CodeEditor(UIElement):
         self.fullscreen_toggle = Button(width-(26*2), 0, 26, 20, "", self._fullscreen, hover_color=self._fullscreen_hovered)
         self.fullscreen_toggle.on_left_click = self.toggle_fullscreen
         self.children.append(self.fullscreen_toggle)
+        
         self._close = Image(f"{PATH}/close_button.png", 0, 0, 26, 20)
         self._close_hovered = Image(f"{PATH}/close_button_hovered.png", 0, 0, 26, 20)
+        
         self.close_button = Button(width-26, 0, 26, 20, "", self._close, hover_color=self._close_hovered)
         self.close_button.on_left_click = self.close_window
         self.children.append(self.close_button)
@@ -6477,6 +6719,30 @@ class PopoutWindow(UIElement):
         if pygame.display.get_init():
             ... # launch sub-process
         else:
+            comps = {}
+            children = []
+            for comp in content["components"]:
+                ...
+            
+            for link in content["links"]:
+                if "link_handler" in link:
+                    e = link.pop("link_handler")
+                    # ctx = {
+                    #     "parent": comps[link["parent"]]
+                    #     "child": comps[link["child"]]
+                    # }
+                    l = lambda a: eval(e, {"a": a})
+                else:
+                    l = lambda a: a
+                children.append(
+                    Link(
+                        comps[link.pop("parent")],
+                        comps[link.pop("child")],
+                        **link,
+                        link_handler = l
+                    )
+                )
+                ...
             ... # create window, parse content, and run a mainloop
 
 class IOHook:

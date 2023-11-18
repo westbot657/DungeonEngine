@@ -9,13 +9,9 @@ except ImportError:
     from ui_library import *
 
 
-
-
-
 if __name__ == "__main__":
-    args = sys.argv[1:]
-    
-    if len(args) != 1:
+    if len(sys.argv) < 2:
         exit()
+    args = sys.argv[1]
     PopoutWindow(**json.loads(args[0]))
 

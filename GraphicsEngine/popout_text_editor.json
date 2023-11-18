@@ -1,0 +1,30 @@
+{
+    "components": {
+        "text_edit": {
+            "type": "NumberedTextArea",
+            "args": [
+                5, 21, 240, 208
+            ],
+            "kwargs": {}
+        }
+    },
+    "links": [
+        {
+            "parent": "editor",
+            "child": "editor",
+            "parent_attr": ""
+        },
+        {
+            "parent": "editor",
+            "child": "text_edit",
+            "parent_attr": "width",
+            "child_attr": "width",
+            "link_handler": "max(a, 200)"
+        }
+    ],
+    "editor_layers": {
+        "0": [
+            "text_edit"
+        ]
+    }
+}

@@ -6720,6 +6720,11 @@ class PopoutWindow(UIElement):
             ... # launch sub-process
         else:
             comps = {}
+            self.editor = Editor(None, None, *size)
+            self.frame = WindowFrame(*size, self.editor)
+
+            self.editor.add_layer(5, self.frame)
+
             children = []
             for comp in content["components"]:
                 ...
@@ -6743,7 +6748,22 @@ class PopoutWindow(UIElement):
                     )
                 )
                 ...
+
+            self.editor.add_layer(0, self)
             ... # create window, parse content, and run a mainloop
+
+            self.editor.run()
+
+    def _event(self, editor, X, Y):
+        
+        c = self.children.copy()
+        c.reverse()
+
+        for _c in c:
+            _c._event(editor, X, Y)
+    
+    def _update(self, editor, X, Y):
+        ...
 
 class IOHook:
     def __init__(self):

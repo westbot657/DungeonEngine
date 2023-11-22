@@ -4,3 +4,5 @@ mouse
 pypresence
 simpleaudio
 mergedeep
+orjson
+opendal

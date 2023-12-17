@@ -21,6 +21,7 @@ try:
     from .EngineOperation import EngineOperation
     from .Util import Util
     from .LootTable import LootTable
+    from .Serializer import Serializable, Serializer
 except ImportError:
     from Inventory import Inventory
     from Entity import Entity
@@ -42,11 +43,13 @@ except ImportError:
     from EngineOperation import EngineOperation
     from Util import Util
     from LootTable import LootTable
+    from Serializer import Serializable, Serializer
 
 from typing import Any
 
 import json, random
 
+@Serializable("Player")
 class Player(Entity):
     _loaded = {}
 
@@ -401,22 +404,26 @@ class Player(Entity):
             json.dump(data, f, indent=4)
 
     def serialize(self, function_memory:FunctionMemory):
-        """
-        This returns only the information needed to display player data for combat in multiplayer
-        """
-        data = {
-            "name": self.name,
-            "health": self.health,
-            "max_health": self.max_health
+        return {
+            "uuid": Serializer.serialize(self.uuid),
+            "name": Serializer.serialize(self.name),
+            "health": Serializer.serialize(self.health),
+            "max_health": Serializer.serialize(self.max_health),
+            "inventory": Serializer.serialize(self.inventory),
+            "status_effects": Serializer.serialize(self.status_effects),
+            "in_combat": Serializer.serialize(self.in_combat),
+            "_combat": Serializer.serialize(self._combat),
+            "currency": Serializer.serialize(self.currency),
+            "dungeon_data": Serializer.serialize(self.dungeon_data),
+            "_text_pattern_categories": Serializer.serialize(self._text_pattern_categories),
+            "last_location": Serializer.serialize(self.last_location),
+            "location": Serializer.serialize(self.location),
+            "position": Serializer.serialize(self.position)
         }
         
-        return data
-
-    def full_serialize(self, function_memory:FunctionMemory):
-        """
-        This function sends all data needed for multiplayer clients to re-create player displays
-        """
-        return self._get_save(function_memory)
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
 
 if __name__ == "__main__":

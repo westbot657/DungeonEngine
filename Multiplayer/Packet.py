@@ -1,33 +1,25 @@
-# pylint: disable=[W,R,C,import-error]
-import socket
+# pylint: disable=[W,R,C]
+
+import json
 
 class Packet:
-    _content_builders = {}
-    _queue = []
-
-    def __init__(self, source, content):
-        self.source = source
-        self.content = content
-
+    backlog = ""
+    socket = None
+    
     @classmethod
-    def build(cls, source:socket.socket, address:str, content:str):
-        if address not in cls._content_builders:
-            cls._content_builders.update({address: ""})
-        cls._content_builders[address] += content
+    def next(cls) -> dict|None:
+        while True:
+            if "&e" in cls.backlog:
+                packet, cls.backlog = cls.backlog.split("&e", 1)
+                packet = packet.replace("&a", "&")
 
-        while "\n" in (text := cls._content_builders[address]):
-            packet_content, text = text.split("\n", 1)
-            packet_content = packet_content.replace("&new;", "\n").replace("&amp;", "&")
-            cls._content_builders[address] = text
-            packet = cls(source, content)
-
-            cls._queue.append(packet)
-
+                try:
+                    return json.loads(packet)
+                except json.JSONDecodeError:
+                    return None
+            cls.backlog += cls.socket.recv(1024).decode()
+    
     @classmethod
-    def nextPacket(cls):
-        if cls._queue:
-            return cls._queue.pop(0)
-        return None
-
-
+    def send(cls, data:dict):
+        cls.socket.send((json.dumps(data).replace("&", "&a") + "&e").encode())
 

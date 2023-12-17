@@ -9,6 +9,7 @@ try:
     from .EngineOperation import _EngineOperation
     from .Logger import Log
     from .AbstractAmmo import AbstractAmmo, Ammo
+    from .Serializer import Serializable, Serializer
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
@@ -18,9 +19,11 @@ except ImportError:
     from EngineOperation import _EngineOperation
     from Logger import Log
     from AbstractAmmo import AbstractAmmo, Ammo
+    from Serializer import Serializable, Serializer
 
 import random
 
+@Serializable("Weapon")
 class Weapon(GameObject):
     identifier = Identifier("engine", "object/", "weapon")
     def __init__(self, abstract, name:str, description:str, damage:DynamicValue, range:int, max_durability:int, durability:int, ammo_type, events:dict):
@@ -268,3 +271,21 @@ class Weapon(GameObject):
             d.update({"ammo_type": self.ammo_type.identifier.full()})
 
         return d
+
+    def serialize(self):
+        return {
+            "abstract": Serializer.serialize(self.abstract),
+            "name": Serializer.serialize(self.name),
+            "description": Serializer.serialize(self.description),
+            "damage": Serializer.serialize(self.damage),
+            "range": Serializer.serialize(self.range),
+            "durability": Serializer.serialize(self.durability),
+            "max_durability": Serializer.serialize(self.max_durability),
+            "ammo_type": Serializer.serialize(self.ammo_type),
+            "events": Serializer.serialize(self.events)
+        }
+        
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
+

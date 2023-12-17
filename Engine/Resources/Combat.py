@@ -13,6 +13,7 @@ try:
     from .Location import Location
     from .Position import Position
     from .Map import Map
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from AbstractEnemy import AbstractEnemy, Enemy
     from FunctionMemory import FunctionMemory
@@ -26,12 +27,13 @@ except ImportError:
     from Location import Location
     from Position import Position
     from Map import Map
+    from Serializer import Serializer, Serializable
 
 from enum import Enum, auto
 
 import random, re, json, time
 
-
+@Serializable("Combat")
 class Combat(FunctionalElement):
     _combats = {}
 
@@ -175,6 +177,37 @@ class Combat(FunctionalElement):
         }
         self.summarize_output = True
         self._enemies = {}
+
+    def serialize(self):
+        return {
+            "abstract": Serializer.serialize(self.abstract),
+            "location": Serializer.serialize(self.location),
+            "abstract_enemies": Serializer.serialize(self.abstract_enemies),
+            "complete": Serializer.serialize(self.complete),
+            "enemies": Serializer.serialize(self.enemies),
+            "sequence": Serializer.serialize(self.sequence),
+            "data": Serializer.serialize(self.data),
+            "respawn_point": Serializer.serialize(self.respawn_point),
+            "players": Serializer.serialize(self.players),
+            "old_players": Serializer.serialize(self.old_players),
+            "turn_order": Serializer.serialize(self.turn_order),
+            "current_turn": Serializer.serialize(self.current_turn),
+            "scheduled_tasks": Serializer.serialize(self.scheduled_tasks),
+            "tick": Serializer.serialize(self.tick),
+            "turn": Serializer.serialize(self.turn),
+            "last_trigger": Serializer.serialize(self.last_trigger),
+            "input_requests": Serializer.serialize(self.input_requests),
+            "function_memory": Serializer.serialize(self.function_memory),
+            "combat_config": Serializer.serialize(self.combat_config),
+            "active": Serializer.serialize(self.active),
+            "turn_summary": Serializer.serialize(self.turn_summary),
+            "summarize_output": Serializer.serialize(self.summarize_output),
+            "_enemies": Serializer.serialize(self._enemies)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     def resetCombat(self):
         try:
@@ -831,17 +864,5 @@ class Combat(FunctionalElement):
         ]
         
         return "\n".join(lines)
-    
-    def serialize(self, function_memory:FunctionMemory):
-        """
-        This returns only the information needed to re-create the combat ui display for multiplayer
-        """
-        data = {
-            "turn_order": [e.serialize(function_memory) for e in self.turn_order],
-            "turn": self.turn_order.index(self.turn)
-        }
-        
-        return data
-        
 
 

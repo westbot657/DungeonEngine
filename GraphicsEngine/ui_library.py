@@ -97,13 +97,10 @@ class DiscordPresence(dict):
             self.active[id].update(kwargs)
 
 RPCD = DiscordPresence(RPC)
-
 RPC = RPCD
 
 class Color(list):
-    # __slots__ = [
-    #     "r", "g", "b", "a"
-    # ]
+    __slots__ = ["r", "g", "b", "a"]
     def __init__(self, r, g, b, a=None):
         self.r = r
         self.g = g
@@ -163,7 +160,6 @@ class Color(list):
             raise ValueError(f"Invalid Color! ({obj})")
 
 PATH = "./ui_resources"
-
 FONT = f"{PATH}/PTMono-Regular.ttf" # PTMono-Regular has correct lineup for │ and ┼!
 
 with open("./editor_settings.json", "r+", encoding="utf-8") as f:
@@ -3838,11 +3834,9 @@ class Link(UIElement):
     def _update(self, editor, X, Y): pass
 
 class ContextTree(UIElement):
-    
     global_tree = None
     
     class Line: pass
-        # __slots__ = []
     
     __slots__ = [
         "visible", "width", "option_height", "text_color", "bg_color",
@@ -3852,9 +3846,7 @@ class ContextTree(UIElement):
     
     @classmethod
     def new(cls, x, y, width, height, label, *args, **kwargs) -> Button:
-        """
-        See ContextTree.__init__() for args/kwargs
-        """
+        """See ContextTree.__init__() for args/kwargs"""
         _m = cls(*args, **kwargs)
         m = Button(x, y, width, height, label, hover_color=(50, 50, 50), click_color=(50, 50, 50))
         m.on_left_click = _m
@@ -3873,24 +3865,26 @@ class ContextTree(UIElement):
         self.hover_color = hover_color
         self.click_color = click_color
         self.tree = {}
-        
         self.parent = None
-        
         h = 0
+
         for obj in tree_fields:
             if isinstance(obj, ContextTree.Line):
                 self.tree.update({h: Box(0, h, self.width, 1, self.line_color)})
                 h += 1/2
+
             elif isinstance(obj, dict):
                 for key, val in obj.items():
                     if val is None:
                         continue
+
                     b = Button(0, h, self.width, self.option_height, key, self.bg_color, self.text_color, self.text_size, self.hover_color, self.click_color)
                     b.on_left_click = val
                     if isinstance(val, UIElement):
                         b.children.append(val)
                         if isinstance(val, ContextTree):
                             val.parent = b
+
                     self.tree.update({h: b})
                     h += self.option_height/2
 
@@ -3924,7 +3918,6 @@ class ContextTree(UIElement):
                 t._event(editor, X + _x, Y + h)
 
 class DirectoryTree(UIElement):
-    
     folds = {
         "open": Image(f"{PATH}/folder_open.png", 0, 0, 14, 14),
         "closed": Image(f"{PATH}/folder_closed.png", 0, 0, 14, 14)
@@ -3943,7 +3936,6 @@ class DirectoryTree(UIElement):
     ]
     
     class Folder(UIElement):
-        
         __slots__ = [
             "parent", "name", "width", "components", "collapsed", "height", "_height",
             "hitbox", "fold_arrow", "label"
@@ -3957,18 +3949,15 @@ class DirectoryTree(UIElement):
             self.collapsed = collapsed
             self.height = 15
             self._height = 15
-            
             self.hitbox = Button(0, 0, width, 15)
             self.fold_arrow = DirectoryTree.folds["closed" if collapsed else "open"]
             self.label = Text(14, -1, width-14, name, text_size=12, text_bg_color=None)
-            
             self.hitbox.on_left_click = self._toggle
             
         def get_expanded(self) -> dict:
             if self.collapsed: return {}
 
             d = {}
-
             for f in self.components:
                 if isinstance(f, DirectoryTree.Folder):
                     d.update(f.get_expanded())
@@ -3976,6 +3965,7 @@ class DirectoryTree(UIElement):
             return {self.name: d}
         
         def expand_tree(self, tree):
+
             if self.collapsed:
                 self._toggle(None)
                 
@@ -3983,18 +3973,17 @@ class DirectoryTree(UIElement):
                 if isinstance(f, DirectoryTree.Folder) and (f.name in tree.keys()):
                     f.expand_tree(tree[f.name])
 
-
-
         def _toggle(self, editor): # "editor" is an argument as it is passed by the button this function is bound to
-            # print("toggle fold!")
             self.collapsed = not self.collapsed
             self.fold_arrow = DirectoryTree.folds["closed" if self.collapsed else "open"]
         
         def _update(self, editor, X, Y, x_offset=0):
             self.fold_arrow._update(editor, X+x_offset, Y)
             self.label._update(editor, X+x_offset, Y)
+
             if self.collapsed:
                 self.height = self._height
+
             else:
                 self.height = self._height
                 for component in self.components:
@@ -4003,12 +3992,11 @@ class DirectoryTree(UIElement):
                     self.height += component.height
         
         def _event(self, editor, X, Y, x_offset=0):
-            
             self.hitbox._event(editor, X, Y)
-            # self.fold_arrow._event(editor, X+x_offset, Y)
             
             if self.collapsed:
                 self.height = self._height
+
             else:
                 self.height = self._height
                 for component in self.components:
@@ -4017,7 +4005,6 @@ class DirectoryTree(UIElement):
                     self.height += component.height
 
     class File(UIElement):
-        
         __slots__ = [
             "parent", "name", "width", "on_click", "icon", "height",
             "hitbox", "label"#, "rct"
@@ -4030,70 +4017,27 @@ class DirectoryTree(UIElement):
             self.on_click = on_click
             self.icon = DirectoryTree.file_icons[icon]
             self.height = 15
-            
             self.hitbox = Button(0, 0, width, 15, "", (255, 0, 0))
             self.label = Text(14, -1, width-14, name, text_size=12, text_bg_color=None)
-
-            # self.ctx_tree_opts = (20, TEXT_COLOR, TEXT_BG_COLOR, (70, 70, 70), TEXT_SIZE, (50, 50, 50), (50, 50, 50))
-            # self.top_bar_file = ContextTree.new(
-            #     20, 0, 40, 20, "File", [
-            #         {
-            #             "New File...": self.top_bar_file_new_file
-            #         },
-            #         ContextTree.Line(),
-            #         {
-            #             "Open File...": self.top_bar_file_open_file,
-            #             "Open Folder...": self.top_bar_file_open_folder
-            #         },
-            #         ContextTree.Line(),
-            #         {
-            #             "Save": self.top_bar_file_save,
-            #             "Save All": self.top_bar_file_save_all
-            #         },
-            #         ContextTree.Line(),
-            #         {
-            #             "Exit": self.top_bar_file_exit
-            #         }
-            #     ], 115, *self.ctx_tree_opts
-            # )
-
-            # self.rct = ContextTree([
-            #     {
-            #         "Rename... (WIP)": self.rename_opt,
-            #         "Delete": self.delete_opt
-            #     }
-            # ], 115, 20)
-
-            # self.rct.parent = self
-
             self.hitbox.on_left_click = on_click
-            # self.hitbox.on_right_click = self.rct
-            # self.children.append(self.rct)
-            
-        # def rename_opt(self, *_, **__):
-        #     print("rename!")
-        
-        # def delete_opt(self, *_, **__):
-        #     print("delete!")
 
         def _update(self, editor, X, Y, x_offset=0):
-            # self.hitbox._update(editor, X, Y)
             self.icon._update(editor, X+x_offset, Y)
             self.label._update(editor, X+x_offset, Y)
-            # self.rct._update(editor, X+x_offset, Y)
         
         def _event(self, editor, X, Y, x_offset=0):
             self.hitbox._event(editor, X, Y)
-            # self.label.width
-            # self.rct._event(editor, X+x_offset, Y)
 
     def _get_icon_for_file(self, file_name):
         if file_name.endswith((".ds", ".dungeon_script")):
             return "ds"
+        
         elif file_name.endswith(".combat"):
             return "combat"
+        
         elif file_name.endswith(".json"):
             return "json"
+        
         return "default"
 
     def parse_components(self, name, tree, parent):
@@ -4101,7 +4045,9 @@ class DirectoryTree(UIElement):
             comps = []
             for k, v in tree.items():
                 comps.append(self.parse_components(k, v, parent))
+
             return DirectoryTree.Folder(name, self.width, comps, parent)
+        
         else:
             return DirectoryTree.File(name, tree, self._get_icon_for_file(name), self.width, parent)
 
@@ -4112,17 +4058,15 @@ class DirectoryTree(UIElement):
         self.expanded = False
         self.width = width
         self.children = []
-        
         self._height = 0
         self.height = 0
-        
         self.components = []
+        
         for name, comp in components.items():
             self.components.append(self.parse_components(name, comp, self))
         
         self.surface = Scrollable(self.x, self.y, 225, editor.height-42, (24, 24, 24), left_bound=0, top_bound = 0)
         self.children.append(self.surface)
-        
         self.folder = DirectoryTree.Folder(self.name, width, self.components, self, False)
         self.surface.children.append(self.folder)
 
@@ -4136,40 +4080,28 @@ class DirectoryTree(UIElement):
         self.surface.height = editor.height-42
 
     def _update(self, editor, X, Y):
-        
-        # print("dir tree update!")
-        
-        # self.surface._update(editor, X, Y)
-        
         for child in self.children:
             child._update(editor, X, Y)
     
     def _event(self, editor, X, Y):
-        
         _c = self.children.copy()
         _c.reverse()
+
         for child in _c:
             child._event(editor, X, Y)
         
-        # self.surface._event(editor, X + self.x, Y + self.y)
-
 class Popup(UIElement):
     _popup = None
-
     tick = 0
     
     def __init__(self, width:int, height:int):
         self.width = width
         self.height = height
         self.children = []
-
         self.mask = Button(0, 20, 1, 1, "", (0, 0, 0, 127), hover_color=(0, 0, 0, 127))
         self.mask.on_left_click = self._mask_on_click
-
         self.bg = Button(0, 0, self.width, self.height, bg_color=(24, 24, 24), hover_color=(24, 24, 24))
-
         self._on_close = self._default_on_close
-
         self.x = 0
         self.y = 0
 
@@ -4186,6 +4118,7 @@ class Popup(UIElement):
 
     def popup(self):
         MultilineTextBox.set_focus(None)
+
         if isinstance(Popup._popup, Popup):
             Popup._popup._on_close()
         
@@ -4202,10 +4135,8 @@ class Popup(UIElement):
     def _update_layout(self, editor):
         self.x = (editor.width-self.width)/2
         self.y = (editor.height-self.height)/2
-
         self.bg.width = self.width
         self.bg.height = self.height
-        
         self.mask.width = editor.width
         self.mask.height = editor.height-40
     
@@ -4227,6 +4158,7 @@ class Popup(UIElement):
 
         _c = self.children.copy()
         _c.reverse()
+
         for child in _c:
             child._event(editor, X+self.x, Y+self.y)
         
@@ -4234,19 +4166,16 @@ class Popup(UIElement):
         self.mask._event(editor, X, Y)
 
 class Editor:
+
     def __init__(self, engine, io_hook, width=1280, height=720) -> None:
         self.screen:pygame.Surface = None
         self.engine = engine
         self.io_hook = io_hook
         self.game_app: GameApp = None
-        # self.window = Window.from_display_module()
         self.previous_mouse = [False, False, False]
         self.mouse = [False, False, False]
         self.mouse_pos = (0, 0)
         self.previous_keys = []
-        # self.keys = []
-        # self.new_keys = []
-        # self.old_keys = []
         self.override_cursor = False
         self.running = True
         self._updates = []
@@ -4260,7 +4189,6 @@ class Editor:
         self._focused_object = None
         self._hovered = False
         self._hovering = None
-
         self.unicodes = {
             pygame.K_UP: "$↑",
             pygame.K_DOWN: "$↓",
@@ -4271,52 +4199,46 @@ class Editor:
         self.keys = []
         self.typing = []
 
-    # def set_window_location(self, x, y):
-    #     if int(time.time() % 5) == 0:
-    #         # window = Window.from_display_module()
-    #         # window.position = (x, y)
-    #         os.environ["SDL_VIDEO_WINDOW_POS"] = f"{x},{y}"
-            
-    #         pygame.display.set_mode((self.width+1, self.height))
-    #         self.screen = pygame.display.set_mode((self.width, self.height))
-
     def set_window_location(self, new_x, new_y):
-        # print("position?")
         hwnd = pygame.display.get_wm_info()['window']
         windll.user32.MoveWindow(hwnd, int(new_x), int(new_y), int(self.width), int(self.height), False)
 
     def left_mouse_down(self): return (self.previous_mouse[0] is False) and (self.mouse[0] is True)
+
     def left_mouse_up(self): return (self.previous_mouse[0] is True) and (self.mouse[0] is False)
+
     def middle_mouse_down(self): return (self.previous_mouse[1] is False) and (self.mouse[1] is True)
+
     def middle_mouse_up(self): return (self.previous_mouse[1] is True) and (self.mouse[1] is False)
+
     def right_mouse_down(self): return (self.previous_mouse[2] is False) and (self.mouse[2] is True)
+
     def right_mouse_up(self): return (self.previous_mouse[2] is True) and (self.mouse[2] is False)
-    # def queue_update(self, obj): self._updates.append(obj)
 
     def collides(self, mouse, rect) -> bool:
         mx, my = mouse
         x, y, w, h = rect
-        #print(f"Editor: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")
+
         if x <= mx <= x + w and y <= my <= y + h:
             return True
+        
         return False
 
     def cancel_mouse_event(self):
         self.previous_mouse = self.mouse.copy()
 
     def add_layer(self, layer:int, *content):
+
         if not layer in [*self.layers]:
             self.layers.update({layer: []})
+
         for c in content:
             self.layers[layer].append(c)
 
     def run(self):
-        #pygame.init()
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME) # pylint: disable=no-member
-
         pygame.display.set_icon(pygame.image.load(f"{PATH}/dungeon_game_icon.png"))
         pygame.display.set_caption("Insert Dungeon Name Here")
-        
 
         while self.running:
             self.screen.fill((24, 24, 24))
@@ -4326,40 +4248,47 @@ class Editor:
             self._hovering = None
             self.mouse = list(pygame.mouse.get_pressed()) #[mouse.is_pressed(mouse.LEFT), mouse.is_pressed(mouse.MIDDLE), mouse.is_pressed(mouse.RIGHT)]#list(a and b for a, b in zip(pygame.mouse.get_pressed(), ))
             self.mouse_pos = pygame.mouse.get_pos()
-            # print(f"mouse: {self.mouse_pos}")
-            # self.new_keys.clear()
-            # self.old_keys.clear()
             self.width, self.height = self.Width, self.Height = self.screen.get_size()
-
             self.typing.clear()
-
             self.scroll = 0
+
             for event in pygame.event.get():
+
                 if event.type == pygame.MOUSEWHEEL: # pylint: disable=no-member
                     self.scroll = event.y
+
                 elif event.type == pygame.KEYDOWN: # pylint: disable=no-member
+
                     if event.key not in self.keys:
                         self.keys.append(event.key)
+
                     un = self.unicodes.get(event.key, event.unicode)
+
                     if un:
                         self.unicode.update({un: time.time()})
                         self.typing.append(un)
-                    # self.new_keys.append(event.unicode or event.key)
-                    # self.keys.append(event.key)
+                        
                 elif event.type == pygame.KEYUP: # pylint: disable=no-member
+
                     if event.key in self.keys:
                         self.keys.remove(event.key)
+
                     un = self.unicodes.get(event.key, event.unicode)
+
                     if un and un in self.unicode.keys():
                         self.unicode.pop(un)
+
                 elif event.type == pygame.QUIT: # pylint: disable=no-member
                     pygame.quit() # pylint: disable=no-member
                     self.running = False
                     return
 
             nt = time.time()
+
             for key, t in self.unicode.items():
+
                 if (nt - t) > 0.8:
+
                     if int(((nt - t) * 1000) % 5) == 0:
                         self.typing.append(key)
 
@@ -4371,38 +4300,40 @@ class Editor:
                 Popup._popup._event(self, 0, 0)
 
             rmd = self.right_mouse_down()
-
             _layers = layers.copy()
             _layers.reverse()
+
             for l in _layers:
                 _l = self.layers[l].copy()
                 _l.reverse()
+
                 for i in _l:
                     i._event(self, 0, 0)
 
             if rmd:
-                # print("right click!")
+
                 if self._hovering is not None:
-                    # print(f"right clicked on {self._hovering}")
+
                     if hasattr(self._hovering, "on_right_click"):
+
                         try:
                             self._hovering.on_right_click(self, self._hovering)
+
                         except Exception as e:
                             print("\n".join(e.args))
 
             for l in layers:
+
                 for i in self.layers[l]:
                     i._update(self, 0, 0)
 
-            
             if Popup._popup:
                 Popup._popup._update(self, 0, 0)
-            #self.screen.fill((255, 0, 0), (self.mouse_pos[0]-1, self.mouse_pos[1]-1, 3, 3))
-
-            # print(self._hovering)
+                
             pygame.display.update()
 
 class DebugApp(UIElement):
+
     def __init__(self, code_editor, editor):
         ... # This is ambitious
     
@@ -4420,39 +4351,55 @@ class GameApp(UIElement):
     
     class SerialIdentifier:
         ...
+
     class SerialAbstractObject:
         ...
+        
     class SerialTool:
         ...
+
     class SerialAmmo:
         ...
+
     class SerialArmor:
         ...
+
     class SerialWeapon:
         ...
+
     class SerialItem:
         ...
+
     class SerialInventory:
+
         def __init__(self, data:list):
             self.equips = {}
             self.contents = []
             
     class SerialLocation:
         ...
+
     class SerialPosition:
         ...
+
     class SerialStatusEffect:
         ...
+
     class SerialStatusEffectManager:
+
         def __init__(self, data:list):
             ...
+
     class SerialCurrency:
         __slots__ = [
             "gold", "silver", "copper"
         ]
+
         def __init__(self, data:list):
             self.gold, self.silver, self.copper = data
+
     class SerialPlayer:
+
         def __init__(self, data:dict):
             self.uuid = data["id"]
             self.name = data["name"]
@@ -4466,12 +4413,14 @@ class GameApp(UIElement):
             self.currency = GameApp.SerialCurrency(data["currency"])
 
     class SerialEntity:
+
         def __init__(self, data:dict):
             self.name = data["name"]
             self.health = data["health"]
             self.max_health = data["max_health"]
 
     class SerialCombat:
+
         def __init__(self, data:dict):
             self.turn_order = [GameApp.SerialEntity(d) for d in data["turn_order"]]
             self.turn = self.turn_order[data["turn"]]
@@ -4507,15 +4456,14 @@ class GameApp(UIElement):
             self.current = options.get("current_hp", (20, 168, 0))
             self.shadow_heal = options.get("shadow_heal", (26, 218, 0))
             self.shadow_damage = options.get("shadow_damage", (210, 4, 4))
-            
             self.full_bar = Box(0, 0, width, height, self.background)
             self.current_bar = Box(0, 0, (self.current_health/self.max_health)*width, height, self.current)
             self.shadow_heal_bar = Box(0, 0, 0, height, self.shadow_heal)
             self.shadow_damage_bar = Box(0, 0, 0, height, self.shadow_damage)
-            
             self.shadow = ""
     
         def set_current_health(self, health):
+
             if health < self.current_health:
                 health = max(0, health)
                 self.shadow_damage_bar.x = (health/self.max_health)*self.width
@@ -4531,6 +4479,7 @@ class GameApp(UIElement):
                 self.shadow_heal_bar.width =  self.current_bar.width - self.shadow_heal_bar.x
                 self.shadow = "heal"
                 self.current_health = health
+
             else:
                 self.shadow = ""
             
@@ -4543,6 +4492,7 @@ class GameApp(UIElement):
 
             if self.shadow == "heal":
                 self.shadow_heal_bar._update(editor, X+self.x, Y+self.y)
+
             elif self.shadow == "damage":
                 self.shadow_damage_bar._update(editor, X+self.x, Y+self.y)
 
@@ -4557,33 +4507,27 @@ class GameApp(UIElement):
             self.game_app = game_app
             self.background = Image(f"{PATH}/enemy_card.png", 0, 0, 400, 85)
             self.background_turn = Image(f"{PATH}/enemy_card_turn.png", 0, 0, 400, 85)
-            
             self.name_display = Text(10, 10, 1, enemy.name, text_bg_color=None)
-            
             self.health_bar = GameApp.HealthBar(290, 10, 100, 20, enemy.max_health, enemy.health)
             self._max = enemy.max_health
-
             self.health_display = Text(290, 12, 100, f"{enemy.health}/{enemy.max_health}", (0, 0, 0), text_size=14, text_bg_color=None)
-
             self.health_display.set_text(f"{self.enemy.health}/{self._max}")
             self.health_display.x = 340 - (self.health_display.width/2)
-        
             self.old_health = enemy.health
-        
-            # self.children.append(self.background)
             self.children.append(self.name_display)
             self.children.append(self.health_bar)
             self.children.append(self.health_display)
         
         def _update(self, editor, X, Y):
+
             if self.enemy is self.game_app.current_combat.turn:
                 self.background_turn._update(editor, X+self.x, Y+self.y)
+
             else:
                 self.background._update(editor, X+self.x, Y+self.y)
 
             for child in self.children:
                 child._update(editor, X+self.x, Y+self.y)
-
 
         def _event(self, editor, X, Y):
 
@@ -4601,10 +4545,13 @@ class GameApp(UIElement):
 
         @staticmethod
         def get_icon(obj):
+
             if p := SETTINGS["icons"].get(obj.abstract.identifier.full(), None):
                 return Image(f"{PATH}/{p}.png", 0, 0, 25, 25)
+            
             elif p := SETTINGS["icons"].get(obj.identifier.full()):
                 return Image(f"{PATH}/{p}.png", 0, 0, 25, 25)
+            
             return f"{PATH}/sword_icon.png"
 
     class WeaponCard(UIElement):
@@ -4619,26 +4566,23 @@ class GameApp(UIElement):
             self.children = []
             self.background = Image(f"{PATH}/object_card.png", 0, 0, 400, GameApp.GameCard.height)
             self.background_active = Image(f"{PATH}/object_card_active.png", 0, 0, 400, GameApp.GameCard.height)
-
             self.icon = GameApp.GameCard.get_icon(obj)
             self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
             self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
-
             self.damage_display = Text(5, 55, 100, f"{obj.damage.quickDisplay(self.game_app.editor.engine._function_memory)} damage", text_bg_color=None)
             self.durability_bar = GameApp.HealthBar(295, 55, 100, 15, obj.max_durability, obj.durability)
-
             self.children.append(self.icon)
             self.children.append(self.name_display)
             self.children.append(self.description_display)
             self.children.append(self.damage_display)
             self.children.append(self.durability_bar)
-
             self.active = active
 
         def _update(self, editor, X, Y):
 
             if self.active:
                 self.background_active._update(editor, X+self.x, Y+self.y)
+
             else:
                 self.background._update(editor, X+self.x, Y+self.y)
 
@@ -4648,10 +4592,12 @@ class GameApp(UIElement):
         def _event(self, editor, X, Y):
             _c = self.children.copy()
             _c.reverse()
+
             for child in _c:
                 child._event(editor, X+self.x, Y+self.y)
 
     class ToolCard(UIElement):
+
         def __init__(self, game_app, obj, x, y, active):
             self.game_app = game_app
             self.obj = obj
@@ -4662,26 +4608,21 @@ class GameApp(UIElement):
             self.children = []
             self.background = Image(f"{PATH}/object_card.png", 0, 0, 400, GameApp.GameCard.height)
             self.background_active = Image(f"{PATH}/object_card_active.png", 0, 0, 400, GameApp.GameCard.height)
-
             self.icon = GameApp.GameCard.get_icon(obj)
             self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
             self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
-
-            # self.damage_display = Text(5, 55, 100, f"{obj.damage}dmg", text_bg_color=None)
             self.durability_bar = GameApp.HealthBar(295, 55, 100, 15, obj.max_durability, obj.durability)
-
             self.children.append(self.icon)
             self.children.append(self.name_display)
             self.children.append(self.description_display)
-            # self.children.append(self.damage_display)
             self.children.append(self.durability_bar)
-
             self.active = active
 
         def _update(self, editor, X, Y):
 
             if self.active:
                 self.background_active._update(editor, X+self.x, Y+self.y)
+
             else:
                 self.background._update(editor, X+self.x, Y+self.y)
 
@@ -4691,6 +4632,7 @@ class GameApp(UIElement):
         def _event(self, editor, X, Y):
             _c = self.children.copy()
             _c.reverse()
+
             for child in _c:
                 child._event(editor, X+self.x, Y+self.y)
 
@@ -4705,32 +4647,28 @@ class GameApp(UIElement):
             self.children = []
             self.background = Image(f"{PATH}/object_card.png", 0, 0, 400, GameApp.GameCard.height)
             self.background_active = Image(f"{PATH}/object_card_active.png", 0, 0, 400, GameApp.GameCard.height)
-
             self.icon = GameApp.GameCard.get_icon(obj)
             self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
             self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
-
             dmg = obj.bonus_damage.quickDisplay(self.game_app.editor.engine._function_memory)
             self.damage_display = Text(5, 55, 100, f"{dmg} bonus damage", text_bg_color=None)
             self.count_disp = f"{obj.count}/{obj.max_count}" if obj.max_count > 0 else f"{obj.count}"
             self.count_display = Text(0, 0, 1, self.count_disp, text_bg_color=None)
             self.count_display.x = 395 - self.count_display.width
             self.count_display.y = 70 - self.count_display.height
-
             self.old_count = obj.count
-
             self.children.append(self.icon)
             self.children.append(self.name_display)
             self.children.append(self.description_display)
             self.children.append(self.damage_display)
             self.children.append(self.count_display)
-
             self.active = active
 
         def _update(self, editor, X, Y):
 
             if self.active:
                 self.background_active._update(editor, X+self.x, Y+self.y)
+
             else:
                 self.background._update(editor, X+self.x, Y+self.y)
 
@@ -4746,10 +4684,12 @@ class GameApp(UIElement):
 
             _c = self.children.copy()
             _c.reverse()
+
             for child in _c:
                 child._event(editor, X+self.x, Y+self.y)
     
     class ArmorCard(UIElement):
+
         def __init__(self, game_app, obj, x, y, active):
             self.game_app = game_app
             self.obj = obj
@@ -4760,26 +4700,23 @@ class GameApp(UIElement):
             self.children = []
             self.background = Image(f"{PATH}/object_card.png", 0, 0, 400, GameApp.GameCard.height)
             self.background_active = Image(f"{PATH}/object_card_active.png", 0, 0, 400, GameApp.GameCard.height)
-
             self.icon = GameApp.GameCard.get_icon(obj)
             self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
             self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
-
             self.damage_display = Text(5, 55, 100, f"{obj.damage_reduction.quickDisplay(self.game_app.editor.engine._function_memory)} defense", text_bg_color=None)
             self.durability_bar = GameApp.HealthBar(295, 55, 100, 15, obj.max_durability, obj.durability)
-
             self.children.append(self.icon)
             self.children.append(self.name_display)
             self.children.append(self.description_display)
             self.children.append(self.damage_display)
             self.children.append(self.durability_bar)
-
             self.active = active
 
         def _update(self, editor, X, Y):
 
             if self.active:
                 self.background_active._update(editor, X+self.x, Y+self.y)
+
             else:
                 self.background._update(editor, X+self.x, Y+self.y)
 
@@ -4789,10 +4726,12 @@ class GameApp(UIElement):
         def _event(self, editor, X, Y):
             _c = self.children.copy()
             _c.reverse()
+
             for child in _c:
                 child._event(editor, X+self.x, Y+self.y)
     
     class ItemCard(UIElement):
+
         def __init__(self, game_app, obj, x, y, active):
             self.game_app = game_app
             self.obj = obj
@@ -4803,31 +4742,25 @@ class GameApp(UIElement):
             self.children = []
             self.background = Image(f"{PATH}/object_card.png", 0, 0, 400, GameApp.GameCard.height)
             self.background_active = Image(f"{PATH}/object_card_active.png", 0, 0, 400, GameApp.GameCard.height)
-
             self.icon = GameApp.GameCard.get_icon(obj)
             self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
             self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
-
-            # self.damage_display = Text(5, 55, 100, f"{'+' if obj.damage >= 0 else '-'}{obj.damage}dmg", text_bg_color=None)
             self.count_disp = f"{obj.count}/{obj.max_count}" if obj.max_count > 0 else f"{obj.count}"
             self.count_display = Text(0, 0, 1, self.count_disp, text_bg_color=None)
             self.count_display.x = 395 - self.count_display.width
             self.count_display.y = 70 - self.count_display.height
-
             self.old_count = obj.count
-
             self.children.append(self.icon)
             self.children.append(self.name_display)
             self.children.append(self.description_display)
-            # self.children.append(self.damage_display)
             self.children.append(self.count_display)
-
             self.active = active
 
         def _update(self, editor, X, Y):
 
             if self.active:
                 self.background_active._update(editor, X+self.x, Y+self.y)
+
             else:
                 self.background._update(editor, X+self.x, Y+self.y)
 
@@ -4843,50 +4776,26 @@ class GameApp(UIElement):
 
             _c = self.children.copy()
             _c.reverse()
+
             for child in _c:
                 child._event(editor, X+self.x, Y+self.y)
-
-
-    # class CombatLabel(UIElement):
-    #     def __init__(self, ):
-    #         self.children = []
-    #         self.width = 400
-    #         self.height = 85
-    #         self.background = Image(f"{PATH}/enemy_card.png", 0, 0, 400, 85)
 
     def __init__(self, code_editor, editor):
         self.code_editor = code_editor
         self.children = []
         self.editor = editor
-
         self.player_id = 10
-        
         self.player = None
-        
         editor.game_app = self
         self.io_hook = editor.io_hook
         editor.io_hook.game_app = self
-        
         self.main_hud = Box(51, editor.height-106, editor.width-57, 85, (24, 24, 24))
         self.children.append(self.main_hud)
-        
         self.main_hud_line = Box(51, editor.height-107, editor.width-52, 1, (70, 70, 70))
         self.children.append(self.main_hud_line)
-        
         self.player_inventory = None
         self.current_combat = None
-        
         self.page = "inv"
-        # pages: IO, Inventory, Combat, Logs
-        
-        # self.page_io_icons = (
-        #     Image(f"{PATH}/page_io_icon", 0, 0, 50, 51),
-        #     Image(f"{PATH}/page_io_icon_hovered", 0, 0, 50, 51),
-        #     Image(f"{PATH}/page_io_icon_selected", 0, 0, 50, 51)
-        # )
-        # self.page_io_tab = Button(editor.width-(50*4), editor.height-107, 50, 51, "", self.page_io_icons[2], hover_color=self.page_io_icons[2], click_color=self.page_io_icons[2])
-        # self.children.append(self.page_io_tab)
-        
         self.page_inv_icons = (
             Image(f"{PATH}/page_inv_icon.png", 0, 0, 50, 51),
             Image(f"{PATH}/page_inv_icon_hovered.png", 0, 0, 50, 51),
@@ -4895,7 +4804,6 @@ class GameApp(UIElement):
         self.page_inv_tab = Button(editor.width-(50*3), editor.height-107, 50, 51, "", self.page_inv_icons[2], hover_color=self.page_inv_icons[2], click_color=self.page_inv_icons[2])
         self.page_inv_tab.on_left_click = self.page_inv_onclick
         self.children.append(self.page_inv_tab)
-        
         self.page_combat_icons = (
             Image(f"{PATH}/page_combat_icon.png", 0, 0, 50, 51),
             Image(f"{PATH}/page_combat_icon_hovered.png", 0, 0, 50, 51),
@@ -4904,7 +4812,6 @@ class GameApp(UIElement):
         self.page_combat_tab = Button(editor.width-(50*2), editor.height-107, 50, 51, "", self.page_combat_icons[0], hover_color=self.page_combat_icons[1], click_color=self.page_combat_icons[2])
         self.page_combat_tab.on_left_click = self.page_combat_onclick
         self.children.append(self.page_combat_tab)
-        
         self.page_log_icons = (
             Image(f"{PATH}/page_log_icon.png", 0, 0, 50, 51),
             Image(f"{PATH}/page_log_icon_hovered.png", 0, 0, 50, 51),
@@ -4913,58 +4820,42 @@ class GameApp(UIElement):
         self.page_log_tab = Button(editor.width-(50), editor.height-107, 50, 51, "", self.page_log_icons[0], hover_color=self.page_log_icons[1], click_color=self.page_log_icons[2])
         self.page_log_tab.on_left_click = self.page_log_onclick
         self.children.append(self.page_log_tab)
-        
         self.tab_buttons = (
             ("inv", self.page_inv_tab, self.page_inv_icons),
             ("combat", self.page_combat_tab, self.page_combat_icons),
             ("log", self.page_log_tab, self.page_log_icons)
         )
-
         self.play_pause_buttons = (
             Image(f"{PATH}/play_gray.png", 0, 0, 50, 50),
             Image(f"{PATH}/play_solid.png", 0, 0, 50, 50),
             Image(f"{PATH}/pause_gray.png", 0, 0, 50, 50),
             Image(f"{PATH}/pause_solid.png", 0, 0, 50, 50)
         )
-
-
         self.page_seperator_line = Box(editor.width-451, 21, 1, editor.height-128, (70, 70, 70))
         self.children.append(self.page_seperator_line)
-        
         self.main_out_scrollable = Scrollable(52, 22, editor.width-504, editor.height-130, (31, 31, 31), left_bound=0, top_bound=0)
-
         self.main_output = MultilineText(0, 0, editor.width-504, editor.height-130, "", text_bg_color=(31, 31, 31))
         self.main_out_scrollable.children.append(self.main_output)
         self.children.append(self.main_out_scrollable)
-        
         self.log_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130, (24, 24, 24), left_bound=0, top_bound=0)
         self.log_output = MultilineText(0, 0, 450, editor.height-130, "")
         self.log_scrollable.children.append(self.log_output)
-        
         self.enemy_card_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130, left_bound=0, top_bound=0, right_bound=0)
         self.no_combat_text = Text(0, 0, 1, "You are not in combat", text_size=25)
-        # self.in_combat = False
-
         self.inventory_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130, left_bound=0, top_bound=0, right_bound=0, scroll_speed=30)
         self.empty_inventory_text = Text(0, 0, 1, "Your inventory is empty or not loaded", text_size=18)
-        
         self.buttons_left_bar = Box(editor.width-502, 21, 1, 50, (70, 70, 70))
         self.buttons_bottom_bar = Box(editor.width-501, 71, 51, 1, (70, 70, 70))
         self.children.append(self.buttons_left_bar)
         self.children.append(self.buttons_bottom_bar)
-        
-
         self.play_pause = Button(editor.width-501, 21, 50, 50, "", self.play_pause_buttons[0], hover_color=self.play_pause_buttons[1])
         self.play_pause.on_left_click = self.play_pause_toggle
         self.children.append(self.play_pause)
-
-        
         self.input_marker = Text(52, editor.height-106, content="Input:", text_bg_color=(70, 70, 70))
         self.input_box = MultilineTextBox(52+self.input_marker.width, editor.height-106, editor.width-504-self.input_marker.width, self.input_marker.height, text_bg_color=(70, 70, 70))
         self.children.append(self.input_marker)
         self.children.append(self.input_box)
         self.input_box.on_enter(self.input_on_enter)
-        
         self.id_refresh = Button(56, editor.height-75, 15, 15, "", Image(f"{PATH}/id_refresh.png", 0, 0, 15, 15), hover_color=Image(f"{PATH}/id_refresh_hovered.png", 0, 0, 15, 15))
         self.id_refresh.on_left_click = self.refresh_player_data
         self.id_input = MultilineTextBox(71, editor.height-75, 15, 15, "10", text_bg_color=(31, 31, 31))
@@ -4972,41 +4863,28 @@ class GameApp(UIElement):
         self.id_input.char_whitelist = [a for a in "0123456789"]
         self.children.append(self.id_refresh)
         self.children.append(self.id_input)
-        
         self.player_name_display = Text(96, editor.height-75, content="[Start game to load player info]", text_size=15)
         self.player_location_display = Text(56, editor.height-55, 1, "[location]", text_size=12)
         self.player_money_display = Text(editor.width-200, editor.height-75, 1, "[money]", text_bg_color=None, text_size=13)
         self._old_location = ""
-
         self.player_health_bar = GameApp.HealthBar(80+self.player_name_display.width + self.id_input._text_width+self.id_refresh.width, editor.height-75, 200, self.player_name_display.height, 20, 20)
         self._old_health = 0
-
         self.children.append(self.player_name_display)
         self.children.append(self.player_location_display)
         self.children.append(self.player_money_display)
-        
         self.new_player_button = Button(50, editor.height-33, 85, 13, " + NEW PLAYER", (31, 31, 31), text_size=10, hover_color=(70, 70, 70))
-
-
         self.new_player_button.on_left_click = self.popup_createplayer
-
         self.children.append(self.new_player_button)
-        
         self.new_player_id_label = Text(15, 25, 1, "Player ID:", text_bg_color=None)
-        
         self.new_player_name_label = Text(125, 25, 1, "Player Name:", text_bg_color=None)
-        
         self.new_player_id_box = MultilineTextBox(15, 50, 75, 1, "10", text_bg_color=(70, 70, 70))
         self.new_player_id_box.single_line = True
         self.new_player_id_box.char_whitelist = [a for a in "0123456789"]
         self.new_player_id_box.on_enter(self.create_player_id_on_enter)
-
         self.new_player_name_box = MultilineTextBox(125, 50, 450, 1, "", text_bg_color=(70, 70, 70))
         self.new_player_name_box.single_line = True
         self.new_player_name_box.on_enter(self.create_player)
-        
         self.new_player_error = MultilineText(15, 75, 570, 300, "", text_color=(255, 180, 180), text_bg_color=None)
-        
         self.new_player_popup = Popup(600, 400).add_children(
             self.new_player_id_label,
             self.new_player_name_label,
@@ -5014,211 +4892,6 @@ class GameApp(UIElement):
             self.new_player_name_box,
             self.new_player_error
         )
-
-
-        # self.children.append(Polygon(
-        #     [
-        #         Point(450, 250),
-        #         Point(400, 400),
-        #         Point(200, 400),
-        #         Point(200, 200),
-        #     ],
-        #     (20, 200, 20),
-        #     draggable=True,
-        #     draggable_points=True
-        # ))
-
-        # def rotater(poly3d):
-        #     poly3d.vertices = [rotate3D(poly3d.data["origin"], v, poly3d.data["rotations"]) for v in poly3d.vertices]
-
-        # def color_shifter(poly3d):
-        #     if poly3d.data["r_shift"] == "up":
-        #         poly3d.color[0] += 1
-        #         if poly3d.color[0] >= 255:
-        #             poly3d.data["r_shift"] = "down"
-        #     elif poly3d.data["r_shift"] == "down":
-        #         poly3d.color[0] -= 1
-        #         if poly3d.color[0] <= 0:
-        #             poly3d.data["r_shift"] = "up"
-            
-        #     if poly3d.data["g_shift"] == "up":
-        #         poly3d.color[1] += 1
-        #         if poly3d.color[1] >= 255:
-        #             poly3d.data["g_shift"] = "down"
-        #     elif poly3d.data["g_shift"] == "down":
-        #         poly3d.color[1] -= 1
-        #         if poly3d.color[1] <= 0:
-        #             poly3d.data["g_shift"] = "up"
-            
-        #     if poly3d.data["b_shift"] == "up":
-        #         poly3d.color[2] += 1
-        #         if poly3d.color[2] >= 255:
-        #             poly3d.data["b_shift"] = "down"
-        #     elif poly3d.data["b_shift"] == "down":
-        #         poly3d.color[2] -= 1
-        #         if poly3d.color[2] <= 0:
-        #             poly3d.data["b_shift"] = "up"
-
-        # def mover(poly3d):
-        #     if poly3d.data["move"] == "left":
-        #         poly3d.vertices = [(v[0]-1, *v[1:3]) for v in poly3d.vertices]
-        #         if min(v[0] for v in poly3d.vertices) <= -800:
-        #             poly3d.data["move"] = "right"
-        #     elif poly3d.data["move"] == "right":
-        #         poly3d.vertices = [(v[0]+1, *v[1:3]) for v in poly3d.vertices]
-        #         if max(v[0] for v in poly3d.vertices) >= 800:
-        #             poly3d.data["move"] = "left"
-
-        # def light_rotater(poly3d:Poly3D):
-        #     Poly3D.light_angle = rotate3D((0, 0, 0), Poly3D.light_angle, (0, 1, 0))
-
-        # img = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\redstone_lamp.png")
-        # img2 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\redstone_lamp_on.png")
-        # img3 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\piston_side_sticky.png")
-        # img4 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\piston_bottom_sticky.png")
-        # img5 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\observer_top.png")
-        # img6 = pygame.image.load("c:\\Users\\Westb\\AppData\\Roaming\\.minecraft\\resourcepacks\\better redstone stuff\\assets\\minecraft\\textures\\block\\hopper_inside_side.png")
-
-        # self.children += [
-            # Polygon(
-            #     [
-            #         Point(100, 50),
-            #         Point(50, 35),
-            #         Point(-35, 35),
-            #         Point(-35, 7.5),
-            #         Point(50, 7.5),
-            #         Point(50, -50),
-            #         Point(-50, -50),
-            #         Point(-50, -35),
-            #         Point(35, -35),
-            #         Point(35, -7.5),
-            #         Point(-50, -7.5),
-            #         Point(-50, 50)
-            #     ],
-            #     (0, 200, 20),
-            #     draggable=True,
-            #     draggable_points=True
-            # )
-            # Poly3D.cube(
-            #     position=(0, 0, -600),
-            #     size=6,
-            #     color=[0, 0, 127],
-            #     rotations=[(35, 0, 0)],
-            #     controllers=[rotater],#, color_shifter],
-            #     data={
-            #         # "r_shift": "none",
-            #         # "g_shift": "down",
-            #         # "b_shift": "up",
-            #         "origin": [0, 0, -600],
-            #         "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
-            #     },
-            #     # texture_mapping = Poly3D.cube_map(None, img4, *([img3]*4), img)
-            # ),
-            # Poly3D.cylinder(
-            #     position=(-200, 0, 200),
-            #     radius=50,
-            #     length=100,
-            #     color=[0, 200, 0],
-            #     subdivisions=20,
-            #     rotations=[(35, 0, 0)],
-            #     controllers=[rotater],
-            #     data={
-            #         "origin": [-200, 0, 200],
-            #         "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
-            #     }
-            # ),
-            # Poly3D.sphere(
-            #     position=(0, -100, 200),
-            #     radius=50,
-            #     subdivisions=18,
-            #     color=[255, 127, 0],
-            #     rotations=[(90, 0, 0)],
-            #     controllers=[rotater],
-            #     data={
-            #         "origin": [0, -100, 200],
-            #         "rotations": [(-35, 0, 0), (0, 0.2, 0), (35, 0, 0)]
-            #     }
-            # ),
-            # Poly3D.extrude_polygon(
-            #     (200, 0, 200),
-            #     Polygon(
-            #         [
-            #             Point(50, 50),
-            #             Point(50, 35),
-            #             Point(-35, 35),
-            #             Point(-35, 7.5),
-            #             Point(50, 7.5),
-            #             Point(50, -50),
-            #             Point(-50, -50),
-            #             Point(-50, -35),
-            #             Point(35, -35),
-            #             Point(35, -7.5),
-            #             Point(-50, -7.5),
-            #             Point(-50, 50)
-            #         ],
-            #         (0, 200, 20)
-            #     ),
-            #     20,
-            #     [200, 200, 10],
-            #     [(0, 40, 0), (-35, 0, 0)],
-            #     controllers=[rotater],
-            #     data={
-            #         "origin": [200, 0, 200],
-            #         "rotations": [(1, 1, 0)]
-            #     }
-            # ),
-            # Poly3D.cube(
-            #     (200, 0, -100),
-            #     50,
-            #     [0, 200, 0],
-            #     rotations=[(0, 40, 0), (35, 0, 0)],
-            #     controllers=[rotater, color_shifter],
-            #     data={
-            #         "r_shift": "up",
-            #         "g_shift": "down",
-            #         "b_shift": "up",
-            #         "origin": [200, 0, -100]
-            #     }
-            # ),
-            # Poly3D.cube(
-            #     (-150, 0, -150),
-            #     50,
-            #     [0, 0, 0],
-            #     rotations=[(0, 40, 0), (35, 0, 0)],
-            #     controllers=[rotater, color_shifter],
-            #     data={
-            #         "r_shift": "up",
-            #         "g_shift": "none",
-            #         "b_shift": "none",
-            #         "origin": [-150, 0, -150]
-            #     }
-            # ),
-        # ]
-
-        
-
-        # self.test = GameApp.HealthBar(100, 100, 100, 20, 67, 34)
-        # self.test.set_current_health(33)
-        # self.children.append(self.test)
-        
-        # Display:
-        #
-        # General Info:
-        # output (game)
-        # output (logs)
-        # input
-        # input history
-        # player name
-        # player health
-        # player inventory
-        # player status effects
-        # player location
-        # 
-        # When in combat:
-        # enemy names and health
-        # other player's names (maybe health?)
-        # who's turn it is
-        # 
 
     def popup_createplayer(self, editor):
         self.new_player_popup.popup()
@@ -5235,21 +4908,23 @@ class GameApp(UIElement):
 
     def create_player(self, text_box):
         name = text_box.get_content().strip()
-
         id = int(self.new_player_id_box.get_content())
 
         if id < 10 and not name:
             self.new_player_error.set_colored_content(f"Invalid ID:\nID must be 10 or larger.\n\nInvalid Name:\nName cannot be blank or whitespace.")
             self.new_player_id_box.set_content("10")
             return
+        
         elif id < 10:
             self.new_player_error.set_colored_content(f"Invalid ID:\nID must be 10 or larger.")
             self.new_player_id_box.set_content("10")
             return
+        
         elif not name:
             self.new_player_error.set_colored_content(f"Invalid Name:\nName cannot be blank or whitespace.")
             self.new_player_id_box.set_content("10")
             return
+        
         else:
             self.editor.engine.handleInput(0, f"engine:new-player {id} \"{name}\"")
 
@@ -5259,14 +4934,13 @@ class GameApp(UIElement):
         if c < 10:
             c = 10
             text_box.set_content("10")
+
         self.player_id = c
         self.refresh_player_data(self.editor)
     
     def refresh_player_data(self, editor):
-
         self.player_id = max(10, int(self.id_input.get_content()))
         self.id_input.set_content(str(self.player_id))
-
         editor.engine.handleInput(0, f"engine:ui/get_player {self.player_id}")
 
     def updateInventory(self, inventory=...):
@@ -5279,6 +4953,7 @@ class GameApp(UIElement):
             equips = self.player_inventory.equips.values()
             y = 10
             x = 25
+
             for item in self.player_inventory.contents:
                 card = {
                     "engine:object/weapon": GameApp.WeaponCard,
@@ -5287,7 +4962,6 @@ class GameApp(UIElement):
                     "engine:object/item": GameApp.ItemCard,
                     "engine:object/armor": GameApp.ArmorCard,
                 }.get(item.identifier.full())
-            
                 self.inventory_scrollable.children.append(
                     card(self, item, x, y, item in equips)
                 )
@@ -5301,12 +4975,14 @@ class GameApp(UIElement):
             
         if self.current_combat is not None:
             y = 25
+
             for entity in self.current_combat.turn_order:
                 card = GameApp.EnemyCard(self, entity, y)
                 y += card.height + 25
                 self.enemy_card_scrollable.children.append(card)
 
     def updatePlayer(self, player=...):
+
         if player is not ...:
             self.player = player
 
@@ -5325,47 +5001,43 @@ class GameApp(UIElement):
             self.player_money_display.set_text(str(self.player.currency))
 
     def input_on_enter(self, text_box:MultilineTextBox):
-
         text = text_box.get_content().strip()
         text_box.set_content("")
-
         text_box.cursor_location.line = 0
         text_box.cursor_location.col = 0
-
         self.io_hook.sendInput(self.player_id, text)
 
     def play_pause_toggle(self, editor):
+
         if editor.engine.running:
             editor.engine.stop()
             self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[0]
             self.play_pause.hover_color = self.play_pause_buttons[1]
-            
             self.updateInventory(None)
             self.updateCombat(None)
+
         else:
             editor.engine.start()
-            
             editor.engine.handleInput(0, f"engine:ui/get_inventory {self.player_id}")
             editor.engine.handleInput(0, f"engine:ui/get_combat {self.player_id}")
             editor.engine.handleInput(0, f"engine:ui/get_player {self.player_id}")
-
             self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[2]
             self.play_pause.hover_color = self.play_pause_buttons[3]
 
     def set_page(self, page:str):
+
         for name, tab, icons in self.tab_buttons:
+
             if page == name:
                 tab.bg_color = tab._bg_color = tab.hover_color = icons[2]
+
             else:
                 tab.bg_color = tab._bg_color = icons[0]
                 tab.hover_color = icons[1]
     
     def page_inv_onclick(self, editor):
-
         self.editor.engine.handleInput(0, f"engine:ui/get_inventory {self.player_id}")
-
         self.page = "inv"
-        
         RPCD["state"] = random.choice([
             "Playing strategicaly (maybe? idk lmao)",
             "Having Fun! (hopefully)",
@@ -5375,16 +5047,16 @@ class GameApp(UIElement):
         self.set_page("inv")
     
     def page_combat_onclick(self, editor):
-
         self.editor.engine.handleInput(0, f"engine:ui/get_combat {self.player_id}")
-
         self.page = "combat"
+
         if self.current_combat:
             RPCD["state"]=random.choice([
                 "Currently in combat! (don't distract me (or do, I don't care lol))",
                 "Fighting uhh...  something! (I might make it actually say what when combat actually works)"
             ])
             RPC.update(**RPCD)
+
         else:
             RPCD["state"]=random.choice([
                 "Staring at the combat page for no reason",
@@ -5392,6 +5064,7 @@ class GameApp(UIElement):
                 "Pikachu! I choose you! (Pikachu isn't in this game (probably))"
             ])
             RPC.update(**RPCD)
+
         self.set_page("combat")
         
     def page_log_onclick(self, editor):
@@ -5409,47 +5082,30 @@ class GameApp(UIElement):
         self.main_hud.width = editor.width-57
         self.main_hud_line.y = editor.height-107
         self.main_hud_line.width = editor.width - 52
-        
         self.main_output.min_width = self.main_out_scrollable.width = editor.width - 504
         self.main_output.min_height = self.main_out_scrollable.height = editor.height - 130
-        
         self.page_inv_tab.x = editor.width-(50*3)
         self.page_inv_tab.y = editor.height-107
-        
         self.page_combat_tab.x = editor.width-(50*2)
         self.page_combat_tab.y = editor.height-107
-        
         self.page_log_tab.x = editor.width-50
         self.page_log_tab.y = editor.height-107
-        
         self.page_seperator_line.x = editor.width - 451
         self.page_seperator_line.height = editor.height - (23 + 105)
-
         self.input_marker.y = self.input_box.y = editor.height - 106
         self.input_box.min_width = self.main_out_scrollable.width - self.input_marker.width
-        
-        # self.log_output = MultilineText(editor.width-449, 22, 450, editor.height-130, "Log output")
-        
         self.enemy_card_scrollable.x = self.log_scrollable.x = self.inventory_scrollable.x = editor.width-449
         self.log_output.min_height = self.log_scrollable.height = self.enemy_card_scrollable.height = self.inventory_scrollable.height = editor.height-130
-
         self.play_pause.x = (editor.width-501)
-
         self.id_input.y = self.id_refresh.y = self.player_name_display.y = self.player_money_display.y = self.player_health_bar.y = editor.height-75
-
         self.player_name_display.x = 70 + self.id_input._text_width + self.id_refresh.width
         self.player_health_bar.x = 80 + self.player_name_display.width + self.id_input._text_width + self.id_refresh.width
-
         self.player_location_display.y = editor.height - 55
         self.player_money_display.x = editor.width - self.player_money_display.width - 460
-        
         self.new_player_button.y = editor.height - 33
-
         self.buttons_left_bar.x = self.buttons_bottom_bar.x = editor.width-502
-        
         self.no_combat_text.x = (editor.width-224)-(self.no_combat_text.width/2)
         self.no_combat_text.y = self.log_scrollable.y + (self.log_output.min_height/2) - (self.no_combat_text.height/2)
-
         self.empty_inventory_text.x = (editor.width-224)-(self.empty_inventory_text.width/2)
         self.empty_inventory_text.y = self.log_scrollable.y + (self.log_output.min_height/2) - (self.empty_inventory_text.height/2)
 
@@ -5457,44 +5113,60 @@ class GameApp(UIElement):
         self._update_layout(editor)
         _c = self.children.copy()
         _c.reverse()
+
         for child in _c:
             child._event(editor, X, Y)
             
         if self.page == "log":
             self.log_scrollable._event(editor, X, Y)
+
         elif self.page == "combat":
+
             if self.current_combat is not None:
                 self.enemy_card_scrollable._event(editor, X, Y)
+
             else:
                 self.no_combat_text._event(editor, X, Y)
+
         elif self.page == "inv":
+
             if self.player_inventory:
                 self.inventory_scrollable._event(editor, X, Y)
+
             else:
                 self.empty_inventory_text._event(editor, X, Y)
         
         if (self.player is not None):
+
             if self.player.health != self._old_health:
                 self._old_health = self.player.health
                 self.player_health_bar.set_current_health(self._old_health)
+
             if self._old_location != self.player.location.full():
                 self._old_location = self.player.location.full()
                 self.player_location_display.content = self.player.location.translate(self.editor.engine._function_memory)
 
     def _update(self, editor, X, Y):
+
         for child in self.children:
             child._update(editor, X, Y)
             
         if self.page == "log":
             self.log_scrollable._update(editor, X, Y)
+
         elif self.page == "combat":
+
             if self.current_combat is not None:
                 self.enemy_card_scrollable._update(editor, X, Y)
+
             else:
                 self.no_combat_text._update(editor, X, Y)
+
         elif self.page == "inv":
+
             if self.player_inventory:
                 self.inventory_scrollable._update(editor, X, Y)
+
             else:
                 self.empty_inventory_text._update(editor, X, Y)
         
@@ -5502,7 +5174,6 @@ class GameApp(UIElement):
             self.player_health_bar._update(editor, X, Y)
 
 # Dungeon Building Editors:
-
 
 class FileEditor(UIElement):
     
@@ -5518,7 +5189,6 @@ class FileEditor(UIElement):
             self.contents = f.read()
         
         self.edit_area = NumberedTextArea(self.x, self.y, self.width, self.height, text_bg_color=(31, 31, 31), scroll_speed=45)
-        
         self.edit_area.set_content(self.contents)
         self.edit_area.editable.save_history()
         self.edit_area.editable.on_save(self.save_file)
@@ -5528,10 +5198,13 @@ class FileEditor(UIElement):
         match file_name.rsplit(".", 1)[-1]:
             case "json"|"piskel":
                 self.edit_area.editable.color_text = self.json_colors
+
             case "ds"|"dungeon_script"|"dse":
                 self.edit_area.editable.color_text = self.ds_colors
+
             case "md":
                 self.edit_area.editable.color_text = self.md_colors
+
         self.edit_area.editable.refresh_surfaces()
 
     def __repr__(self):
@@ -5541,7 +5214,6 @@ class FileEditor(UIElement):
         with open(self.file_location, "w+", encoding="utf-8") as f:
             f.write(content)
 
-
     def json_colors(self, text:str) -> str:
 
         def repl(match:re.Match) -> str:
@@ -5550,19 +5222,22 @@ class FileEditor(UIElement):
             if (m := re.match(r"(\"(?:\\.|[^\"\\])*\":)", t)): # "...":
                 t = re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;156;220;254m", m.group())
                 return f"\033[38;2;156;220;254m{t[0:-1]}\033[0m:"
+            
             elif (m := re.match(r"(\"(?:\\.|[^\"\\])*\")", t)): # "..."
                 t = re.sub(r"(\\.)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", m.group())
                 return f"\033[38;2;206;145;120m{t}\033[0m"
+            
             elif (m := re.match(r"\b(true|false|null)\b", t)): # keywords - and/or/not/...
                 return f"\033[38;2;86;156;214m{m.group()}\033[0m"
+            
             elif (m := re.match(r"\d+(?:\.\d+)?", t)):
                 return f"\033[38;2;181;206;168m{m.group()}\033[0m"
+            
             else:
                 return t
 
         return re.sub(r"((?:\"(?:\\.|[^\"\\])*\":)|(?:\"(?:\\.|[^\"\\])*\")|\d+(\.\d+)?|\b(true|false|null)\b)", repl, text)
 
-    
     def ds_colors(self, text:str) -> str:
 
         def repl(match:re.Match) -> str:
@@ -5570,41 +5245,50 @@ class FileEditor(UIElement):
 
             if (m := re.match(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*)", t)): # /* */ # //
                 return f"\033[38;2;106;153;85m{m.group()}\033[0m"
+            
             elif (m := re.match(r"(\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')", t)): # "..." # '...'
                 t = re.sub(r"(\\.|`[^`]*`)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", m.group())
                 return f"\033[38;2;206;145;120m{t}\033[0m"
+            
             elif (m := re.match(r"\[([^:]+:)((?:[^/\]]+/)*)([^\]]+)\]", t)): # [engine:combat/start]
                 ns, g, f = m.groups()
                 return f"[\033[38;2;86;156;214m{ns}\033[38;2;156;220;254m{g}\033[38;2;220;220;170m{f}\033[0m]"
+            
             elif (m := re.match(r"<([^>]+)>", t)): # <variables>
                 t = m.groups()[0]
 
                 if t.startswith("#"):
                     v = re.sub(r"([./])", "\033[0m\\1\033[38;2;209;105;105m", t)
                     return f"<\033[38;2;209;105;105m{v}\033[0m>"
+                
                 elif t.startswith("%"):
                     v = re.sub(r"([./])", "\033[0m\\1\033[38;2;79;193;255m", t)
                     return f"<\033[38;2;79;193;255m{v}\033[0m>"
+                
                 elif t.startswith("$"):
                     v = re.sub(r"([./])", "\033[0m\\1\033[38;2;220;220;170m", t)
                     return f"<\033[38;2;220;220;170m{v}\033[0m>"
+                
                 else:
                     v = re.sub(r"([./])", "\033[0m\\1\033[38;2;78;201;176m", t)
                     return f"<\033[38;2;78;201;176m{v}\033[0m>"
                 
             elif (m := re.match(r"(@[^:]*:|#|%|\$[a-zA-Z_][a-zA-Z0-9_]*)", t)): # @tags:
                 return f"\033[38;2;79;193;255m{m.group()}\033[0m"
+            
             elif (m := re.match(r"\b(if|elif|else|break|return|pass|for|in)\b", t)): # keywords - if/elif/else/...
                 return f"\033[38;2;197;134;192m{m.group()}\033[0m"
+            
             elif (m := re.match(r"\b(true|false|none|not|and|or)\b", t)): # keywords - and/or/not/...
                 return f"\033[38;2;86;156;214m{m.group()}\033[0m"
+            
             elif (m := re.match(r"\d+(?:\.\d+)?", t)):
                 return f"\033[38;2;181;206;168m{m.group()}\033[0m"
+            
             else:
                 return t
             
         return re.sub(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*|(?:\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')|\[[^:]+:[^\]]+\]|<=|>=|<<|>>|==|!=|<[^>]+>|@[^:]+:|\$[a-zA-Z_0-9]+|\d+(?:\.\d+)?|\b(and|if|or|not|elif|else|not|return|break|pass|for|in)\b|#|%)", repl, text)
-
 
     def md_colors(self, text:str) -> str:
 
@@ -5678,8 +5362,6 @@ class DungeonEditor(UIElement): # Visual
             self.dungeon_editor = dungeon_editor
             self.dungeon = dungeon
             self.rooms = []
-            # self.namespace_edit = MultilineTextBox(60, 30, 200, 20, "[namespace]", single_line=True)
-            # self.name_edit = MultilineTextBox(60, 50, 200, 20, "[dungeon name]", single_line=True)
             self.x = 0
             self.y = 0
             self.children = []
@@ -5687,10 +5369,12 @@ class DungeonEditor(UIElement): # Visual
         def _event(self, editor, X, Y):
             c = self.children.copy()
             c.reverse()
+
             for _c in c:
                 _c._event(editor, X+self.x, Y+self.y)
         
         def _update(self, editor, X, Y):
+
             for c in self.children:
                 c._update(editor, X+self.x, Y+self.y)
 
@@ -5726,10 +5410,12 @@ class DungeonEditor(UIElement): # Visual
 # class InventoryEditor(UIElement):
 
 class Opener:
+
     def __init__(self, sub_app, file_path, editor):
         self.sub_app = sub_app
         self.file_path = file_path
         self.editor = editor
+
     def __call__(s, *_, **__): # pylint: disable=no-self-argument
         self = s.sub_app
         editor = s.editor
@@ -5740,23 +5426,17 @@ class Opener:
             self.open_files.update(new)
             n = "  " + file_path.replace("./Dungeons/", "") + "   " #"  " + file_path.rsplit("/", 1)[-1] + "   "
             self.file_tabs.add_tab(n, [new[file_path]])
-            
             tab = self.file_tabs.get_tab(n)
-            
             ico = LayeredObjects({"0": [
                 DirectoryTree.file_icons[DirectoryTree._get_icon_for_file(None, file_path)]
             ]}, 2, 4)
             close_button = Button(tab.width - 15, 1, 14, 14, "X", None, text_size=12)
             close_button.on_left_click = self.tab_remover_getter(n)
-            
             self.file_tabs.add_tab_children(n, (
                 ico,
                 close_button
             ))
-            # tab.children = [ico, close_button]
-            
-            # print(tab, tab.children)
-            
+
         self.file_tabs.active_tab = "  " + file_path.replace("./Dungeons/", "") + "   " #.rsplit("/", 1)[-1] + "   "
         self.file_tabs.reset_tab_colors()
         self.focused_file = file_path
@@ -5766,17 +5446,14 @@ class FileEditorSubApp(UIElement):
     def open_folder(self, folder_path, file_opener_getter, editor):
         folder_name = folder_path.replace("\\", "/").rsplit("/", 1)[1]
         tree = list(os.walk(folder_path))
-        # _, sub_folder, sub_files = tree.pop(0)
-        
-        
         dir_tree = {
             folder_name: {}
         }
-        
-        # curr_branch = dir_tree[folder_name]
+
         for path, sub_folders, files in tree:
             path = path.replace("./", "").replace("\\", "/").split("/")
             curr = dir_tree
+
             for p in path:
                 curr = curr[p]
             
@@ -5789,16 +5466,13 @@ class FileEditorSubApp(UIElement):
         self.dir_tree = DirectoryTree(103, 21, folder_name.replace("./", "").rsplit("/", 1)[-1].upper(), dir_tree[folder_name], 225, editor)
 
         for c in self.children.copy():
+
             if isinstance(c, DirectoryTree) and (c is not self.dir_tree):
                 i = self.children.index(c)
                 self.children.remove(c)
-
                 tree = c.get_expanded()
-
                 self.children.insert(i, self.dir_tree)
-
                 self.dir_tree.expand_tree(tree)
-
             
     def tab_remover_getter(self, tab_name):
         
@@ -5808,18 +5482,15 @@ class FileEditorSubApp(UIElement):
             for k, c in self.open_files.copy().items():
                 
                 if k.strip().endswith(tab_name.strip()):
-                    
                     self.open_files.pop(k)
                     return
 
-            
             if self.focused_file == tab_name:
                 self.focused_file = None
         
         return remove_tab
         
     def file_opener_getter(self, file_path, editor):
-        
         return Opener(self, file_path, editor)
     
     def __init__(self, code_editor, editor):
@@ -5829,14 +5500,10 @@ class FileEditorSubApp(UIElement):
         self.dir_tree = None
         self.open_files = {}
         self.focused_file = None
-        
         self.open_folder("./Dungeons", self.file_opener_getter, editor)
-        
         self.children.append(self.dir_tree)
-        
         self.explorer_bar = Box(328, 21, 1, editor.height-42, (70, 70, 70))
         self.children.append(self.explorer_bar)
-        
         self.file_tabs = Tabs(
             329, 41, editor.width-329, 15,
             tab_color_unselected=(24, 24, 24), tab_color_hovered=(31, 31, 31),
@@ -5849,15 +5516,8 @@ class FileEditorSubApp(UIElement):
     def _update_layout(self, editor):
         self.explorer_bar.height = editor.height-42
         self.file_tabs.width = editor.width-329
-        
         self.dir_tree._update_layout(editor)
         
-        # content = self.file_tabs.tab_data.get(self.file_tabs.active_tab, [])
-        
-        # for c in content:
-        #     if hasattr(c, "_update_layout"):
-        #         c._update_layout(editor)
-
         if file_editor := self.file_tabs.tab_data.get(self.file_tabs.active_tab, [None])[0]:
             file_editor.width = editor.width-329
             file_editor.height = editor.height-42
@@ -5868,18 +5528,10 @@ class FileEditorSubApp(UIElement):
         for child in self.children:
             child._update(editor, X, Y)
         
-        # if self.focused_file:
-        #     self.open_files[self.focused_file]._update(editor, X, Y)
-            
     def _event(self, editor, X, Y):
-
-
-        # self._update_layout(editor)
-        # if self.focused_file:
-        #     self.open_files[self.focused_file]._event(editor, X, Y)
-        
         _c = self.children.copy()
         _c.reverse()
+
         for child in _c:
             child._event(editor, X, Y)
 
@@ -5889,13 +5541,10 @@ class EditorApp(UIElement):
         self.code_editor = code_editor
         self.children = []
         self.sub_apps = []
-        
         self.sub_app_bar = Box(51, 21, 50, editor.height-42, (24, 24, 24))
         self.children.append(self.sub_app_bar)
-        
         self.sub_app_bar_line = Box(102, 21, 1, editor.height-42, (70, 70, 70))
         self.children.append(self.sub_app_bar_line)
-        
         self.file_editor_icons = [
             Image(f"{PATH}/file_editor_sub_app.png", 0, 0, 50, 50),
             Image(f"{PATH}/file_editor_sub_app_hovered.png", 0, 0, 50, 50),
@@ -5908,28 +5557,28 @@ class EditorApp(UIElement):
         self.sub_apps.append((self.file_editor_sub_app_button, self.file_editor_icons))
         self.active_app = self.sub_app_file_editor
     
-    
     def click_file_editor(self, *_, **__):
+
         if self.active_app != self.sub_app_file_editor:
             self._reset_sub_apps()
             self.active_app = self.sub_app_file_editor
             self.file_editor_sub_app_button._bg_color = self.file_editor_sub_app_button.bg_color = self.file_editor_sub_app_button.hover_color = self.file_editor_icons[2]
+
         else:
             self._reset_sub_apps()
     
     def _reset_sub_apps(self):
         self.active_app = None
+
         for button, icons in self.sub_apps:
             button._bg_color = button.bg_color = icons[0]
             button.hover_color = icons[1]
 
     def _update_layout(self, editor):
         self.sub_app_bar.height = self.sub_app_bar_line.height = editor.height - 42
-        
         self.sub_app_file_editor._update_layout(editor)
 
     def _event(self, editor, X, Y):
-        
         self._update_layout(editor)
         
         if self.active_app:
@@ -5937,6 +5586,7 @@ class EditorApp(UIElement):
         
         _c = self.children.copy()
         _c.reverse()
+
         for child in _c:
             child._event(editor, X, Y)
     
@@ -5948,7 +5598,6 @@ class EditorApp(UIElement):
         for child in self.children:
             child._update(editor, X, Y)
 
-
 class WindowFrame(UIElement):
     def __init__(self, width, height, editor):
         self.resolution = [width, height]
@@ -5956,64 +5605,44 @@ class WindowFrame(UIElement):
         self.editor = editor
         self.hover_color = (50, 50, 50)
         self.click_button = (70, 70, 70)
-        
         self.window_drag_offset = None
         self.selected_drag = ""
         self.drag_offset = 0
-        
         self._recent_window_pos = (int((1920 - (1920*2/4))/2), int((1080 - (1080*2/4))/2))
-        # print(self._recent_window_pos)
         self._recent_window_size = (1920*2/4, 1080*2/4)
-        
-        
         self.bottom_drag = Box(5, height-5, width-10, 5, (24, 24, 24))
         self.children.append(self.bottom_drag)
-
         self.bottom_right_drag = Box(width-5, height-5, 5, 5, (24, 24, 24))
         self.children.append(self.bottom_right_drag)
-        
         self.bottom_left_drag = Box(0, height-5, 5, 5, (24, 24, 24))
         self.children.append(self.bottom_left_drag)
-        
         self.left_drag = Box(0, 20, 5, height-25, (24, 24, 24))
         self.children.append(self.left_drag)
-        
         self.right_drag = Box(width-5, 20, 5, height-25, (24, 24, 24))
         self.children.append(self.right_drag)
-
         self.top_bar_line = Box(0, 20, width, 1, (70, 70, 70))
         self.children.append(self.top_bar_line)
-        
         self.bottom_bar = Box(5, height-20, width-10, 15, (24, 24, 24))
         self.children.append(self.bottom_bar)
-        
         self.bottom_bar_line = Box(0, height-21, width, 1, (70, 70, 70))
         self.children.append(self.bottom_bar_line)
-        
         self.top_bar = Box(0, 0, width, 20, Color(24, 24, 24))
         self.children.append(self.top_bar)
-        
         self.top_bar_icon = Image(f"{PATH}/dungeon_game_icon.png", 2, 2, 16, 16)
         self.children.append(self.top_bar_icon)
-        
-        
         self.minimize_button = Button(width-(26*3), 0, 26, 20, " ─ ", (24, 24, 24), hover_color=(70, 70, 70))
         self.minimize_button.on_left_click = self.minimize
         self.children.append(self.minimize_button)
-        
         self._is_fullscreen = False
         self._fullscreen = Image(f"{PATH}/full_screen.png", 0, 0, 26, 20)
         self._fullscreen_hovered = Image(f"{PATH}/full_screen_hovered.png", 0, 0, 26, 20)
         self._shrinkscreen = Image(f"{PATH}/shrink_window.png", 0, 0, 26, 20)
         self._shrinkscreen_hovered = Image(f"{PATH}/shrink_window_hovered.png", 0, 0, 26, 20)
-
         self.fullscreen_toggle = Button(width-(26*2), 0, 26, 20, "", self._fullscreen, hover_color=self._fullscreen_hovered)
         self.fullscreen_toggle.on_left_click = self.toggle_fullscreen
         self.children.append(self.fullscreen_toggle)
-        
         self._close = Image(f"{PATH}/close_button.png", 0, 0, 26, 20)
         self._close_hovered = Image(f"{PATH}/close_button_hovered.png", 0, 0, 26, 20)
-        
         self.close_button = Button(width-26, 0, 26, 20, "", self._close, hover_color=self._close_hovered)
         self.close_button.on_left_click = self.close_window
         self.children.append(self.close_button)
@@ -6024,17 +5653,10 @@ class WindowFrame(UIElement):
 
     def get_screen_pos(self, editor):
         mx, my = mouse.get_position()
-        # rx, ry = editor.mouse_pos
-        # # print(f"mouse: ({mx}, {my}) -> ({rx}, {ry})  ({mx-rx}, {my-ry})")
-        # return mx-rx, my-ry
-    
         hwnd = pygame.display.get_wm_info()["window"]
-
         prototype = WINFUNCTYPE(BOOL, HWND, POINTER(RECT))
         paramflags = (1, "hwnd"), (2, "lprect")
-
         GetWindowRect = prototype(("GetWindowRect", windll.user32), paramflags)
-
         rect = GetWindowRect(hwnd)
         return rect.left, rect.top
 
@@ -6043,22 +5665,19 @@ class WindowFrame(UIElement):
         work_area = monitor_info.get("Work")
         editor.width, editor.height = work_area[2:4]
         editor.set_window_location(0, 0)
-        
         self._update_layout(editor)
 
     def toggle_fullscreen(self, editor):
+
         if self._is_fullscreen:
             self.fullscreen_toggle.bg_color = self.fullscreen_toggle._bg_color = self._fullscreen
             self.fullscreen_toggle.hover_color = self._fullscreen_hovered
             editor.width, editor.height = self._recent_window_size
             self.top_bar.hovered = False
             self.window_drag_offset = None
-            # editor.mouse[0] = editor.previous_mouse[0] = False
-            # editor.set_window_location(-1920, -1080)
             editor.set_window_location(*self._recent_window_pos)
-            
-            # print(self._recent_window_pos)
             self._update_layout(editor)
+
         else:
             self.fullscreen_toggle.bg_color = self.fullscreen_toggle._bg_color = self._shrinkscreen
             self.fullscreen_toggle.hover_color = self._shrinkscreen_hovered
@@ -6067,8 +5686,7 @@ class WindowFrame(UIElement):
             self._recent_window_pos = self.get_screen_pos(editor)
             self._recent_window_size = (editor.width, editor.height)
             self.set_fullscreen(editor)
-            # editor.mouse[0] = False
-            # editor.previous_mouse[0] = False
+
         self._is_fullscreen = not self._is_fullscreen
 
     def close_window(self, editor):
@@ -6079,18 +5697,12 @@ class WindowFrame(UIElement):
         sys.exit()
 
     def _update(self, editor, X, Y):
-        # print(editor._focused_object)
-        
+
         for child in self.children:
             child._update(editor, X, Y)
 
-        # if self.active_app == "game":
-        #     self.game_app._update2(editor, X, Y)
-
     def _update_layout(self, editor):
-        
         pygame.display.set_mode((editor.width, editor.height), pygame.RESIZABLE | pygame.NOFRAME)
-        
         self.top_bar.width = editor.width
         self.bottom_drag.width = editor.width-10
         self.bottom_drag.y = self.bottom_left_drag.y = self.bottom_right_drag.y = editor.height-5
@@ -6100,21 +5712,21 @@ class WindowFrame(UIElement):
         self.bottom_bar_line.width = self.top_bar_line.width = editor.width
         self.bottom_bar.width = editor.width-10
         self.bottom_bar.y = editor.height-20
-        
-        # self.app_bar.height = self.app_line.height = editor.height - 42
-        
         self.minimize_button.x = editor.width - (26*3)
         self.fullscreen_toggle.x = editor.width - (26*2)
         self.close_button.x = editor.width - 26
 
     def _event(self, editor:Editor, X, Y):
+
         if (self.top_bar.hovered and editor.mouse[0] and (not editor.previous_mouse[0])):
             self.window_drag_offset = editor.mouse_pos
+
         elif (editor.mouse[0] and self.window_drag_offset):
             x, y = mouse.get_position()
             x -= self.window_drag_offset[0]
             y -= self.window_drag_offset[1]
             editor.set_window_location(x, y)
+
         elif (not editor.mouse[0]) and editor.previous_mouse[0]:
             x, y = mouse.get_position()
             
@@ -6122,14 +5734,12 @@ class WindowFrame(UIElement):
                 self._is_fullscreen = True
                 self._recent_window_size = (editor.width, editor.height)
                 self._recent_window_pos = self.get_screen_pos(editor)
-                
                 self.set_fullscreen(editor)
             
             self.window_drag_offset = None
 
         rmx, rmy = mouse.get_position()
         rsx, rsy = self.get_screen_pos(editor)
-        # print(rmx, rmy, rsx, rsy)
 
         if self.bottom_drag.hovered:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZENS)
@@ -6152,38 +5762,39 @@ class WindowFrame(UIElement):
             
         elif self.bottom_left_drag.hovered:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZENESW)
+
             if editor.mouse[0] and (not editor.previous_mouse[0]):
                 self.selected_drag = "bottom_left_drag"
                 self.drag_offset = (rsx + editor.width, rsy)
+
         elif self.bottom_right_drag.hovered:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZENWSE)
+
             if editor.mouse[0] and (not editor.previous_mouse[0]):
                 self.selected_drag = "bottom_right_drag"
+
         elif not editor.override_cursor:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         if self.selected_drag in ["bottom_drag", "bottom_right_drag", "bottom_left_drag"]:
-            # print(rmy, rsy, rmy-rsy)
-            # print(f"rmy:{rmy} - rsy:{rsy} = {rmy-rsy}")
             editor.height = max(425, rmy - rsy)
-            # print(editor.height)
             self._update_layout(editor)
+
         if self.selected_drag in ["left_drag", "bottom_left_drag"]:
             editor.set_window_location(min (rmx, self.drag_offset[0]-100), self.drag_offset[1])
             editor.width = max(800, self.drag_offset[0] - rmx)
-            # print(editor.width)
-            self._update_layout(editor)
-        if self.selected_drag in ["right_drag", "bottom_right_drag"]:
-            # print(f"rmx:{rmx} - rsx:{rsx} = {rmx-rsx}")
-            editor.width = max(800, rmx - rsx)
             self._update_layout(editor)
 
+        if self.selected_drag in ["right_drag", "bottom_right_drag"]:
+            editor.width = max(800, rmx - rsx)
+            self._update_layout(editor)
 
         if (not editor.mouse[0]) and editor.previous_mouse[0]:
             self.selected_drag = ""
             
         _c = self.children.copy()
         _c.reverse()
+
         for child in _c:
             child._event(editor, X, Y)
 
@@ -6196,103 +5807,68 @@ class CodeEditor(UIElement):
         self.hover_color = (50, 50, 50)
         self.click_button = (70, 70, 70)
         self.ctx_tree_opts = (20, TEXT_COLOR, TEXT_BG_COLOR, (70, 70, 70), TEXT_SIZE, (50, 50, 50), (50, 50, 50))
-        
         self._recent_window_pos = (int((1920 - (1920*2/4))/2), int((1080 - (1080*2/4))/2))
-        # print(self._recent_window_pos)
         self._recent_window_size = (1920*2/4, 1080*2/4)
-        
-        # Apps:
-        # The Game
-        # Text Editor
-        # Console
-        
         self.active_app = ""
-        
         self.window_drag_offset = None
         self.selected_drag = ""
         self.drag_offset = 0
-        
         self.app_bar = Box(5, 21, 45, height-42, (24, 24, 24))
         self.children.append(self.app_bar)
-        
         self.app_line = Box(50, 21, 1, height-42, (70, 70, 70))
         self.children.append(self.app_line)
-        
         self.bottom_drag = Box(5, height-5, width-10, 5, (24, 24, 24))
         self.children.append(self.bottom_drag)
-
         self.bottom_right_drag = Box(width-5, height-5, 5, 5, (24, 24, 24))
         self.children.append(self.bottom_right_drag)
-        
         self.bottom_left_drag = Box(0, height-5, 5, 5, (24, 24, 24))
         self.children.append(self.bottom_left_drag)
-        
         self.left_drag = Box(0, 20, 5, height-25, (24, 24, 24))
         self.children.append(self.left_drag)
-        
         self.right_drag = Box(width-5, 20, 5, height-25, (24, 24, 24))
         self.children.append(self.right_drag)
-
         self.top_bar_line = Box(0, 20, width, 1, (70, 70, 70))
         self.children.append(self.top_bar_line)
-        
         self.bottom_bar = Box(5, height-20, width-10, 15, (24, 24, 24))
         self.children.append(self.bottom_bar)
-        
         self.bottom_bar_line = Box(0, height-21, width, 1, (70, 70, 70))
         self.children.append(self.bottom_bar_line)
-
         self._error_message = MultilineText(25, 25, 1, 1, "", text_color=(255, 200, 200), text_bg_color=None)
-        self._error_popup = Popup(400, 30).add_children(
-            self._error_message
-        )
+        self._error_popup = Popup(400, 30).add_children(self._error_message)
         self._error_popup._update_layout = self._error_message_update_layout
-
         self._app_game_icon = Image(f"{PATH}/dungeon_game_app_icon.png", 0, 0, 50, 50)
         self._app_game_icon_hovered = Image(f"{PATH}/dungeon_game_app_icon_hovered.png", 0, 0, 50, 50)
         self._app_game_icon_selected = Image(f"{PATH}/dungeon_game_app_icon_selected.png", 0, 0, 50, 50)
         self.app_game_selector = Button(0, 22, 50, 50, "", self._app_game_icon, hover_color=self._app_game_icon_hovered, click_color=self._app_game_icon_selected)
         self.app_game_selector.on_left_click = self.select_game_app
         self.children.append(self.app_game_selector)
-        
         self._app_editor_icon = Image(f"{PATH}/dungeon_editor_app_icon.png", 0, 0, 50, 50)
         self._app_editor_icon_hovered = Image(f"{PATH}/dungeon_editor_app_icon_hovered.png", 0, 0, 50, 50)
         self._app_editor_icon_selected = Image(f"{PATH}/dungeon_editor_app_icon_selected.png", 0, 0, 50, 50)
         self.app_editor_selector = Button(0, 22+50, 50, 50, "", self._app_editor_icon, hover_color=self._app_editor_icon_hovered, click_color=self._app_editor_icon_selected)
         self.app_editor_selector.on_left_click = self.select_editor_app
         self.children.append(self.app_editor_selector)
-        
         self.top_bar = Box(0, 0, width, 20, Color(24, 24, 24))
         self.children.append(self.top_bar)
-        
         self.top_bar_icon = Image(f"{PATH}/dungeon_game_icon.png", 2, 2, 16, 16)
         self.children.append(self.top_bar_icon)
-        
-
         self.new_file_display = Text(25, 5, 1, "Enter new file path/name:", text_size=13)
         self.new_file_input_box = MultilineTextBox(25, 25, 350, 16, "", text_bg_color=(31, 31, 31))
-
         self.new_file_input_box.single_line = True
         self.new_file_input_box.on_enter(self.create_new_file)
-
         self.new_file_popup = Popup(400, 50).add_children(
             self.new_file_display,
             self.new_file_input_box
         )
-        
-        
         self.delete_file_display = Text(25, 5, 1, "Delete File:", text_size=13)
         self.delete_file_input_box = MultilineTextBox(25, 25, 350, 16, "", text_bg_color=(31, 31, 31))
         self.delete_file_confirm_display = Text(25, 45, 1, "Re-enter file name to delete:", text_size=13)
         self.delete_file_confirm_input_box = MultilineTextBox(25, 65, 350, 16, "", text_bg_color=(31, 31, 31))
         self.delete_file_err = MultilineText(25, 80, 350, 32, "", text_color=(255, 180, 180), text_bg_color=None, text_size=13)
-
-
         self.delete_file_input_box.single_line = True
         self.delete_file_input_box.on_enter(self.delete_focus_confirm_file)
         self.delete_file_confirm_input_box.single_line = True
         self.delete_file_confirm_input_box.on_enter(self.delete_file)
-
         self.delete_file_popup = Popup(400, 120).add_children(
             self.delete_file_display,
             self.delete_file_input_box,
@@ -6300,7 +5876,6 @@ class CodeEditor(UIElement):
             self.delete_file_confirm_input_box,
             self.delete_file_err
         )
-        
         self.top_bar_file = ContextTree.new(
             20, 0, 40, 20, "File", [
                 {
@@ -6326,7 +5901,6 @@ class CodeEditor(UIElement):
         self.top_bar_file._uoffx = -self.top_bar_file.width
         self.top_bar_file._uoffy = self.top_bar_file.height
         self.children.append(self.top_bar_file)
-
         self.top_bar_edit = ContextTree.new(
             60, 0, 40, 20, "Edit", [
                 {
@@ -6338,62 +5912,48 @@ class CodeEditor(UIElement):
                     "Cut": self.top_bar_edit_cut,
                     "Copy": self.top_bar_edit_copy,
                     "Paste": self.top_bar_edit_paste
-                },
-                # ContextTree.Line(),
-                # {
-                #     "Find": self.top_bar_edit_find,
-                #     "Replace": self.top_bar_edit_replace
-                # }
+                }
             ], 60, *self.ctx_tree_opts
         )
         self.top_bar_edit._uoffx = -self.top_bar_edit.width
         self.top_bar_edit._uoffy = self.top_bar_edit.height
         self.children.append(self.top_bar_edit)
-
         ctx_file_onclick = self.top_bar_file.on_left_click
         def ctx_file(*_, **__):
             self.top_bar_edit.children[0].set_visibility(False)
             ctx_file_onclick(*_, **__)
-        self.top_bar_file.on_left_click = ctx_file
 
+        self.top_bar_file.on_left_click = ctx_file
         ctx_edit_onclick = self.top_bar_edit.on_left_click
         def ctx_edit(*_, **__):
             self.top_bar_file.children[0].set_visibility(False)
             ctx_edit_onclick(*_, **__)
-        self.top_bar_edit.on_left_click = ctx_edit
 
+        self.top_bar_edit.on_left_click = ctx_edit
         self.minimize_button = Button(width-(26*3), 0, 26, 20, " ─ ", (24, 24, 24), hover_color=(70, 70, 70))
         self.minimize_button.on_left_click = self.minimize
         self.children.append(self.minimize_button)
-
         self.game_app = GameApp(self, editor)
         self.editor_app = EditorApp(self, editor)
-
         self._is_fullscreen = False
         self._fullscreen = Image(f"{PATH}/full_screen.png", 0, 0, 26, 20)
         self._fullscreen_hovered = Image(f"{PATH}/full_screen_hovered.png", 0, 0, 26, 20)
         self._shrinkscreen = Image(f"{PATH}/shrink_window.png", 0, 0, 26, 20)
         self._shrinkscreen_hovered = Image(f"{PATH}/shrink_window_hovered.png", 0, 0, 26, 20)
-
         self.fullscreen_toggle = Button(width-(26*2), 0, 26, 20, "", self._fullscreen, hover_color=self._fullscreen_hovered)
         self.fullscreen_toggle.on_left_click = self.toggle_fullscreen
         self.children.append(self.fullscreen_toggle)
-        
         self._close = Image(f"{PATH}/close_button.png", 0, 0, 26, 20)
         self._close_hovered = Image(f"{PATH}/close_button_hovered.png", 0, 0, 26, 20)
-        
         self.close_button = Button(width-26, 0, 26, 20, "", self._close, hover_color=self._close_hovered)
         self.close_button.on_left_click = self.close_window
         self.children.append(self.close_button)
 
     def _error_message_update_layout(self, editor):
-        # print("popup update layout")
         self._error_popup.width = self._error_popup.bg.width = self._error_message._text_width + 50
         self._error_popup.height = self._error_popup.bg.height = self._error_message._text_height + 50
-        
         self._error_popup.x = (editor.width-self._error_popup.width)/2
         self._error_popup.y = (editor.height-self._error_popup.height)/2
-        
         self._error_popup.mask.width = editor.width
         self._error_popup.mask.height = editor.height
 
@@ -6404,17 +5964,18 @@ class CodeEditor(UIElement):
     def reset_app_selectors(self):
         self.app_game_selector.bg_color = self.app_game_selector._bg_color = self._app_game_icon
         self.app_game_selector.hover_color = self._app_game_icon_hovered
-        
         self.app_editor_selector.bg_color = self.app_editor_selector._bg_color = self._app_editor_icon
         self.app_editor_selector.hover_color = self._app_editor_icon_hovered
         
     def select_game_app(self, editor):
         self.reset_app_selectors()
+
         if self.active_app != "game":
             self.active_app = "game"
             RPCD["details"] = "Playing <Insert Dungeon Name Here>"
             RPC.update(**RPCD)
             self.app_game_selector.bg_color = self.app_game_selector._bg_color = self.app_game_selector.hover_color = self._app_game_icon_selected
+
         else:
             RPCD["details"] = "Just staring at a blank screen..."
             RPC.update(**RPCD)
@@ -6422,11 +5983,13 @@ class CodeEditor(UIElement):
     
     def select_editor_app(self, editor):
         self.reset_app_selectors()
+
         if self.active_app != "editor":
             self.active_app = "editor"
             RPCD["details"] = "Editing a Dungeon"
             RPC.update(**RPCD)
             self.app_editor_selector.bg_color = self.app_editor_selector._bg_color = self.app_editor_selector.hover_color = self._app_editor_icon_selected
+            
         else:
             RPCD["details"] = "Just staring at a blank screen..."
             RPC.update(**RPCD)
@@ -6438,17 +6001,10 @@ class CodeEditor(UIElement):
 
     def get_screen_pos(self, editor):
         mx, my = mouse.get_position()
-        # rx, ry = editor.mouse_pos
-        # # print(f"mouse: ({mx}, {my}) -> ({rx}, {ry})  ({mx-rx}, {my-ry})")
-        # return mx-rx, my-ry
-    
         hwnd = pygame.display.get_wm_info()["window"]
-
         prototype = WINFUNCTYPE(BOOL, HWND, POINTER(RECT))
         paramflags = (1, "hwnd"), (2, "lprect")
-
         GetWindowRect = prototype(("GetWindowRect", windll.user32), paramflags)
-
         rect = GetWindowRect(hwnd)
         return rect.left, rect.top
 
@@ -6457,22 +6013,19 @@ class CodeEditor(UIElement):
         work_area = monitor_info.get("Work")
         editor.width, editor.height = work_area[2:4]
         editor.set_window_location(0, 0)
-        
         self._update_layout(editor)
 
     def toggle_fullscreen(self, editor):
+
         if self._is_fullscreen:
             self.fullscreen_toggle.bg_color = self.fullscreen_toggle._bg_color = self._fullscreen
             self.fullscreen_toggle.hover_color = self._fullscreen_hovered
             editor.width, editor.height = self._recent_window_size
             self.top_bar.hovered = False
             self.window_drag_offset = None
-            # editor.mouse[0] = editor.previous_mouse[0] = False
-            # editor.set_window_location(-1920, -1080)
             editor.set_window_location(*self._recent_window_pos)
-            
-            # print(self._recent_window_pos)
             self._update_layout(editor)
+
         else:
             self.fullscreen_toggle.bg_color = self.fullscreen_toggle._bg_color = self._shrinkscreen
             self.fullscreen_toggle.hover_color = self._shrinkscreen_hovered
@@ -6481,8 +6034,7 @@ class CodeEditor(UIElement):
             self._recent_window_pos = self.get_screen_pos(editor)
             self._recent_window_size = (editor.width, editor.height)
             self.set_fullscreen(editor)
-            # editor.mouse[0] = False
-            # editor.previous_mouse[0] = False
+
         self._is_fullscreen = not self._is_fullscreen
 
     def close_window(self, editor):
@@ -6495,17 +6047,13 @@ class CodeEditor(UIElement):
     def create_new_file(self, text_box):
         c = text_box.get_content()
         text_box.set_colored_content("")
-
-
         comps = c.strip().replace("\\", "/").split("/")
-
         file_name = comps.pop(-1)
 
         if comps[0] == "Dungeons":
             comps.pop(0)
 
         path = "./Dungeons/"
-
         a = {"DUNGEONS": {}}
         b = a["DUNGEONS"]
 
@@ -6513,8 +6061,10 @@ class CodeEditor(UIElement):
             b.update({comps[0]: {}})
             b = b[comps[0]]
             path += comps.pop(0) + "/"
+
             try:
                 os.mkdir(path)
+
             except:
                 pass
 
@@ -6523,11 +6073,11 @@ class CodeEditor(UIElement):
             w = max(len(path+file_name), len(err))
             self.popupError(f"{err: ^{w}}\n{path+file_name: ^{w}}")
             return
+        
         else:
             open(path+file_name, "w+", encoding="utf-8").close()
 
         self.editor_app.sub_app_file_editor.open_folder("./Dungeons", self.editor_app.sub_app_file_editor.file_opener_getter, self.editor)
-        # self.open_folder("./Dungeons", self.file_opener_getter, editor)
         self.editor_app.sub_app_file_editor.file_opener_getter(path+file_name, self.editor)()
         self.editor_app.sub_app_file_editor.dir_tree.expand_tree(a)
 
@@ -6538,80 +6088,91 @@ class CodeEditor(UIElement):
         self.delete_file_confirm_input_box.cursor_location.col = len(self.delete_file_confirm_input_box.get_content())
     
     def delete_file(self, text_box):
-        
         txt = self.delete_file_input_box.get_content().strip()
         txt2 = text_box.get_content().strip()
         
         if txt == txt2 and txt:
             self.delete_file_input_box.set_content("")
             text_box.set_content("")
+
             try:
                 os.remove(f"./Dungeons/{txt}")
                 self.editor_app.sub_app_file_editor.open_folder("./Dungeons", self.editor_app.sub_app_file_editor.file_opener_getter, self.editor)
+
             except Exception as e:
                 self.popupError("Error: " + "\n".join(str(a) for a in e.args))
+
         else:
+
             if txt and (not txt2):
                 self.delete_file_err.set_colored_content("Please re-enter file name in second text box")
+
             elif txt2 and (not txt):
                 self.delete_file_err.set_colored_content("Please enter file name in first text box")
+
             elif txt and txt2:
                 self.delete_file_err.set_colored_content("File names do not match")
+
             else:
                 self.delete_file_err.set_colored_content("Please enter name of file to delete")
                 
-
     def top_bar_file_new_file(self, *_, **__):
-        # print("popup?")
         self.top_bar_file.children[0].toggle_visibility()
         self.new_file_popup.popup()
+
     def top_bar_file_delete_file(self, *_, **__):
         self.top_bar_file.children[0].toggle_visibility()
         self.delete_file_popup.popup()
         
     def top_bar_file_open_file(self, *_, **__):
         ...
+
     def top_bar_file_open_folder(self, *_, **__):
         ...
+
     def top_bar_file_save(self, *_, **__):
         ...
+
     def top_bar_file_save_all(self, *_, **__):
         ...
+
     def top_bar_file_exit(self, *_, **__):
         ...
+
     def top_bar_edit_undo(self, *_, **__):
         ...
+
     def top_bar_edit_redo(self, *_, **__):
         ...
+
     def top_bar_edit_cut(self, *_, **__):
         ...
+
     def top_bar_edit_copy(self, *_, **__):
         ...
+
     def top_bar_edit_paste(self, *_, **__):
         ...
+
     def top_bar_edit_find(self, *_, **__):
         ...
+
     def top_bar_edit_replace(self, *_, **__):
         ...
 
     def _update(self, editor, X, Y):
-        # print(editor._focused_object)
-        
+
         if self.active_app == "game":
             self.game_app._update(editor, X, Y)
+
         elif self.active_app == "editor":
             self.editor_app._update(editor, X, Y)
             
         for child in self.children:
             child._update(editor, X, Y)
 
-        # if self.active_app == "game":
-        #     self.game_app._update2(editor, X, Y)
-
     def _update_layout(self, editor):
-        
         pygame.display.set_mode((editor.width, editor.height), pygame.RESIZABLE | pygame.NOFRAME)
-        
         self.top_bar.width = editor.width
         self.bottom_drag.width = editor.width-10
         self.bottom_drag.y = self.bottom_left_drag.y = self.bottom_right_drag.y = editor.height-5
@@ -6621,21 +6182,22 @@ class CodeEditor(UIElement):
         self.bottom_bar_line.width = self.top_bar_line.width = editor.width
         self.bottom_bar.width = editor.width-10
         self.bottom_bar.y = editor.height-20
-        
         self.app_bar.height = self.app_line.height = editor.height - 42
-        
         self.minimize_button.x = editor.width - (26*3)
         self.fullscreen_toggle.x = editor.width - (26*2)
         self.close_button.x = editor.width - 26
 
     def _event(self, editor:Editor, X, Y):
+
         if (self.top_bar.hovered and editor.mouse[0] and (not editor.previous_mouse[0])):
             self.window_drag_offset = editor.mouse_pos
+
         elif (editor.mouse[0] and self.window_drag_offset):
             x, y = mouse.get_position()
             x -= self.window_drag_offset[0]
             y -= self.window_drag_offset[1]
             editor.set_window_location(x, y)
+
         elif (not editor.mouse[0]) and editor.previous_mouse[0]:
             x, y = mouse.get_position()
             
@@ -6643,14 +6205,12 @@ class CodeEditor(UIElement):
                 self._is_fullscreen = True
                 self._recent_window_size = (editor.width, editor.height)
                 self._recent_window_pos = self.get_screen_pos(editor)
-                
                 self.set_fullscreen(editor)
             
             self.window_drag_offset = None
 
         rmx, rmy = mouse.get_position()
         rsx, rsy = self.get_screen_pos(editor)
-        # print(rmx, rmy, rsx, rsy)
 
         if self.bottom_drag.hovered:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZENS)
@@ -6673,43 +6233,45 @@ class CodeEditor(UIElement):
             
         elif self.bottom_left_drag.hovered:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZENESW)
+
             if editor.mouse[0] and (not editor.previous_mouse[0]):
                 self.selected_drag = "bottom_left_drag"
                 self.drag_offset = (rsx + editor.width, rsy)
+
         elif self.bottom_right_drag.hovered:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZENWSE)
+
             if editor.mouse[0] and (not editor.previous_mouse[0]):
                 self.selected_drag = "bottom_right_drag"
+
         elif not editor.override_cursor:
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         if self.selected_drag in ["bottom_drag", "bottom_right_drag", "bottom_left_drag"]:
-            # print(rmy, rsy, rmy-rsy)
-            # print(f"rmy:{rmy} - rsy:{rsy} = {rmy-rsy}")
             editor.height = max(425, rmy - rsy)
-            # print(editor.height)
             self._update_layout(editor)
+
         if self.selected_drag in ["left_drag", "bottom_left_drag"]:
             editor.set_window_location(min (rmx, self.drag_offset[0]-100), self.drag_offset[1])
             editor.width = max(800, self.drag_offset[0] - rmx)
-            # print(editor.width)
-            self._update_layout(editor)
-        if self.selected_drag in ["right_drag", "bottom_right_drag"]:
-            # print(f"rmx:{rmx} - rsx:{rsx} = {rmx-rsx}")
-            editor.width = max(800, rmx - rsx)
             self._update_layout(editor)
 
+        if self.selected_drag in ["right_drag", "bottom_right_drag"]:
+            editor.width = max(800, rmx - rsx)
+            self._update_layout(editor)
 
         if (not editor.mouse[0]) and editor.previous_mouse[0]:
             self.selected_drag = ""
             
         _c = self.children.copy()
         _c.reverse()
+
         for child in _c:
             child._event(editor, X, Y)
             
         if self.active_app == "game":
             self.game_app._event(editor, X, Y)
+
         elif self.active_app == "editor":
             self.editor_app._event(editor, X, Y)
 
@@ -6766,15 +6328,12 @@ class PopoutWindow(UIElement):
         ...
 
 class IOHook:
+
     def __init__(self):
         self.engine = None
         self.player_data = None
         self.game_app: GameApp = None
-        # self.running = False
-        # self._input_queue = []
-        # self._output_queue = []
-        # self._log_queue = []
-    
+
     def init(self, engine):
         self.engine = engine
 
@@ -6785,16 +6344,22 @@ class IOHook:
             if (m := re.match(r"(\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')", t)): # "..."
                 t = re.sub(r"(\\.|`[^`]*`)", "\033[38;2;215;186;125m\\1\033[38;2;206;145;120m", m.group())
                 return f"\033[38;2;206;145;120m{t}\033[0m"
+            
             elif (m := re.match(r"\+(?:\d+|\[(?:\d+\-\d+|(?:\d+\%\:\d+ *)+)\])(?:dmg|def)\b", t)):
                 return f"\033[38;2;100;250;100m{m.group()}\033[0m"
+            
             elif (m := re.match(r"\-(?:\d+|\[(?:\d+\-\d+|(?:\d+\%\:\d+ *)+)\])(?:dmg|def)\b", t)):
                 return f"\033[38;2;250;100;100m{m.group()}\033[0m"
+            
             elif (m := re.match(r"\[(?: INFINITE |EQUIPPED|WEARING)\]", t)):
                 return f"\033[38;2;255;255;255m[\033[38;2;25;180;40m{m.group().replace('[', '').replace(']', '')}\033[38;2;255;255;255m]\033[0m"
+            
             elif (m := re.match(r"\[(=*)(-*)\](?: *(\d+)/(\d+))?", t)):
                 g = m.groups()
+
                 if g[2] is None:
                     return f"\033[38;2;255;255;255m[\033[38;2;100;250;100m{g[0]}\033[38;2;250;100;100m{g[1]}\033[38;2;255;255;255m]\033[0m"
+                
                 else:
                     a = int(g[2])
                     b = int(g[3])
@@ -6803,65 +6368,68 @@ class IOHook:
                     c2 = 255 - c1
 
                     return f"\033[38;2;255;255;255m[\033[38;2;100;250;100m{g[0]}\033[38;2;250;100;100m{g[1]}\033[38;2;255;255;255m] \033[38;2;{int(c2)};{int(c1)};0m{a}\033[38;2;255;255;255m/\033[38;2;255;255;255m{b}\033[0m"
+                
             elif (m := re.match(r"```(?P<lang>json|md|ds|dungeon_script|ascii|less)?(?:\\.|[^`])*```", t)):
                 d = m.groupdict()
                 lang = d["lang"]
                 text = t[3+len(lang or ""):-3]
+
                 if lang == "json":
                     return FileEditor.json_colors(None, text)
+                
                 elif lang == "md":
                     return FileEditor.md_colors(None, text)
+                
                 elif lang in ["ds", "dungeon_script"]:
                     return FileEditor.ds_colors(None, text)
+                
                 elif lang == "less":
                     return self.color_text(text)
+                
                 else:
                     return self.ascii_colors(text)
-                # return f"\033[38;2;200;200;200m{text}\033[0m"
+                
             elif (m := re.match(r"`[^`\n]*`", t)):
                 return f"\033[38;2;95;240;255m{m.group().replace('`', '')}\033[0m"
+            
             elif (m := re.match(r"\*[^\*\n]*\*", t)):
                 return f"\033[38;2;30;200;80m{m.group().replace('*', '')}\033[0m"
+            
             elif (m := re.match(r"_[^_\n]*_", t)):
                 return f"\033[38;2;220;90;145m{m.group().replace('_', '')}\033[0m"
+            
             else:
                 return t
 
         return re.sub(r"(```(?:\\.|[^`])*```|\"(?:\\.|[^\"\\\n])*\"|\[(?:| INFINITE |EQUIPPED|WEARING)\]|\[=*-*\](?: *\d+/\d+)?|(?:\+|\-)(?:\d+|\[(?:\d+\-\d+|(?:\d+\%\:\d+ *)+)\])(?:dmg|def)\b|\d+ft\b|`[^`\n]*`|\*[^\*\n]*\*|_[^_\n]*_|\d+\/\d+)", repl, text)
 
     def ascii_colors(self, text:str) -> str:
-
         return re.sub(r"([│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌]+)", "\033[38;2;100;100;100m\\1\033[0m", text)
 
     def sendOutput(self, target, text):
 
         if target in ["log", 0, 1, 5, 6, 7, 8]:
-            # print(f"{target}: {text}")
-            # self._log_queue.append(text)
-
             cl = self.game_app.log_output.colored_content.split("\n")
             cl.append("[" + str({
                 0: "engine",
                 1: "sound"
             }.get(target, target)) + "]: " + text)
+
             if len(cl) > 200:
                 cl = cl[-200:]
 
             self.game_app.log_output.set_colored_content("\n".join(cl))
-
             self.game_app.log_scrollable.offsetY = -(self.game_app.log_output._text_height - (self.game_app.log_output.min_height - 20))
 
         elif target == 2:
-            # print(f"{target}: {text}")
             self.game_app.updateInventory(text)
         
         elif target == 3:
-            # print(f"{target}: {text}")
             self.game_app.updateCombat(text)
 
         elif target == 4:
-            # print(f"{target}: {text}")
             self.game_app.updatePlayer(text)
+
             if text is not None:
                 self.game_app.updateInventory(text.inventory)
 
@@ -6869,50 +6437,38 @@ class IOHook:
 
             if text == "update-combat-ui":
                 self.game_app.updateCombat()
+
             elif text == "update-inventory-ui":
                 self.game_app.updateInventory()
 
         else:
-
             cl = self.game_app.main_output.colored_content.split("\n")
             cl.append("\n" + text)
+
             if len(cl) > 200:
                 cl = cl[-200:]
 
             self.game_app.main_output.set_colored_content(self.color_text("\n".join(cl)))
-
             self.game_app.main_out_scrollable.offsetY = -(self.game_app.main_output._text_height - (self.game_app.main_output.min_height - 20))
 
-
-            # self._output_queue.append("\n" + text)
-
     def start(self):
-        pass #self.running = True
+        pass
     
     def stop(self):
-        pass #self.running = False
+        pass
         
-    # def _input_thread(self):
-    #     while self.running:
-    #         while self._input_queue:
-    #             self.engine.handleInput(*self._input_queue.pop(0))
-    
     def sendInput(self, player_id, text):
-        # self._input_queue.append((player_id, text))
         if self.engine is None: return
     
         cl = self.game_app.log_output.colored_content.split("\n")
         cl.append(f"\033[38;2;100;250;100m[{player_id}]: \033[38;2;255;255;255m" + text + "\033[0m")
+
         if len(cl) > 200:
             cl = cl[-200:]
 
         self.game_app.log_output.set_colored_content("\n".join(cl))
-
         self.game_app.log_scrollable.offsetY = -(self.game_app.log_output._text_height - (self.game_app.log_output.min_height - 20))
-
         self.engine.handleInput(player_id, text)
-
-# os.system("\"C:\\Program Files\\Blender Foundation\\Blender 3.6\\blender-launcher.exe\"")
 
 if __name__ == "__main__":
     # from threading import Thread

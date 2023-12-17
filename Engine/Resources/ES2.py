@@ -957,6 +957,7 @@ class EngineScript:
                 raise ScriptError("not an if-statement")
         else:
             raise EOF()
+
     def elif_branch(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         # print("elif")
         if tokens:
@@ -1018,6 +1019,7 @@ class EngineScript:
                 return self.else_branch(tokens, ignore_macro)
         else:
             raise EOF()
+
     def else_branch(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         # print("else")
         if tokens:
@@ -1050,6 +1052,7 @@ class EngineScript:
                 raise tokens[0].unexpected()
         else:
             raise EOF()
+
     def while_loop(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         if tokens:
             if tokens[0] == ("KEYWORD", "while"):
@@ -1102,6 +1105,7 @@ class EngineScript:
                 
         else:
             raise EOF()
+
     def for_loop(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         if tokens:
             if tokens[0] == ("KEYWORD", "for"):
@@ -1208,6 +1212,7 @@ class EngineScript:
                 raise ScriptError()
         else:
             raise EOF()
+
     def arith(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         # print("arith")
         if tokens:
@@ -1328,6 +1333,7 @@ class EngineScript:
 
         else:
             raise EOF()
+
     def access(self, tokens:list[Token], ignore_macro:bool=False) -> dict|int|float|bool|None:
         # print("access")
         if tokens:
@@ -1532,6 +1538,7 @@ class EngineScript:
                 raise tokens[0].unexpected()
         else:
             raise EOF()
+
     def comma_expressions(self, tokens:list[Token], ignore_macro:bool=False) -> list:
 
         if tokens:
@@ -1594,6 +1601,7 @@ class EngineScript:
                         
         else:
             raise EOF()
+
     def function_call(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         # print("function call")
         if tokens:
@@ -2005,6 +2013,7 @@ class EngineScript:
 
         else:
             raise EOF()
+
     def tag_list(self, tokens:list[Token], ignore_macro:bool=False) -> dict:
         if tokens:
             data = []

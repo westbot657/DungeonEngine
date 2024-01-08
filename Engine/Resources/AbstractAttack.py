@@ -9,6 +9,7 @@ try:
     from .Logger import Log
     from .FunctionMemory import FunctionMemory
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Identifier import Identifier
     from AbstractGameObject import AbstractGameObject
@@ -18,9 +19,11 @@ except ImportError:
     from Logger import Log
     from FunctionMemory import FunctionMemory
     from Loader import Loader
+    from Serializer import Serializer, Serializable
 
 import glob, json, random
 
+@Serializable("AbstractAttack")
 class AbstractAttack(AbstractGameObject):
     _loaded = {}
     _link_parents = []
@@ -153,3 +156,17 @@ class AbstractAttack(AbstractGameObject):
         cls._link_parents.clear()
         return cls._loaded
 
+    def serialize(self):
+        return {
+            "name": Serializer.serialize(self.name),
+            "range": Serializer.serialize(self.range),
+            "damage": Serializer.serialize(self.damage),
+            "accuracy": Serializer.serialize(self.accuracy),
+            "data": Serializer.serialize(self.data),
+            "events": Serializer.serialize(self.events),
+            "is_template": Serializer.serialize(self.is_template)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)

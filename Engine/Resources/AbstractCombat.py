@@ -11,6 +11,7 @@ try:
     from .Position import Position
     from .Logger import Log
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Combat import Combat
     from Identifier import Identifier
@@ -22,10 +23,12 @@ except ImportError:
     from Position import Position
     from Logger import Log
     from Loader import Loader
+    from Serializer import Serializer, Serializable
 
 import glob, json, re
 
 
+@Serializable("AbstractCombat")
 class AbstractCombat:
     _loaded: dict = {}
 
@@ -107,4 +110,18 @@ class AbstractCombat:
         Log["loadup"]["abstract"]["combat"]("AbstractCombat loading complete")
         return cls._loaded
 
+
+    def serialize(self):
+        return {
+            "identifier": Serializer.serialize(self.identifier),
+            "_raw_data": Serializer.serialize(self._raw_data),
+            "enemies": Serializer.serialize(self.enemies),
+            "sequence": Serializer.serialize(self.sequence),
+            "respawn_point": Serializer.serialize(self.respawn_point),
+            "data": Serializer.serialize(self.data)
+        }
+        
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 

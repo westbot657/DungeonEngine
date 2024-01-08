@@ -13,6 +13,7 @@ try:
     from .FunctionMemory import FunctionMemory
     from .Util import Util
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Identifier import Identifier
     from EngineErrors import InvalidObjectError
@@ -26,6 +27,7 @@ except ImportError:
     from FunctionMemory import FunctionMemory
     from Util import Util
     from Loader import Loader
+    from Serializer import Serializer, Serializable
 
 import glob, json, re
 
@@ -43,7 +45,7 @@ Example Enemy:
 
 """
 
-
+@Serializable("AbstractEnemy")
 class AbstractEnemy:
     _loaded: dict = {}
     _link_parents: list = []
@@ -246,7 +248,24 @@ class AbstractEnemy:
         Log["loadup"]["abstract"]["enemy"]("AbstractEnemy loading complete")
         return cls._loaded
 
-
+    def serialize(self):
+        return {
+            "identifier": Serializer.serialize(self.identifier),
+            "_raw_data": Serializer.serialize(self._raw_data),
+            "children": Serializer.serialize(self.children),
+            "parent": Serializer.serialize(self.parent),
+            "name": Serializer.serialize(self.name),
+            "max_health": Serializer.serialize(self.max_health),
+            "health": Serializer.serialize(self.health),
+            "attacks": Serializer.serialize(self.attacks),
+            "_id": Serializer.serialize(self._id),
+            "is_template": Serializer.serialize(self.is_template),
+            "events": Serializer.serialize(self.events)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
 
 

@@ -13,6 +13,7 @@ try:
     from .Location import Location
     from .Map import Map
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Dungeon import Dungeon
     from Identifier import Identifier
@@ -26,7 +27,7 @@ except ImportError:
     from Location import Location
     from Map import Map
     from Loader import Loader
-
+    from Serializer import Serializer, Serializable
 
 import glob, json, re
 
@@ -37,6 +38,7 @@ import glob, json, re
 # │┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌
 
 
+@Serializable("AbstractCombat")
 class AbstractDungeon:
     _loaded = {}
     _dungeon_instances = []
@@ -56,12 +58,8 @@ class AbstractDungeon:
         if map := data.get("map", None): self.map = Map(map)
         else: self.map = None
 
-
-        #room_files: list[str] = glob.glob(f"Dungeons/{self.identifier.name}/rooms/*.json")
-
     def createRooms(self, function_memory:FunctionMemory):
         return AbstractRoom.getDungeonRooms(function_memory, self.identifier.full())
-
 
     def createInstance(self, function_memory, **override_values):
         dungeon = Dungeon(self,
@@ -119,6 +117,24 @@ class AbstractDungeon:
         for dungeon in cls._dungeon_instances:
             dungeon: Dungeon
             dungeon.saveData(function_memory)
+
+    def serialize(self):
+        return {
+            "identifier": Serializer.serialize(self.identifier),
+            "_raw_data": Serializer.serialize(self._raw_data),
+            "name": Serializer.serialize(self.name),
+            "version": Serializer.serialize(self.version),
+            "environment": Serializer.serialize(self.environment),
+            "entry_point": Serializer.serialize(self.entry_point),
+            "events": Serializer.serialize(self.events),
+            "data": Serializer.serialize(self.data),
+            "recovery_location": Serializer.serialize(self.recovery_location),
+            "map": Serializer.serialize(self.map)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
 
 if __name__ == "__main__":

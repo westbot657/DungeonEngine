@@ -9,6 +9,7 @@ try:
     from .DynamicValue import DynamicValue
     from .Logger import Log
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Armor import Armor
     from Identifier import Identifier
@@ -18,11 +19,13 @@ except ImportError:
     from DynamicValue import DynamicValue
     from Logger import Log
     from Loader import Loader
+    from Serializer import Serializer, Serializable
 
 import glob, json, re, random
 
 from mergedeep import merge
 
+@Serializable("AbstractArmor")
 class AbstractArmor(AbstractGameObject):
     _loaded: dict = {}
     _link_parents:list = []
@@ -169,6 +172,21 @@ class AbstractArmor(AbstractGameObject):
 
         Log["loadup"]["abstract"]["armor"]("AbstractArmor loading complete")
         return cls._loaded
+
+    def serialize(self):
+        return {
+            "name": Serializer.serialize(self.name),
+            "description": Serializer.serialize(self.description),
+            "max_durability": Serializer.serialize(self.max_durability),
+            "durability": Serializer.serialize(self.durability),
+            "damage_reduction": Serializer.serialize(self.damage_reduction),
+            "events": Serializer.serialize(self.events)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
+
 
 
 if __name__ == "__main__":

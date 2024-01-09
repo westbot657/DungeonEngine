@@ -8,14 +8,28 @@
 # other descriptors, made as needed
 try:
     from .Util import Util
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Util import Util
+    from Serializer import Serializer, Serializable
     
+
+@Serializable("Environment")
 class Environment:
 
     def __init__(self, stats:dict):
         self.stats = stats
         self.parent: Environment|None = None
+
+    def serialize(self):
+        return {
+            "stats": Serializer.serialize(self.stats),
+            "parent": Serializer.serialize(self.parent)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     def setParent(self, environment):
         self.parent = environment

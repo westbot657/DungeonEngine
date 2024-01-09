@@ -6,15 +6,18 @@ try:
     from .DynamicValue import DynamicValue
     from .EngineOperation import _EngineOperation
     from .Logger import Log
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from FunctionMemory import FunctionMemory
     from FunctionalElement import FunctionalElement
     from DynamicValue import DynamicValue
     from EngineOperation import _EngineOperation
     from Logger import Log
+    from Serializer import Serializer, Serializable
 
 import random
 
+@Serializable("Attack")
 class Attack(FunctionalElement):
     def __init__(self, abstract, name:str, damage:DynamicValue, range:int, accuracy:int, data:dict, events:dict):
         self.abstract = abstract
@@ -184,5 +187,18 @@ class Attack(FunctionalElement):
 
         return 0
 
-
+    def serialize(self):
+        return {
+            "abstract": Serializer.serialize(self.abstract),
+            "name": Serializer.serialize(self.name),
+            "damage": Serializer.serialize(self.damage),
+            "range": Serializer.serialize(self.range),
+            "accuracy": Serializer.serialize(self.accuracy),
+            "data": Serializer.serialize(self.data),
+            "events": Serializer.serialize(self.events)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 

@@ -9,6 +9,7 @@ try:
     from .Logger import Log
     from .EngineErrors import FinalScriptError, ScriptError, EOF
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from LoaderFunction import LoaderFunction
     from Functions import *
@@ -16,6 +17,7 @@ except ImportError:
     from Logger import Log
     from EngineErrors import FinalScriptError, ScriptError, EOF
     from Loader import Loader
+    from Serializer import Serializer, Serializable
 
 import re, glob, json
 
@@ -65,6 +67,7 @@ def class_functions(shorthand):
     # print(shorthand)
     return x
 
+@Serializable("EngineScript")
 class EngineScript:
 
     __slots__ = [
@@ -124,6 +127,25 @@ class EngineScript:
 
         self.macros: dict[str, Any] = {}
         self.macro_functions: dict[str, EngineScript.MacroFunction] = {}
+
+    def serialize(self):
+        return {
+            "script_file": Serializer.serialize("ignored for security/privacy"),
+            "script": Serializer.serialize(self.script),
+            "line": Serializer.serialize(self.line),
+            "col": Serializer.serialize(self.col),
+            "lexpos": Serializer.serialize(self.lexpos),
+            "compiler_script": Serializer.serialize(self.compiled_script),
+            "context_hints": Serializer.serialize(self.context_hints),
+            "_tokens": Serializer.serialize([]),
+            "do_summary": Serializer.serialize(False),
+            "macros": Serializer.serialize(self.macros),
+            "macro_functions": Serializer.serialize(self.macro_functions),
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     def setup(self):
         if not self.do_summary: return

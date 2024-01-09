@@ -2,10 +2,12 @@
 
 try:
     from .EngineErrors import CurrencyError
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from EngineErrors import CurrencyError
+    from Serializer import Serializer, Serializable
 
-
+@Serializable("Currency")
 class Currency:
 
     def __init__(self, gold=0, silver=0, copper=0):
@@ -159,3 +161,14 @@ class Currency:
 
     def get_save(self):
         return [self.gold, self.silver, self.copper]
+
+    def serialize(self):
+        return {
+            "gold": Serializer.serialize(self.gold),
+            "silver": Serializer.serialize(self.silver),
+            "copper": Serializer.serialize(self.copper)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)

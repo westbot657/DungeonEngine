@@ -5,13 +5,16 @@ try:
     from .Identifier import Identifier
     from .DynamicValue import DynamicValue
     from .FunctionMemory import FunctionMemory
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
     from DynamicValue import DynamicValue
     from FunctionMemory import FunctionMemory
+    from Serializer import Serializer, Serializable
 
 
+@Serializable("Ammo")
 class Ammo(GameObject):
     identifier = Identifier("engine", "object/", "ammo")
     def __init__(self, abstract, name:str, description:str, bonus_damage:DynamicValue, max_count:int, count:int=None):
@@ -26,7 +29,6 @@ class Ammo(GameObject):
 
     def __repr__(self):
         return f"Ammo {self.name}: bonus-damage:{self.bonus_damage} max-count:{self.max_count}"
-
 
     def can_stack(self, other):
         other: Ammo
@@ -88,18 +90,6 @@ class Ammo(GameObject):
     def postEvaluate(self, function_memory:FunctionMemory):
         ... # self.updateLocalVariables(function_memory.symbol_table)
 
-    # # on_load: when ammo is loaded into a weapon
-    # def onLoad(self, function_memory:FunctionMemory):
-    #     ...
-
-    # # on_unload: when ammo is unloaded from a weapon
-    # def onUnload(self, function_memory:FunctionMemory):
-    #     ...
-    
-    # # when weapon is used to fire ammo
-    # def onFire(self, function_memory:FunctionMemory):
-    #     ...
-
     def onHit(self, function_memory:FunctionMemory):
         ...
     
@@ -124,3 +114,17 @@ class Ammo(GameObject):
             d.update({"count": self.count})
         return d
 
+    def serialize(self):
+        return {
+            "abstract": Serializer.serialize(self.abstract),
+            "name": Serializer.serialize(self.name),
+            "description": Serializer.serialize(self.description),
+            "bonus_damage": Serializer.serialize(self.bonus_damage),
+            "max_count": Serializer.serialize(self.max_count),
+            "count": Serializer.serialize(self.count),
+            "owner": Serializer.serialize(self.owner)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)

@@ -11,6 +11,7 @@ try:
     from .AbstractAttack import AbstractAttack, Attack
     from .EngineOperation import _EngineOperation
     from .Logger import Log
+    from .Serializer import Serializer, Serializable
 except:
     from Entity import Entity
     from Identifier import Identifier
@@ -22,16 +23,19 @@ except:
     from AbstractAttack import AbstractAttack, Attack
     from EngineOperation import _EngineOperation
     from Logger import Log
+    from Serializer import Serializer, Serializable
 
 import json, random
 
+@Serializable("Enemy")
 class Enemy(Entity):
     
     class Operation:
+        
         class _Operation:
             def __init__(self, name:str):
                 self._name = name
-        
+
         class ChooseAttack(_Operation):
             def __init__(self, attack:Attack):
                 super().__init__("Choose Attack")
@@ -60,6 +64,24 @@ class Enemy(Entity):
         self.events: dict[str, dict] = {}
 
         self.combat = None
+        
+    def serialize(self):
+        return {
+            "abstract": Serializer.serialize(self.abstract),
+            "name": Serializer.serialize(self.name),
+            "max_health": Serializer.serialize(self.max_health),
+            "health": Serializer.serialize(self.health),
+            "attacks": Serializer.serialize(self.attacks),
+            "uid": Serializer.serialize(self.uid),
+            "events": Serializer.serialize(self.events),
+            "combat": Serializer.serialize(self.combat),
+            "location": Serializer.serialize(self.location),
+            "position": Serializer.serialize(self.position)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     def __repr__(self):
         return f"Enemy{' ' + str(self.uid) if self.uid else ''} '{self.name}' {self.health}/{self.max_health} ({self.abstract})  ({super().__repr__()})"
@@ -290,16 +312,4 @@ class Enemy(Entity):
 
     def _get_save(self, function_memory:FunctionMemory) -> dict:
         return {}
-
-    def serialize(self, function_memory:FunctionMemory):
-        """
-        This only returns information needed to display for multiplayer
-        """
-        data = {
-            "name": self.name,
-            "health": self.health,
-            "max_health": self.max_health
-        }
-        return data
-
 

@@ -15,6 +15,7 @@ except ImportError:
 
 import json, re
 
+## Not Serializable  (self.command_exec gets assigned a function)
 class ConsoleCommand:
     _commands = {}
 

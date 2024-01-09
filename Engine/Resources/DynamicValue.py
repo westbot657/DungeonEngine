@@ -5,18 +5,31 @@ try:
     from .FunctionMemory import FunctionMemory
     from .EngineOperation import _EngineOperation
     from .FunctionalElement import FunctionalElement
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from EngineDummy import Engine
     from FunctionMemory import FunctionMemory
     from EngineOperation import _EngineOperation
     from FunctionalElement import FunctionalElement
+    from Serializer import Serializer, Serializable
 
 
+@Serializable("DynamicValue")
 class DynamicValue(FunctionalElement):
 
     def __init__(self, raw_data):
         self.raw_data = raw_data
         self.cached_value = None
+
+    def serialize(self):
+        return {
+            "raw_data": Serializer.serialize(self.raw_data),
+            "cached_value": Serializer.serialize(self.cached_value)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data):
+        Serializer.smartDeserialize(instance, data)
 
     def __repr__(self):
         return f"DynamicValue:{self.raw_data}"

@@ -16,6 +16,7 @@ try:
     from .EngineErrors import EngineError, EngineBreak
     from .Location import Location
     from .Map import Map
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from FunctionalElement import FunctionalElement
     from FunctionMemory import FunctionMemory
@@ -32,11 +33,13 @@ except ImportError:
     from EngineErrors import EngineError, EngineBreak
     from Location import Location
     from Map import Map
+    from Serializer import Serializer, Serializable
 
 from typing import Generator
 
 import json, os
 
+@Serializable("Dungeon")
 class Dungeon(FunctionalElement):
 
     def __init__(self, abstract, name:str, version:int|float|str, environment:Environment, entry_point:Location, events:list, data:dict|None, rooms:dict[str, Room], recovery_location:Location|None):
@@ -51,6 +54,24 @@ class Dungeon(FunctionalElement):
         self.recovery_location = recovery_location
 
         self.map: Map = None
+
+    def serialize(self):
+        return {
+            "abstract": Serializer.serialize(self.abstract),
+            "name": Serializer.serialize(self.name),
+            "version": Serializer.serialize(self.version),
+            "environment": Serializer.serialize(self.environment),
+            "entry_point": Serializer.serialize(self.entry_point),
+            "events": Serializer.serialize(self.events),
+            "data": Serializer.serialize(self.data),
+            "rooms": Serializer.serialize(self.rooms),
+            "recovery_location": Serializer.serialize(self.recovery_location),
+            "map": Serializer.serialize(self.map),
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     def getLocalVariables(self) -> dict:
         d = {

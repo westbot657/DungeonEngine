@@ -8,6 +8,7 @@ try:
     from .FunctionMemory import FunctionMemory
     from .EngineOperation import _EngineOperation
     from .Logger import Log
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
@@ -16,10 +17,11 @@ except ImportError:
     from FunctionMemory import FunctionMemory
     from EngineOperation import _EngineOperation
     from Logger import Log
+    from Serializer import Serializer, Serializable
 
 from typing import Generator
 
-
+@Serializable("Armor")
 class Armor(GameObject):
     identifier = Identifier("engine", "object/", "armor")
     def __init__(self, abstract, name:str, description:str, damage_reduction:DynamicValue, max_durability:int, durability:int, events:dict):
@@ -235,3 +237,20 @@ class Armor(GameObject):
             d.update({"durability": self.durability})
 
         return d
+
+    def serialize(self):
+        return {
+            "abstract": Serializer.serialize(self.abstract),
+            "name": Serializer.serialize(self.name),
+            "description": Serializer.serialize(self.description),
+            "damage_reduction": Serializer.serialize(self.damage_reduction),
+            "max_durability": Serializer.serialize(self.max_durability),
+            "durability": Serializer.serialize(self.durability),
+            "events": Serializer.serialize(self.events),
+            "owner": Serializer.serialize(self.owner)
+        }
+
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
+

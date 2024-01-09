@@ -33,6 +33,7 @@ try:
     from .Entity import Entity
     from .DynamicValue import DynamicValue
     from .ES2 import EngineScript
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -66,11 +67,13 @@ except ImportError:
     from Entity import Entity
     from DynamicValue import DynamicValue
     from ES2 import EngineScript
+    from Serializer import Serializer, Serializable
 
 
 from typing import Any, Generator
 import re, time, random
 
+@Serializable("DungeonLoader")
 class DungeonLoader:
 
     _loader = None
@@ -81,7 +84,7 @@ class DungeonLoader:
         return cls._loader
 
     def init(self):
-        self.loader_function = LoaderFunction
+        self.loader_function = LoaderFunction # this can't be serialized
         self.abstract_ammo: dict[str, AbstractAmmo] = {}
         self.abstract_armor: dict[str, AbstractArmor] = {}
         self.abstract_attacks: dict[str, AbstractAttack] = {}
@@ -98,7 +101,7 @@ class DungeonLoader:
         self.abstract_weapons: dict[str, AbstractWeapon] = {}
         self.players = {}
 
-        self.classes = {
+        self.classes = { # This can't be serialized
             "Player": Player,
             "Enemy": Enemy,
             "Attack": Attack,
@@ -115,6 +118,49 @@ class DungeonLoader:
             "StatusEffectCause": StatusEffectCause,
             "StatusEffectManager": StatusEffectManager
         }
+
+    def serialize(self):
+        return {
+            "abstract_ammo": Serializer.serialize(self.abstract_ammo),
+            "abstract_armor": Serializer.serialize(self.abstract_armor),
+            "abstract_attacks": Serializer.serialize(self.abstract_attacks),
+            "abstract_combats": Serializer.serialize(self.abstract_combats),
+            "abstract_dungeons": Serializer.serialize(self.abstract_dungeons),
+            "dungeons": Serializer.serialize(self.dungeons),
+            "abstract_enemies": Serializer.serialize(self.abstract_enemies),
+            "abstract_items": Serializer.serialize(self.abstract_items),
+            "abstract_interactables": Serializer.serialize(self.abstract_interactables),
+            "abstract_rooms": Serializer.serialize(self.abstract_rooms),
+            "abstract_status_effects": Serializer.serialize(self.abstract_status_effects),
+            "abstract_tools": Serializer.serialize(self.abstract_tools),
+            "abstract_weapons": Serializer.serialize(self.abstract_weapons),
+            "players": Serializer.serialize(self.players)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        cls._loader = instance
+        Serializer.smartDeserialize(data)
+        
+        instance.loader_function = LoaderFunction # this can't be serialized
+        instance.classes = { # This can't be serialized
+            "Player": Player,
+            "Enemy": Enemy,
+            "Attack": Attack,
+            "Weapon": Weapon,
+            "Armor": Armor,
+            "Ammo": Ammo,
+            "Tool": Tool,
+            "Combat": Combat,
+            "Item": Item,
+            "Room": Room,
+            "Dungeon": Dungeon,
+            "Interactable": Interactable,
+            "StatusEffect": StatusEffect,
+            "StatusEffectCause": StatusEffectCause,
+            "StatusEffectManager": StatusEffectManager
+        }
+        
 
     def evaluateFunction(self, function_memory:FunctionMemory, data:dict):
         val = self._evaluateFunction(function_memory, data)

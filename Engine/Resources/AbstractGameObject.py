@@ -4,11 +4,14 @@ try:
     from .GameObject import GameObject
     from .Identifier import Identifier
     from .EngineErrors import IdentifierError
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
     from EngineErrors import IdentifierError
+    from Serializer import Serializer, Serializable
 
+@Serializable("AbstractGameObject")
 class AbstractGameObject:
     _game_object_types = {}
     identity: Identifier = None
@@ -54,4 +57,14 @@ class AbstractGameObject:
         else:
             return [self.parent] + self.parent.get_parent_chain()
 
+    def serialize(self):
+        return {
+            "children": Serializer.serialize(self.children),
+            "parent": Serializer.serialize(self.parent),
+            "is_template": Serializer.serialize(self.is_template)
+        }
+        
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 

@@ -9,6 +9,7 @@ try:
     from .DynamicValue import DynamicValue
     from .Logger import Log
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Identifier import Identifier
     from Tool import Tool
@@ -18,11 +19,13 @@ except ImportError:
     from DynamicValue import DynamicValue
     from Logger import Log
     from Loader import Loader
+    from Serializer import Serializer, Serializable
 
 import glob, json, random
 
 from mergedeep import merge
 
+@Serializable("AbstractTool")
 class AbstractTool(AbstractGameObject):
     _loaded = {}
     _link_parents = []
@@ -166,6 +169,26 @@ class AbstractTool(AbstractGameObject):
 
         Log["loadup"]["abstract"]["tool"]("AbstractTool loading complete")
         return cls._loaded
+
+    def serialize(self):
+        return {
+            "identifier": Serializer.serialize(self.identifier),
+            "_raw_data": Serializer.serialize(self._raw_data),
+            "parent": Serializer.serialize(self.parent),
+            "children": Serializer.serialize(self.children),
+            "name": Serializer.serialize(self.name),
+            "description": Serializer.serialize(self.description),
+            "max_durability": Serializer.serialize(self.max_durability),
+            "durability": Serializer.serialize(self.durability),
+            "events": Serializer.serialize(self.events),
+            "data": Serializer.serialize(self.data),
+            "keywords": Serializer.serialize(self.keywords),
+            "is_template": Serializer.serialize(self.is_template)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
 if __name__ == "__main__":
     print(AbstractTool.loadData(None))

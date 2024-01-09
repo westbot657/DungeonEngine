@@ -9,6 +9,7 @@ try:
     from .FunctionMemory import FunctionMemory
     from .Logger import Log
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from StatusEffect import StatusEffect
     from EngineErrors import InvalidObjectError
@@ -18,10 +19,12 @@ except ImportError:
     from FunctionMemory import FunctionMemory
     from Logger import Log
     from Loader import Loader
+    from Serializer import Serializer, Serializable
 
 
 import glob, json, re
 
+@Serializable("AbstractStatusEffect")
 class AbstractStatusEffect:
     _loaded = {}
     _link_parents = []
@@ -160,6 +163,25 @@ class AbstractStatusEffect:
         Log["loadup"]["abstract"]["status effect"]("AbstractStatusEffect loading complete")
         return cls._loaded
 
+    def serialize(self):
+        return {
+            "identifier": Serializer.serialize(self.identifier),
+            "_raw_data": Serializer.serialize(self._raw_data),
+            "parent": Serializer.serialize(self.parent),
+            "children": Serializer.serialize(self.children),
+            "name": Serializer.serialize(self.name),
+            "level": Serializer.serialize(self.level),
+            "duration": Serializer.serialize(self.duration),
+            "tick_interval": Serializer.serialize(self.tick_interval),
+            "cause": Serializer.serialize(self.cause),
+            "events": Serializer.serialize(self.events),
+            "getters": Serializer.serialize(self.getters),
+            "is_template": Serializer.serialize(self.is_template)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
 if __name__ == "__main__":
     print(AbstractStatusEffect.loadData(None))

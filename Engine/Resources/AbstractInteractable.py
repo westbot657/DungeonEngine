@@ -10,6 +10,7 @@ try:
     from .Logger import Log
     from .Util import Util
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Location import Location
     from Identifier import Identifier
@@ -20,11 +21,13 @@ except ImportError:
     from Logger import Log
     from Util import Util
     from Loader import Loader
+    from Serializer import Serializer, Serializable
 
 from typing import Any
 
 import re, glob, json
 
+@Serializable("AbstractInteractable")
 class AbstractInteractable:
     _loaded = {}
     _link_parents = []
@@ -191,4 +194,19 @@ class AbstractInteractable:
 
         Log["loadup"]["abstract"]["interactable"]("AbstractInteractable loading complete")
         return cls._loaded
+
+    def serialize(self):
+        return {
+            "identifier": Serializer.serialize(self.identifier),
+            "_raw_data": Serializer.serialize(self._raw_data),
+            "children": Serializer.serialize(self.children),
+            "parent": Serializer.serialize(self.parent),
+            "fields": Serializer.serialize(self.fields),
+            "data": Serializer.serialize(self.data),
+            "interaction": Serializer.serialize(self.interaction)
+        }
+
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 

@@ -10,6 +10,7 @@ try:
     from .AbstractGameObject import AbstractGameObject
     from .Logger import Log
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Identifier import Identifier
     from Weapon import Weapon
@@ -20,6 +21,7 @@ except ImportError:
     from AbstractGameObject import AbstractGameObject
     from Logger import Log
     from Loader import Loader
+    from Serializer import Serializer, Serializable
 
 import glob, json, random
 
@@ -45,6 +47,7 @@ from mergedeep import merge
 
 """
 
+@Serializable("AbstractWeapon")
 class AbstractWeapon(AbstractGameObject):
     _loaded: dict = {}
     _link_parents = []
@@ -86,7 +89,6 @@ class AbstractWeapon(AbstractGameObject):
         return ""
         # raise InvalidObjectError(f"Weapon has no description! ({self.identifier})")
         
-    
     def getDamage(self) -> int|dict:
         if self.damage is None:
             d = self.parent.getDamage() if self.parent else None
@@ -213,6 +215,27 @@ class AbstractWeapon(AbstractGameObject):
 
         Log["loadup"]["abstract"]["weapon"]("AbstractWeapon loading complete")
         return cls._loaded
+
+    def serialize(self):
+        return {
+            "identifier": Serializer.serialize(self.identifier),
+            "_raw_data": Serializer.serialize(self._raw_data),
+            "parent": Serializer.serialize(self.parent),
+            "children": Serializer.serialize(self.children),
+            "name": Serializer.serialize(self.name),
+            "description": Serializer.serialize(self.description),
+            "max_durability": Serializer.serialize(self.max_durability),
+            "durability": Serializer.serialize(self.durability),
+            "events": Serializer.serialize(self.events),
+            "damage": Serializer.serialize(self.damage),
+            "range": Serializer.serialize(self.range),
+            "ammo_type": Serializer.serialize(self.ammo_type),
+            "is_template": Serializer.serialize(self.is_template),
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
 if __name__ == "__main__":
     print(AbstractWeapon.loadData(None))

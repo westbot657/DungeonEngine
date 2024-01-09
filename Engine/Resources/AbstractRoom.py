@@ -13,6 +13,7 @@ try:
     from .Environment import Environment
     from .Map import Map
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Room import Room
     from Identifier import Identifier
@@ -26,9 +27,11 @@ except ImportError:
     from Environment import Environment
     from Map import Map
     from Loader import Loader
+    from Serializer import Serializer, Serializable
 
 import glob, json, re
 
+@Serializable("AbstractRoom")
 class AbstractRoom:
     _loaded = {}
     _link_parents = []
@@ -87,7 +90,6 @@ class AbstractRoom:
         else:
             return [self.parent] + self.parent.get_parent_chain()
 
-
     def getName(self):
         n = self.name or (self.parent.getName() if self.parent else None)
         if n is not None: return n
@@ -105,7 +107,6 @@ class AbstractRoom:
         for interaction in self.interactions:
             interactables.append(AbstractInteractable.createInteractable(function_memory, interaction))
         return interactables
-
 
     def createInstance(self, function_memory:FunctionMemory, **override_values):
         room = Room(self,
@@ -206,5 +207,25 @@ class AbstractRoom:
             s.update({"template": True})
         return s
 
+    def serialize(self):
+        return {
+            "identifier": Serializer.serialize(self.identifier),
+            "_raw_data": Serializer.serialize(self._raw_data),
+            "parent": Serializer.serialize(self.parent),
+            "children": Serializer.serialize(self.children),
+            "name": Serializer.serialize(self.name),
+            "events": Serializer.serialize(self.events),
+            "environment": Serializer.serialize(self.environment),
+            "interactions": Serializer.serialize(self.interactions),
+            "is_template": Serializer.serialize(self.is_template),
+            "map": Serializer.serialize(self.map)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
+
 if __name__ == "__main__":
     print(AbstractRoom.loadData(None))
+
+

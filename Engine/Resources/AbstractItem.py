@@ -9,6 +9,7 @@ try:
     from .AbstractGameObject import AbstractGameObject
     from .Logger import Log
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Identifier import Identifier
     from Item import Item
@@ -18,11 +19,12 @@ except ImportError:
     from AbstractGameObject import AbstractGameObject
     from Logger import Log
     from Loader import Loader
+    from Serializer import Serializer, Serializable
 
 import glob, json, re, random
 from mergedeep import merge
 
-
+@Serializable("AbstractItem")
 class AbstractItem(AbstractGameObject):
     _loaded: dict = {}
     _link_parents: list = []
@@ -190,6 +192,25 @@ class AbstractItem(AbstractGameObject):
         Log["loadup"]["abstract"]["item"]("AbstractItem loading complete")
         return cls._loaded
 
+    def serialize(self):
+        return {
+            "identifier": Serializer.serialize(self.identifier),
+            "_raw_data": Serializer.serialize(self._raw_data),
+            "parent": Serializer.serialize(self.parent),
+            "children": Serializer.serialize(self.children),
+            "name": Serializer.serialize(self.name),
+            "description": Serializer.serialize(self.description),
+            "max_count": Serializer.serialize(self.max_count),
+            "count": Serializer.serialize(self.count),
+            "data": Serializer.serialize(self.data),
+            "events": Serializer.serialize(self.events),
+            "keywords": Serializer.serialize(self.keywords),
+            "is_template": Serializer.serialize(self.is_template)
+        }
+
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
 if __name__ == "__main__":
     pass #print(AbstractItem.loadData())

@@ -2,10 +2,12 @@
 
 try:
     from .FunctionalElement import FunctionalElement
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from FunctionalElement import FunctionalElement
+    from Serializer import Serializer, Serializable
 
-
+@Serializable("StatusEffectCause")
 class StatusEffectCause(FunctionalElement):
     _cause_types = {}
 
@@ -21,6 +23,13 @@ class StatusEffectCause(FunctionalElement):
 
     def __init__(self, name:str):
         self.name = name
+
+    def serialize(self):
+        return Serializer.smartSerialize(self, "name")
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     def getDisplay(self):
         return None #f"[{self.name}]"

@@ -4,12 +4,15 @@ try:
     from .Location import Location
     from .Position import Position
     from .Region import Region
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Location import Location
     from Position import Position
     from Region import Region
+    from Serializer import Serializer, Serializable
 
 
+@Serializable("Map")
 class Map:
 
     def __init__(self, **kwargs):
@@ -21,6 +24,12 @@ class Map:
         self.regions = []
 
         self.draw(**kwargs)
+
+    def serialize(self):
+        return {
+            "map": Serializer.serialize(self.map),
+            "regions": Serializer.serialize(self.regions)
+        }
 
     def draw(self, **kwargs):
         """

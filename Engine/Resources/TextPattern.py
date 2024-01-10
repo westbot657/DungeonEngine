@@ -4,10 +4,12 @@ try:
     from .EngineDummy import Engine
     from .Logger import Log
     from .EngineOperation import EngineOperation, _EngineOperation
+    from .Serializer import Serializer, Serializable
 except:
     from EngineDummy import Engine
     from Logger import Log
     from EngineOperation import EngineOperation, _EngineOperation
+    from .Serializer import Serializer, Serializable
 
 
 from enum import Enum, auto
@@ -15,6 +17,7 @@ from typing import Any, Generator
 
 import re
 
+@Serializable("TextPattern")
 class TextPattern:
 
     class CheckType(Enum):
@@ -35,6 +38,13 @@ class TextPattern:
         self.regex = regex
         self.categories = categories or ["default"]
         TextPattern._patterns.append(self)
+    
+    def serialize(self):
+        return Serializer.smartSerialize(self, "check_type", "regex", "categories")
+
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
     
     def __call__(self, eval_method):
         self.eval_method = eval_method

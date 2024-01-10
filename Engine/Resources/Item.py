@@ -7,6 +7,7 @@ try:
     from .EngineDummy import Engine
     from .EngineOperation import EngineOperation, _EngineOperation
     from .FunctionMemory import FunctionMemory
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
@@ -14,9 +15,11 @@ except ImportError:
     from EngineDummy import Engine
     from EngineOperation import EngineOperation, _EngineOperation
     from FunctionMemory import FunctionMemory
+    from Serializer import Serializer, Serializable
 
 from enum import Enum, auto
 
+@Serializable("Item")
 class Item(GameObject):
 
     identifier = Identifier("engine", "object/", "item")
@@ -30,6 +33,22 @@ class Item(GameObject):
         self.events = events
 
         self.owner = None
+
+    def serialize(self):
+        return {
+            "abstract": Serializer.serialize(self.abstract),
+            "name": Serializer.serialize(self.name),
+            "description": Serializer.serialize(self.description),
+            "max_count": Serializer.serialize(self.max_count),
+            "count": Serializer.serialize(self.count),
+            "data": Serializer.serialize(self.data),
+            "events": Serializer.serialize(self.events),
+            "owner": Serializer.serialize(self.owner)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     def can_stack(self, other):
         other: Item

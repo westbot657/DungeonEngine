@@ -14,6 +14,7 @@ try:
     from .Logger import Log
     from .FunctionMemory import FunctionMemory
     from .FunctionalElement import FunctionalElement
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from AbstractAmmo import AbstractAmmo, Ammo
     from AbstractArmor import AbstractArmor, Armor
@@ -28,7 +29,9 @@ except ImportError:
     from Logger import Log
     from FunctionMemory import FunctionMemory
     from FunctionalElement import FunctionalElement
+    from Serializer import Serializer, Serializable
 
+@Serializable("Inventory")
 class Inventory(FunctionalElement):
     _default_equips = {}
 
@@ -42,6 +45,20 @@ class Inventory(FunctionalElement):
         for key, abstract in Inventory._default_equips.items():
             self.defaults.update({key: abstract.createInstance(function_memory)})
             self.equips.update({key: self.defaults[key]})
+
+    def serialize(self):
+        return {
+            "parent": Serializer.serialize(self.parent),
+            "contents": Serializer.serialize(self.contents),
+            "equips": Serializer.serialize(self.equips),
+            "defaults": Serializer.serialize(self.defaults),
+            "function_memory": Serializer.serialize(self.function_memory),
+            "slots": Serializer.serialize(self.slots)
+        }
+
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     # def get_ui_data(self):
     #     return self

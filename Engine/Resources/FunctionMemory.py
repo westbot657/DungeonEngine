@@ -7,6 +7,7 @@ try:
     from .FunctionalElement import FunctionalElement
     from .Environment import Environment
     from .EngineOperation import _EngineOperation
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from EngineDummy import Engine
     from EngineErrors import MemoryError
@@ -14,6 +15,7 @@ except ImportError:
     from FunctionalElement import FunctionalElement
     from Environment import Environment
     from EngineOperation import _EngineOperation
+    from Serializer import Serializer, Serializable
 
 from typing import Any
 
@@ -21,8 +23,11 @@ import glob, json, sys, os
 
 
 
+
+@Serializable("FunctionMemory")
 class FunctionMemory:
     #_instance = None
+    _engine_instance = None
     
 
     with open(f"./resources/engine.json", "r+", encoding="utf-8") as f:
@@ -53,6 +58,17 @@ class FunctionMemory:
         self.symbol_table = {}
         self.context_data = {}
         self.engine = engine
+    
+    def serialize(self):
+        return {
+            "symbol_table": Serializer.serialize(self.symbol_table),
+            "context_data": Serializer.serialize(self.context_data),
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
+        instance.engine = cls._engine_instance
     
     # def prepFunction(self):
     #     self.symbol_table.clear()

@@ -2,15 +2,28 @@
 
 try:
     from .FunctionalElement import FunctionalElement
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from FunctionalElement import FunctionalElement
+    from Serializer import Serializer, Serializable
 
 
+@Serializable("Position")
 class Position(FunctionalElement):
 
     def __init__(self, x:int, y:int):
         self.x = x
         self.y = y
+    
+    def serialize(self):
+        return {
+            "x": Serializer.serialize(self.x),
+            "y": Serializer.serialize(self.y),
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
     
     def copy(self):
         return Position(self.x, self.y)

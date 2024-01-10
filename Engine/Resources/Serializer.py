@@ -60,7 +60,14 @@ class Serializer:
                 _class.deserialize(instance, v)
             elif k == "serial-reference":
                 return cls._deserialized[v]
-            
+
+    @classmethod
+    def smartSerialize(cls, instance:object, *attrs) -> dict:
+        out = {}
+        for attr in attrs:
+            out.update({attr: cls.serialize(getattr(instance, attr))})
+        return out
+    
     @classmethod
     def smartDeserialize(cls, instance:object, data:dict) -> None:
         for k, v in data.items():

@@ -11,6 +11,7 @@ try:
     from .Environment import Environment
     from .Map import Map
     from .Logger import Log
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from FunctionalElement import FunctionalElement
     from DynamicValue import DynamicValue
@@ -22,7 +23,9 @@ except ImportError:
     from Environment import Environment
     from Map import Map
     from Logger import Log
+    from Serializer import Serializer, Serializable
 
+@Serializable("Room")
 class Room(FunctionalElement):
     def __init__(self, abstract, location:Location, name:str, events:dict, interactions:list[Interactable], environment:Environment):
         self.abstract = abstract
@@ -35,6 +38,17 @@ class Room(FunctionalElement):
 
         self.map: Map = None
 
+    def serialize(self):
+        return {
+            "abstract": Serializer.serialize(self.abstract),
+            "location": Serializer.serialize(self.location),
+            "name": Serializer.serialize(self.name),
+            "events": Serializer.serialize(self.events),
+            "interactions": Serializer.serialize(self.interactions),
+            "environment": Serializer.serialize(self.environment),
+            "players_in_room": Serializer.serialize(self.players_in_room),
+            "map": Serializer.serialize(self.map)
+        }
 
     def getLocalVariables(self) -> dict:
         l = {

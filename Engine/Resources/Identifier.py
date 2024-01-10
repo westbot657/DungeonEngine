@@ -2,17 +2,31 @@
 
 try:
     from .EngineErrors import IdentifierError
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from EngineErrors import IdentifierError
+    from Serializer import Serializer, Serializable
 
 
 import re
 
+@Serializable("Identifier")
 class Identifier:
     def __init__(self, namespace:str, path:str, name:str|None=None):
         self.namespace = namespace
         self.path = path
         self.name = name
+
+    def serialize(self):
+        return {
+            "namespace": Serializer.serialize(self.namespace),
+            "path": Serializer.serialize(self.path),
+            "name": Serializer.serialize(self.name)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     def ID(self):
         return f"{self.namespace}:{self.name}" if self.name else f"{self.namespace}"

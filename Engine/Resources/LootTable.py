@@ -8,6 +8,7 @@ try:
     from .Util import Util
     from .Logger import Log
     from .EngineOperation import _EngineOperation
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Identifier import Identifier
     from EngineDummy import Engine
@@ -15,6 +16,7 @@ except ImportError:
     from Util import Util
     from Logger import Log
     from EngineOperation import _EngineOperation
+    from Serializer import Serializer, Serializable
 
 import random
 
@@ -40,10 +42,21 @@ LootTable Examples:
 
 """
 
+@Serializable("LootPool")
 class LootPool:
     def __init__(self, rolls:int, entries:list):
         self.rolls = rolls
         self.entries = entries
+    
+    def serialize(self):
+        return {
+            "rolls": Serializer.serialize(self.rolls),
+            "entries": Serializer.serialize(self.entries)
+        }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
     
     @classmethod
     def fromList(cls, data:list):

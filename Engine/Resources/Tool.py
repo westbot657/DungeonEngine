@@ -8,6 +8,7 @@ try:
     from .Util import Util
     from .FunctionMemory import FunctionMemory
     from .Loader import Loader
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
@@ -16,9 +17,11 @@ except ImportError:
     from Util import Util
     from FunctionMemory import FunctionMemory
     from Loader import Loader
+    from Serializer import Serializer, Serializable
 
 from enum import Enum, auto
 
+@Serializable("Tool")
 class Tool(GameObject):
 
     class Action(Enum):
@@ -35,6 +38,13 @@ class Tool(GameObject):
         self.data = data
 
         self.owner = None
+
+    def serialize(self):
+        return Serializer.smartSerialize(self, "abstract", "name", "description", "durability", "max_durability", "events", "data", "owner")
+
+    @classmethod
+    def deserialize(cls, instance:object, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     def checkKeyword(self, keyword):
         return keyword in self.abstract.getKeywords()

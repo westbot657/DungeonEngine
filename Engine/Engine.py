@@ -64,6 +64,7 @@ class Engine:
         self.loader: DungeonLoader = DungeonLoader()
         #self.function_memory: FunctionMemory = FunctionMemory()
         self._function_memory = FunctionMemory(self)
+        FunctionMemory._engine_instance = self
         self.default_input_handler = self._default_input_handler
         self.players: dict[str, Player] = {}
         self.combats: list[Combat] = []

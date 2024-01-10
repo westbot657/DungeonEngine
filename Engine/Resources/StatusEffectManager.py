@@ -5,18 +5,27 @@ try:
     from .StatusEffect import StatusEffect
     from .EngineDummy import Engine
     from .FunctionMemory import FunctionMemory
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from Identifier import Identifier
     from StatusEffect import StatusEffect
     from EngineDummy import Engine
     from FunctionMemory import FunctionMemory
+    from Serializer import Serializer, Serializable
 
-
+@Serializable("StatusEffectManager")
 class StatusEffectManager:
     
     def __init__(self):
         self.effects: list[StatusEffect] = []
-        
+    
+    def serialize(self):
+        return Serializer.smartSerialize(self, "effects")
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
+    
     def addEffect(self, effect:StatusEffect):
         effect.effect_manager = self
         self.effects.append(effect)

@@ -8,6 +8,7 @@ try:
     from .FunctionMemory import FunctionMemory
     from .Player import Player
     from .EngineOperation import _EngineOperation
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
@@ -16,9 +17,11 @@ except ImportError:
     from FunctionMemory import FunctionMemory
     from Player import Player
     from EngineOperation import _EngineOperation
+    from Serializer import Serializer, Serializable
 
 from typing import Any
 
+@Serializable("Interactable")
 class Interactable(FunctionalElement):
 
     def __init__(self, abstract, interaction_event, field_values:dict, data:dict):
@@ -27,6 +30,19 @@ class Interactable(FunctionalElement):
         self.interaction_event = interaction_event
         self.data = data
         self.name = self.field_values.pop("id")
+
+    def serialize(self):
+        return {
+            "abstract": Serializer.serialize(self.abstract),
+            "field_values": Serializer.serialize(self.field_values),
+            "interaction_event": Serializer.serialize(self.interaction_event),
+            "data": Serializer.serialize(self.data),
+            "name": Serializer.serialize(self.name)
+        }
+
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     def getLocalVariables(self):
         vals = {}

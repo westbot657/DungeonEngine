@@ -4,19 +4,33 @@ try:
     from .EngineDummy import Engine
     from .Identifier import Identifier
     from .EngineErrors import LocationError
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from EngineDummy import Engine
     from Identifier import Identifier
     from EngineErrors import LocationError
+    from Serializer import Serializer, Serializable
 
 import re
 
+@Serializable("Location")
 class Location:
 
     def __init__(self, dungeon:str, room_path:str, room:str):
         self.dungeon = dungeon
         self.room_path = room_path
         self.room = room
+
+    def serialize(self):
+        return {
+            "dungeon": Serializer.serialize(self.dungeon),
+            "room_path": Serializer.serialize(self.room_path),
+            "room": Serializer.serialize(self.room)
+        }
+    
+    @classmethod
+    def deserialize(self, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     def full(self):
         if self.room_path == self.room == "":

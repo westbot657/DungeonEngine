@@ -5,14 +5,16 @@ try:
     from .StatusEffectCause import StatusEffectCause
     from .FunctionalElement import FunctionalElement
     from .FunctionMemory import FunctionMemory
+    from .Serializer import Serializer, Serializable
 except ImportError:
     from EngineDummy import Engine
     from StatusEffectCause import StatusEffectCause
     from FunctionalElement import FunctionalElement
     from FunctionMemory import FunctionMemory
+    from Serializer import Serializer, Serializable
 
 
-
+@Serializable("StatusEffect")
 class StatusEffect(FunctionalElement):
 
     def __init__(self, abstract, name:str, level:int, duration:float|int, tick_interval:int, cause:StatusEffectCause, events:dict, getters:dict):
@@ -27,6 +29,15 @@ class StatusEffect(FunctionalElement):
 
         self.effect_manager = None
 
+    def serialize(self) -> dict:
+        return Serializer.smartSerialize(
+            self, 
+            "abstract", "name", "level", "duration", "tick_interval", "cause", "events", "getters", "effect_manager"
+        )
+    
+    @classmethod
+    def deserialize(cls, instance, data: dict):
+        return Serializer.smartDeserialize(instance, data)
 
     def getLocalVariables(self) -> dict:
         d = {

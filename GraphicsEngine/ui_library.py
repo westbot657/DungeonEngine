@@ -15,6 +15,7 @@ import sys
 import random
 import json
 import math
+from Comm import Comm
 
 # 3D rendering
 import cv2
@@ -6279,7 +6280,7 @@ class PopoutWindow(UIElement):
     
     def __init__(self, size:tuple[int, int], content:dict, pygame_window_args:tuple=..., pygame_window_kwargs:dict=...):
         if pygame.display.get_init():
-            ... # launch sub-process
+            ... # launch sub-process, set up communication
         else:
             comps = {}
             self.editor = Editor(None, None, *size)
@@ -6318,14 +6319,13 @@ class PopoutWindow(UIElement):
 
     def _event(self, editor, X, Y):
         
-        c = self.children.copy()
-        c.reverse()
+        c = self.children.copy()[::-1]
 
         for _c in c:
             _c._event(editor, X, Y)
     
     def _update(self, editor, X, Y):
-        ...
+        pass
 
 class IOHook:
 

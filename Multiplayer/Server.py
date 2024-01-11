@@ -79,7 +79,9 @@ class Server:
                     conn.send(data.outb) # Send data to all clients except the one that data was recieved from
                 data.outb = data.outb[sent:]
 
-s = Server()
 
-s.run()
+if __name__ == "__main__":
+    s = Server()
+
+    s.run()
 

@@ -15,7 +15,6 @@ import sys
 import random
 import json
 import math
-from Comm import Comm
 
 # 3D rendering
 import cv2
@@ -798,9 +797,6 @@ class MultilineText(UIElement):
             h += surface.get_height()
         
         self.surface = surf
-            
-        
-        
 
     def set_content(self, content:str=""):
         self.content = content
@@ -1700,11 +1696,9 @@ class Box(UIElement):
             child._update(editor, X + self.x, Y + self.y)
     
     def _event(self, editor, X, Y):
-        _c = self.children.copy()
-        _c.reverse()
         _x, _y = editor.mouse_pos
         #if (max(editor.X, X + self.x) <= _x <= min(X + self.x + self.width, editor.Width) and max(editor.Y, Y + self.y) <= _y <= min(Y + self.y + self.height, editor.Height)):
-        for child in _c:
+        for child in self.children[::-1]:
             child._event(editor, X + self.x, Y + self.y)
 
         
@@ -1797,9 +1791,7 @@ class Polygon(UIElement):
     
     def _event(self, editor, X, Y):
         if self.children:
-            _c = self.children.copy()
-            _c.reverse()
-            for c in _c:
+            for c in self.children[::-1]:
                 c._event(editor, X, Y)
         if self.collides(*editor.mouse_pos):
             if editor._hovering is None:
@@ -2443,9 +2435,7 @@ class LayeredObjects(UIElement):
         layers.sort()
         layers.reverse()
         for l in layers:
-            _l = self.layers[l]
-            _l.reverse()
-            for i in _l:
+            for i in self.layers[l][::-1]:
                 i._event(editor, X+self.x, Y+self.y)
 
     def _update(self, editor, X, Y):
@@ -2480,9 +2470,7 @@ class Draggable(UIElement):
 
         _x, _y = editor.mouse_pos
 
-        _c = self.children.copy()
-        _c.reverse()
-        for child in _c:
+        for child in self.children[::-1]:
             child._event(editor, X + self.x, Y + self.y)
 
         #if max(editor.X, X + self.x) <= _x <= min(X + self.x + self.width, editor.Width) and max(editor.Y, Y + self.y) <= _y <= min(Y + self.y + self.height, editor.Height):
@@ -2610,9 +2598,7 @@ class Resizable(Draggable):
         self.height = self.bg.height = self.right_resize.height = self.down_resize.y
 
     def _update(self, editor, X, Y):
-        _c = self.children.copy()
-        _c.reverse()
-        for child in _c:
+        for child in self.children[::-1]:
             child._update(editor, X + self.x, Y + self.y)
         self.right_resize._update(editor, X + self.x, Y + self.y)
         self.down_resize._update(editor, X + self.x, Y + self.y)
@@ -2679,9 +2665,7 @@ class Button(UIElement):
         self._mimic = EditorMimic(None, self._override)
 
     def _event(self, editor, X, Y):
-        _c = self.children.copy()
-        _c.reverse()
-        for child in _c:
+        for child in self.children[::-1]:
             child._event(editor, X+self.x+self._uoffx, Y+self.y+self._uoffy)
         
         _x, _y = editor.mouse_pos
@@ -3276,12 +3260,7 @@ class Scrollable:
         def _event(self, editor, X, Y):
             _x, _y = editor.mouse_pos
             self.set_editor(editor)
-            # self.mouse_pos[0] -= X
-            # self.mouse_pos[1] -= Y
-
-            _c = self.children.copy()
-            _c.reverse()
-            for child in _c:
+            for child in self.children[::-1]:
                 child._event(self.parent, 0, 0)
 
             #print(f"Scrollable: {_y-self.y=} {_y-self.y==self.mouse_pos[1]=}")
@@ -4085,10 +4064,8 @@ class DirectoryTree(UIElement):
             child._update(editor, X, Y)
     
     def _event(self, editor, X, Y):
-        _c = self.children.copy()
-        _c.reverse()
 
-        for child in _c:
+        for child in self.children[::-1]:
             child._event(editor, X, Y)
         
 class Popup(UIElement):
@@ -4157,10 +4134,7 @@ class Popup(UIElement):
             self.tick -= 1
             return
 
-        _c = self.children.copy()
-        _c.reverse()
-
-        for child in _c:
+        for child in self.children[::-1]:
             child._event(editor, X+self.x, Y+self.y)
         
         self.bg._event(editor, X+self.x, Y+self.y)
@@ -4301,14 +4275,11 @@ class Editor:
                 Popup._popup._event(self, 0, 0)
 
             rmd = self.right_mouse_down()
-            _layers = layers.copy()
-            _layers.reverse()
+            # _layers = layers.copy()
+            # _layers.reverse()
 
-            for l in _layers:
-                _l = self.layers[l].copy()
-                _l.reverse()
-
-                for i in _l:
+            for l in layers[::-1]:
+                for i in self.layers[l][::-1]:
                     i._event(self, 0, 0)
 
             if rmd:
@@ -5112,10 +5083,8 @@ class GameApp(UIElement):
 
     def _event(self, editor, X, Y):
         self._update_layout(editor)
-        _c = self.children.copy()
-        _c.reverse()
 
-        for child in _c:
+        for child in self.children[::-1]:
             child._event(editor, X, Y)
             
         if self.page == "log":
@@ -5530,10 +5499,8 @@ class FileEditorSubApp(UIElement):
             child._update(editor, X, Y)
         
     def _event(self, editor, X, Y):
-        _c = self.children.copy()
-        _c.reverse()
 
-        for child in _c:
+        for child in self.children[::-1]:
             child._event(editor, X, Y)
 
 class EditorApp(UIElement):
@@ -5585,10 +5552,7 @@ class EditorApp(UIElement):
         if self.active_app:
             self.active_app._event(editor, X, Y)
         
-        _c = self.children.copy()
-        _c.reverse()
-
-        for child in _c:
+        for child in self.children[::-1]:
             child._event(editor, X, Y)
     
     def _update(self, editor, X, Y):
@@ -5793,10 +5757,8 @@ class WindowFrame(UIElement):
         if (not editor.mouse[0]) and editor.previous_mouse[0]:
             self.selected_drag = ""
             
-        _c = self.children.copy()
-        _c.reverse()
 
-        for child in _c:
+        for child in self.children[::-1]:
             child._event(editor, X, Y)
 
 class CodeEditor(UIElement):
@@ -6263,11 +6225,8 @@ class CodeEditor(UIElement):
 
         if (not editor.mouse[0]) and editor.previous_mouse[0]:
             self.selected_drag = ""
-            
-        _c = self.children.copy()
-        _c.reverse()
 
-        for child in _c:
+        for child in self.children[::-1]:
             child._event(editor, X, Y)
             
         if self.active_app == "game":
@@ -6319,10 +6278,10 @@ class PopoutWindow(UIElement):
 
     def _event(self, editor, X, Y):
         
-        c = self.children.copy()[::-1]
+        # c = self.children.copy()[::-1]
 
-        for _c in c:
-            _c._event(editor, X, Y)
+        for c in self.children[::-1]:
+            c._event(editor, X, Y)
     
     def _update(self, editor, X, Y):
         pass

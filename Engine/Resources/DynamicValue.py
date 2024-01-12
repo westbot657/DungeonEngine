@@ -27,6 +27,9 @@ class DynamicValue(FunctionalElement):
             "cached_value": Serializer.serialize(self.cached_value)
         }
     
+    def json_serialize(self):
+        return self.raw_data
+    
     @classmethod
     def deserialize(cls, instance, data):
         Serializer.smartDeserialize(instance, data)

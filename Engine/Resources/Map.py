@@ -31,6 +31,10 @@ class Map:
             "regions": Serializer.serialize(self.regions)
         }
 
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
+
     def draw(self, **kwargs):
         """
         kwargs: 

@@ -49,6 +49,10 @@ class Room(FunctionalElement):
             "players_in_room": Serializer.serialize(self.players_in_room),
             "map": Serializer.serialize(self.map)
         }
+    
+    @classmethod
+    def deserialize(cls, instance, data:dict):
+        Serializer.smartDeserialize(instance, data)
 
     def getLocalVariables(self) -> dict:
         l = {

@@ -1,0 +1,207 @@
+{
+    "rooms": {
+        "test_dungeon:rooms/room1": {
+            "interactions": {
+                "start_passage": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/start",
+                        "travel_message": "you go back to the start",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "room3_passage": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room3",
+                        "travel_message": "you go to room 3",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "room4_door": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room4",
+                        "travel_message": "you enter room 4",
+                        "locked": null
+                    }
+                }
+            }
+        },
+        "test_dungeon:rooms/room2": {
+            "interactions": {
+                "start_passage": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/start",
+                        "travel_message": "you go back to the start",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "room4_door": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room4",
+                        "travel_message": "you enter room 4",
+                        "locked": null
+                    }
+                },
+                "shop": {
+                    "fields": {
+                        "shop_name": "Test Shop",
+                        "stock": {
+                            "pools": [
+                                {
+                                    "rolls": 2,
+                                    "entries": [
+                                        {
+                                            "item": {
+                                                "type": "engine:weapon",
+                                                "parent": "engine:weapons/sword"
+                                            },
+                                            "cost": [
+                                                1,
+                                                1,
+                                                0
+                                            ]
+                                        },
+                                        {
+                                            "item": {
+                                                "type": "engine:weapon",
+                                                "parent": "engine:weapons/shortsword"
+                                            },
+                                            "cost": [
+                                                0,
+                                                8,
+                                                0
+                                            ]
+                                        },
+                                        {
+                                            "item": {
+                                                "type": "engine:weapon",
+                                                "parent": "engine:weapons/dagger"
+                                            },
+                                            "cost": [
+                                                0,
+                                                5,
+                                                0
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "rolls": 1,
+                                    "entries": [
+                                        {
+                                            "item": {
+                                                "type": "engine:weapon",
+                                                "parent": "engine:weapon/bow"
+                                            },
+                                            "cost": [
+                                                0,
+                                                8,
+                                                5
+                                            ]
+                                        },
+                                        {
+                                            "item": {
+                                                "type": "engine:weapon",
+                                                "parent": "engine:weapon/crossbow"
+                                            },
+                                            "cost": [
+                                                2,
+                                                0,
+                                                0
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "rolls": {
+                                        "min": 0,
+                                        "max": 1
+                                    },
+                                    "entries": [
+                                        {
+                                            "item": {
+                                                "type": "engine:item",
+                                                "parent": "engine:items/stick",
+                                                "count": 20
+                                            },
+                                            "cost": [
+                                                0,
+                                                1,
+                                                2
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        "shopkeeper": null,
+                        "restock_time": null,
+                        "enter_message": null,
+                        "exit_message": null,
+                        "closed": null
+                    }
+                }
+            }
+        },
+        "test_dungeon:rooms/room3": {
+            "interactions": {
+                "room1_passage": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room1",
+                        "travel_message": "you go back to room 1",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                }
+            }
+        },
+        "test_dungeon:rooms/room4": {
+            "interactions": {
+                "room1_door": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room1",
+                        "travel_message": "you enter room 1",
+                        "locked": null
+                    }
+                },
+                "room2_door": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room2",
+                        "travel_message": "you enter room 2",
+                        "locked": null
+                    }
+                }
+            }
+        },
+        "test_dungeon:rooms/start": {
+            "interactions": {
+                "room1_passage": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room1",
+                        "travel_message": "You go to room 1",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "room2_passage": {
+                    "fields": {
+                        "target": "test_dungeon:rooms/room2",
+                        "travel_message": "You go to room 2",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "exit": {
+                    "fields": {
+                        "target": "world:rooms/start",
+                        "travel_message": "You leave the test dungeon",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                }
+            }
+        }
+    }
+}

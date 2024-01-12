@@ -401,7 +401,7 @@ class Player(Entity):
             data.append(save_data)
 
         with open("./save_data/players.json", "w+", encoding="utf-8") as f:
-            json.dump(data, f, indent=4)
+            json.dump(data, f, indent=4, default=Util.json_serialize)
 
     def serialize(self, function_memory:FunctionMemory):
         return {

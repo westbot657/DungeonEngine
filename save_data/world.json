@@ -1,0 +1,16 @@
+{
+    "rooms": {
+        "world:rooms/start": {
+            "interactions": {
+                "spawn_boat": {
+                    "fields": {
+                        "target": "emberhollow:rooms/boats/spawn_boat",
+                        "travel_message": null,
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                }
+            }
+        }
+    }
+}

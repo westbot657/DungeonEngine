@@ -1,1 +1,112 @@
-[]
+[
+    {
+        "id": 10,
+        "name": "Weston",
+        "max_health": 20,
+        "health": 20,
+        "location": "world:rooms/start",
+        "position": [
+            0,
+            0
+        ],
+        "inventory": [
+            {
+                "type": "engine:armor",
+                "parent": "engine:armor/leather_armor",
+                "name": "Old Leather Tunic",
+                "damage_reduction": {
+                    "function": "engine:random/weighted",
+                    "weights": [
+                        1,
+                        3
+                    ],
+                    "values": [
+                        1,
+                        0
+                    ]
+                }
+            },
+            {
+                "type": "engine:weapon",
+                "parent": "engine:weapons/dagger",
+                "name": "Rusty Dagger",
+                "damage": {
+                    "function": "engine:random/weighted",
+                    "weights": [
+                        1,
+                        12,
+                        17
+                    ],
+                    "values": [
+                        3,
+                        2,
+                        1
+                    ]
+                },
+                "max_durability": 140,
+                "durability": 98
+            },
+            {
+                "type": "engine:weapon",
+                "parent": "engine:weapons/crossbow",
+                "name": "Damaged Crossbow",
+                "damage": {
+                    "function": "engine:random/weighted",
+                    "weights": [
+                        1,
+                        4,
+                        9,
+                        12
+                    ],
+                    "values": [
+                        4,
+                        3,
+                        2,
+                        1
+                    ]
+                },
+                "max_durability": 210,
+                "durability": 163
+            },
+            {
+                "type": "engine:ammo",
+                "parent": "engine:ammo/crossbow_bolt",
+                "count": 25
+            },
+            {
+                "type": "engine:item",
+                "parent": "engine:items/salmon",
+                "data": {
+                    "heal_amount": 2
+                },
+                "max_count": 40,
+                "count": 6
+            },
+            {
+                "type": "engine:item",
+                "parent": "engine:items/bread",
+                "data": {
+                    "heal_amount": 2
+                },
+                "max_count": 40,
+                "count": 36
+            },
+            {
+                "type": "engine:item",
+                "parent": "engine:items/cod",
+                "data": {
+                    "heal_amount": 2
+                },
+                "max_count": 40,
+                "count": 3
+            }
+        ],
+        "status_effects": [],
+        "in_combat": false,
+        "text_pattern_categories": [
+            "common",
+            "global",
+            "world"
+        ]
+    }
+]

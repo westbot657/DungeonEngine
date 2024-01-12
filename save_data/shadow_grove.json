@@ -1,0 +1,131 @@
+{
+    "rooms": {
+        "shadow_grove:rooms/grove_entrance": {
+            "interactions": {
+                "left_tunnel": {
+                    "fields": {
+                        "target": "shadow_grove:rooms/left_tunnel",
+                        "travel_message": "You move into the left tunnel.",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "right_tunnel": {
+                    "fields": {
+                        "target": "shadow_grove:rooms/right_tunnel",
+                        "travel_message": "You move into the right tunnel.",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "boss_room_door": {
+                    "fields": {
+                        "target": "shadow_grove:rooms/boss_room",
+                        "locked": true,
+                        "lock_message": "You pull at the door but the vines hold it fast against your efforts."
+                    }
+                },
+                "ritual_staff": {
+                    "fields": {
+                        "loot": "shadow_grove:weapons/ritual_staff"
+                    }
+                },
+                "exit": {
+                    "fields": {
+                        "target": "world:rooms/start",
+                        "travel_message": "You emerge from the dark and overgrown grove.",
+                        "locked": null
+                    }
+                }
+            }
+        },
+        "shadow_grove:rooms/left_tunnel": {
+            "interactions": {
+                "rusty_sword": {
+                    "fields": {
+                        "loot": "shadow_grove:weapons/rusty_sword"
+                    }
+                },
+                "entrance": {
+                    "fields": {
+                        "target": "shadow_grove:rooms/grove_entrance",
+                        "travel_message": "You move into the grove's entrance.",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "shrine": {
+                    "fields": {
+                        "target": "shadow_grove:rooms/shrine",
+                        "travel_message": "You move into the dark shrine.",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                }
+            }
+        },
+        "shadow_grove:rooms/right_tunnel": {
+            "interactions": {
+                "red_fruit": {
+                    "fields": {
+                        "loot": "shadow_grove:items/red_fruit"
+                    }
+                },
+                "entrance": {
+                    "fields": {
+                        "target": "shadow_grove:rooms/grove_entrance",
+                        "travel_message": "You move into the grove's entrance.",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "shrine": {
+                    "fields": {
+                        "target": "shadow_grove:rooms/shrine",
+                        "travel_message": "You move into the dark shrine.",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                }
+            }
+        },
+        "shadow_grove:rooms/shrine": {
+            "interactions": {
+                "left_tunnel": {
+                    "fields": {
+                        "target": "shadow_grove:rooms/left_tunnel",
+                        "travel_message": "You move into the left tunnel.",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "right_tunnel": {
+                    "fields": {
+                        "target": "shadow_grove:rooms/right_tunnel",
+                        "travel_message": "You move into the right tunnel.",
+                        "blocked": null,
+                        "blocked_message": null
+                    }
+                },
+                "boss_room_door": {
+                    "fields": {
+                        "target": "shadow_grove:rooms/boss_room",
+                        "travel_message": "You move into the Shadow Ent's Lair.",
+                        "locked": null,
+                        "open_message": "this door leads to the Shadow Ent's Lair, are you ready to enter?"
+                    }
+                },
+                "ritual_dagger": {
+                    "fields": {
+                        "loot": "shadow_grove:weapons/ritual_dagger"
+                    }
+                },
+                "bark_armor": {
+                    "fields": {
+                        "loot": "shadow_grove:armor/bark_armor"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -2,6 +2,12 @@
 from typing import Any, Generator
 
 class Util:
+    
+    @staticmethod
+    def json_serialize(obj):
+        if hasattr(obj, "json_serialize"):
+            return obj.json_serialize()
+        raise TypeError(f"Cannot serialize object {obj}")
 
     @classmethod
     def flatten_list(cls, ls:list):

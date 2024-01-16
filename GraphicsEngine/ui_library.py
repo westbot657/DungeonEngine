@@ -12,6 +12,8 @@ import re
 import os
 import sys
 import random
+import Stockings
+import socket
 
 # 3D rendering
 from shapely.geometry.polygon import Polygon as Poly
@@ -2560,6 +2562,7 @@ class PopoutWindow(UIElement):
     def __init__(self, size:tuple[int, int], content:dict, pygame_window_args:tuple=..., pygame_window_kwargs:dict=...):
         if pygame.display.get_init():
             ... # launch sub-process, set up communication
+            self.socket
         else:
             comps = {}
             self.editor = Editor(None, None, *size)

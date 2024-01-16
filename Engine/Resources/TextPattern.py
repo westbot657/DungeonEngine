@@ -9,7 +9,7 @@ except:
     from EngineDummy import Engine
     from Logger import Log
     from EngineOperation import EngineOperation, _EngineOperation
-    from .Serializer import Serializer, Serializable
+    from Serializer import Serializer, Serializable
 
 
 from enum import Enum, auto

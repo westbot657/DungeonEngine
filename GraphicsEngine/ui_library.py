@@ -2638,16 +2638,12 @@ class PopoutWindow(UIElement):
 
             self.editor.add_layer(0, self)
             ... # create window, parse content, and run a mainloop
-
             self.editor.run()
 
     def _event(self, editor, X, Y):
-        
-        # c = self.children.copy()[::-1]
-
         for c in self.children[::-1]:
             c._event(editor, X, Y)
-    
+
     def _update(self, editor, X, Y):
         pass
 
@@ -2777,13 +2773,13 @@ class IOHook:
 
     def start(self):
         pass
-    
+
     def stop(self):
         pass
-        
+
     def sendInput(self, player_id, text):
         if self.engine is None: return
-    
+
         cl = self.game_app.log_output.colored_content.split("\n")
         cl.append(f"\033[38;2;100;250;100m[{player_id}]: \033[38;2;255;255;255m" + text + "\033[0m")
 
@@ -2866,6 +2862,3 @@ image: [center X, center Y, width, height, rotation], src: <file location>
 
 
 """
-
-
-

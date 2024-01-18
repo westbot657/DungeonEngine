@@ -2,18 +2,38 @@
 
 ## Development
 
-### Weston Day
-Design - Programming - Art  
-
+### Weston
+- Dungeoneer  
+Game Design - Programming - Art  
+UI/UX Design  
 
 [<img src="./ui_resources/credits/github-mark-white.png" alt="Github" width=15/>](https://github.com/westbot657)
 
+---
 
+### Devin
+- Dungeoneer  
+- Alpha Tester  
+Design  
 
+[<img src="./ui_resources/credits/github-mark-white.png" alt="Github" width=15/>](https://github.com/altincloak)
 
+---
 
+### Kiera
+Story Design  
 
+[<img src="./ui_resources/credits/github-mark-white.png" alt="Github" width=15/>](https://github.com/pennythoughts1)
 
+---
+
+### William
+- Alpha Tester  
+Programming?  
+
+[<img src="./ui_resources/credits/github-mark-white.png" alt="Github" width=15/>](https://github.com/wbfw3131)
+
+---
 
 ## Project Links
 [<img src="./ui_resources/credits/github-mark-white.png" alt="Check out the Github!" width=25>](https://github.com/westbot657/DungeonEngineReleases)

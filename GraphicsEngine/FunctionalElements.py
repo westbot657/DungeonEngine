@@ -148,12 +148,12 @@ class Button(UIElement):
             child._update(editor, X+self.x+self._uoffx, Y+self.y+self._uoffy)
     
     def pre_blit(self, editor, X, Y): ... # pylint: disable=unused-argument
-    def on_left_click(self, editor): ... # pylint: disable=unused-argument
-    def off_left_click(self, editor): ... # pylint: disable=unused-argument
-    def on_right_click(self, editor): ... # pylint: disable=unused-argument
-    def off_right_click(self, editor): ... # pylint: disable=unused-argument
-    def on_hover(self, editor): ... # pylint: disable=unused-argument
-    def off_hover(self, editor): ... # pylint: disable=unused-argument
+    def on_left_click(self, editor, *_, **__): ... # pylint: disable=unused-argument
+    def off_left_click(self, editor, *_, **__): ... # pylint: disable=unused-argument
+    def on_right_click(self, editor, *_, **__): ... # pylint: disable=unused-argument
+    def off_right_click(self, editor, *_, **__): ... # pylint: disable=unused-argument
+    def on_hover(self, editor, *_, **__): ... # pylint: disable=unused-argument
+    def off_hover(self, editor, *_, **__): ... # pylint: disable=unused-argument
 
 @PopoutElement()
 class Tabs(UIElement):

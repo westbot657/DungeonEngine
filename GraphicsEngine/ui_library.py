@@ -1492,8 +1492,8 @@ class FileEditor(UIElement):
         self.edit_area.set_content(self.contents)
         self.edit_area.editable.save_history()
         self.edit_area.editable.on_save(self.save_file)
-
-        # TODO: finish undo/redo then add file saving!
+        
+        
 
         match file_name.rsplit(".", 1)[-1]:
             case "json"|"piskel":
@@ -1740,6 +1740,11 @@ class Opener:
         self.file_tabs.active_tab = "  " + file_path.replace("./Dungeons/", "") + "   " #.rsplit("/", 1)[-1] + "   "
         self.file_tabs.reset_tab_colors()
         self.focused_file = file_path
+        
+    def rmb_call(s, *_, **__): # pylint: disable=no-self-argument
+        self = s.sub_app
+        editor = s.editor
+        file_path = s.file_path
 
 class FileEditorSubApp(UIElement):
     
@@ -2566,15 +2571,19 @@ class CodeEditor(UIElement):
             self.editor_app._event(editor, X, Y)
 
 class PopoutWindow(UIElement):
+    _windows = []
     _port = 1234
     
-    def __init__(self, size:tuple[int, int], content:dict, pygame_window_args:list=..., pygame_window_kwargs:dict=...):
+    def __init__(self, size:tuple[int, int], content:dict[str, dict|list], pygame_window_args:list=..., pygame_window_kwargs:dict=...):
         if pygame.display.get_init():
             # This branch is run from the main process
             # launch sub-process, set up communication
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.connect(("127.0.0.1", PopoutWindow._port))
             self.conn = Stockings.Stocking(self.socket)
+            self.ctx = "parent"
+            
+            PopoutWindow._windows.append(self)
             
             if pygame_window_args is ...:
                 pygame_window_args = []
@@ -2603,11 +2612,15 @@ class PopoutWindow(UIElement):
             self.server.listen(1)
             self.server.setblocking(False)
             self.conn = Stockings.Stocking(self.socket)
+            self.ctx = "child"
             content.pop("PORT")
             
-            comps = {}
             self.editor = Editor(None, None, *size)
             self.frame = WindowFrame(*size, self.editor)
+            comps = {
+                "editor": self.editor,
+                "frame": self.frame
+            }
 
             self.editor.add_layer(5, self.frame)
 
@@ -2637,15 +2650,31 @@ class PopoutWindow(UIElement):
                 ...
 
             self.editor.add_layer(0, self)
-            ... # create window, parse content, and run a mainloop
+            
+            for layer, objs in content["editor_layers"]:
+                self.editor.add_layer(int(layer), *[comps[name] for name in objs])
+            
             self.editor.run()
 
     def _event(self, editor, X, Y):
         for c in self.children[::-1]:
             c._event(editor, X, Y)
+        
+        if io := self.conn.read():
+            if self.ctx == "parent":
+                ...
+            else:
+                if io == "%close%":
+                    self.conn.close()
+                    pygame.quit()
+                    exit()
 
     def _update(self, editor, X, Y):
         pass
+    
+    def close(self): # This method can only be called from the main process
+        self.conn.write("%close%")
+        self.conn.close()
 
 class IOHook:
 

@@ -1,4 +1,4 @@
-# pylint: disable=W,R,C,no-member
+# pylint: disable=W,R,C,no-member,import-error
 
 from UIElement import UIElement
 from RenderPrimitives import Color, Image, Animation
@@ -6,12 +6,13 @@ from Options import TEXT_COLOR
 from shapely.geometry import Point
 from shapely.geometry.polygon import Polygon as Poly
 from Util import rotate, rotate3D, rotate3DV, quad_to_tris, \
-    invert_tris, angle_between, warp
+    invert_tris, angle_between, warp, PopoutElement
 from meshpy import geometry
 
 import pygame
 import math
 
+@PopoutElement()
 class Box(UIElement):
     
     __slots__ = [
@@ -54,6 +55,7 @@ class Box(UIElement):
         else:
             self.hovered = False
 
+@PopoutElement()
 class Polygon(UIElement):
     closest_point_disp = Box(-1, -1, 3, 3, (200, 20, 20))
     second_closest_disp = Box(-1, -1, 3, 3, (200, 200, 20))
@@ -309,6 +311,7 @@ class Polygon(UIElement):
                         self.mesh += new
                         self.refresh()
 
+@PopoutElement()
 class Poly3D(UIElement):
     FOV = 90 # degrees
     width = 1280

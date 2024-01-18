@@ -1,4 +1,4 @@
-# pylint: disable=W,R,C,no-member
+# pylint: disable=W,R,C,no-member,import-error
 
 from UIElement import UIElement
 from RenderPrimitives import Color, Image, Animation
@@ -6,9 +6,13 @@ from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE, \
     FONT, SCROLL_MULTIPLIER
 from EditorMimic import EditorMimic
 from Organizers import Draggable
+from Util import PopoutElement
+
 from enum import Enum, auto
+
 import pygame
 
+@PopoutElement()
 class Button(UIElement):
 
     __slots__ = [
@@ -151,6 +155,7 @@ class Button(UIElement):
     def on_hover(self, editor): ... # pylint: disable=unused-argument
     def off_hover(self, editor): ... # pylint: disable=unused-argument
 
+@PopoutElement()
 class Tabs(UIElement):
     class Style(Enum):
         TOP = auto()
@@ -592,6 +597,7 @@ class Tabs(UIElement):
                 #         c._event(editor, X+self.x+tab.x, Y+self.x+tab.y)
                 tab._event(editor, X+self.x, Y+self.y)
 
+@PopoutElement()
 class Scrollable:
     class _Scrollable(UIElement):
         def __init__(self, parent:UIElement, x:int, y:int, width:int, height:int, bg_color:Color|tuple|int|Image|Animation=TEXT_BG_COLOR, **options):
@@ -747,6 +753,7 @@ class Scrollable:
         else:
             setattr(super().__getattribute__("_scrollable"), __name, __value)
 
+@PopoutElement()
 class Collapsable:
     class SplitType(Enum):
         VERTICAL_LEFT = auto()

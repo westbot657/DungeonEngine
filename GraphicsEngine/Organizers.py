@@ -1,10 +1,12 @@
-# pylint: disable=W,R,C,no-member
+# pylint: disable=W,R,C,no-member,import-error
 
 from UIElement import UIElement
 from Options import TEXT_BG_COLOR
 from RenderPrimitives import Color, Image
 from Geometry import Box
+from Util import PopoutElement
 
+@PopoutElement()
 class LayeredObjects(UIElement):
     
     __slots__ = [

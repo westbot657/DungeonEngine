@@ -1,16 +1,17 @@
-# pylint: disable=W,R,C,no-member
+# pylint: disable=W,R,C,no-member,import-error
 
 from UIElement import UIElement
 from RenderPrimitives import Color, Image, Animation
 from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE, \
     FONT, CURSOR_BLINK_TIME, PATH, CURSOR_COLOR
-from Util import Cursor, Selection, expand_text_lists
+from Util import Cursor, Selection, expand_text_lists, PopoutElement
 
 import pygame
 import re
 import time
 import pyperclip
 
+@PopoutElement()
 class MultilineTextBox(UIElement):
 
     _focused = None

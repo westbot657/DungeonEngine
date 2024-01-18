@@ -1,10 +1,12 @@
-# pylint: disable=W,R,C
+# pylint: disable=W,R,C,import-error
 
 from UIElement import UIElement
+from Util import PopoutElement
 
 import pygame
 import time
 
+@PopoutElement()
 class Color(list):
     __slots__ = ["r", "g", "b", "a"]
     def __init__(self, r, g, b, a=None):
@@ -67,6 +69,7 @@ class Color(list):
 
 
 
+@PopoutElement()
 class Image(UIElement):
     
     __slots__ = [
@@ -139,8 +142,9 @@ class Image(UIElement):
         #self.partial_update()
         editor.screen.blit(self.surface, (X+self.x, Y+self.y))
 
-from Options import PATH
+from Options import PATH # This import must be after the definition of `Color` to avoid circular input loop
 
+@PopoutElement()
 class Animation(UIElement):
     
     __slots__ = [

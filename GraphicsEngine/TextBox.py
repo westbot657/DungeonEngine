@@ -1,13 +1,15 @@
-# pylint: disable=W,R,C
+# pylint: disable=W,R,C,import-error
 
 from UIElement import UIElement
 from RenderPrimitives import Color, Animation, Image
 from Options import TEXT_COLOR, TEXT_BG_COLOR, \
     TEXT_SIZE, FONT, CURSOR_BLINK_TIME, PATH, TAB_SIZE
+from Util import PopoutElement
 
 import pygame
 import pyperclip
 
+@PopoutElement()
 class TextBox(UIElement):
     
     __slots__ = [

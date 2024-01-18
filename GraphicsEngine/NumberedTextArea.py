@@ -1,4 +1,4 @@
-# pylint: disable=W,R,C,no-member
+# pylint: disable=W,R,C,no-member,import-error
 
 from UIElement import UIElement
 from RenderPrimitives import Color, Image, Animation
@@ -6,7 +6,9 @@ from Options import TEXT_COLOR, TEXT_BG_COLOR, SCROLL_MULTIPLIER
 from MultilineText import MultilineText
 from FunctionalElements import Collapsable
 from MultilineTextBox import MultilineTextBox
+from Util import PopoutElement
 
+@PopoutElement()
 class NumberedTextArea(UIElement):
 
     class Fold:

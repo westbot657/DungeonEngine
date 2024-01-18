@@ -32,7 +32,7 @@ Story Design
 ### William
 - Alpha Tester  
 
-Programming?  
+Programming  
 
 [<img src="./ui_resources/credits/github-mark-white.png" alt="Github" width=15/>](https://github.com/wbfw3131)
 

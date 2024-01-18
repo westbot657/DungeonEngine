@@ -1,12 +1,14 @@
-# pylint: disable=W,R,C
+# pylint: disable=W,R,C,import-error
 
 from UIElement import UIElement
 from RenderPrimitives import Color
 from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE, FONT
+from Util import PopoutElement
 
 import pygame
 import re
 
+@PopoutElement()
 class MultilineText(UIElement):
     
     __slots__ = [

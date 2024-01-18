@@ -8,12 +8,16 @@ import pygame
 from enum import Enum, auto
 from mergedeep import merge
 import time
+import json
 import re
 import os
 import sys
 import random
 import Stockings
 import socket
+import ast
+
+from subprocess import Popen
 
 # 3D rendering
 from shapely.geometry.polygon import Polygon as Poly
@@ -40,8 +44,8 @@ try:
     from GraphicsEngine.Util import expand_text_lists, \
         rotate, rotate3D, rotate3DV, \
         quad_to_tris, invert_tris, \
-        angle_between, warp, \
-        Selection, Cursor
+        angle_between, warp, safe_eval, \
+        Selection, Cursor, PopoutElement
     from GraphicsEngine.UIElement import UIElement
     from GraphicsEngine.RenderPrimitives import Color, Image, Animation
     from GraphicsEngine.EditorMimic import EditorMimic
@@ -60,8 +64,8 @@ except ImportError:
     from Util import expand_text_lists, \
         rotate, rotate3D, rotate3DV, \
         quad_to_tris, invert_tris, \
-        angle_between, warp, \
-        Selection, Cursor
+        angle_between, warp, safe_eval, \
+        Selection, Cursor, PopoutElement
     from UIElement import UIElement
     from RenderPrimitives import Color, Image, Animation
     from EditorMimic import EditorMimic
@@ -135,6 +139,7 @@ RPC = RPCD
 pygame.init() # pylint: disable=no-member
 pygame.font.init()
 
+@PopoutElement()
 class ContextTree(UIElement):
     global_tree = None
     
@@ -219,6 +224,7 @@ class ContextTree(UIElement):
                 _x = self.parent.width if X + self.parent.width + self.width < editor.width else -t.width
                 t._event(editor, X + _x, Y + h)
 
+@PopoutElement()
 class DirectoryTree(UIElement):
     folds = {
         "open": Image(f"{PATH}/folder_open.png", 0, 0, 14, 14),
@@ -389,7 +395,8 @@ class DirectoryTree(UIElement):
 
         for child in self.children[::-1]:
             child._event(editor, X, Y)
-        
+
+@PopoutElement()
 class Popup(UIElement):
     _popup = None
     tick = 0
@@ -1467,6 +1474,7 @@ class GameApp(UIElement):
 
 # Dungeon Building Editors:
 
+@PopoutElement()
 class FileEditor(UIElement):
     
     def __init__(self, x, y, width, height, file_location, file_name, editor):
@@ -2558,21 +2566,55 @@ class CodeEditor(UIElement):
             self.editor_app._event(editor, X, Y)
 
 class PopoutWindow(UIElement):
+    _port = 1234
     
-    def __init__(self, size:tuple[int, int], content:dict, pygame_window_args:tuple=..., pygame_window_kwargs:dict=...):
+    def __init__(self, size:tuple[int, int], content:dict, pygame_window_args:list=..., pygame_window_kwargs:dict=...):
         if pygame.display.get_init():
-            ... # launch sub-process, set up communication
-            self.socket
+            # This branch is run from the main process
+            # launch sub-process, set up communication
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.connect(("127.0.0.1", PopoutWindow._port))
+            self.conn = Stockings.Stocking(self.socket)
+            
+            if pygame_window_args is ...:
+                pygame_window_args = []
+            if pygame_window_kwargs is ...:
+                pygame_window_kwargs = {}
+            
+            data = {
+                "size": size,
+                "content": content,
+                "pygame_window_args": pygame_window_args,
+                "pygame_window_kwargs": pygame_window_kwargs
+            }
+            
+            data["content"].update({"PORT": PopoutWindow._port})
+            PopoutWindow._port += 1
+            if PopoutWindow._port > 25565:
+                PopoutWindow._port = 1234
+            
+            Popen(f"py -3.12 ./PopoutWindow.py {json.dumps(data)!r}")
+            
         else:
+            # This branch is run in the sub-process
+            
+            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.socket.bind(("127.0.0.1", content["PORT"]))
+            self.server.listen(1)
+            self.server.setblocking(False)
+            self.conn = Stockings.Stocking(self.socket)
+            content.pop("PORT")
+            
             comps = {}
             self.editor = Editor(None, None, *size)
             self.frame = WindowFrame(*size, self.editor)
 
             self.editor.add_layer(5, self.frame)
 
-            children = []
-            for comp in content["components"]:
-                ...
+            self.children = []
+            for name, comp in content["components"].items():
+                if comp["type"] in PopoutElement._elements:
+                    comps.update({name: PopoutElement._elements[comp["type"]](*comp.get("args", []), **comp.get("kwargs", {}))})
             
             for link in content["links"]:
                 if "link_handler" in link:
@@ -2581,10 +2623,10 @@ class PopoutWindow(UIElement):
                     #     "parent": comps[link["parent"]]
                     #     "child": comps[link["child"]]
                     # }
-                    l = lambda a: eval(e, {"a": a})
+                    l = lambda a: safe_eval(e, {"a": a})
                 else:
                     l = lambda a: a
-                children.append(
+                self.children.append(
                     Link(
                         comps[link.pop("parent")],
                         comps[link.pop("child")],

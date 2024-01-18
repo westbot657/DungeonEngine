@@ -155,6 +155,10 @@ def warp(surf: pygame.Surface,
     # swap x and y once again...
     return out, pixel_rect
 
+def safe_eval(expr, var):
+    if re.sub(r"(\bmax\b|\bmin\b|\ba\b|[\*/\+\-0-9\.()]| )", "", expr) != "":
+        raise ValueError("Unsafe expression")
+    return eval(expr, var, {})
 
 class Selection:
     
@@ -214,3 +218,18 @@ class Cursor:
     def __repr__(self):
         return f"Cursor({self.line}, {self.col})"
 
+
+class PopoutElement:
+    _elements = {}
+    _instance = None
+    
+    __slots__ = []
+    
+    def __new__(cls):
+        if not cls._instance:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+        
+    def __call__(self, obj:type):
+        PopoutElement._elements.update({obj.__name__: obj})
+        return obj

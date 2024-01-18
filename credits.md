@@ -9,11 +9,6 @@ Design - Programming - Art
 [<img src="./ui_resources/credits/github-mark-white.png" alt="Github" width=15/>](https://github.com/westbot657)
 
 
-## External Resources
-
-### Python Libraries
-
-
 
 
 

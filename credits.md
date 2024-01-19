@@ -1,3 +1,4 @@
+<!-- #!credits -->
 # Credits
 
 ## Development

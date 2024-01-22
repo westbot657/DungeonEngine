@@ -1782,7 +1782,7 @@ class FileEditorSubApp(UIElement):
     def tab_remover_getter(self, tab_name):
         
         def remove_tab(*_, **__):
-            print(f"{tab_name} - {self.open_files}")
+            # print(f"{tab_name} - {self.open_files}")
             self.file_tabs.remove_tab(tab_name)
             for k, c in self.open_files.copy().items():
                 

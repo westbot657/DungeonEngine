@@ -222,7 +222,7 @@ class Polygon(UIElement):
                 self.point_displays.clear()
 
             for key in editor.typing:
-                print(f"{key!r}")
+                # print(f"{key!r}")
                 if key == "\x10": # CTRL+P
                     points = []
                     i = 0
@@ -627,9 +627,10 @@ class Poly3D(UIElement):
 
                 angle = math.degrees(math.acos(diff))
             else:
-                print("LIGTHING ERROR: d == 0!!")
+                ...
+                # print("LIGTHING ERROR: d == 0!!")
         except Exception as e:
-            print(f"{d=}, {dot=}, {mag1=}, {mag2=}, {normal=}, {dot/d=}, {diff=}")
+            # print(f"{d=}, {dot=}, {mag1=}, {mag2=}, {normal=}, {dot/d=}, {diff=}")
             raise
 
         lighting_diff = (angle/180)

@@ -16,6 +16,7 @@ import random
 import Stockings
 import socket
 import ast
+import webbrowser
 
 from subprocess import Popen
 

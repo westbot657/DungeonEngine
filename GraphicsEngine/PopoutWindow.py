@@ -10,8 +10,6 @@ except ImportError:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        exit()
-    args = sys.argv[1]
-    PopoutWindow(**json.loads(args))
+    # breakpoint()
+    PopoutWindow()
 

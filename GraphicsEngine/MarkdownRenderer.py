@@ -73,8 +73,6 @@ class MarkdownRenderer:
                 # bullet points
                 # code blocks
                 # links
-                
-            
 
 
     def _event(self, editor, X, Y):

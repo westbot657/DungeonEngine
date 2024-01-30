@@ -28,7 +28,14 @@
             "child": "text_edit",
             "parent_attr": "width",
             "child_attr": "width",
-            "link_handler": "max(a, 200)"
+            "link_handler": "a-10"
+        },
+        {
+            "parent": "editor",
+            "child": "text_edit",
+            "parent_attr": "height",
+            "child_attr": "height",
+            "link_handler": "a-30"
         }
     ],
     "editor_layers": {

@@ -3,6 +3,7 @@
 # pygame UI Library
 
 import pygame
+from pygame.time import Clock
 
 # useful utils
 from enum import Enum, auto
@@ -18,7 +19,8 @@ import socket
 import ast
 import webbrowser
 
-from subprocess import Popen
+from subprocess import Popen, PIPE, STDOUT
+from threading import Thread
 
 # 3D rendering
 from shapely.geometry.polygon import Polygon as Poly
@@ -544,8 +546,10 @@ class Editor:
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME) # pylint: disable=no-member
         pygame.display.set_icon(pygame.image.load(f"{PATH}/dungeon_game_icon.png"))
         pygame.display.set_caption("Insert Dungeon Name Here")
+        self.clock = Clock()
 
         while self.running:
+            self.clock.tick(60)
             self.screen.fill((24, 24, 24))
             self.previous_keys = self.keys.copy()
             self.previous_mouse = self.mouse
@@ -2573,15 +2577,24 @@ class CodeEditor(UIElement):
 
 class PopoutWindow(UIElement):
     _windows = []
-    _port = 1234
+    # _port = 12345
     
-    def __init__(self, size:tuple[int, int], content:dict[str, dict|list], pygame_window_args:list=..., pygame_window_kwargs:dict=...):
-        if pygame.display.get_init():
+    def __init__(self, size:tuple[int, int]=..., content:dict[str, dict|list]=..., pygame_window_args:list=..., pygame_window_kwargs:dict=...):
+        self.children = []
+        self._input_buffer = []
+        if (size != ...) and (content != ...):
             # This branch is run from the main process
             # launch sub-process, set up communication
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.connect(("127.0.0.1", PopoutWindow._port))
-            self.conn = Stockings.Stocking(self.socket)
+            
+            if size is ...:
+                raise ValueError("size must be a tuple of width, height: (int, int)")
+            if content is ...:
+                raise ValueError("content must be defined")
+                
+            # self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # self.socket.bind(("127.0.0.1", PopoutWindow._port))
+            # self.socket.listen(1)
+            # self.socket.setblocking(False)
             self.ctx = "parent"
             
             PopoutWindow._windows.append(self)
@@ -2598,24 +2611,55 @@ class PopoutWindow(UIElement):
                 "pygame_window_kwargs": pygame_window_kwargs
             }
             
-            data["content"].update({"PORT": PopoutWindow._port})
-            PopoutWindow._port += 1
-            if PopoutWindow._port > 25565:
-                PopoutWindow._port = 1234
+            # data["content"].update({"PORT": PopoutWindow._port})
+            # PopoutWindow._port += 1
+            # if PopoutWindow._port > 25565:
+                # PopoutWindow._port = 1234
+            # print(json.dumps(data))
             
-            Popen(f"py -3.12 ./PopoutWindow.py {json.dumps(data)!r}")
+            
+            
+            self._window = Popen(f"py -3.12 ./GraphicsEngine/PopoutWindow.py", stdin=PIPE, stdout=PIPE, stderr=STDOUT, bufsize=0)
+            self._ithread = Thread(target=self._reader)
+            self._ithread.start()
+            # self.socket.accept()
+            # self.conn = Stockings.Stocking(self.socket)
+            
+            
+            while True:
+                r = self._read()
+                if r == "'Building popout window...'":
+                    print(f"parent read: {r}")
+                    break
+            
+            print("Writing info...")
+            self._write(json.dumps(data))
+            # self.conn.write(json.dumps(data))
+            
             
         else:
             # This branch is run in the sub-process
-            
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.bind(("127.0.0.1", content["PORT"]))
-            self.server.listen(1)
-            self.server.setblocking(False)
-            self.conn = Stockings.Stocking(self.socket)
+            time.sleep(1)
+            # self.f = open("./DEBUG.txt", "w+", encoding="utf-8")
+            # self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # self.socket.connect(("127.0.0.1", content["PORT"]))
+            # self.conn = Stockings.Stocking(self.socket)
             self.ctx = "child"
-            content.pop("PORT")
+            self._write("Building popout window...")
+            while True:
+                r = self._read()
+                if r:
+                    print(f"Recieved: {r}\r\n")
+                    break
+            self._write(f"recieved data: {r}")
+            data = json.loads(r)
+            # data = json.loads(self.conn.read())
+            size = data["size"]
+            content = data["content"]
             
+            
+            # content.pop("PORT")
+            self._write("Creating Editor...")
             self.editor = Editor(None, None, *size)
             self.frame = WindowFrame(*size, self.editor)
             comps = {
@@ -2652,23 +2696,59 @@ class PopoutWindow(UIElement):
 
             self.editor.add_layer(0, self)
             
-            for layer, objs in content["editor_layers"]:
+            for layer, objs in content["editor_layers"].items():
                 self.editor.add_layer(int(layer), *[comps[name] for name in objs])
             
+            self._ithread = Thread(target=self._reader)
+            self._ithread.start()
+            
+            self._write("Running editor...")
             self.editor.run()
 
+    def _write(self, data:str):
+        if self.ctx == "parent":
+            self._window.stdin.write(f"{data}\r\n".encode())
+            self._window.stdin.flush()
+            # sys.stdin.flush()
+        else:
+            print(repr(data))
+            # sys.stdout.flush()
+    
+    def _read(self) -> str|None:
+        if self._input_buffer:
+            out = self._input_buffer.pop(0)
+            if self.ctx == "parent": print(out)
+            return out
+        return None
+    
+    def _reader(self):
+        if self.ctx == "parent":
+            while True:
+                out = self._window.stdout.readline().decode().strip()
+                if out:
+                    self._input_buffer.append(out)
+                self._window.stdout.flush()
+        else:
+            while True:
+                if l := input().strip():
+                    self._input_buffer.append(l)
+                # if l := sys.stdin.readline().strip():
+                #     self._input_buffer.append(l)
+                
     def _event(self, editor, X, Y):
         for c in self.children[::-1]:
             c._event(editor, X, Y)
         
-        if io := self.conn.read():
+        if io := self._read():
             if self.ctx == "parent":
                 ...
             else:
                 if io == "%close%":
-                    self.conn.close()
+                    self._window.kill()
                     pygame.quit()
                     exit()
+        
+        
 
     def _update(self, editor, X, Y):
         pass
@@ -2820,6 +2900,13 @@ class IOHook:
         self.game_app.log_scrollable.offsetY = -(self.game_app.log_output._text_height - (self.game_app.log_output.min_height - 20))
         self.engine.handleInput(player_id, text)
 
+def popout(editor):
+    time.sleep(10)
+    with open("./GraphicsEngine/popout_text_editor.json", "r+", encoding="utf-8") as f:
+        p = PopoutWindow((200, 200), json.load(f))
+    editor.layers[0] += [p]
+
+
 if __name__ == "__main__":
     # from threading import Thread
     # import traceback
@@ -2851,9 +2938,15 @@ if __name__ == "__main__":
     
     c = CodeEditor(editor.width, editor.height, editor)
 
+    
+
     editor.layers[0] += [
         c
     ]
+    
+    t = Thread(target=popout, args=(editor, ))
+    t.start()
+    
     editor.run()
 
 """

@@ -13,7 +13,7 @@ except ImportError:
     from RenderPrimitives import Color, Image
     from Text import Text
     from Organizers import Link
-  
+
 # webbrowser.open(url)
 
 class MarkdownRenderer:
@@ -25,7 +25,7 @@ class MarkdownRenderer:
         self.components = []
         self.links = []
         self.render_mode = "normal"
-    
+
     def render(self):
         self.components.clear()
 
@@ -41,17 +41,16 @@ class MarkdownRenderer:
         for line in lines:
             if m := re.match(r"\<\!\-\- \#\!(?P<mode>[^ ]+) \-\-\>", line):
                 self.render_mode = m.groupdict()["mode"]
-            
-            
+
             # page seperator line
             if line.strip() == "---":
                 ...
-            
+
             if self.render_mode == "credits":
                 # align content to center
                 # create badges
                 ...
-                
+
                 # H1
                 # H2
                 # H3
@@ -59,12 +58,12 @@ class MarkdownRenderer:
                 # text
                 # badges
                 # social links
-                
+
             elif self.render_mode == "normal":
                 # left align
                 # 
                 ...
-                
+
                 # H1
                 # H2
                 # H3
@@ -80,6 +79,4 @@ class MarkdownRenderer:
 
     def _update(self, editor, X, Y):
         ...
-
-
 

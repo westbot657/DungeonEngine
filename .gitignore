@@ -6,6 +6,8 @@ __pycache__/
 *.pyc
 *.cpython-310.pyc
 
+.vs/
+
 *.lnk
 
 Insert Dungeon Name Here.exe

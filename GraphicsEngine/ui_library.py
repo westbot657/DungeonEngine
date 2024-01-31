@@ -3,6 +3,7 @@
 # pygame UI Library
 
 import pygame
+from pygame.time import Clock
 
 # useful utils
 from enum import Enum, auto
@@ -16,8 +17,10 @@ import random
 import Stockings
 import socket
 import ast
+import webbrowser
 
-from subprocess import Popen
+from subprocess import Popen, PIPE, STDOUT
+from threading import Thread
 
 # 3D rendering
 from shapely.geometry.polygon import Polygon as Poly
@@ -543,8 +546,10 @@ class Editor:
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME) # pylint: disable=no-member
         pygame.display.set_icon(pygame.image.load(f"{PATH}/dungeon_game_icon.png"))
         pygame.display.set_caption("Insert Dungeon Name Here")
+        self.clock = Clock()
 
         while self.running:
+            self.clock.tick(60)
             self.screen.fill((24, 24, 24))
             self.previous_keys = self.keys.copy()
             self.previous_mouse = self.mouse
@@ -1782,7 +1787,7 @@ class FileEditorSubApp(UIElement):
     def tab_remover_getter(self, tab_name):
         
         def remove_tab(*_, **__):
-            print(f"{tab_name} - {self.open_files}")
+            # print(f"{tab_name} - {self.open_files}")
             self.file_tabs.remove_tab(tab_name)
             for k, c in self.open_files.copy().items():
                 
@@ -1899,7 +1904,10 @@ class EditorApp(UIElement):
             child._update(editor, X, Y)
 
 class WindowFrame(UIElement):
-    def __init__(self, width, height, editor):
+    def __init__(self, width, height, editor, window_limits:list[int,int,int,int]=...):
+        if window_limits is ...:
+            window_limits = [800, 425, 1920, 1080]
+        self.window_limits = window_limits
         self.resolution = [width, height]
         self.children = []
         self.editor = editor
@@ -2077,16 +2085,16 @@ class WindowFrame(UIElement):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         if self.selected_drag in ["bottom_drag", "bottom_right_drag", "bottom_left_drag"]:
-            editor.height = max(425, rmy - rsy)
+            editor.height = min(max(self.window_limits[1], rmy - rsy), self.window_limits[3])
             self._update_layout(editor)
 
         if self.selected_drag in ["left_drag", "bottom_left_drag"]:
-            editor.set_window_location(min (rmx, self.drag_offset[0]-100), self.drag_offset[1])
-            editor.width = max(800, self.drag_offset[0] - rmx)
+            editor.set_window_location(min(rmx, self.drag_offset[0]-100), self.drag_offset[1])
+            editor.width = min(max(self.window_limits[0], self.drag_offset[0] - rmx), self.window_limits[2])
             self._update_layout(editor)
 
         if self.selected_drag in ["right_drag", "bottom_right_drag"]:
-            editor.width = max(800, rmx - rsx)
+            editor.width = min(max(self.window_limits[0], rmx - rsx), self.window_limits[2])
             self._update_layout(editor)
 
         if (not editor.mouse[0]) and editor.previous_mouse[0]:
@@ -2572,15 +2580,15 @@ class CodeEditor(UIElement):
 
 class PopoutWindow(UIElement):
     _windows = []
-    _port = 1234
+    _port = 12345
     
-    def __init__(self, size:tuple[int, int], content:dict[str, dict|list], pygame_window_args:list=..., pygame_window_kwargs:dict=...):
-        if pygame.display.get_init():
+    def __init__(self, size:tuple[int, int]=..., content:dict[str, dict|list]=..., pygame_window_args:list=..., pygame_window_kwargs:dict=...):
+        self.children = []
+        self.closed = False
+        if (size != ...) and (content != ...):
             # This branch is run from the main process
             # launch sub-process, set up communication
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.connect(("127.0.0.1", PopoutWindow._port))
-            self.conn = Stockings.Stocking(self.socket)
             self.ctx = "parent"
             
             PopoutWindow._windows.append(self)
@@ -2590,33 +2598,55 @@ class PopoutWindow(UIElement):
             if pygame_window_kwargs is ...:
                 pygame_window_kwargs = {}
             
-            data = {
+            data: dict[str, dict|list] = {
                 "size": size,
                 "content": content,
                 "pygame_window_args": pygame_window_args,
                 "pygame_window_kwargs": pygame_window_kwargs
             }
             
-            data["content"].update({"PORT": PopoutWindow._port})
+            # data["content"].update({"PORT": PopoutWindow._port})
+            
+            self.socket.bind(("127.0.0.1", PopoutWindow._port))
+            Popen(f"py -3.12 ./GraphicsEngine/PopoutWindow.py {PopoutWindow._port}")
+            self.socket.listen(1)
+            self.connection, self.conn_addr = self.socket.accept()
+            # self.socket.setblocking(False)
+            self.conn = Stockings.Stocking(self.connection)
+            
             PopoutWindow._port += 1
             if PopoutWindow._port > 25565:
-                PopoutWindow._port = 1234
+                PopoutWindow._port = 12345
             
-            Popen(f"py -3.12 ./PopoutWindow.py {json.dumps(data)!r}")
+            while not self.conn.handshakeComplete: pass
+            
+            self.conn.write(json.dumps(data))
+            
             
         else:
             # This branch is run in the sub-process
             
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.bind(("127.0.0.1", content["PORT"]))
-            self.server.listen(1)
-            self.server.setblocking(False)
+            # print(f"client connecting with port: {content["PORT"]}")
+            self.socket.connect(("127.0.0.1", content["PORT"]))
+            
+            
             self.conn = Stockings.Stocking(self.socket)
+            
+            while not self.conn.handshakeComplete: pass
+            
             self.ctx = "child"
-            content.pop("PORT")
+            # content.pop("PORT")
+            
+            while not (r := self.conn.read()):
+                pass
+            data = json.loads(r)
+            
+            content = data["content"]
+            size = data["size"]
             
             self.editor = Editor(None, None, *size)
-            self.frame = WindowFrame(*size, self.editor)
+            self.frame = WindowFrame(*size, self.editor, content.get("window_limits", ...))
             comps = {
                 "editor": self.editor,
                 "frame": self.frame
@@ -2624,12 +2654,13 @@ class PopoutWindow(UIElement):
 
             self.editor.add_layer(5, self.frame)
 
-            self.children = []
             for name, comp in content["components"].items():
                 if comp["type"] in PopoutElement._elements:
                     comps.update({name: PopoutElement._elements[comp["type"]](*comp.get("args", []), **comp.get("kwargs", {}))})
             
             for link in content["links"]:
+                link: dict
+                # print(f"creating link: {link}")
                 if "link_handler" in link:
                     e = link.pop("link_handler")
                     # ctx = {
@@ -2647,27 +2678,35 @@ class PopoutWindow(UIElement):
                         link_handler = l
                     )
                 )
-                ...
+                
 
             self.editor.add_layer(0, self)
             
-            for layer, objs in content["editor_layers"]:
+            for layer, objs in content["editor_layers"].items():
                 self.editor.add_layer(int(layer), *[comps[name] for name in objs])
             
             self.editor.run()
 
     def _event(self, editor, X, Y):
-        for c in self.children[::-1]:
-            c._event(editor, X, Y)
-        
-        if io := self.conn.read():
+        if self.closed: pass
+        if self.ctx == "child":
+            for c in self.children:
+                c._event(editor, X, Y)
+        try:
+            if io := self.conn.read():
+                if self.ctx == "parent":
+                    ...
+                else:
+                    if io == "%close%":
+                        self.conn.close()
+                        pygame.quit()
+                        exit()
+        except BrokenPipeError:
             if self.ctx == "parent":
-                ...
+                self.closed = True
             else:
-                if io == "%close%":
-                    self.conn.close()
-                    pygame.quit()
-                    exit()
+                pygame.quit()
+                exit()
 
     def _update(self, editor, X, Y):
         pass
@@ -2819,6 +2858,12 @@ class IOHook:
         self.game_app.log_scrollable.offsetY = -(self.game_app.log_output._text_height - (self.game_app.log_output.min_height - 20))
         self.engine.handleInput(player_id, text)
 
+# def popout(editor):
+#     time.sleep(10)
+#     with open("./GraphicsEngine/popout_text_editor.json", "r+", encoding="utf-8") as f:
+#         p = PopoutWindow((200, 200), json.load(f))
+#     editor.layers[0] += [p]
+
 if __name__ == "__main__":
     # from threading import Thread
     # import traceback
@@ -2850,9 +2895,12 @@ if __name__ == "__main__":
     
     c = CodeEditor(editor.width, editor.height, editor)
 
+    
+
     editor.layers[0] += [
         c
     ]
+    
     editor.run()
 
 """

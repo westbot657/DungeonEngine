@@ -156,7 +156,7 @@ def warp(surf: pygame.Surface,
     return out, pixel_rect
 
 def safe_eval(expr, var):
-    if re.sub(r"(\bmax\b|\bmin\b|\ba\b|[\*/\+\-0-9\.()]| )", "", expr) != "":
+    if re.sub(r"(\bmax\b|\bmin\b|\ba\b|[\*/\+\-0-9\.,()]| )", "", expr) != "":
         raise ValueError("Unsafe expression")
     return eval(expr, var, {})
 

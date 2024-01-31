@@ -275,6 +275,8 @@ class Link(UIElement):
         val = self.link_handler(val)
         if self.child_attr and hasattr(self.child, self.child_attr): setattr(self.child, self.child_attr, val)
         elif self.child_method and hasattr(self.child, self.child_method): getattr(self.child, self.child_method)(editor, val)
+        if hasattr(self.child, "_update_layout"):
+            self.child._update_layout()
 
     def _update(self, editor, X, Y): pass
 

@@ -1,4 +1,5 @@
 {
+    "size": [300, 200],
     "components": {
         "text_edit": {
             "type": "NumberedTextArea",
@@ -28,19 +29,20 @@
             "child": "text_edit",
             "parent_attr": "width",
             "child_attr": "width",
-            "link_handler": "a-10"
+            "link_handler": "a"
         },
         {
             "parent": "editor",
             "child": "text_edit",
             "parent_attr": "height",
             "child_attr": "height",
-            "link_handler": "a-30"
+            "link_handler": "a"
         }
     ],
     "editor_layers": {
         "0": [
             "text_edit"
         ]
-    }
+    },
+    "window_limits": [300, 200, 1920, 1280]
 }

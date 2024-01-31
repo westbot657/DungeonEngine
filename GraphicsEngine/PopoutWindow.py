@@ -11,5 +11,5 @@ except ImportError:
 
 if __name__ == "__main__":
     # breakpoint()
-    PopoutWindow()
+    PopoutWindow(content={"PORT": int(sys.argv[1])})
 

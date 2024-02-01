@@ -15,14 +15,14 @@
             "child": "editor",
             "parent_attr": "width",
             "child_attr": "width",
-            "link_handler": "max(a, 200)"
+            "link_handler": "max(a, 250)"
         },
         {
             "parent": "editor",
             "child": "editor",
             "parent_attr": "height",
             "child_attr": "height",
-            "link_handler": "max(a, 200)"
+            "link_handler": "max(a, 250)"
         },
         {
             "parent": "editor",

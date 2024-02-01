@@ -1974,6 +1974,7 @@ class WindowFrame(UIElement):
         window = gw.getActiveWindow()
         if window is not None:
             return window.left, window.top
+        return self._recent_window_pos
 
     def set_fullscreen(self, editor):
         screen = get_monitors()[0]
@@ -2315,6 +2316,7 @@ class CodeEditor(UIElement):
         window = gw.getActiveWindow()
         if window is not None:
             return window.left, window.top
+        return self._recent_window_pos
 
     def set_fullscreen(self, editor):
         screen = get_monitors()[0]

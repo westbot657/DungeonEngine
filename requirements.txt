@@ -10,4 +10,4 @@ Stockings
 shapely
 pygetwindow
 screeninfo
-cv2
+opencv

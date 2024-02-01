@@ -39,7 +39,8 @@ from pynput.mouse import Controller
 
 mouse = Controller()
 
-import pygetwindow as gw
+import pywinctl as gw
+import pyautogui
 from screeninfo import get_monitors
 
 from pygame._sdl2.video import Window, Texture # pylint: disable=no-name-in-module

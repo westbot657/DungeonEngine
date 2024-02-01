@@ -18,6 +18,7 @@ import Stockings
 import socket
 import ast
 import webbrowser
+import platform
 
 from subprocess import Popen, PIPE, STDOUT
 from threading import Thread
@@ -34,9 +35,10 @@ from pypresence import Presence
 
 # Things needed to move and resize pygame window
 import mouse
-from ctypes import windll, WINFUNCTYPE, POINTER
-from ctypes.wintypes import BOOL, HWND, RECT
-from win32api import GetMonitorInfo, MonitorFromPoint # pylint: disable=no-name-in-module
+
+import pygetwindow as gw
+from screeninfo import get_monitors
+
 from pygame._sdl2.video import Window, Texture # pylint: disable=no-name-in-module
 
 # import components
@@ -507,8 +509,10 @@ class Editor:
         self.typing = []
 
     def set_window_location(self, new_x, new_y):
-        hwnd = pygame.display.get_wm_info()['window']
-        windll.user32.MoveWindow(hwnd, int(new_x), int(new_y), int(self.width), int(self.height), False)
+        window = gw.getActiveWindow()
+        if window is not None:
+            window.moveTo(int(new_x), int(new_y))
+            window.resizeTo(self.width, self.height)
 
     def left_mouse_down(self): return (self.previous_mouse[0] is False) and (self.mouse[0] is True)
 
@@ -1559,6 +1563,9 @@ class FileEditor(UIElement):
                 ns, g, f = m.groups()
                 return f"[\033[38;2;86;156;214m{ns}\033[38;2;156;220;254m{g}\033[38;2;220;220;170m{f}\033[0m]"
             
+            elif (m := re.match(r"(?P<name>[a-zA-Z_][a-zA-Z0-9_]*)(?P<after> *\()", t)):
+                return f"\033[38;2;220;220;170m{m.groupdict()["name"]}\033[0m{m.groupdict()["after"]}"
+            
             elif (m := re.match(r"<([^>]+)>", t)): # <variables>
                 t = m.groups()[0]
 
@@ -1593,7 +1600,7 @@ class FileEditor(UIElement):
             else:
                 return t
             
-        return re.sub(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*|(?:\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')|\[[^:]+:[^\]]+\]|<=|>=|<<|>>|==|!=|<[^>]+>|@[^:]+:|\$[a-zA-Z_0-9]+|\d+(?:\.\d+)?|\b(and|if|or|not|elif|else|not|return|break|pass|for|in)\b|#|%)", repl, text)
+        return re.sub(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*|(?:\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')|\[[^:]+:[^\]]+\]|[a-zA-Z_][a-zA-Z0-9_]* *\(|<=|>=|<<|>>|==|!=|<[^>]+>|@[^:]+:|\$[a-zA-Z_0-9]+|\d+(?:\.\d+)?|\b(and|if|or|not|elif|else|not|return|break|pass|for|in)\b|#|%)", repl, text)
 
     def md_colors(self, text:str) -> str:
 
@@ -2306,18 +2313,13 @@ class CodeEditor(UIElement):
         pygame.display.iconify()
 
     def get_screen_pos(self, editor):
-        mx, my = mouse.get_position()
-        hwnd = pygame.display.get_wm_info()["window"]
-        prototype = WINFUNCTYPE(BOOL, HWND, POINTER(RECT))
-        paramflags = (1, "hwnd"), (2, "lprect")
-        GetWindowRect = prototype(("GetWindowRect", windll.user32), paramflags)
-        rect = GetWindowRect(hwnd)
-        return rect.left, rect.top
+        window = gw.getActiveWindow()
+        if window is not None:
+            return window.left, window.top
 
     def set_fullscreen(self, editor):
-        monitor_info = GetMonitorInfo(MonitorFromPoint((0,0)))
-        work_area = monitor_info.get("Work")
-        editor.width, editor.height = work_area[2:4]
+        screen = get_monitors()[0]
+        editor.width, editor.height = screen.width, screen.height
         editor.set_window_location(0, 0)
         self._update_layout(editor)
 

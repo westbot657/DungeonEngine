@@ -16,7 +16,11 @@ FONT = f"{PATH}/PTMono-Regular.ttf" # PTMono-Regular has correct lineup for │ 
 with open("./editor_settings.json", "r+", encoding="utf-8") as f:
     SETTINGS = json.load(f)
 
-from RenderPrimitives import Color
+try:
+    from .RenderPrimitives import Color
+except ImportError:
+    from RenderPrimitives import Color
+    
 
 TEXT_SIZE = SETTINGS["text_size"]
 TEXT_COLOR = Color(*SETTINGS["text_color"])

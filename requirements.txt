@@ -6,3 +6,7 @@ simpleaudio
 mergedeep
 orjson
 opendal
+Stockings
+shapely
+pygetwindow
+screeninfo

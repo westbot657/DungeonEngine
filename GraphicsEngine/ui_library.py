@@ -34,7 +34,10 @@ from importlib.machinery import SourceFileLoader
 from pypresence import Presence
 
 # Things needed to move and resize pygame window
-import mouse
+# import mouse
+from pynput.mouse import Controller
+
+mouse = Controller()
 
 import pygetwindow as gw
 from screeninfo import get_monitors
@@ -2032,13 +2035,13 @@ class WindowFrame(UIElement):
             self.window_drag_offset = editor.mouse_pos
 
         elif (editor.mouse[0] and self.window_drag_offset):
-            x, y = mouse.get_position()
+            x, y = mouse.position#.get_position()
             x -= self.window_drag_offset[0]
             y -= self.window_drag_offset[1]
             editor.set_window_location(x, y)
 
         elif (not editor.mouse[0]) and editor.previous_mouse[0]:
-            x, y = mouse.get_position()
+            x, y = mouse.position#.get_position()
             
             if y == 0:
                 self._is_fullscreen = True
@@ -2048,7 +2051,7 @@ class WindowFrame(UIElement):
             
             self.window_drag_offset = None
 
-        rmx, rmy = mouse.get_position()
+        rmx, rmy = mouse.position#.get_position()
         rsx, rsy = self.get_screen_pos(editor)
 
         if self.bottom_drag.hovered:
@@ -2496,13 +2499,13 @@ class CodeEditor(UIElement):
             self.window_drag_offset = editor.mouse_pos
 
         elif (editor.mouse[0] and self.window_drag_offset):
-            x, y = mouse.get_position()
+            x, y = mouse.position#.get_position()
             x -= self.window_drag_offset[0]
             y -= self.window_drag_offset[1]
             editor.set_window_location(x, y)
 
         elif (not editor.mouse[0]) and editor.previous_mouse[0]:
-            x, y = mouse.get_position()
+            x, y = mouse.position#.get_position()
             
             if y == 0:
                 self._is_fullscreen = True
@@ -2512,7 +2515,7 @@ class CodeEditor(UIElement):
             
             self.window_drag_offset = None
 
-        rmx, rmy = mouse.get_position()
+        rmx, rmy = mouse.position#.get_position()
         rsx, rsy = self.get_screen_pos(editor)
 
         if self.bottom_drag.hovered:

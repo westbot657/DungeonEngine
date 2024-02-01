@@ -118,8 +118,6 @@ class Button(UIElement):
                 self.off_right_click(editor)
             self.rheld = False
 
-        
-
         #self.update(editor, X, Y)
 
     def _update(self, editor, X, Y):

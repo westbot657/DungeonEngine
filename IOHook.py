@@ -68,4 +68,4 @@ class IOHook:
                 # it doesn't matter how you receive input, but this function:
                 self.engine.handleInput(player_id, txt)
                 # must be used to tell the engine to handle the input
-                # the function takes 2 arguments: the id of the player, and their input
+                # the function takes 2 arguments: the id of the player (int), and their input (str)

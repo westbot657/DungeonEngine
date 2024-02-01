@@ -8,6 +8,6 @@ orjson
 opendal
 Stockings
 shapely
-pygetwindow
+pywinctl
 screeninfo
 opencv-python

@@ -1967,18 +1967,13 @@ class WindowFrame(UIElement):
         pygame.display.iconify()
 
     def get_screen_pos(self, editor):
-        mx, my = mouse.get_position()
-        hwnd = pygame.display.get_wm_info()["window"]
-        prototype = WINFUNCTYPE(BOOL, HWND, POINTER(RECT))
-        paramflags = (1, "hwnd"), (2, "lprect")
-        GetWindowRect = prototype(("GetWindowRect", windll.user32), paramflags)
-        rect = GetWindowRect(hwnd)
-        return rect.left, rect.top
+        window = gw.getActiveWindow()
+        if window is not None:
+            return window.left, window.top
 
     def set_fullscreen(self, editor):
-        monitor_info = GetMonitorInfo(MonitorFromPoint((0,0)))
-        work_area = monitor_info.get("Work")
-        editor.width, editor.height = work_area[2:4]
+        screen = get_monitors()[0]
+        editor.width, editor.height = screen.width, screen.height
         editor.set_window_location(0, 0)
         self._update_layout(editor)
 

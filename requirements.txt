@@ -11,3 +11,4 @@ shapely
 pywinctl
 screeninfo
 opencv-python
+meshpy

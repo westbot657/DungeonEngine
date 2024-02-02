@@ -12,3 +12,4 @@ pywinctl
 screeninfo
 opencv-python
 meshpy
+pyautogui

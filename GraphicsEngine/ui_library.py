@@ -43,6 +43,29 @@ import pywinctl as gw
 import pyautogui
 from screeninfo import get_monitors
 
+if platform.system() == "Darwin":
+    from Quartz import CoreGraphics # pylint: disable=import-error
+
+    def macOSsetWindow(x, y, width, height):
+        # Get the frontmost window
+        frontmost_window = CoreGraphics.CGWindowListCopyWindowInfo(CoreGraphics.kCGWindowListOptionOnScreenOnly, CoreGraphics.kCGNullWindowID)
+        frontmost_window = frontmost_window[0]
+
+        # Get the window ID
+        window_id = frontmost_window[CoreGraphics.kCGWindowNumber]
+
+        # Move and resize the window
+        CoreGraphics.CGWindowMove(window_id, (x, y))
+        CoreGraphics.CGWindowResize(window_id, (width, height))
+
+    def macOSgetWindowPos():
+        # Get the frontmost window
+        frontmost_window = CoreGraphics.CGWindowListCopyWindowInfo(CoreGraphics.kCGWindowListOptionOnScreenOnly, CoreGraphics.kCGNullWindowID)
+        frontmost_window = frontmost_window[0]
+
+        # Get the window ID
+        window_id = frontmost_window[CoreGraphics.kCGWindowNumber]
+
 from pygame._sdl2.video import Window, Texture # pylint: disable=no-name-in-module
 
 # import components
@@ -513,10 +536,13 @@ class Editor:
         self.typing = []
 
     def set_window_location(self, new_x, new_y):
-        window = gw.getActiveWindow()
-        if window is not None:
-            window.moveTo(int(new_x), int(new_y))
-            window.resizeTo(self.width, self.height)
+        if platform.system() in ["Windows", "Linux"]:
+            window = gw.getActiveWindow()
+            if window is not None:
+                window.moveTo(int(new_x), int(new_y))
+                window.resizeTo(self.width, self.height)
+        elif platform.system() == "Darwin":
+            macOSsetWindow(int(new_x), int(new_y), self.width, self.height)
 
     def left_mouse_down(self): return (self.previous_mouse[0] is False) and (self.mouse[0] is True)
 
@@ -1971,10 +1997,13 @@ class WindowFrame(UIElement):
         pygame.display.iconify()
 
     def get_screen_pos(self, editor):
-        window = gw.getActiveWindow()
-        if window is not None:
-            return window.left, window.top
-        return self._recent_window_pos
+        if platform.system() in ["Windows", "Linux"]:
+            window = gw.getActiveWindow()
+            if window is not None:
+                return window.left, window.top
+            return self._recent_window_pos
+        elif platform.system() == "Darwin":
+            return macOSgetWindowPos()
 
     def set_fullscreen(self, editor):
         screen = get_monitors()[0]
@@ -2313,10 +2342,13 @@ class CodeEditor(UIElement):
         pygame.display.iconify()
 
     def get_screen_pos(self, editor):
-        window = gw.getActiveWindow()
-        if window is not None:
-            return window.left, window.top
-        return self._recent_window_pos
+        if platform.system() in ["Windows", "Linux"]:
+            window = gw.getActiveWindow()
+            if window is not None:
+                return window.left, window.top
+            return self._recent_window_pos
+        elif platform.system() == "Darwin":
+            return macOSgetWindowPos()
 
     def set_fullscreen(self, editor):
         screen = get_monitors()[0]

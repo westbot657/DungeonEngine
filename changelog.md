@@ -12,7 +12,7 @@
 The scripting language has been updated to:
 - give error messages instead of failing to compile or partially compiling
 - give you a summary of your code when compiled
--  allow better and cleaner syntax
+- allow better and cleaner syntax
 
 #### Compilation Summary
 - Gives you a list of variables and where (or why) they are defined
@@ -21,18 +21,18 @@ The scripting language has been updated to:
 #### Syntax and feature updates
 
 - macros and macro functions
-    - can be used to write repetitive code faster
-    - function macros are basically just functions that can't have code updated live (normal functions can be modified by code)
+  - can be used to write repetitive code faster
+  - function macros are basically just functions that can't have code updated live (normal functions can be modified by code)
 - shorthand functions
-    - common functions can be written easier. ie: `output()` vs `[engine:player/message]()`
+  - common functions can be written easier. ie: `output()` vs `[engine:player/message]()`
 - string joining
-    - written as `expr_1`..`expr_2`..`expr_n`::`seperator`
-    - `..` indicates to join strings
-    - `::` indicates the seperator (defaults to space)
+  - written as `expr_1`..`expr_2`..`expr_n`::`seperator`
+  - `..` indicates to join strings
+  - `::` indicates the seperator (defaults to space)
 - list/dict accessing
-    - written as `<var>['key']` or `<var>[0]` (index starts at 0)
+  - written as `<var>['key']` or `<var>[0]` (index starts at 0)
 - error messages
-    - compiling code with syntax errors will now tell you what/where an error is (error position may be wrong if it was expecting a closing parenthesis/bracket/brace)
+  - compiling code with syntax errors will now tell you what/where an error is (error position may be wrong if it is expecting a closing parenthesis/bracket/brace)
 
 
 

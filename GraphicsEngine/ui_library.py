@@ -89,6 +89,7 @@ try:
     from GraphicsEngine.Organizers import LayeredObjects, Draggable, Resizable, Tie, Link
     from GraphicsEngine.FunctionalElements import Button, Tabs, Scrollable, Collapsable
     from GraphicsEngine.NumberedTextArea import NumberedTextArea
+    from GraphicsEngine.PopoutInterface import PopoutInterface
 except ImportError:
     from Options import client_id, DO_RICH_PRESENCE, PATH, \
         FONT, SETTINGS, TEXT_SIZE, TEXT_COLOR, TEXT_BG_COLOR, \
@@ -109,6 +110,7 @@ except ImportError:
     from Organizers import LayeredObjects, Draggable, Resizable, Tie, Link
     from FunctionalElements import Button, Tabs, Scrollable, Collapsable
     from NumberedTextArea import NumberedTextArea
+    from PopoutInterface import PopoutInterface
 
 class fake_presence:
     def __init__(self, *_, **__): pass
@@ -1763,12 +1765,21 @@ class Opener:
         editor = s.editor
         file_path = s.file_path
         
+        n = "  " + file_path.replace("./Dungeons/", "") + "   " #"  " + file_path.rsplit("/", 1)[-1] + "   "
+
+        if n in self.popouts.keys():
+            self.popouts[n].send(
+                PopoutInterface()
+                .cmd()
+            )
+            self.popouts[n].close()
+
         if file_path not in self.open_files.keys():
             new = {file_path: FileEditor(329, 41, editor.width-329, editor.height-62, file_path, file_path.rsplit("/", 1)[-1], editor)}
             self.open_files.update(new)
-            n = "  " + file_path.replace("./Dungeons/", "") + "   " #"  " + file_path.rsplit("/", 1)[-1] + "   "
             self.file_tabs.add_tab(n, [new[file_path]])
             tab = self.file_tabs.get_tab(n)
+            self.tabs.append(n)
             ico = LayeredObjects({"0": [
                 DirectoryTree.file_icons[DirectoryTree._get_icon_for_file(None, file_path)]
             ]}, 2, 4)
@@ -1779,7 +1790,7 @@ class Opener:
                 close_button
             ))
 
-        self.file_tabs.active_tab = "  " + file_path.replace("./Dungeons/", "") + "   " #.rsplit("/", 1)[-1] + "   "
+        self.file_tabs.active_tab = n
         self.file_tabs.reset_tab_colors()
         self.focused_file = file_path
         
@@ -1787,6 +1798,11 @@ class Opener:
         self = s.sub_app
         editor = s.editor
         file_path = s.file_path
+
+        n = "  " + file_path.replace("./Dungeons/", "") + "   " #"  " + file_path.rsplit("/", 1)[-1] + "   "
+
+
+
 
 class FileEditorSubApp(UIElement):
     
@@ -1846,6 +1862,8 @@ class FileEditorSubApp(UIElement):
         self.children = []
         self.dir_tree = None
         self.open_files = {}
+        self.popouts = {}
+        self.tabs = []
         self.focused_file = None
         self.open_folder("./Dungeons", self.file_opener_getter, editor)
         self.children.append(self.dir_tree)
@@ -2746,6 +2764,15 @@ class PopoutWindow(UIElement):
     def _update(self, editor, X, Y):
         pass
     
+
+
+    def send(self, data):
+        if not self.closed:
+            try:
+                self.conn.send(data)
+            except BrokenPipeError:
+                self.closed = True
+
     def close(self): # This method can only be called from the main process
         self.conn.write("%close%")
         self.conn.close()

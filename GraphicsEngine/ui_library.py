@@ -66,6 +66,16 @@ if platform.system() == "Darwin":
         # Get the window ID
         window_id = frontmost_window[CoreGraphics.kCGWindowNumber]
 
+        window_info_list = CoreGraphics.CGWindowListCopyWindowInfo(CoreGraphics.kCGWindowListOptionIncludingWindow, window_id)
+    
+        if window_info_list:
+            window_info = window_info_list[0]
+            bounds = window_info[CoreGraphics.kCGWindowBounds]
+            x, y = bounds[CoreGraphics.kCGWindowBoundsX], bounds[CoreGraphics.kCGWindowBoundsY]
+            return x, y
+        else:
+            return None
+
 from pygame._sdl2.video import Window, Texture # pylint: disable=no-name-in-module
 
 # import components

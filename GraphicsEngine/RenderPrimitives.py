@@ -2,70 +2,10 @@
 
 from UIElement import UIElement
 from Util import PopoutElement
+from Options import PATH
 
 import pygame
 import time
-
-@PopoutElement()
-class Color(list):
-    __slots__ = ["r", "g", "b", "a"]
-    def __init__(self, r, g, b, a=None):
-        self.r = r
-        self.g = g
-        self.b = b
-        self.a = a
-    def with_alpha(self):
-        if self.a:
-            return Color(self.r, self.g, self.b, self.a)
-        else:
-            return Color(self.r, self.g, self.b, 255)
-    def without_alpha(self):
-        return Color(self.r, self.g, self.b)
-    
-    def __list__(self) -> list:
-        if self.a:
-            return [self.r, self.g, self.b, self.a]
-        else:
-            return [self.r, self.g, self.b]
-    
-    def __tuple__(self) -> tuple:
-        if self.a:
-            return (self.r, self.g, self.b, self.a)
-        else:
-            return (self.r, self.g, self.b)
-    def __iter__(self):
-        if self.a:
-            return iter((self.r, self.g, self.b, self.a))
-        else:
-            return iter((self.r, self.g, self.b))
-    def __len__(self):
-        if self.a: return 4
-        else: return 3
-    @classmethod
-    def color(cls, obj, allow_none=True, allow_image=True):
-        if obj is None and allow_none:
-            return None
-        elif obj is None:
-            raise ValueError("Color cannot be None")
-        if isinstance(obj, (Image, Animation, pygame.Surface)) and allow_image:
-            return obj
-        elif isinstance(obj, (Image, Animation)):
-            raise Exception(f"Color cannot be an image/animation")
-        if isinstance(obj, Color):
-            return obj
-        elif isinstance(obj, (list, tuple)) and len(obj) in (3, 4):
-            return cls(*obj)
-        elif isinstance(obj, int):
-            b = obj % 256
-            obj = obj // 256
-            g = obj % 256
-            obj = obj // 256
-            r = obj % 256
-            obj = obj // 256
-            a = obj % 256
-            return cls(r, g, b, a)
-        else:
-            raise ValueError(f"Invalid Color! ({obj})")
 
 
 
@@ -142,7 +82,6 @@ class Image(UIElement):
         #self.partial_update()
         editor.screen.blit(self.surface, (X+self.x, Y+self.y))
 
-from Options import PATH # This import must be after the definition of `Color` to avoid circular input loop
 
 @PopoutElement()
 class Animation(UIElement):
@@ -376,4 +315,68 @@ class Animation(UIElement):
         i._surface = i.surface = self._frames[item]
         i.partial_update()
         return i
+
+
+@PopoutElement()
+class Color(list):
+    __slots__ = ["r", "g", "b", "a"]
+    def __init__(self, r, g, b, a=None):
+        self.r = r
+        self.g = g
+        self.b = b
+        self.a = a
+    def with_alpha(self):
+        if self.a:
+            return Color(self.r, self.g, self.b, self.a)
+        else:
+            return Color(self.r, self.g, self.b, 255)
+    def without_alpha(self):
+        return Color(self.r, self.g, self.b)
+    
+    def __list__(self) -> list:
+        if self.a:
+            return [self.r, self.g, self.b, self.a]
+        else:
+            return [self.r, self.g, self.b]
+    
+    def __tuple__(self) -> tuple:
+        if self.a:
+            return (self.r, self.g, self.b, self.a)
+        else:
+            return (self.r, self.g, self.b)
+    def __iter__(self):
+        if self.a:
+            return iter((self.r, self.g, self.b, self.a))
+        else:
+            return iter((self.r, self.g, self.b))
+    def __len__(self):
+        if self.a: return 4
+        else: return 3
+    @classmethod
+    def color(cls, obj, allow_none=True, allow_image=True):
+        if obj is None and allow_none:
+            return None
+        elif obj is None:
+            raise ValueError("Color cannot be None")
+        if isinstance(obj, (Image, Animation, pygame.Surface)) and allow_image:
+            return obj
+        elif isinstance(obj, (Image, Animation)):
+            raise Exception(f"Color cannot be an image/animation")
+        if isinstance(obj, Color):
+            return obj
+        elif isinstance(obj, (list, tuple)) and len(obj) in (3, 4):
+            return cls(*obj)
+        elif isinstance(obj, int):
+            b = obj % 256
+            obj = obj // 256
+            g = obj % 256
+            obj = obj // 256
+            r = obj % 256
+            obj = obj // 256
+            a = obj % 256
+            return cls(r, g, b, a)
+        else:
+            raise ValueError(f"Invalid Color! ({obj})")
+
+
 

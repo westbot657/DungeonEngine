@@ -23,11 +23,11 @@ except ImportError:
     
 
 TEXT_SIZE = SETTINGS["text_size"]
-TEXT_COLOR = Color(*SETTINGS["text_color"])
-TEXT_BG_COLOR = Color(*SETTINGS["text_bg_color"])
-TEXT_HIGHLIGHT = Color(*SETTINGS["text_highlight"])
+TEXT_COLOR = tuple(SETTINGS["text_color"])
+TEXT_BG_COLOR = tuple(SETTINGS["text_bg_color"])
+TEXT_HIGHLIGHT = tuple(SETTINGS["text_highlight"])
 TAB_SIZE = 4
 CURSOR_BLINK_TIME = 50
-CURSOR_COLOR = Color(190, 190, 190)
+CURSOR_COLOR = (190, 190, 190)
 SCROLL_MULTIPLIER = 15
 

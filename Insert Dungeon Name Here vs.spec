@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['GraphicsEngine\\ui_library.py', 'Engine\\Engine.py'],
+    ['GraphicsEngine/ui_library.py', 'Engine/Engine.py'],
     pathex=["./GraphicsEngine", "./Engine", "./Engine/Resources"],
     binaries=[],
     datas=[],
@@ -34,5 +34,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['ui_resources\\dungeon_builder_iconx512.png'],
+    icon=['ui_resources/dungeon_builder_iconx512.png'],
 )

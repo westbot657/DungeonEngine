@@ -47,7 +47,7 @@ class Color(list):
             return None
         elif obj is None:
             raise ValueError("Color cannot be None")
-        if isinstance(obj, (Image, Animation)) and allow_image:
+        if isinstance(obj, (Image, Animation, pygame.Surface)) and allow_image:
             return obj
         elif isinstance(obj, (Image, Animation)):
             raise Exception(f"Color cannot be an image/animation")

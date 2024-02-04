@@ -1770,8 +1770,9 @@ class Opener:
         if n in self.popouts.keys():
             self.popouts[n].send(
                 PopoutInterface()
-                .cmd()
+                .cmd().component("text_edit").attr("editable").method("get_content").return_result().end()
             )
+            content = self.popouts[n].await_read()
             self.popouts[n].close()
 
         if file_path not in self.open_files.keys():
@@ -2764,14 +2765,32 @@ class PopoutWindow(UIElement):
     def _update(self, editor, X, Y):
         pass
     
-
-
     def send(self, data):
         if not self.closed:
             try:
                 self.conn.send(data)
             except BrokenPipeError:
                 self.closed = True
+
+    def await_read(self, timeout=-1) -> str|None:
+        t = time.time()
+        while True:
+            if time.time() - t > timeout > 0:
+                return None
+            try:
+                r = self.conn.read()
+                if r:
+                    return r
+            except BrokenPipeError:
+                self.closed = True
+                return None
+    
+    def read(self):
+        try:
+            return self.conn.read()
+        except BrokenPipeError:
+            self.closed = True
+            return None
 
     def close(self): # This method can only be called from the main process
         self.conn.write("%close%")

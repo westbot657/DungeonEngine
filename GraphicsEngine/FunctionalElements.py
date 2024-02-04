@@ -58,7 +58,7 @@ class Button(UIElement):
         
         self.surface = pygame.Surface((min(1, self.width), self.height), pygame.SRCALPHA, 32) # pylint: disable=no-member
         if self.bg_color:
-            if isinstance(self.bg_color, (Image, Animation)):
+            if (isinstance(self.bg_color, (Image, Animation)) or ("Image" in f"{type(self.bg_color)}" or "Animation" in f"{type(self.bg_color)}")):
                 self.bg_color.partial_update()
                 self.surface.blit(self.bg_color.surface, (0, 0))
             elif isinstance(self.bg_color, Color):
@@ -81,7 +81,7 @@ class Button(UIElement):
         self._mimic._editor = editor
         #if max(editor.X, X + self.x) <= _x <= min(X + self.x + self.width, editor.Width) and max(editor.Y, Y + self.y) <= _y <= min(Y + self.y + self.height, editor.Height):
         if self.bg_color:
-            if isinstance(self.bg_color, (Image, Animation)):
+            if (isinstance(self.bg_color, (Image, Animation)) or ("Image" in f"{type(self.bg_color)}" or "Animation" in f"{type(self.bg_color)}")):
                 self.bg_color.x = 0
                 self.bg_color.y = 0
                 self.bg_color.width = self.width
@@ -126,7 +126,7 @@ class Button(UIElement):
         self._override.screen = self.surface
         self._mimic._editor = editor
         if self.bg_color:
-            if isinstance(self.bg_color, (Image, Animation)):
+            if (isinstance(self.bg_color, (Image, Animation)) or ("Image" in f"{type(self.bg_color)}" or "Animation" in f"{type(self.bg_color)}")):
                 self.bg_color.x = 0
                 self.bg_color.y = 0
                 self.bg_color.width = self.width
@@ -536,7 +536,7 @@ class Tabs(UIElement):
     def _update(self, editor, X, Y):
 
         if self.tab_color_empty:
-            if isinstance(self.tab_color_empty, (Image, Animation)):
+            if (isinstance(self.tab_color_empty, (Image, Animation)) or ("Image" in f"{type(self.tab_color_empty)}" or "Animation" in f"{type(self.tab_color_empty)}")):
                 ...
             else:
                 if self.tab_style == Tabs.Style.LEFT:
@@ -646,7 +646,7 @@ class Scrollable:
 
             self.screen = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32) # pylint: disable=no-member
             if self.bg_color:
-                if isinstance(self.bg_color, (Image, Animation)):
+                if (isinstance(self.bg_color, (Image, Animation)) or ("Image" in f"{type(self.bg_color)}" or "Animation" in f"{type(self.bg_color)}")):
                     self.bg_color._update(self.parent, X+self.offsetX, Y+self.offsetY)
                 else:
                     self.screen.fill(tuple(self.bg_color))

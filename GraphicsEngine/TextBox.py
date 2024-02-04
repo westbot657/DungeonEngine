@@ -209,7 +209,7 @@ class TextBox(UIElement):
     def _update(self, editor, X, Y):
         _x, _y = self.surface.get_size()
         if self.text_bg_color:
-            if isinstance(self.text_bg_color, (Image, Animation)):
+            if (isinstance(self.text_bg_color, (Image, Animation)) or ("Image" in f"{type(self.text_bg_color)}" or "Animation" in f"{type(self.text_bg_color)}")):
                 self.text_bg_color.resize(_x+2, _y+2)._update(editor, X+self.x-1, Y+self.y-1)
             else:
                 editor.screen.fill(self.text_bg_color, (X+self.x-1, Y+self.y-1, _x+2, _y+2))

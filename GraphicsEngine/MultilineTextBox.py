@@ -267,7 +267,7 @@ class MultilineTextBox(UIElement):
         h = 0
 
         if self.text_bg_color:
-            if isinstance(self.text_bg_color, (Image, Animation)):
+            if (isinstance(self.text_bg_color, (Image, Animation)) or ("Image" in f"{type(self.text_bg_color)}" or "Animation" in f"{type(self.text_bg_color)}")):
                 self.text_bg_color.x = self.x - 1
                 self.text_bg_color.y = self.y - 1
                 self.text_bg_color.width = max(self._text_width, self.min_width) + 2

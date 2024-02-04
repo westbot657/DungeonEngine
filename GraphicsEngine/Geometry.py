@@ -30,7 +30,7 @@ class Box(UIElement):
         self.hovered = False
 
     def _update(self, editor, X, Y):
-        if isinstance(self.color, (Image, Animation)):
+        if (isinstance(self.color, (Image, Animation)) or ("Image" in f"{type(self.color)}" or "Animation" in f"{type(self.color)}")):
             self.color._update(editor, X, Y)
             self.color.x = 0
             self.color.y = 0

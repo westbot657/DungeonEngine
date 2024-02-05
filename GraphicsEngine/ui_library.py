@@ -592,6 +592,7 @@ class Editor:
         self._hovered = False
         self._hovering = None
         self._hovering_ctx_tree = False
+        self._listeners = {}
         self.unicodes = {
             pygame.K_UP: "$↑",
             pygame.K_DOWN: "$↓",
@@ -601,6 +602,12 @@ class Editor:
         self.unicode = {}
         self.keys = []
         self.typing = []
+
+    def add_event_listener(self, event, listener):
+        if event not in self._listeners:
+            self._listeners.update({event: []})
+        
+        self._listeners[event].append(listener)
 
     def set_window_location(self, new_x, new_y):
         if platform.system() in ["Windows", "Linux"]:
@@ -690,6 +697,9 @@ class Editor:
                         self.unicode.pop(un)
 
                 elif event.type == pygame.QUIT: # pylint: disable=no-member
+                    for listener in self._listeners.get("WINDOW_CLOSED", []):
+                        listener()
+                    
                     pygame.quit() # pylint: disable=no-member
                     self.running = False
                     return
@@ -2866,7 +2876,7 @@ class PopoutWindow(UIElement):
                         data = json.loads(io)
                         for key, val in data.items():
                             if key == "interface-cmd":
-                                PopoutInterface.execute(val, )
+                                PopoutInterface.execute(val, self.components, self)
         except BrokenPipeError:
             if self.ctx == "parent":
                 self.closed = True

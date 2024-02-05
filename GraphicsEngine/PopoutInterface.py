@@ -80,7 +80,7 @@ class PopoutInterface:
         self.sub_op += 1
         return self
 
-    def event(self, event_type:Event, linked_object:str|None=None):
+    def event(self, event_type:Event):#, linked_object:str|None=None):
         if self.current:
             self.cmd_chain.update({self.op: self.current})
             self.op += 1
@@ -88,8 +88,8 @@ class PopoutInterface:
             self.current = {}
         
         self.current.update({"event": event_type.value})
-        if linked_object:
-            self.current.update({"link-to": linked_object})
+        # if linked_object:
+        #     self.current.update({"link-to": linked_object})
         return self
 
     def end(self) -> str:
@@ -113,7 +113,7 @@ class PopoutInterface:
         return interface
 
     @classmethod
-    def execute(cls, cmd_chain:dict, components:dict, editor) -> list:
+    def execute(cls, cmd_chain:dict, components:dict, popout) -> list:
         """Takes a command chain and executes it.
         Returns a list of values to be returned to the main process
         """
@@ -123,6 +123,7 @@ class PopoutInterface:
         func = None
         args = []
         kwargs = {}
+        event = None
         for op, command in cmd_chain.items():
             for key, cmd in command.items():
                 if key == "target":
@@ -132,13 +133,24 @@ class PopoutInterface:
                         if cmd == "return":
                             rets.append(curr)
                         if cmd == "call":
-                            curr = func(*args, **kwargs) # pylint: disable=not-callable
+                            if event:
+                                components["editor"].add_event_listener(event,
+                                    lambda: popout.send(json.dumps({f"event-return-{event}": func(*args, **kwargs)})) # pylint: disable=not-callable
+                                )
+                                event = None
+                            else:
+                                curr = func(*args, **kwargs) # pylint: disable=not-callable
                             func = None
                             args = []
                             kwargs = {}
                     else:
                         for k, v in cmd.items():
                             match k:
+                                case "event":
+                                    event = v
+                                    func = None
+                                    args = []
+                                    kwargs = {}
                                 case "attr":
                                     if v.startswith("__"):
                                         raise ValueError("Attr cannot start with '__'")

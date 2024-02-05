@@ -217,6 +217,6 @@ class TextBox(UIElement):
 
         if self._cursor_visible:
             h = self.font.render(self.get_content()[0:self.cursor_location], True, (0, 0, 0)) # This is not shown on screen, only used to get width
-            editor.screen.blit(self._cursor_surface, (X+self.x+h.get_width(), Y+self.y+2))
+            editor.screen.blit(self._cursor_surface, (X+self.x+h.get_width(), Y+self.y))
 
     def on_enter(self, text:str): ... # pylint: disable=unused-argument

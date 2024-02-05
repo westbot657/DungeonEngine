@@ -31,3 +31,55 @@ CURSOR_BLINK_TIME = 50
 CURSOR_COLOR = (190, 190, 190)
 SCROLL_MULTIPLIER = 15
 
+POPOUTS = {
+    "text-editor": {
+        "size": [300, 200],
+        "components": {
+            "text_edit": {
+                "type": "NumberedTextArea",
+                "args": [
+                    5, 21, 240, 208
+                ],
+                "kwargs": {}
+            }
+        },
+        "links": [
+            {
+                "parent": "editor",
+                "child": "editor",
+                "parent_attr": "width",
+                "child_attr": "width",
+                "link_handler": "max(a, 250)"
+            },
+            {
+                "parent": "editor",
+                "child": "editor",
+                "parent_attr": "height",
+                "child_attr": "height",
+                "link_handler": "max(a, 250)"
+            },
+            {
+                "parent": "editor",
+                "child": "text_edit",
+                "parent_attr": "width",
+                "child_attr": "width",
+                "link_handler": "a"
+            },
+            {
+                "parent": "editor",
+                "child": "text_edit",
+                "parent_attr": "height",
+                "child_attr": "height",
+                "link_handler": "a"
+            }
+        ],
+        "editor_layers": {
+            "0": [
+                "text_edit"
+            ]
+        },
+        "window_limits": [300, 200, 1920, 1280]
+    }
+}
+
+

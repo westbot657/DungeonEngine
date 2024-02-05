@@ -82,7 +82,7 @@ from pygame._sdl2.video import Window, Texture # pylint: disable=no-name-in-modu
 try:
     from GraphicsEngine.Options import client_id, DO_RICH_PRESENCE, PATH, \
         FONT, SETTINGS, TEXT_SIZE, TEXT_COLOR, TEXT_BG_COLOR, \
-        TEXT_HIGHLIGHT, TAB_SIZE
+        TEXT_HIGHLIGHT, TAB_SIZE, POPOUTS
     from GraphicsEngine.Util import expand_text_lists, \
         rotate, rotate3D, rotate3DV, \
         quad_to_tris, invert_tris, \
@@ -103,7 +103,7 @@ try:
 except ImportError:
     from Options import client_id, DO_RICH_PRESENCE, PATH, \
         FONT, SETTINGS, TEXT_SIZE, TEXT_COLOR, TEXT_BG_COLOR, \
-        TEXT_HIGHLIGHT, TAB_SIZE
+        TEXT_HIGHLIGHT, TAB_SIZE, POPOUTS
     from Util import expand_text_lists, \
         rotate, rotate3D, rotate3DV, \
         quad_to_tris, invert_tris, \
@@ -121,6 +121,8 @@ except ImportError:
     from FunctionalElements import Button, Tabs, Scrollable, Collapsable
     from NumberedTextArea import NumberedTextArea
     from PopoutInterface import PopoutInterface
+
+
 
 class fake_presence:
     def __init__(self, *_, **__): pass
@@ -186,13 +188,20 @@ pygame.font.init()
 @PopoutElement()
 class ContextTree(UIElement):
     global_tree = None
+    groups = {}
     
     class Line: pass
+
+    class MousePos:
+        x = 0
+        y = 0
+        width = 0
+        height = 0
     
     __slots__ = [
         "visible", "width", "option_height", "text_color", "bg_color",
         "line_color", "text_size", "hover_color", "click_color", "tree",
-        "parent"
+        "parent", "group"
     ]
     
     @classmethod
@@ -202,10 +211,10 @@ class ContextTree(UIElement):
         m = Button(x, y, width, height, label, hover_color=(50, 50, 50), click_color=(50, 50, 50))
         m.on_left_click = _m
         _m.parent = m
-        m.children.append(_m)
+        # m.children.append(_m)
         return m
     
-    def __init__(self, tree_fields, width, option_height, text_color=TEXT_COLOR, bg_color=TEXT_BG_COLOR, line_color=(70, 70, 70), text_size=TEXT_SIZE, hover_color=TEXT_BG_COLOR, click_color=TEXT_BG_COLOR):
+    def __init__(self, tree_fields, width, option_height, text_color=TEXT_COLOR, bg_color=TEXT_BG_COLOR, line_color=(70, 70, 70), text_size=TEXT_SIZE, hover_color=TEXT_BG_COLOR, click_color=TEXT_BG_COLOR, group=None):
         self.visible = False
         self.width = width
         self.option_height = option_height
@@ -217,6 +226,8 @@ class ContextTree(UIElement):
         self.click_color = click_color
         self.tree = {}
         self.parent = None
+        self.group = group
+
         h = 0
 
         for obj in tree_fields:
@@ -241,7 +252,15 @@ class ContextTree(UIElement):
 
     def set_visibility(self, val:bool):
         self.visible = val
-        if not val:
+        if val:
+            # print("group:", self.group)
+            if self.group:
+                if (tree := ContextTree.groups.get(self.group, None)):
+                    if tree is not self:
+                        tree.set_visibility(False)
+                ContextTree.groups.update({self.group: self})
+
+        else:
             for t in self.tree.values():
                 if isinstance(t, Button):
                     for c in t.children:
@@ -249,24 +268,53 @@ class ContextTree(UIElement):
                             c.set_visibility(False)
 
     def toggle_visibility(self):
-        self.visible = not self.visible
-        if not self.visible:
-            self.set_visibility(False)
+        self.set_visibility(not self.visible)
     
+    def close(self):
+        self.set_visibility(False)
+    
+    def open(self):
+        self.set_visibility(True)
+
+    def openAtMouse(self, editor):
+        if not (self.parent is ContextTree.MousePos or self.parent is None):
+            self.set_visibility(not self.visible)
+            return
+        ContextTree.MousePos.x, ContextTree.MousePos.y = editor.mouse_pos
+        self.parent = ContextTree.MousePos
+        self.set_visibility(not self.visible)
+
     def __call__(self, *_, **__):
         self.toggle_visibility()
     
     def _update(self, editor, X, Y):
         if self.visible:
             for h, t in self.tree.items():
-                _x = self.parent.width if X + self.parent.width + self.width < editor.width else -t.width
-                t._update(editor, X + _x, Y + h)
+                _x = 0 if X + self.parent.width + self.width < editor.width else -t.width
+                t._update(editor, X + _x+self.parent.x, Y + h+self.parent.height+self.parent.y)
     
     def _event(self, editor, X, Y):
         if self.visible:
             for h, t in self.tree.items():
-                _x = self.parent.width if X + self.parent.width + self.width < editor.width else -t.width
-                t._event(editor, X + _x, Y + h)
+                _x = 0 if X + self.parent.width + self.width < editor.width else -t.width
+                t._event(editor, X + _x+self.parent.x, Y + h+self.parent.height+self.parent.y)
+                if t.hovered:
+                    editor._hovering_ctx_tree = True
+    
+    @classmethod
+    def closeAll(cls):
+        for group, tree in cls.groups.items():
+            tree.set_visibility(False)
+
+    @classmethod
+    def event(cls, editor, X, Y):
+        for group, tree in cls.groups.items():
+            tree._event(editor, X, Y)
+    
+    @classmethod
+    def update(cls, editor, X, Y):
+        for group, tree in cls.groups.items():
+            tree._update(editor, X, Y)
 
 @PopoutElement()
 class DirectoryTree(UIElement):
@@ -362,7 +410,7 @@ class DirectoryTree(UIElement):
             "hitbox", "label"#, "rct"
         ]
         
-        def __init__(self, name, on_click, icon, width, parent):
+        def __init__(self, name, on_click, icon, width, parent, on_right_click=None):
             self.parent = parent
             self.name = name
             self.width = width
@@ -372,6 +420,8 @@ class DirectoryTree(UIElement):
             self.hitbox = Button(0, 0, width, 15, "", (255, 0, 0))
             self.label = Text(14, -1, width-14, name, text_size=12, text_bg_color=None)
             self.hitbox.on_left_click = on_click
+            if on_right_click:
+                self.hitbox.on_right_click = on_right_click
 
         def _update(self, editor, X, Y, x_offset=0):
             self.icon._update(editor, X+x_offset, Y)
@@ -401,7 +451,11 @@ class DirectoryTree(UIElement):
             return DirectoryTree.Folder(name, self.width, comps, parent)
         
         else:
-            return DirectoryTree.File(name, tree, self._get_icon_for_file(name), self.width, parent)
+            if hasattr(tree, "rmb_click"):
+                return DirectoryTree.File(name, tree, self._get_icon_for_file(name), self.width, parent, tree.rmb_click)
+
+            else:
+                return DirectoryTree.File(name, tree, self._get_icon_for_file(name), self.width, parent)
 
     def __init__(self, x, y, name, components:dict, width, editor):
         self.x = x
@@ -537,6 +591,7 @@ class Editor:
         self._focused_object = None
         self._hovered = False
         self._hovering = None
+        self._hovering_ctx_tree = False
         self.unicodes = {
             pygame.K_UP: "$↑",
             pygame.K_DOWN: "$↓",
@@ -601,6 +656,7 @@ class Editor:
             self.previous_mouse = self.mouse
             self._hovered = False
             self._hovering = None
+            self._hovering_ctx_tree = False
             self.mouse = list(pygame.mouse.get_pressed()) #[mouse.is_pressed(mouse.LEFT), mouse.is_pressed(mouse.MIDDLE), mouse.is_pressed(mouse.RIGHT)]#list(a and b for a, b in zip(pygame.mouse.get_pressed(), ))
             self.mouse_pos = pygame.mouse.get_pos()
             self.width, self.height = self.Width, self.Height = self.screen.get_size()
@@ -650,34 +706,47 @@ class Editor:
             layers = [*self.layers.keys()]
             layers.sort()
 
+
             if Popup._popup:
                 Popup._popup._update_layout(self)
                 Popup._popup._event(self, 0, 0)
 
-            rmd = self.right_mouse_down()
-            # _layers = layers.copy()
-            # _layers.reverse()
+            ContextTree.event(self, 0, 0)
 
             for l in layers[::-1]:
                 for i in self.layers[l][::-1]:
                     i._event(self, 0, 0)
 
+            lmd = self.left_mouse_down()
+            rmd = self.right_mouse_down()
             if rmd:
 
                 if self._hovering is not None:
 
-                    if hasattr(self._hovering, "on_right_click"):
+                    if hasattr(self._hovering, "on_right_click") and not isinstance(self._hovering, Button):
 
                         try:
                             self._hovering.on_right_click(self, self._hovering)
 
                         except Exception as e:
                             print("\n".join(e.args))
+            
+            if isinstance(self._hovering, (TextBox, MultilineTextBox)):
+                editor.override_cursor = True
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_IBEAM)
+            
+            else:
+                editor.override_cursor = False
+
+            if (rmd or lmd) and not self._hovering_ctx_tree:
+                ContextTree.closeAll()
 
             for l in layers:
 
                 for i in self.layers[l]:
                     i._update(self, 0, 0)
+
+            ContextTree.update(self, 0, 0)
 
             if Popup._popup:
                 Popup._popup._update(self, 0, 0)
@@ -1543,8 +1612,6 @@ class FileEditor(UIElement):
         self.edit_area.set_content(self.contents)
         self.edit_area.editable.save_history()
         self.edit_area.editable.on_save(self.save_file)
-        
-        
 
         match file_name.rsplit(".", 1)[-1]:
             case "json"|"piskel":
@@ -1769,8 +1836,14 @@ class Opener:
         self.sub_app = sub_app
         self.file_path = file_path
         self.editor = editor
+        self.ctx_tree = ContextTree([
+            {
+                "Open in popout": self.open_popout
+            }
+        ], 200, 20, TEXT_COLOR, TEXT_BG_COLOR, (70, 70, 70), TEXT_SIZE, (50, 50, 50), (50, 50, 50), group="main-ctx")
 
     def __call__(s, *_, **__): # pylint: disable=no-self-argument
+        print("Left clicked!!!")
         self = s.sub_app
         editor = s.editor
         file_path = s.file_path
@@ -1780,7 +1853,7 @@ class Opener:
         if n in self.popouts.keys():
             self.popouts[n].send(
                 PopoutInterface()
-                .cmd().component("text_edit").attr("editable").method("get_content").return_result().end()
+                .cmd().component("text_edit").attr("editable").method("get_content").call().return_result().end()
             )
             content = self.popouts[n].await_read()
             self.popouts[n].close()
@@ -1805,15 +1878,30 @@ class Opener:
         self.file_tabs.reset_tab_colors()
         self.focused_file = file_path
         
-    def rmb_call(s, *_, **__): # pylint: disable=no-self-argument
-        self = s.sub_app
-        editor = s.editor
-        file_path = s.file_path
+    def rmb_click(self, *_, **__):
+        print("Right clicked!")
+        self.ctx_tree.openAtMouse(self.editor)
 
-        n = "  " + file_path.replace("./Dungeons/", "") + "   " #"  " + file_path.rsplit("/", 1)[-1] + "   "
+    def open_popout(self, *_, **__):
+        self.ctx_tree.close()
+        print("Open popout!")
 
+        n = "  " + self.file_path.replace("./Dungeons/", "") + "   "
 
+        if n in self.sub_app.popouts:
+            # TODO: bring popout window to top
+            return
 
+        elif n in self.sub_app.tabs:
+            ...
+
+        p = PopoutWindow((300, 200), POPOUTS["text-editor"])
+        self.sub_app.popouts.update({n: p})
+
+        p.send(
+            PopoutInterface()
+            .cmd().component("text_edit").method("set_content").param()
+        )
 
 class FileEditorSubApp(UIElement):
     
@@ -1852,12 +1940,15 @@ class FileEditorSubApp(UIElement):
         
         def remove_tab(*_, **__):
             # print(f"{tab_name} - {self.open_files}")
+            keys = list(self.open_files.keys())
             self.file_tabs.remove_tab(tab_name)
+            i = 0
             for k, c in self.open_files.copy().items():
                 
                 if k.strip().endswith(tab_name.strip()):
                     self.open_files.pop(k)
-                    return
+                    break
+                i += 1
 
             if self.focused_file == tab_name:
                 self.focused_file = None
@@ -2267,7 +2358,8 @@ class CodeEditor(UIElement):
                 # {
                 #     "Exit": self.top_bar_file_exit
                 # }
-            ], 115, *self.ctx_tree_opts
+            ], 115, *self.ctx_tree_opts,
+            group="main-ctx"
         )
         self.top_bar_file._uoffx = -self.top_bar_file.width
         self.top_bar_file._uoffy = self.top_bar_file.height
@@ -2284,23 +2376,24 @@ class CodeEditor(UIElement):
                     "Copy": self.top_bar_edit_copy,
                     "Paste": self.top_bar_edit_paste
                 }
-            ], 60, *self.ctx_tree_opts
+            ], 60, *self.ctx_tree_opts,
+            group="main-ctx"
         )
         self.top_bar_edit._uoffx = -self.top_bar_edit.width
         self.top_bar_edit._uoffy = self.top_bar_edit.height
         self.children.append(self.top_bar_edit)
-        ctx_file_onclick = self.top_bar_file.on_left_click
-        def ctx_file(*_, **__):
-            self.top_bar_edit.children[0].set_visibility(False)
-            ctx_file_onclick(*_, **__)
+        # ctx_file_onclick = self.top_bar_file.on_left_click
+        # def ctx_file(*_, **__):
+        #     self.top_bar_edit.children[0].set_visibility(False)
+        #     ctx_file_onclick(*_, **__)
 
-        self.top_bar_file.on_left_click = ctx_file
-        ctx_edit_onclick = self.top_bar_edit.on_left_click
-        def ctx_edit(*_, **__):
-            self.top_bar_file.children[0].set_visibility(False)
-            ctx_edit_onclick(*_, **__)
+        # self.top_bar_file.on_left_click = ctx_file
+        # ctx_edit_onclick = self.top_bar_edit.on_left_click
+        # def ctx_edit(*_, **__):
+        #     self.top_bar_file.children[0].set_visibility(False)
+        #     ctx_edit_onclick(*_, **__)
 
-        self.top_bar_edit.on_left_click = ctx_edit
+        # self.top_bar_edit.on_left_click = ctx_edit
         self.minimize_button = Button(width-(26*3), 0, 26, 20, " ─ ", (24, 24, 24), hover_color=(70, 70, 70))
         self.minimize_button.on_left_click = self.minimize
         self.children.append(self.minimize_button)
@@ -2672,7 +2765,11 @@ class PopoutWindow(UIElement):
             # data["content"].update({"PORT": PopoutWindow._port})
             
             self.socket.bind(("127.0.0.1", PopoutWindow._port))
-            Popen(f"py -3.12 ./GraphicsEngine/PopoutWindow.py {PopoutWindow._port}")
+
+            if getattr(sys, "frozen", False):
+                Popen(f"\"{sys.executable}\" popout {PopoutWindow._port}")
+            else:
+                Popen(f"py -3.12 ./GraphicsEngine/ui_library.py popout {PopoutWindow._port}")
             self.socket.listen(1)
             self.connection, self.conn_addr = self.socket.accept()
             # self.socket.setblocking(False)
@@ -2685,8 +2782,7 @@ class PopoutWindow(UIElement):
             while not self.conn.handshakeComplete: pass
             
             self.conn.write(json.dumps(data))
-            
-            
+
         else:
             # This branch is run in the sub-process
             
@@ -2743,6 +2839,7 @@ class PopoutWindow(UIElement):
                     )
                 )
                 
+            self.components = comps
 
             self.editor.add_layer(0, self)
             
@@ -2765,6 +2862,11 @@ class PopoutWindow(UIElement):
                         self.conn.close()
                         pygame.quit()
                         exit()
+                    elif io.startswith("{"):
+                        data = json.loads(io)
+                        for key, val in data.items():
+                            if key == "interface-cmd":
+                                PopoutInterface.execute(val, )
         except BrokenPipeError:
             if self.ctx == "parent":
                 self.closed = True
@@ -2951,13 +3053,21 @@ class IOHook:
 
 # def popout(editor):
 #     time.sleep(10)
-#     with open("./GraphicsEngine/popout_text_editor.json", "r+", encoding="utf-8") as f:
-#         p = PopoutWindow((200, 200), json.load(f))
+#     # with open("./GraphicsEngine/popout_text_editor.json", "r+", encoding="utf-8") as f:
+#     p = PopoutWindow((200, 200), POPOUTS["text-editor"])
 #     editor.layers[0] += [p]
 
 if __name__ == "__main__":
     # from threading import Thread
     # import traceback
+
+    argv = sys.argv[1:]
+
+    if argv:
+        if argv[0] == "popout":
+            PopoutWindow(content={"PORT": int(argv[1])})
+        
+        exit()
 
     try:
         from Engine import Engine
@@ -2986,6 +3096,8 @@ if __name__ == "__main__":
     
     c = CodeEditor(editor.width, editor.height, editor)
 
+    # t = Thread(target=popout, args=(editor,))
+    # t.start()
     
 
     editor.layers[0] += [

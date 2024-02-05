@@ -40,7 +40,6 @@ class NumberedTextArea(UIElement):
             split_draggable=False,
             split_size=75,
             scroll_speed = scroll_speed,
-            
         )
 
         self.collapsable.main_area.left_bound = 0

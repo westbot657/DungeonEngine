@@ -41,7 +41,6 @@ class Color(list):
         else: return 3
     @classmethod
     def color(cls, obj, allow_none=True, allow_image=True):
-        print(str(type(obj)))
         if obj is None and allow_none:
             return None
         elif obj is None:

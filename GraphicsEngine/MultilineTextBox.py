@@ -128,7 +128,7 @@ class MultilineTextBox(UIElement):
             if ll == gl:
                 line = self.get_lines()[ll]
                 pre = len(line[0:lc]) * w
-                self._highlight_offset = [pre, (ll * h)]
+                self._highlight_offset = [pre, (ll * h) + 2]
                 self.highlights.append(pygame.transform.scale(self._highlight, ((gc-lc)*w, h)))
 
             else:
@@ -282,7 +282,7 @@ class MultilineTextBox(UIElement):
             editor.screen.blit(s, (X+self.x, Y+self.y+h))
             if l == self.cursor_location.line and self._cursor_visible:
                 _h = self.font.render(self.get_lines()[self.cursor_location.line][0:self.cursor_location.col], True, (0, 0, 0)) # This is not shown on screen, only used to get width
-                editor.screen.blit(self._cursor_surface, (X+self.x+_h.get_width(), Y+self.y+h+2))
+                editor.screen.blit(self._cursor_surface, (X+self.x+_h.get_width(), Y+self.y+h))
             h += self._height#s.get_height()
             l += 1
 
@@ -293,10 +293,10 @@ class MultilineTextBox(UIElement):
             h = self.highlights[0]
             _x, _y = self._highlight_offset
             #print(f"highlight at: {X+self.x+_x}, {Y+self.y+_y}  mouse: {editor.mouse_pos} {h.get_size()}")
-            editor.screen.blit(h, (X+self.x+_x, Y+self.y+_y))
+            editor.screen.blit(h, (X+self.x+_x, Y+self.y+_y-2))
             height = _h
             for h in self.highlights[1:]:
-                editor.screen.blit(h, (X+self.x, Y+self.y+_y+height))
+                editor.screen.blit(h, (X+self.x, Y+self.y+_y+height-2))
                 height += _h
 
     def refresh_lines(self):

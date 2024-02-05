@@ -139,6 +139,7 @@ class Engine:
     def start(self):
         if not self.thread_running:
             t = Thread(target=self._main_loop_threaded)
+            t.daemon = True
             self.thread_running = True
             self.running = True
             t.start()

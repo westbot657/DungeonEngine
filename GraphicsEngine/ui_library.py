@@ -604,6 +604,7 @@ class Editor:
         self.typing = []
 
     def add_event_listener(self, event, listener):
+        print(f"ADDING EVENT: {event} :: {listener}")
         if event not in self._listeners:
             self._listeners.update({event: []})
         
@@ -697,12 +698,13 @@ class Editor:
                         self.unicode.pop(un)
 
                 elif event.type == pygame.QUIT: # pylint: disable=no-member
-                    for listener in self._listeners.get("WINDOW_CLOSED", []):
-                        listener()
-                    
-                    pygame.quit() # pylint: disable=no-member
-                    self.running = False
-                    return
+                    if "WINDOW_CLOSED" in self._listeners:
+                        for listener in self._listeners.get("WINDOW_CLOSED", []):
+                            listener()
+                    else:
+                        pygame.quit() # pylint: disable=no-member
+                        self.running = False
+                        return
 
             nt = time.time()
 
@@ -742,11 +744,11 @@ class Editor:
                             print("\n".join(e.args))
             
             if isinstance(self._hovering, (TextBox, MultilineTextBox)):
-                editor.override_cursor = True
+                self.override_cursor = True
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_IBEAM)
             
             else:
-                editor.override_cursor = False
+                self.override_cursor = False
 
             if (rmd or lmd) and not self._hovering_ctx_tree:
                 ContextTree.closeAll()
@@ -1853,7 +1855,6 @@ class Opener:
         ], 200, 20, TEXT_COLOR, TEXT_BG_COLOR, (70, 70, 70), TEXT_SIZE, (50, 50, 50), (50, 50, 50), group="main-ctx")
 
     def __call__(s, *_, **__): # pylint: disable=no-self-argument
-        print("Left clicked!!!")
         self = s.sub_app
         editor = s.editor
         file_path = s.file_path
@@ -1889,12 +1890,10 @@ class Opener:
         self.focused_file = file_path
         
     def rmb_click(self, *_, **__):
-        print("Right clicked!")
         self.ctx_tree.openAtMouse(self.editor)
 
     def open_popout(self, *_, **__):
         self.ctx_tree.close()
-        print("Open popout!")
 
         n = "  " + self.file_path.replace("./Dungeons/", "") + "   "
 
@@ -1905,13 +1904,39 @@ class Opener:
         elif n in self.sub_app.tabs:
             ...
 
-        p = PopoutWindow((300, 200), POPOUTS["text-editor"])
+        p = PopoutWindow((300, 200), POPOUTS["text-editor"], window_title=n.strip())
         self.sub_app.popouts.update({n: p})
+        
+        with open(self.file_path, "r+", encoding="utf-8") as f:
+            content = f.read()
 
         p.send(
             PopoutInterface()
-            .cmd().component("text_edit").method("set_content").param()
+            .cmd().component("text_edit").method("set_content").param(content).call()
+            .end()
         )
+        p.send(
+            PopoutInterface()
+            .event(PopoutInterface.Event.WINDOW_CLOSED).component("text_edit").method("get_content").call()
+            .end()
+        )
+        
+        def p_event(s, editor, X, Y):
+            try:
+                if io := s.conn.read():
+                    if io.startswith("{"):
+                        data = json.loads(io)
+                        if "event-return-WINDOW_CLOSED" in data:
+                            content = data["event-return-WINDOW_CLOSED"]
+                            s.send("%close%")
+                            with open(self.file_path, "w+", encoding="utf-8") as f:
+                                f.write(content)
+                
+            except BrokenPipeError:
+                self.closed = True
+        p._event = p_event
+            
+            
 
 class FileEditorSubApp(UIElement):
     
@@ -2071,7 +2096,7 @@ class EditorApp(UIElement):
             child._update(editor, X, Y)
 
 class WindowFrame(UIElement):
-    def __init__(self, width, height, editor, window_limits:list[int,int,int,int]=...):
+    def __init__(self, width, height, editor, window_limits:list[int,int,int,int]=..., title=""):
         if window_limits is ...:
             window_limits = [800, 425, 1920, 1080]
         self.window_limits = window_limits
@@ -2105,6 +2130,11 @@ class WindowFrame(UIElement):
         self.children.append(self.top_bar)
         self.top_bar_icon = Image(f"{PATH}/dungeon_game_icon.png", 2, 2, 16, 16)
         self.children.append(self.top_bar_icon)
+        
+        # print(f"TITLE: {title}")
+        self.title = Text(20, 2, content=title, text_size=13)
+        self.children.append(self.title)
+        
         self.minimize_button = Button(width-(26*3), 0, 26, 20, " ─ ", (24, 24, 24), hover_color=(70, 70, 70))
         self.minimize_button.on_left_click = self.minimize
         self.children.append(self.minimize_button)
@@ -2164,11 +2194,17 @@ class WindowFrame(UIElement):
         self._is_fullscreen = not self._is_fullscreen
 
     def close_window(self, editor):
-        editor.running = False
-        editor.engine.stop()
-        pygame.display.quit()
-        pygame.quit()
-        sys.exit()
+        
+        if "WINDOW_CLOSED" in editor._listeners:
+            for listener in editor._listeners["WINDOW_CLOSED"]:
+                listener()
+        else:
+            editor.running = False
+            if editor.engine:
+                editor.engine.stop()
+            pygame.display.quit()
+            pygame.quit()
+            sys.exit()
 
     def _update(self, editor, X, Y):
 
@@ -2264,8 +2300,7 @@ class WindowFrame(UIElement):
             self._update_layout(editor)
 
         if (not editor.mouse[0]) and editor.previous_mouse[0]:
-            self.selected_drag = ""
-            
+            self.selected_drag = ""  
 
         for child in self.children[::-1]:
             child._event(editor, X, Y)
@@ -2749,7 +2784,7 @@ class PopoutWindow(UIElement):
     _windows = []
     _port = 12345
     
-    def __init__(self, size:tuple[int, int]=..., content:dict[str, dict|list]=..., pygame_window_args:list=..., pygame_window_kwargs:dict=...):
+    def __init__(self, size:tuple[int, int]=..., content:dict[str, dict|list]=..., pygame_window_args:list=..., pygame_window_kwargs:dict=..., window_title=""):
         self.children = []
         self.closed = False
         if (size != ...) and (content != ...):
@@ -2767,7 +2802,7 @@ class PopoutWindow(UIElement):
             
             data: dict[str, dict|list] = {
                 "size": size,
-                "content": content,
+                "content": merge({"window_title": window_title}, content),
                 "pygame_window_args": pygame_window_args,
                 "pygame_window_kwargs": pygame_window_kwargs
             }
@@ -2816,7 +2851,7 @@ class PopoutWindow(UIElement):
             size = data["size"]
             
             self.editor = Editor(None, None, *size)
-            self.frame = WindowFrame(*size, self.editor, content.get("window_limits", ...))
+            self.frame = WindowFrame(*size, self.editor, content.get("window_limits", ...), title=content.get("window_title", ""))
             comps = {
                 "editor": self.editor,
                 "frame": self.frame
@@ -2890,7 +2925,7 @@ class PopoutWindow(UIElement):
     def send(self, data):
         if not self.closed:
             try:
-                self.conn.send(data)
+                self.conn.write(data)
             except BrokenPipeError:
                 self.closed = True
 
@@ -2916,7 +2951,8 @@ class PopoutWindow(UIElement):
 
     def close(self): # This method can only be called from the main process
         self.conn.write("%close%")
-        self.conn.close()
+        
+        #self.conn.close()
 
 class IOHook:
 

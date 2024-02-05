@@ -15,7 +15,7 @@ class PopoutInterface:
 
     def __init__(self):
         self.cmd_chain: dict = {}
-        self.current: dict = self.cmd_chain
+        self.current: dict = {}
         self.op = 0
         self.sub_op = 0
 
@@ -128,14 +128,23 @@ class PopoutInterface:
             for key, cmd in command.items():
                 if key == "target":
                     curr = components.get(cmd)
+                elif key == "event":
+                    event = cmd
+                    # func = None
+                    args = []
+                    kwargs = {}
                 else:
                     if isinstance(cmd, str):
                         if cmd == "return":
                             rets.append(curr)
                         if cmd == "call":
                             if event:
+                                
+                                def listener():
+                                    popout.send(json.dumps({f"event-return-{event}": func(*args, **kwargs)})) # pylint: disable=not-callable
+                                
                                 components["editor"].add_event_listener(event,
-                                    lambda: popout.send(json.dumps({f"event-return-{event}": func(*args, **kwargs)})) # pylint: disable=not-callable
+                                    listener
                                 )
                                 event = None
                             else:
@@ -146,11 +155,6 @@ class PopoutInterface:
                     else:
                         for k, v in cmd.items():
                             match k:
-                                case "event":
-                                    event = v
-                                    func = None
-                                    args = []
-                                    kwargs = {}
                                 case "attr":
                                     if v.startswith("__"):
                                         raise ValueError("Attr cannot start with '__'")
@@ -164,7 +168,7 @@ class PopoutInterface:
                                     if hasattr(curr, v):
                                         curr = func = getattr(curr, v)
                                         args = []
-                                        kwargs = []
+                                        kwargs = {}
                                     else:
                                         raise ValueError(f"No attribute '{v}'")
                                 case "param":
@@ -188,7 +192,7 @@ class PopoutInterface:
                                 case "kwarg":
                                     if not func:
                                         raise ValueError("Param calls must happen after a method call")
-                                    kwargs.append(v)
+                                    kwargs.update(v)
                                 case "ref-kwarg":
                                     if not func:
                                         raise ValueError("Ref-param calls must happen after a method call")
@@ -203,7 +207,7 @@ class PopoutInterface:
                                         else:
                                             raise ValueError(f"No attribute '{_c}'")
                                     args.append({v.keys()[0]: c})
-                            break
+                            
 
 
 

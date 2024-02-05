@@ -55,6 +55,8 @@ class NumberedTextArea(UIElement):
         self.collapsable.width = self.width-5
         self.editable.min_width = self.width-75
 
+    def get_content(self):
+        return self.editable.get_content()
 
     def set_content(self, content:str):
         self.editable.set_content(content)

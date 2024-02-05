@@ -60,6 +60,7 @@ except ImportError as e:
             # o = Thread(target=self._output_loop)
             # o.start()
             i = Thread(target=self._input_loop)
+            i.daemon = True
             i.start()
 
 

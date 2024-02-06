@@ -2815,51 +2815,61 @@ class PopoutBehaviorPreset(UIElement):
 
 class PopoutWindow(UIElement):
     _windows = []
-    _port = 12345
+    _port = 25560
+    _init = False
+    _server = None
     
-    def __init__(self, size:tuple[int, int]=..., content:dict[str, dict|list]=..., pygame_window_args:list=..., pygame_window_kwargs:dict=..., window_title=""):
+    @classmethod
+    def init(cls):
+        if not cls._init:
+            cls._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            cls._server.bind(("127.0.0.1", cls._port))
+            cls._server.listen(5)
+        return cls._server
+    
+    def __init__(self, size:tuple[int, int]=..., content:dict[str, dict|list]=..., window_title=""):
         self.children = []
         self.closed = False
+        self.ready = False
         if (size != ...) and (content != ...):
             # This branch is run from the main process
             # launch sub-process, set up communication
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            # self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            PopoutWindow.init()
             self.ctx = "parent"
             
             PopoutWindow._windows.append(self)
             
-            if pygame_window_args is ...:
-                pygame_window_args = []
-            if pygame_window_kwargs is ...:
-                pygame_window_kwargs = {}
-            
             data: dict[str, dict|list] = {
                 "size": size,
-                "content": merge({"window_title": window_title}, content),
-                "pygame_window_args": pygame_window_args,
-                "pygame_window_kwargs": pygame_window_kwargs
+                "content": merge({"window_title": window_title}, content)
             }
             
             # data["content"].update({"PORT": PopoutWindow._port})
             
-            self.socket.bind(("127.0.0.1", PopoutWindow._port))
+            # self.socket.bind(("127.0.0.1", PopoutWindow._port))
 
             if getattr(sys, "frozen", False):
                 Popen(f"\"{sys.executable}\" popout {PopoutWindow._port}")
             else:
                 Popen(f"py -3.12 ./GraphicsEngine/ui_library.py popout {PopoutWindow._port}")
-            self.socket.listen(1)
-            self.connection, self.conn_addr = self.socket.accept()
+            # self.socket.listen(1)
+            self.connection, self.conn_addr = PopoutWindow._server.accept()
             # self.socket.setblocking(False)
             self.conn = Stockings.Stocking(self.connection)
             
-            PopoutWindow._port += 1
-            if PopoutWindow._port > 25565:
-                PopoutWindow._port = 12345
+            # PopoutWindow._port += 1
+            # if PopoutWindow._port > 25565:
+            #     PopoutWindow._port = 12345
             
-            while not self.conn.handshakeComplete: pass
-            
-            self.conn.write(json.dumps(data))
+            def break_off():
+                while not self.conn.handshakeComplete: pass
+                self.ready = True
+                self.conn.write(json.dumps(data))
+                
+            t = Thread(target=break_off)
+            t.daemon = True
+            t.start()
 
         else:
             # This branch is run in the sub-process
@@ -2891,43 +2901,46 @@ class PopoutWindow(UIElement):
             }
 
             self.editor.add_layer(5, self.frame)
-
-            for name, comp in content["components"].items():
-                if comp["type"] in PopoutElement._elements:
-                    comps.update({name: PopoutElement._elements[comp["type"]](*comp.get("args", []), **comp.get("kwargs", {}))})
-            
-            for link in content["links"]:
-                link: dict
-                # print(f"creating link: {link}")
-                if "link_handler" in link:
-                    e = link.pop("link_handler")
-                    # ctx = {
-                    #     "parent": comps[link["parent"]]
-                    #     "child": comps[link["child"]]
-                    # }
-                    l = lambda a: safe_eval(e, {"a": a})
-                else:
-                    l = lambda a: a
-                self.children.append(
-                    Link(
-                        comps[link.pop("parent")],
-                        comps[link.pop("child")],
-                        **link,
-                        link_handler = l
-                    )
-                )
+            if "behavior" in content:
+                self.preset = PopoutBehaviorPreset(content["behavior"], content["data"])
+            else:
+                for name, comp in content["components"].items():
+                    if comp["type"] in PopoutElement._elements:
+                        comps.update({name: PopoutElement._elements[comp["type"]](*comp.get("args", []), **comp.get("kwargs", {}))})
                 
-            self.components = comps
+                for link in content["links"]:
+                    link: dict
+                    # print(f"creating link: {link}")
+                    if "link_handler" in link:
+                        e = link.pop("link_handler")
+                        # ctx = {
+                        #     "parent": comps[link["parent"]]
+                        #     "child": comps[link["child"]]
+                        # }
+                        l = lambda a: safe_eval(e, {"a": a})
+                    else:
+                        l = lambda a: a
+                    self.children.append(
+                        Link(
+                            comps[link.pop("parent")],
+                            comps[link.pop("child")],
+                            **link,
+                            link_handler = l
+                        )
+                    )
+                    
+                self.components = comps
 
-            self.editor.add_layer(0, self)
-            
-            for layer, objs in content["editor_layers"].items():
-                self.editor.add_layer(int(layer), *[comps[name] for name in objs])
+                self.editor.add_layer(0, self)
+                
+                for layer, objs in content["editor_layers"].items():
+                    self.editor.add_layer(int(layer), *[comps[name] for name in objs])
             
             self.editor.run()
 
     def _event(self, editor, X, Y):
-        if self.closed: pass
+        if not self.ready: return
+        if self.closed: return
         if self.ctx == "child":
             for c in self.children:
                 c._event(editor, X, Y)

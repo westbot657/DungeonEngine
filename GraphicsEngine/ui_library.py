@@ -2780,6 +2780,33 @@ class CodeEditor(UIElement):
         elif self.active_app == "editor":
             self.editor_app._event(editor, X, Y)
 
+
+class PopoutBehaviorPreset(UIElement):
+    def __init__(self, preset:str, data):
+        self.preset = preset
+        self.children = []
+        
+        match preset:
+            case "file-editor":
+                ...
+            case "":
+                ...
+
+
+    def _event(self, editor, X, Y):
+        for child in self.children[::-1]:
+            child._event(editor, X, Y)
+
+    def _update(self, editor, X, Y):
+        for child in self.children:
+            child._update(editor, X, Y)
+
+
+    def file_editor_window_close_event(self):
+        ...
+
+
+
 class PopoutWindow(UIElement):
     _windows = []
     _port = 12345

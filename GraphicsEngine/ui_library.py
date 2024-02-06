@@ -1935,8 +1935,8 @@ class Opener:
             except BrokenPipeError:
                 self.closed = True
         p._event = p_event
-            
-            
+
+
 
 class FileEditorSubApp(UIElement):
     

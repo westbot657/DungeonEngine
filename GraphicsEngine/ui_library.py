@@ -2815,7 +2815,7 @@ class PopoutBehaviorPreset(UIElement):
 
 class PopoutWindow(UIElement):
     _windows = []
-    _port = 25560
+    _port = 25555
     _init = False
     _server = None
     
@@ -2877,7 +2877,6 @@ class PopoutWindow(UIElement):
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             # print(f"client connecting with port: {content["PORT"]}")
             self.socket.connect(("127.0.0.1", content["PORT"]))
-            
             
             self.conn = Stockings.Stocking(self.socket)
             

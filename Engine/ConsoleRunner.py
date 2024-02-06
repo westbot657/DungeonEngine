@@ -8,9 +8,13 @@ from typing import Any
 # from pydub.playback import play
 import simpleaudio as sa
 import importlib
+import time
 from importlib.machinery import SourceFileLoader
 # import glob
 
+import socket
+from Stockings import Stocking
+import random
 
 from Engine import Engine
 
@@ -27,6 +31,10 @@ except ImportError as e:
             self.print_queue = []
             self.engine = None
             self.running = False
+            self._server = None
+            self.server = None
+            self._server_running = False
+            self.connections = []
 
         def init(self, engine):
             self.engine = engine
@@ -45,8 +53,6 @@ except ImportError as e:
 
                         # audio = AudioSegment.from_file(text) + VOLUME_MOD
 
-                        
-
                 elif target in [2, 3, 4]:
                     pass
                 elif target == "log":
@@ -63,6 +69,23 @@ except ImportError as e:
             i.daemon = True
             i.start()
 
+        def accepter(self, conn, addr):
+            c = Stocking(conn)
+            t = time.time()
+            
+            while not c.handshakeComplete:
+                if t + 10 < time.time():
+                    print(f"\033[38;2;240;130;130mConnection from \033[0m{addr} \033[38;2;240;130;130mtimed out before fully connected\033[0m")
+                    return
+            self.connections.append(c)
+            print(f"\033[38;2;130;250;130mConnection from \033[0m{addr} \033[38;2;130;250;130maccepted!\033[0m")
+
+        def connect_loop(self):
+            while self.running:
+                conn, addr = self._server.accept()
+                acc = Thread(target=self.accepter, args=(conn, addr))
+                acc.daemon = True
+                acc.start()
 
         def _input_loop(self):
             while self.running:
@@ -72,10 +95,31 @@ except ImportError as e:
                     player_id = int(d["player_id"])
                     txt = text.replace(d["targeter"], "")
                     self.engine.handleInput(player_id, txt)
+                    
+                elif m := re.match(r"/server (?P<port>\d{5})?", text):
+                    d = m.groupdict()
+                    port = min(max(1000, int(d.get("port", random.randint(10000, 25560)))), 25565)
+                    self._server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    self._server.bind(("127.0.0.1", port))
+                    self._server.listen(5)
+                    self._server_running = True
+                    cl = Thread(target=self.connect_loop)
+                    cl.daemon = True
+                    cl.start()
+                    
+        
+        
 
 
 if __name__ == "__main__":
     # from Engine import Engine
-    io_hook = IOHook()
-    game_engine = Engine(io_hook)  # pylint: disable=[not-callable]
-    game_engine.start()
+    
+    argv = sys.argv[1:]
+    
+    if argv:
+        host, port = argv
+        ...
+    else:    
+        io_hook = IOHook()
+        game_engine = Engine(io_hook)  # pylint: disable=[not-callable]
+        game_engine.start()

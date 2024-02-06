@@ -71,8 +71,14 @@ if platform.system() == "Darwin":
         if window_info_list:
             window_info = window_info_list[0]
             bounds = window_info[CoreGraphics.kCGWindowBounds]
-            x, y = bounds[CoreGraphics.kCGWindowBoundsX], bounds[CoreGraphics.kCGWindowBoundsY]
-            return x, y
+            success, egg = CoreGraphics.CGRectMakeWithDictionaryRepresentation(bounds, None)
+            # return {egg.origin.x, egg.origin.y if success else None}
+            if success:
+                return egg.origin.x, egg.origin.y
+            return None
+            #
+            # x, y = bounds[CoreGraphics.kCGWindowBoundsX], bounds[CoreGraphics.kCGWindowBoundsY]
+            # return x, y
         else:
             return None
 

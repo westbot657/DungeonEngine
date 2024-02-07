@@ -2788,20 +2788,51 @@ class CodeEditor(UIElement):
 
 
 class PopoutBehaviorPreset(UIElement):
-    def __init__(self, preset:str, data):
+    def __init__(self, preset:str, data, popout, editor):
         self.preset = preset
         self.children = []
         
         match preset:
             case "file-editor":
-                ...
+                self.text_editor = NumberedTextArea(5, 21, 240, 208)
+                self.children.append(self.text_editor)
+
+                self.file_path = data["file_path"]
+
+                def _update_layout(editor):
+                    self.text_editor.width = editor.width = min(max(300, editor.width), 1920)
+                    self.self.text_editor.height = editor.height = min(max(250, editor.height), 1080)
+                
+                def on_save(_, content, __, ___):
+                    with open(self.file_path, "w+", encoding="utf-8") as f:
+                        f.write(content)
+                    popout.send(json.dumps({"event": "save"}))
+
+                def on_close():
+                    with open(self.file_path, "r+", encoding="utf-8") as f:
+                        if self.text_editor.editable.get_content() == f.read():
+                            popout.send(json.dumps({"event": "close"}))
+                            popout.
+                        else:
+
+
+                self._update_layout = _update_layout
+                self.text_editor.editable.on_save(on_save)
+
+
             case "":
                 ...
 
 
+    def _update_layout(self, editor): # pylint: disable=method-hidden
+        pass
+
     def _event(self, editor, X, Y):
+        self._update_layout(editor)
+
         for child in self.children[::-1]:
             child._event(editor, X, Y)
+        
 
     def _update(self, editor, X, Y):
         for child in self.children:
@@ -2996,8 +3027,9 @@ class PopoutWindow(UIElement):
 
     def close(self): # This method can only be called from the main process
         self.conn.write("%close%")
-        
-        #self.conn.close()
+        while self.conn.writeDataQueued(): pass
+        self.conn.close()
+
 
 class IOHook:
 

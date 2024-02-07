@@ -1910,37 +1910,37 @@ class Opener:
         elif n in self.sub_app.tabs:
             ...
 
-        p = PopoutWindow((300, 200), POPOUTS["text-editor"], window_title=n.strip())
+        p = PopoutWindow((300, 200), {"behavior": "file-editor", "data": {"file_path": self.file_path}}, window_title=n.strip())
         self.sub_app.popouts.update({n: p})
         
-        with open(self.file_path, "r+", encoding="utf-8") as f:
-            content = f.read()
+        # with open(self.file_path, "r+", encoding="utf-8") as f:
+        #     content = f.read()
 
-        p.send(
-            PopoutInterface()
-            .cmd().component("text_edit").method("set_content").param(content).call()
-            .end()
-        )
-        p.send(
-            PopoutInterface()
-            .event(PopoutInterface.Event.WINDOW_CLOSED).component("text_edit").method("get_content").call()
-            .end()
-        )
+        # p.send(
+        #     PopoutInterface()
+        #     .cmd().component("text_edit").method("set_content").param(content).call()
+        #     .end()
+        # )
+        # p.send(
+        #     PopoutInterface()
+        #     .event(PopoutInterface.Event.WINDOW_CLOSED).component("text_edit").method("get_content").call()
+        #     .end()
+        # )
         
-        def p_event(s, editor, X, Y):
-            try:
-                if io := s.conn.read():
-                    if io.startswith("{"):
-                        data = json.loads(io)
-                        if "event-return-WINDOW_CLOSED" in data:
-                            content = data["event-return-WINDOW_CLOSED"]
-                            s.send("%close%")
-                            with open(self.file_path, "w+", encoding="utf-8") as f:
-                                f.write(content)
+        # def p_event(s, editor, X, Y):
+        #     try:
+        #         if io := s.conn.read():
+        #             if io.startswith("{"):
+        #                 data = json.loads(io)
+        #                 if "event-return-WINDOW_CLOSED" in data:
+        #                     content = data["event-return-WINDOW_CLOSED"]
+        #                     s.send("%close%")
+        #                     with open(self.file_path, "w+", encoding="utf-8") as f:
+        #                         f.write(content)
                 
-            except BrokenPipeError:
-                self.closed = True
-        p._event = p_event
+        #     except BrokenPipeError:
+        #         self.closed = True
+        # p._event = p_event
 
 
 
@@ -2817,7 +2817,7 @@ class PopoutBehaviorPreset(UIElement):
 
                 def _update_layout(editor):
                     self.text_editor.width = editor.width = min(max(300, editor.width), 1920)
-                    self.self.text_editor.height = editor.height = min(max(250, editor.height), 1080)
+                    self.text_editor.height = editor.height = min(max(250, editor.height), 1080)
                 
                 def on_save(_, content, __, ___):
                     with open(self.file_path, "w+", encoding="utf-8") as f:
@@ -2831,10 +2831,28 @@ class PopoutBehaviorPreset(UIElement):
                             popout.close()
                         else:
                             self.popup.popup()
+                
+                def on_cancel(*_, **__):
+                    self.popup.close()
+                
+                def on_save_exit(*_, **__):
+                    with open(self.file_path, "w+", encoding="utf-8") as f:
+                        f.write(self.text_editor.editable.get_content())
+                    popout.send(json.dumps({"event": "close"}))
+                    popout.close()
+                    exit()
+                    
+                def on_exit(*_, **__):
+                    popout.send(json.dumps({"event": "close"}))
+                    popout.close()
+                    exit()
 
 
                 self._update_layout = _update_layout
                 self.text_editor.editable.on_save(on_save)
+                self._popup_cancel.on_left_click = on_cancel
+                self._popup_save.on_left_click = on_save_exit
+                self._popup_exit.on_left_click = on_exit
 
 
             case "":

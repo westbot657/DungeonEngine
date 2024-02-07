@@ -19,7 +19,7 @@ import random
 from Engine import Engine
 
 
-os.system('') # this fixes console ansi colors for some reason # NOTE: comment out when compiling VS version, it causes Windows 10 to think the exe is a virus
+os.system('') # this fixes console ansi colors for some reason # NOTE: comment out when compiling VS version, it causes Windows to think the exe is a virus
 
 try:
     _IOHook = SourceFileLoader("IOHook", "./IOHook.py").load_module() # pylint: disable=no-value-for-parameter
@@ -145,7 +145,7 @@ if __name__ == "__main__":
         host, port = argv
         
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print(f"Connecting to server\r")
+        print(f"Connecting to server", end="\r")
         try:
             sock.connect((host, int(port)))
         except Exception as e:
@@ -155,10 +155,10 @@ if __name__ == "__main__":
         conn = Stocking(sock)
 
         dots = 0
-        print("                    \r")
+        print("                    ", end="\r")
         while not conn.handshakeComplete:
             print(f"Connecting{'.'*dots}", end="\r")
-            time.sleep(0.5)
+            time.sleep(0.25)
             dots += 1
             if dots > 3:
                 dots = 0

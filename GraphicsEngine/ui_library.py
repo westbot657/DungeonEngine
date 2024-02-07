@@ -505,10 +505,10 @@ class Popup(UIElement):
     _popup = None
     tick = 0
     
-    def __init__(self, width:int, height:int):
+    def __init__(self, width:int, height:int, children=...):
         self.width = width
         self.height = height
-        self.children = []
+        self.children = [] if children is ... else children
         self.mask = Button(0, 20, 1, 1, "", (0, 0, 0, 127), hover_color=(0, 0, 0, 127))
         self.mask.on_left_click = self._mask_on_click
         self.bg = Button(0, 0, self.width, self.height, bg_color=(24, 24, 24), hover_color=(24, 24, 24))
@@ -2796,6 +2796,22 @@ class PopoutBehaviorPreset(UIElement):
             case "file-editor":
                 self.text_editor = NumberedTextArea(5, 21, 240, 208)
                 self.children.append(self.text_editor)
+                
+                self._popup_save_label = Text(0, 100, content="You have unsaved changes!")
+                self._popup_save_label.x = 125 - (self._popup_save_label.width/2)
+                
+                self._popup_cancel = Button(0, 175, -1, text="Cancel", text_size=13)
+                self._popup_save = Button(100, 175, -1, text="Save & Close", text_size=13)
+                self._popup_exit = Button(200, 175, -1, text="Close anyways", text_size=13)
+                
+                overall_width = self._popup_cancel.width + 10 + self._popup_save.width + 10 + self._popup_exit.width
+                self._popup_cancel.x = 125 - (overall_width/2)
+                self._popup_save.x = self._popup_cancel.x + self._popup_cancel.width + 10
+                self._popup_exit.x = self._popup_save.x + self._popup_save.width + 10
+                
+                self.popup = Popup(250, 175, [
+                    self._popup_save_label
+                ])
 
                 self.file_path = data["file_path"]
 
@@ -2812,8 +2828,9 @@ class PopoutBehaviorPreset(UIElement):
                     with open(self.file_path, "r+", encoding="utf-8") as f:
                         if self.text_editor.editable.get_content() == f.read():
                             popout.send(json.dumps({"event": "close"}))
-                            popout.
+                            popout.close()
                         else:
+                            self.popup.popup()
 
 
                 self._update_layout = _update_layout
@@ -2932,7 +2949,8 @@ class PopoutWindow(UIElement):
 
             self.editor.add_layer(5, self.frame)
             if "behavior" in content:
-                self.preset = PopoutBehaviorPreset(content["behavior"], content["data"])
+                self.preset = PopoutBehaviorPreset(content["behavior"], content["data"], self.editor, self)
+                self.children.append(self.preset)
             else:
                 for name, comp in content["components"].items():
                     if comp["type"] in PopoutElement._elements:

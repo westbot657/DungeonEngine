@@ -2,6 +2,8 @@
 # (C) Weston Day
 # pygame UI Library
 
+import os
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 import pygame
 from pygame.time import Clock
 
@@ -11,7 +13,6 @@ from mergedeep import merge
 import time
 import json
 import re
-import os
 import sys
 import random
 import Stockings
@@ -1897,7 +1898,7 @@ class Opener:
         self.file_tabs.active_tab = n
         self.file_tabs.reset_tab_colors()
         self.focused_file = file_path
-        
+
     def rmb_click(self, *_, **__):
         self.ctx_tree.openAtMouse(self.editor)
 

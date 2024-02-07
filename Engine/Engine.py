@@ -139,10 +139,15 @@ class Engine:
     def start(self):
         if not self.thread_running:
             t = Thread(target=self._main_loop_threaded)
-            t.daemon = True
+            # t.daemon = True # don't enable this, otherwise the main process ends, taking the engine with it
             self.thread_running = True
             self.running = True
             t.start()
+    
+    def run(self):
+        self.running = True
+        self.thread_running = True
+        self._main_loop_threaded()
 
     def stop(self):
         if self.running:

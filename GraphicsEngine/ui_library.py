@@ -82,6 +82,9 @@ if platform.system() == "Darwin":
         else:
             return None
 
+    def macOSfocusWindow(window_name:str):
+        ...
+
 from pygame._sdl2.video import Window, Texture # pylint: disable=no-name-in-module
 
 # import components
@@ -599,6 +602,7 @@ class Editor:
         self._hovering = None
         self._hovering_ctx_tree = False
         self._listeners = {}
+        self._caption = "Insert Dungeon Name Here"
         self.unicodes = {
             pygame.K_UP: "$↑",
             pygame.K_DOWN: "$↓",
@@ -658,9 +662,10 @@ class Editor:
             self.layers[layer].append(c)
 
     def run(self):
+        print(f"making window of size: ({self.width}, {self.height})")
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME) # pylint: disable=no-member
         pygame.display.set_icon(pygame.image.load(f"{PATH}/dungeon_game_icon.png"))
-        pygame.display.set_caption("Insert Dungeon Name Here")
+        pygame.display.set_caption(self._caption)
         self.clock = Clock()
 
         while self.running:
@@ -1868,12 +1873,10 @@ class Opener:
         n = "  " + file_path.replace("./Dungeons/", "") + "   " #"  " + file_path.rsplit("/", 1)[-1] + "   "
 
         if n in self.popouts.keys():
-            self.popouts[n].send(
-                PopoutInterface()
-                .cmd().component("text_edit").attr("editable").method("get_content").call().return_result().end()
-            )
+            self.popouts[n].send("%close%")
             content = self.popouts[n].await_read()
             self.popouts[n].close()
+            self.popouts.pop(n)
 
         if file_path not in self.open_files.keys():
             new = {file_path: FileEditor(329, 41, editor.width-329, editor.height-62, file_path, file_path.rsplit("/", 1)[-1], editor)}
@@ -1904,13 +1907,21 @@ class Opener:
         n = "  " + self.file_path.replace("./Dungeons/", "") + "   "
 
         if n in self.sub_app.popouts:
-            # TODO: bring popout window to top
-            return
+            if self.sub_app.popouts[n].closed:
+                self.sub_app.popouts.pop(n)
+            else:
+                self.sub_app.popouts[n].send("%focus%")
+                # TODO: bring popout window to top
+                return
 
         elif n in self.sub_app.tabs:
-            ...
+            self.sub_app.open_files.pop(self.file_path)
+            self.sub_app.file_tabs.remove_tab(n)
+            self.sub_app.tabs.remove(n)
+            
+            # print(f"{tab}  {dir(tab)}")
 
-        p = PopoutWindow((300, 200), {"behavior": "file-editor", "data": {"file_path": self.file_path}}, window_title=n.strip())
+        p = PopoutWindow((400, 300), {"behavior": "file-editor", "data": {"file_path": self.file_path}}, window_title=n.strip())
         self.sub_app.popouts.update({n: p})
         
         # with open(self.file_path, "r+", encoding="utf-8") as f:
@@ -1941,8 +1952,6 @@ class Opener:
         #     except BrokenPipeError:
         #         self.closed = True
         # p._event = p_event
-
-
 
 class FileEditorSubApp(UIElement):
     
@@ -2786,38 +2795,47 @@ class CodeEditor(UIElement):
         elif self.active_app == "editor":
             self.editor_app._event(editor, X, Y)
 
-
 class PopoutBehaviorPreset(UIElement):
-    def __init__(self, preset:str, data, popout, editor):
+    def __init__(self, preset:str, data, editor, popout):
         self.preset = preset
         self.children = []
         
         match preset:
             case "file-editor":
+                w = 300
+                h = 200
+                popout.frame.window_limits = [400, 300, 1920, 1080]
                 self.text_editor = NumberedTextArea(5, 21, 240, 208)
                 self.children.append(self.text_editor)
                 
                 self._popup_save_label = Text(0, 100, content="You have unsaved changes!")
-                self._popup_save_label.x = 125 - (self._popup_save_label.width/2)
+                self._popup_save_label.x = (w/2) - (self._popup_save_label.width/2)
                 
                 self._popup_cancel = Button(0, 175, -1, text="Cancel", text_size=13)
                 self._popup_save = Button(100, 175, -1, text="Save & Close", text_size=13)
                 self._popup_exit = Button(200, 175, -1, text="Close anyways", text_size=13)
                 
                 overall_width = self._popup_cancel.width + 10 + self._popup_save.width + 10 + self._popup_exit.width
-                self._popup_cancel.x = 125 - (overall_width/2)
+                self._popup_cancel.x = (w/2) - (overall_width/2)
                 self._popup_save.x = self._popup_cancel.x + self._popup_cancel.width + 10
                 self._popup_exit.x = self._popup_save.x + self._popup_save.width + 10
                 
-                self.popup = Popup(250, 175, [
-                    self._popup_save_label
+                self.popup = Popup(w, h, [
+                    self._popup_save_label,
+                    self._popup_cancel,
+                    self._popup_save,
+                    self._popup_exit
                 ])
 
                 self.file_path = data["file_path"]
+                
+                with open(self.file_path, "r+", encoding="utf-8") as f:
+                    self.text_editor.set_content(f.read())
 
-                def _update_layout(editor):
+                def _update_layout(*_, **__):
                     self.text_editor.width = editor.width = min(max(300, editor.width), 1920)
                     self.text_editor.height = editor.height = min(max(250, editor.height), 1080)
+                    self.text_editor._update_layout()
                 
                 def on_save(_, content, __, ___):
                     with open(self.file_path, "w+", encoding="utf-8") as f:
@@ -2828,9 +2846,12 @@ class PopoutBehaviorPreset(UIElement):
                     with open(self.file_path, "r+", encoding="utf-8") as f:
                         if self.text_editor.editable.get_content() == f.read():
                             popout.send(json.dumps({"event": "close"}))
-                            popout.close()
+                            # popout.close()
+                            exit()
                         else:
                             self.popup.popup()
+                
+                editor.add_event_listener("WINDOW_CLOSED", on_close)
                 
                 def on_cancel(*_, **__):
                     self.popup.close()
@@ -2853,14 +2874,15 @@ class PopoutBehaviorPreset(UIElement):
                 self._popup_cancel.on_left_click = on_cancel
                 self._popup_save.on_left_click = on_save_exit
                 self._popup_exit.on_left_click = on_exit
+                
 
 
             case "":
                 ...
 
 
-    def _update_layout(self, editor): # pylint: disable=method-hidden
-        pass
+    # def _update_layout(self, editor): # pylint: disable=method-hidden
+    #     pass
 
     def _event(self, editor, X, Y):
         self._update_layout(editor)
@@ -2958,8 +2980,11 @@ class PopoutWindow(UIElement):
             content = data["content"]
             size = data["size"]
             
+            print(f"{size=}")
             self.editor = Editor(None, None, *size)
-            self.frame = WindowFrame(*size, self.editor, content.get("window_limits", ...), title=content.get("window_title", ""))
+            self.window_title = content.get("window_title", "")
+            self.editor._caption = self.window_title
+            self.frame = WindowFrame(*size, self.editor, content.get("window_limits", ...), title=self.window_title)
             comps = {
                 "editor": self.editor,
                 "frame": self.frame
@@ -2967,8 +2992,11 @@ class PopoutWindow(UIElement):
 
             self.editor.add_layer(5, self.frame)
             if "behavior" in content:
+                print(f"Using behavior preset! ({content})")
                 self.preset = PopoutBehaviorPreset(content["behavior"], content["data"], self.editor, self)
                 self.children.append(self.preset)
+                
+                self.editor.add_layer(0, self)
             else:
                 for name, comp in content["components"].items():
                     if comp["type"] in PopoutElement._elements:
@@ -3005,10 +3033,10 @@ class PopoutWindow(UIElement):
             self.editor.run()
 
     def _event(self, editor, X, Y):
-        if not self.ready: return
+        if (self.ctx == "parent") and (not self.ready): return
         if self.closed: return
         if self.ctx == "child":
-            for c in self.children:
+            for c in self.children[::-1]:
                 c._event(editor, X, Y)
         try:
             if io := self.conn.read():
@@ -3019,11 +3047,23 @@ class PopoutWindow(UIElement):
                         self.conn.close()
                         pygame.quit()
                         exit()
+                    elif io == "%focus%":
+                        if platform.system() == "Windows":
+                            try:
+                                window = gw.getWindowsWithTitle(self.window_title)[0]
+                                # window.activate()
+                                window.alwaysOnTop(True)
+                                window.alwaysOnTop(False)
+                            except: pass
+                        elif platform.system() == "Darwin":
+                            macOSfocusWindow(self.window_title)
+                    
                     elif io.startswith("{"):
                         data = json.loads(io)
-                        for key, val in data.items():
-                            if key == "interface-cmd":
-                                PopoutInterface.execute(val, self.components, self)
+                        print(f"recieved data: {data}")
+                    #     for key, val in data.items():
+                    #         if key == "interface-cmd":
+                    #             PopoutInterface.execute(val, self.components, self)
         except BrokenPipeError:
             if self.ctx == "parent":
                 self.closed = True
@@ -3032,7 +3072,9 @@ class PopoutWindow(UIElement):
                 exit()
 
     def _update(self, editor, X, Y):
-        pass
+        if self.ctx == "child":
+            for child in self.children:
+                child._update(editor, X, Y)
     
     def send(self, data):
         if not self.closed:
@@ -3063,9 +3105,14 @@ class PopoutWindow(UIElement):
 
     def close(self): # This method can only be called from the main process
         self.conn.write("%close%")
-        while self.conn.writeDataQueued(): pass
-        self.conn.close()
-
+        try:
+            while self.conn.writeDataQueued(): pass
+        except OSError:
+            pass
+        try:
+            self.conn.close()
+        except OSError:
+            pass
 
 class IOHook:
 

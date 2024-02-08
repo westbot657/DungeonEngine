@@ -3204,13 +3204,13 @@ class IOHook:
                 text = t[3+len(lang or ""):-3]
 
                 if lang == "json":
-                    return FileEditor.json_colors(None, text)
+                    return FileEditor.json_colors(text)
                 
                 elif lang == "md":
-                    return FileEditor.md_colors(None, text)
+                    return FileEditor.md_colors(text)
                 
                 elif lang in ["ds", "dungeon_script"]:
-                    return FileEditor.ds_colors(None, text)
+                    return FileEditor.ds_colors(text)
                 
                 elif lang == "less":
                     return self.color_text(text)

@@ -107,7 +107,7 @@ try:
     from GraphicsEngine.MultilineTextBox import MultilineTextBox
     from GraphicsEngine.Geometry import Box, Polygon, Poly3D
     from GraphicsEngine.Organizers import LayeredObjects, Draggable, Resizable, Tie, Link
-    from GraphicsEngine.FunctionalElements import Button, Tabs, Scrollable, Collapsable
+    from GraphicsEngine.FunctionalElements import Button, BorderedButton, Tabs, Scrollable, Collapsable
     from GraphicsEngine.NumberedTextArea import NumberedTextArea
     from GraphicsEngine.PopoutInterface import PopoutInterface
 except ImportError:
@@ -128,7 +128,7 @@ except ImportError:
     from MultilineTextBox import MultilineTextBox
     from Geometry import Box, Polygon, Poly3D
     from Organizers import LayeredObjects, Draggable, Resizable, Tie, Link
-    from FunctionalElements import Button, Tabs, Scrollable, Collapsable
+    from FunctionalElements import Button, BorderedButton, Tabs, Scrollable, Collapsable
     from NumberedTextArea import NumberedTextArea
     from PopoutInterface import PopoutInterface
 
@@ -663,14 +663,14 @@ class Editor:
             self.layers[layer].append(c)
 
     def run(self):
-        print(f"making window of size: ({self.width}, {self.height})")
+        # print(f"making window of size: ({self.width}, {self.height})")
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME) # pylint: disable=no-member
         pygame.display.set_icon(pygame.image.load(f"{PATH}/dungeon_game_icon.png"))
         pygame.display.set_caption(self._caption)
         self.clock = Clock()
 
         while self.running:
-            self.clock.tick(60)
+            self.clock.tick(120)
             self.screen.fill((24, 24, 24))
             self.previous_keys = self.keys.copy()
             self.previous_mouse = self.mouse
@@ -1656,7 +1656,8 @@ class FileEditor(UIElement):
         with open(self.file_location, "w+", encoding="utf-8") as f:
             f.write(content)
 
-    def json_colors(self, text:str) -> str:
+    @staticmethod
+    def json_colors(text:str) -> str:
 
         def repl(match:re.Match) -> str:
             t = match.group()
@@ -1680,7 +1681,8 @@ class FileEditor(UIElement):
 
         return re.sub(r"((?:\"(?:\\.|[^\"\\])*\":)|(?:\"(?:\\.|[^\"\\])*\")|\d+(\.\d+)?|\b(true|false|null)\b)", repl, text)
 
-    def ds_colors(self, text:str) -> str:
+    @staticmethod
+    def ds_colors(text:str) -> str:
 
         def repl(match:re.Match) -> str:
             t = match.group()
@@ -1735,7 +1737,8 @@ class FileEditor(UIElement):
             
         return re.sub(r"(\/\*(?:\\.|\*[^/]|[^*])*\*\/|\/\/.*|(?:\"(?:\\.|[^\"\\])*\"|\'(?:\\.|[^\'\\])*\')|\[[^:]+:[^\]]+\]|[a-zA-Z_][a-zA-Z0-9_]* *\(|<=|>=|<<|>>|==|!=|<[^>]+>|@[^:]+:|\$[a-zA-Z_0-9]+|\d+(?:\.\d+)?|\b(and|if|or|not|elif|else|not|return|break|pass|for|in)\b|#|%)", repl, text)
 
-    def md_colors(self, text:str) -> str:
+    @staticmethod
+    def md_colors(text:str) -> str:
 
         text = re.sub(r"(?<=\n)( *#{1,6}.*)", "\033[38;2;86;156;214m\\1\033[0m", text)
         text = re.sub(r"(?<=\n)( *-(?!-))", "\033[38;2;103;150;230m\\1\033[0m", text)
@@ -2806,15 +2809,24 @@ class PopoutBehaviorPreset(UIElement):
                 w = 300
                 h = 200
                 popout.frame.window_limits = [400, 300, 1920, 1080]
+                self.file_path = data["file_path"]
                 self.text_editor = NumberedTextArea(5, 21, 240, 208)
                 self.children.append(self.text_editor)
+                
+                match self.file_path.rsplit(".", 1)[-1]:
+                    case "json"|"piskel":
+                        self.text_editor.editable.color_text = FileEditor.json_colors
+                    case "ds"|"dungeon_script"|"dse":
+                        self.text_editor.editable.color_text = FileEditor.ds_colors
+                    case "md":
+                        self.text_editor.editable.color_text = FileEditor.md_colors
                 
                 self._popup_save_label = Text(0, 100, content="You have unsaved changes!")
                 self._popup_save_label.x = (w/2) - (self._popup_save_label.width/2)
                 
-                self._popup_cancel = Button(0, 175, -1, text="Cancel", text_size=13)
-                self._popup_save = Button(100, 175, -1, text="Save & Close", text_size=13)
-                self._popup_exit = Button(200, 175, -1, text="Close anyways", text_size=13)
+                self._popup_cancel = BorderedButton(0, 175, -1, text="Cancel", text_size=13)
+                self._popup_save = BorderedButton(100, 175, -1, text="Save & Close", text_size=13)
+                self._popup_exit = BorderedButton(200, 175, -1, text="Close anyways", text_size=13)
                 
                 overall_width = self._popup_cancel.width + 10 + self._popup_save.width + 10 + self._popup_exit.width
                 self._popup_cancel.x = (w/2) - (overall_width/2)
@@ -2828,7 +2840,6 @@ class PopoutBehaviorPreset(UIElement):
                     self._popup_exit
                 ])
 
-                self.file_path = data["file_path"]
                 
                 with open(self.file_path, "r+", encoding="utf-8") as f:
                     self.text_editor.set_content(f.read())
@@ -2875,8 +2886,6 @@ class PopoutBehaviorPreset(UIElement):
                 self._popup_cancel.on_left_click = on_cancel
                 self._popup_save.on_left_click = on_save_exit
                 self._popup_exit.on_left_click = on_exit
-                
-
 
             case "":
                 ...
@@ -2899,8 +2908,6 @@ class PopoutBehaviorPreset(UIElement):
 
     def file_editor_window_close_event(self):
         ...
-
-
 
 class PopoutWindow(UIElement):
     _windows = []

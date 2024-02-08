@@ -3,7 +3,7 @@
 from UIElement import UIElement
 from RenderPrimitives import Color, Image, Animation
 from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE, \
-    FONT, SCROLL_MULTIPLIER
+    FONT, SCROLL_MULTIPLIER, TEXT_BG2_COLOR, TEXT_BG3_COLOR
 from EditorMimic import EditorMimic
 from Organizers import Draggable
 from Util import PopoutElement
@@ -31,7 +31,7 @@ class Button(UIElement):
             self._parent = parent
             self.screen = parent.surface
 
-    def __init__(self, x:int, y:int, width:int, height:int|None=None, text:str="", bg_color:Color|Image|tuple|int|None=TEXT_BG_COLOR, text_color:Color|tuple|int=TEXT_COLOR, text_size:int=TEXT_SIZE, hover_color:tuple|list|Color=TEXT_BG_COLOR, click_color:tuple|list|Color=TEXT_BG_COLOR):
+    def __init__(self, x:int, y:int, width:int, height:int|None=None, text:str="", bg_color:Color|Image|tuple|int|None=TEXT_BG_COLOR, text_color:Color|tuple|int=TEXT_COLOR, text_size:int=TEXT_SIZE, hover_color:tuple|list|Color=TEXT_BG2_COLOR, click_color:tuple|list|Color=TEXT_BG2_COLOR):
         self.x = x
         self.y = y
         self.width = width
@@ -152,6 +152,32 @@ class Button(UIElement):
     def off_right_click(self, editor, *_, **__): ... # pylint: disable=unused-argument
     def on_hover(self, editor, *_, **__): ... # pylint: disable=unused-argument
     def off_hover(self, editor, *_, **__): ... # pylint: disable=unused-argument
+
+@PopoutElement()
+class BorderedButton(Button):
+    def __init__(self, x:int, y:int, width:int, height:int|None=None, text:str="", bg_color:Color|Image|tuple|int|None=TEXT_BG_COLOR, text_color:Color|tuple|int=TEXT_COLOR, text_size:int=TEXT_SIZE, hover_color:tuple|list|Color=TEXT_BG2_COLOR, click_color:tuple|list|Color=TEXT_BG2_COLOR, border_thickness=1, border_color=TEXT_BG3_COLOR):
+        
+        self.border_thickness = border_thickness
+        self.border_color = border_color
+
+        super().__init__(x, y, width, height, text, bg_color, text_color, text_size, hover_color, click_color)
+        self.bx = x-border_thickness
+        self.by = y-border_thickness
+        self.bw = self.width+(2*border_thickness)
+        self.bh = self.height+(2*border_thickness)
+        
+        self.border = pygame.Surface((self.bw, self.bh), pygame.SRCALPHA, 32)
+        self.border.fill(border_color)
+        
+    
+    def _event(self, editor, X, Y):
+        super()._event(editor, X, Y)
+        self.bx = self.x - self.border_thickness
+        self.by = self.y - self.border_thickness
+        
+    def _update(self, editor, X, Y):
+        editor.screen.blit(self.border, (X+self.bx, Y+self.by))
+        super()._update(editor, X, Y)
 
 @PopoutElement()
 class Tabs(UIElement):

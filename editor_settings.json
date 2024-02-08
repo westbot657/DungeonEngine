@@ -2,6 +2,8 @@
     "text_size": 14,
     "text_color": [200, 200, 200],
     "text_bg_color": [24, 24, 24],
+    "text_bg2_color": [31, 31, 31],
+    "text_bg3_color": [100, 100, 100],
     "text_highlight": [0, 122, 204, 127],
     "icons": {
         "engine:object/weapon": "sword_icon",

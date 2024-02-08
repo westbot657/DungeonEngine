@@ -25,6 +25,8 @@ except ImportError:
 TEXT_SIZE = SETTINGS["text_size"]
 TEXT_COLOR = tuple(SETTINGS["text_color"])
 TEXT_BG_COLOR = tuple(SETTINGS["text_bg_color"])
+TEXT_BG2_COLOR = tuple(SETTINGS["text_bg2_color"])
+TEXT_BG3_COLOR = tuple(SETTINGS["text_bg3_color"])
 TEXT_HIGHLIGHT = tuple(SETTINGS["text_highlight"])
 TAB_SIZE = 4
 CURSOR_BLINK_TIME = 50

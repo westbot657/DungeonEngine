@@ -45,7 +45,7 @@ import pyautogui
 from screeninfo import get_monitors
 
 if platform.system() == "Darwin":
-    from Quartz import CoreGraphics # pylint: disable=import-error
+    from Quartz import CoreGraphics # pylint: disable=import-error # type: ignore
 
     def macOSsetWindow(x, y, width, height):
         # Get the frontmost window

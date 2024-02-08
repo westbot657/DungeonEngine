@@ -618,7 +618,7 @@ class Editor:
         self.typing = []
 
     def add_event_listener(self, event, listener):
-        print(f"ADDING EVENT: {event} :: {listener}")
+        # print(f"ADDING EVENT: {event} :: {listener}")
         if event not in self._listeners:
             self._listeners.update({event: []})
         
@@ -3022,7 +3022,7 @@ class PopoutWindow(UIElement):
             content = data["content"]
             size = data["size"]
             
-            print(f"{size=}")
+            # print(f"{size=}")
             self.editor = Editor(None, None, *size)
             self.window_title = content.get("window_title", "")
             self.editor._caption = self.window_title
@@ -3034,7 +3034,7 @@ class PopoutWindow(UIElement):
 
             self.editor.add_layer(5, self.frame)
             if "behavior" in content:
-                print(f"Using behavior preset! ({content})")
+                # print(f"Using behavior preset! ({content})")
                 self.preset = PopoutBehaviorPreset(content["behavior"], content["data"], self.editor, self)
                 self.children.append(self.preset)
                 
@@ -3102,7 +3102,7 @@ class PopoutWindow(UIElement):
                     
                     elif io.startswith("{"):
                         data = json.loads(io)
-                        print(f"recieved data: {data}")
+                        # print(f"recieved data: {data}")
                     #     for key, val in data.items():
                     #         if key == "interface-cmd":
                     #             PopoutInterface.execute(val, self.components, self)

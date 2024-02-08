@@ -47,7 +47,7 @@ from screeninfo import get_monitors
 if platform.system() == "Darwin":
     from Quartz import CoreGraphics # pylint: disable=import-error # type: ignore
 
-    def macOSsetWindow(x, y, width, height):
+    def macOSsetWindow(window_name:str, x:int, y:int, width:int, height:int):
         # Get the frontmost window
         frontmost_window = CoreGraphics.CGWindowListCopyWindowInfo(CoreGraphics.kCGWindowListOptionOnScreenOnly, CoreGraphics.kCGNullWindowID)
         frontmost_window = frontmost_window[0]
@@ -59,7 +59,7 @@ if platform.system() == "Darwin":
         CoreGraphics.CGWindowMove(window_id, (x, y))
         CoreGraphics.CGWindowResize(window_id, (width, height))
 
-    def macOSgetWindowPos():
+    def macOSgetWindowPos(window_name:str):
         # Get the frontmost window
         frontmost_window = CoreGraphics.CGWindowListCopyWindowInfo(CoreGraphics.kCGWindowListOptionOnScreenOnly, CoreGraphics.kCGNullWindowID)
         frontmost_window = frontmost_window[0]
@@ -92,7 +92,7 @@ from pygame._sdl2.video import Window, Texture # pylint: disable=no-name-in-modu
 try:
     from GraphicsEngine.Options import client_id, DO_RICH_PRESENCE, PATH, \
         FONT, SETTINGS, TEXT_SIZE, TEXT_COLOR, TEXT_BG_COLOR, \
-        TEXT_HIGHLIGHT, TAB_SIZE, POPOUTS
+        TEXT_HIGHLIGHT, TAB_SIZE, POPOUTS, TEXT_BG2_COLOR, TEXT_BG3_COLOR
     from GraphicsEngine.Util import expand_text_lists, \
         rotate, rotate3D, rotate3DV, \
         quad_to_tris, invert_tris, \
@@ -113,7 +113,7 @@ try:
 except ImportError:
     from Options import client_id, DO_RICH_PRESENCE, PATH, \
         FONT, SETTINGS, TEXT_SIZE, TEXT_COLOR, TEXT_BG_COLOR, \
-        TEXT_HIGHLIGHT, TAB_SIZE, POPOUTS
+        TEXT_HIGHLIGHT, TAB_SIZE, POPOUTS, TEXT_BG2_COLOR, TEXT_BG3_COLOR
     from Util import expand_text_lists, \
         rotate, rotate3D, rotate3DV, \
         quad_to_tris, invert_tris, \
@@ -131,8 +131,6 @@ except ImportError:
     from FunctionalElements import Button, BorderedButton, Tabs, Scrollable, Collapsable
     from NumberedTextArea import NumberedTextArea
     from PopoutInterface import PopoutInterface
-
-
 
 class fake_presence:
     def __init__(self, *_, **__): pass
@@ -601,9 +599,14 @@ class Editor:
         self._focused_object = None
         self._hovered = False
         self._hovering = None
+        self._hovering_last = None
+        self._hover_time = 0
         self._hovering_ctx_tree = False
         self._listeners = {}
         self._caption = "Insert Dungeon Name Here"
+        self._alt = None
+        self._alt_border = None
+        self._alt_pos = (0, 0)
         self.unicodes = {
             pygame.K_UP: "$↑",
             pygame.K_DOWN: "$↓",
@@ -623,12 +626,12 @@ class Editor:
 
     def set_window_location(self, new_x, new_y):
         if platform.system() in ["Windows", "Linux"]:
-            window = gw.getActiveWindow()
+            window = gw.getWindowsWithTitle(self._caption)[0]
             if window is not None:
                 window.moveTo(int(new_x), int(new_y))
                 window.resizeTo(self.width, self.height)
         elif platform.system() == "Darwin":
-            macOSsetWindow(int(new_x), int(new_y), self.width, self.height)
+            macOSsetWindow(self._caption, int(new_x), int(new_y), self.width, self.height)
 
     def left_mouse_down(self): return (self.previous_mouse[0] is False) and (self.mouse[0] is True)
 
@@ -675,6 +678,7 @@ class Editor:
             self.previous_keys = self.keys.copy()
             self.previous_mouse = self.mouse
             self._hovered = False
+            # self._hovering_last = self._hovering
             self._hovering = None
             self._hovering_ctx_tree = False
             self.mouse = list(pygame.mouse.get_pressed()) #[mouse.is_pressed(mouse.LEFT), mouse.is_pressed(mouse.MIDDLE), mouse.is_pressed(mouse.RIGHT)]#list(a and b for a, b in zip(pygame.mouse.get_pressed(), ))
@@ -687,6 +691,9 @@ class Editor:
 
                 if event.type == pygame.MOUSEWHEEL: # pylint: disable=no-member
                     self.scroll = event.y
+                    
+                if event.type == pygame.MOUSEMOTION:
+                    self._alt = None
 
                 elif event.type == pygame.KEYDOWN: # pylint: disable=no-member
 
@@ -743,10 +750,22 @@ class Editor:
 
             lmd = self.left_mouse_down()
             rmd = self.right_mouse_down()
-            if rmd:
+            if self._hovering is not None:
+                # print(f"Hovering: {self._hovering}  alt: {getattr(self._hovering, "_alt_text", "")}")
 
-                if self._hovering is not None:
+                if self._hovering != self._hovering_last:
+                    self._alt = None
+                    self._hover_time = time.time()
+                
+                elif self._hover_time + 1.5 < time.time() < self._hover_time + 2.5 and (self._alt is None):
+                    if alt := getattr(self._hovering, "_alt_text", None):
+                        self._hover_time = 0 # this will make the alt text not follow the mouse between t=1.5 and t=2.5
+                        self._alt = MultilineText(0, 0, 1, 14*(alt.count("\n")+1), alt)
+                        self._alt_border = pygame.Surface((self._alt._text_width+4, self._alt._text_height+4))
+                        self._alt_border.fill(TEXT_BG3_COLOR)
+                        self._alt_pos = (self.mouse_pos[0], self.mouse_pos[1]-self._alt._text_height)
 
+                if rmd:
                     if hasattr(self._hovering, "on_right_click") and not isinstance(self._hovering, Button):
 
                         try:
@@ -755,15 +774,19 @@ class Editor:
                         except Exception as e:
                             print("\n".join(e.args))
             
-            if isinstance(self._hovering, (TextBox, MultilineTextBox)):
-                self.override_cursor = True
-                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_IBEAM)
+                if isinstance(self._hovering, (TextBox, MultilineTextBox)):
+                    self.override_cursor = True
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_IBEAM)
+                
+                else:
+                    self.override_cursor = False
             
-            else:
-                self.override_cursor = False
+            self._hovering_last = self._hovering
 
-            if (rmd or lmd) and not self._hovering_ctx_tree:
-                ContextTree.closeAll()
+            if (rmd or lmd):
+                self._alt = None
+                if not self._hovering_ctx_tree:
+                    ContextTree.closeAll()
 
             for l in layers:
 
@@ -774,6 +797,11 @@ class Editor:
 
             if Popup._popup:
                 Popup._popup._update(self, 0, 0)
+            
+            if self._alt:
+                self.screen.blit(self._alt_border, (self._alt_pos[0]-2, self._alt_pos[1]-2))
+                self._alt._update(self, *self._alt_pos)
+                
                 
             pygame.display.update()
 
@@ -1294,6 +1322,7 @@ class GameApp(UIElement):
         self.children.append(self.buttons_left_bar)
         self.children.append(self.buttons_bottom_bar)
         self.play_pause = Button(editor.width-501, 21, 50, 50, "", self.play_pause_buttons[0], hover_color=self.play_pause_buttons[1])
+        self.play_pause._alt_text = "Start Game"
         self.play_pause.on_left_click = self.play_pause_toggle
         self.children.append(self.play_pause)
         self.input_marker = Text(52, editor.height-106, content="Input:", text_bg_color=(70, 70, 70))
@@ -1458,6 +1487,7 @@ class GameApp(UIElement):
             editor.engine.stop()
             self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[0]
             self.play_pause.hover_color = self.play_pause_buttons[1]
+            self.play_pause._alt_text = "Start Game"
             self.updateInventory(None)
             self.updateCombat(None)
 
@@ -1468,6 +1498,7 @@ class GameApp(UIElement):
             editor.engine.handleInput(0, f"engine:ui/get_player {self.player_id}")
             self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[2]
             self.play_pause.hover_color = self.play_pause_buttons[3]
+            self.play_pause._alt_text = "Stop Game"
 
     def set_page(self, page:str):
 
@@ -2071,6 +2102,7 @@ class EditorApp(UIElement):
         ]
         self.file_editor_sub_app_button = Button(51, 21, 50, 50, "", self.file_editor_icons[2], hover_color=self.file_editor_icons[2], click_color=self.file_editor_icons[2])
         self.file_editor_sub_app_button.on_left_click = self.click_file_editor
+        self.file_editor_sub_app_button._alt_text = "Basic File Editor"
         self.children.append(self.file_editor_sub_app_button)
         self.sub_app_file_editor = FileEditorSubApp(code_editor, editor)
         self.sub_apps.append((self.file_editor_sub_app_button, self.file_editor_icons))
@@ -2177,12 +2209,12 @@ class WindowFrame(UIElement):
 
     def get_screen_pos(self, editor):
         if platform.system() in ["Windows", "Linux"]:
-            window = gw.getActiveWindow()
+            window = gw.getWindowsWithTitle(self.editor._caption)[0]
             if window is not None:
                 return window.left, window.top
             return self._recent_window_pos
         elif platform.system() == "Darwin":
-            return macOSgetWindowPos()
+            return macOSgetWindowPos(self.editor._caption)
 
     def set_fullscreen(self, editor):
         screen = get_monitors()[0]
@@ -2367,12 +2399,14 @@ class CodeEditor(UIElement):
         self._app_game_icon_selected = Image(f"{PATH}/dungeon_game_app_icon_selected.png", 0, 0, 50, 50)
         self.app_game_selector = Button(0, 22, 50, 50, "", self._app_game_icon, hover_color=self._app_game_icon_hovered, click_color=self._app_game_icon_selected)
         self.app_game_selector.on_left_click = self.select_game_app
+        self.app_game_selector._alt_text = "IDNH Game Menu"
         self.children.append(self.app_game_selector)
         self._app_editor_icon = Image(f"{PATH}/dungeon_editor_app_icon.png", 0, 0, 50, 50)
         self._app_editor_icon_hovered = Image(f"{PATH}/dungeon_editor_app_icon_hovered.png", 0, 0, 50, 50)
         self._app_editor_icon_selected = Image(f"{PATH}/dungeon_editor_app_icon_selected.png", 0, 0, 50, 50)
         self.app_editor_selector = Button(0, 22+50, 50, 50, "", self._app_editor_icon, hover_color=self._app_editor_icon_hovered, click_color=self._app_editor_icon_selected)
         self.app_editor_selector.on_left_click = self.select_editor_app
+        self.app_editor_selector._alt_text = "IDNH Dungeon Editor"
         self.children.append(self.app_editor_selector)
         self.top_bar = Box(0, 0, width, 20, Color(24, 24, 24))
         self.children.append(self.top_bar)
@@ -2529,12 +2563,12 @@ class CodeEditor(UIElement):
 
     def get_screen_pos(self, editor):
         if platform.system() in ["Windows", "Linux"]:
-            window = gw.getActiveWindow()
+            window = gw.getWindowsWithTitle(self.editor._caption)[0]
             if window is not None:
                 return window.left, window.top
             return self._recent_window_pos
         elif platform.system() == "Darwin":
-            return macOSgetWindowPos()
+            return macOSgetWindowPos(self.editor._caption)
 
     def set_fullscreen(self, editor):
         screen = get_monitors()[0]
@@ -2806,8 +2840,8 @@ class PopoutBehaviorPreset(UIElement):
         
         match preset:
             case "file-editor":
-                w = 300
-                h = 200
+                w = 350
+                h = 75
                 popout.frame.window_limits = [400, 300, 1920, 1080]
                 self.file_path = data["file_path"]
                 self.text_editor = NumberedTextArea(5, 21, 240, 208)
@@ -2821,12 +2855,12 @@ class PopoutBehaviorPreset(UIElement):
                     case "md":
                         self.text_editor.editable.color_text = FileEditor.md_colors
                 
-                self._popup_save_label = Text(0, 100, content="You have unsaved changes!")
+                self._popup_save_label = Text(0, 15, content="You have unsaved changes!")
                 self._popup_save_label.x = (w/2) - (self._popup_save_label.width/2)
                 
-                self._popup_cancel = BorderedButton(0, 175, -1, text="Cancel", text_size=13)
-                self._popup_save = BorderedButton(100, 175, -1, text="Save & Close", text_size=13)
-                self._popup_exit = BorderedButton(200, 175, -1, text="Close anyways", text_size=13)
+                self._popup_cancel = BorderedButton(0, 45, -1, text=" Cancel ", text_size=13)
+                self._popup_save = BorderedButton(100, 45, -1, text=" Save & Close ", text_size=13)
+                self._popup_exit = BorderedButton(200, 45, -1, text=" Close anyways ", text_size=13)
                 
                 overall_width = self._popup_cancel.width + 10 + self._popup_save.width + 10 + self._popup_exit.width
                 self._popup_cancel.x = (w/2) - (overall_width/2)
@@ -3265,59 +3299,33 @@ class IOHook:
         self.game_app.log_scrollable.offsetY = -(self.game_app.log_output._text_height - (self.game_app.log_output.min_height - 20))
         self.engine.handleInput(player_id, text)
 
-# def popout(editor):
-#     time.sleep(10)
-#     # with open("./GraphicsEngine/popout_text_editor.json", "r+", encoding="utf-8") as f:
-#     p = PopoutWindow((200, 200), POPOUTS["text-editor"])
-#     editor.layers[0] += [p]
-
 if __name__ == "__main__":
-    # from threading import Thread
-    # import traceback
-
     argv = sys.argv[1:]
-
     if argv:
         if argv[0] == "popout":
             PopoutWindow(content={"PORT": int(argv[1])})
-        
         exit()
-
+    if platform.system() == "Windows":
+        if windows := gw.getWindowsWithTitle("Insert Dungeon Name Here"):
+            window = windows[0]
+            window.alwaysOnTop(True)
+            window.alwaysOnTop(False)
+            exit()
+    elif platform.system() == "Darwin":
+        macOSfocusWindow("Insert Dungeon Name Here")
     try:
         from Engine import Engine
     except ImportError:
         sys.path.append("./Engine")
         _Engine = SourceFileLoader("Engine", "./Engine/Engine.py").load_module() # pylint: disable=no-value-for-parameter
         Engine = _Engine.Engine
-
     io_hook = IOHook()
-
     engine = Engine(io_hook)
-
     editor = Editor(engine, io_hook)
-    
-    # def inp_thread():
-    #     while not editor.running: pass
-    #     while editor.running:
-    #         inp = input("> ")
-    #         if inp:
-    #             try:
-    #                 exec(inp)
-    #             except Exception as e:
-    #                 print("\n".join(traceback.format_exception(e)))
-    # i = Thread(target=inp_thread)
-    # i.start()
-    
     c = CodeEditor(editor.width, editor.height, editor)
-
-    # t = Thread(target=popout, args=(editor,))
-    # t.start()
-    
-
     editor.layers[0] += [
         c
     ]
-    
     editor.run()
 
 """

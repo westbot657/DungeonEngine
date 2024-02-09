@@ -1942,51 +1942,21 @@ class Opener:
         n = "  " + self.file_path.replace("./Dungeons/", "") + "   "
 
         if n in self.sub_app.popouts:
+            self.sub_app.popouts[n].check_closed()
             if self.sub_app.popouts[n].closed:
                 self.sub_app.popouts.pop(n)
             else:
                 self.sub_app.popouts[n].send("%focus%")
-                # TODO: bring popout window to top
                 return
 
         elif n in self.sub_app.tabs:
-            self.sub_app.open_files.pop(self.file_path)
+            if self.file_path in self.sub_app.open_files:
+                self.sub_app.open_files.pop(self.file_path)
             self.sub_app.file_tabs.remove_tab(n)
             self.sub_app.tabs.remove(n)
-            
-            # print(f"{tab}  {dir(tab)}")
 
         p = PopoutWindow((400, 300), {"behavior": "file-editor", "data": {"file_path": self.file_path}}, window_title=n.strip())
         self.sub_app.popouts.update({n: p})
-        
-        # with open(self.file_path, "r+", encoding="utf-8") as f:
-        #     content = f.read()
-
-        # p.send(
-        #     PopoutInterface()
-        #     .cmd().component("text_edit").method("set_content").param(content).call()
-        #     .end()
-        # )
-        # p.send(
-        #     PopoutInterface()
-        #     .event(PopoutInterface.Event.WINDOW_CLOSED).component("text_edit").method("get_content").call()
-        #     .end()
-        # )
-        
-        # def p_event(s, editor, X, Y):
-        #     try:
-        #         if io := s.conn.read():
-        #             if io.startswith("{"):
-        #                 data = json.loads(io)
-        #                 if "event-return-WINDOW_CLOSED" in data:
-        #                     content = data["event-return-WINDOW_CLOSED"]
-        #                     s.send("%close%")
-        #                     with open(self.file_path, "w+", encoding="utf-8") as f:
-        #                         f.write(content)
-                
-        #     except BrokenPipeError:
-        #         self.closed = True
-        # p._event = p_event
 
 class FileEditorSubApp(UIElement):
     
@@ -2945,7 +2915,7 @@ class PopoutBehaviorPreset(UIElement):
 
 class PopoutWindow(UIElement):
     _windows = []
-    _port = 25555
+    _port = 10001
     _init = False
     _server = None
     
@@ -2956,6 +2926,10 @@ class PopoutWindow(UIElement):
             cls._server.bind(("127.0.0.1", cls._port))
             cls._server.listen(5)
         return cls._server
+    
+    def check_closed(self):
+        if hasattr(self.conn, "CLOSED"):
+            self.closed = True
     
     def __init__(self, size:tuple[int, int]=..., content:dict[str, dict|list]=..., window_title=""):
         self.children = []
@@ -3075,6 +3049,7 @@ class PopoutWindow(UIElement):
             self.editor.run()
 
     def _event(self, editor, X, Y):
+        self.check_closed()
         if (self.ctx == "parent") and (not self.ready): return
         if self.closed: return
         if self.ctx == "child":
@@ -3102,10 +3077,13 @@ class PopoutWindow(UIElement):
                     
                     elif io.startswith("{"):
                         data = json.loads(io)
+                        
+                        if data.get("event", None) == "close":
+                            self.closed = True
                         # print(f"recieved data: {data}")
-                    #     for key, val in data.items():
-                    #         if key == "interface-cmd":
-                    #             PopoutInterface.execute(val, self.components, self)
+                        # for key, val in data.items():
+                        #     if key == "interface-cmd":
+                        #         PopoutInterface.execute(val, self.components, self)
         except BrokenPipeError:
             if self.ctx == "parent":
                 self.closed = True
@@ -3119,6 +3097,8 @@ class PopoutWindow(UIElement):
                 child._update(editor, X, Y)
     
     def send(self, data):
+        self.check_closed()
+        
         if not self.closed:
             try:
                 self.conn.write(data)
@@ -3126,6 +3106,7 @@ class PopoutWindow(UIElement):
                 self.closed = True
 
     def await_read(self, timeout=-1) -> str|None:
+        self.check_closed()
         t = time.time()
         while True:
             if time.time() - t > timeout > 0:
@@ -3139,6 +3120,7 @@ class PopoutWindow(UIElement):
                 return None
     
     def read(self):
+        self.check_closed()
         try:
             return self.conn.read()
         except BrokenPipeError:
@@ -3147,6 +3129,7 @@ class PopoutWindow(UIElement):
 
     def close(self): # This method can only be called from the main process
         self.conn.write("%close%")
+        self.closed = True
         try:
             while self.conn.writeDataQueued(): pass
         except OSError:

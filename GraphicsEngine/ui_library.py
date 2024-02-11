@@ -1517,7 +1517,7 @@ class GameApp(UIElement):
         self.io_hook.sendInput(self.player_id, text)
 
     def play_pause_toggle(self, editor):
-
+        # print("Toggling local play/pause")
         if editor.engine.running:
             editor.engine.stop()
             self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[0]
@@ -1538,6 +1538,7 @@ class GameApp(UIElement):
             self._available_buttons = "local"
 
     def online_play_click(self, editor):
+        # print("Toggling online play/pause")
         if self.online_play_pause._alt_text == "Play Online":
             self.online_play_pause._alt_text = "Disconnect"
             self.online_play_pause.bg_color = self.online_play_pause._bg_color = self.online_play_pause_buttons[2]

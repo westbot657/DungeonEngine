@@ -673,7 +673,7 @@ class Editor:
         self.clock = Clock()
 
         while self.running:
-            self.clock.tick(120)
+            self.clock.tick(60)
             self.screen.fill((24, 24, 24))
             self.previous_keys = self.keys.copy()
             self.previous_mouse = self.mouse
@@ -801,7 +801,6 @@ class Editor:
             if self._alt:
                 self.screen.blit(self._alt_border, (self._alt_pos[0]-2, self._alt_pos[1]-2))
                 self._alt._update(self, *self._alt_pos)
-                
                 
             pygame.display.update()
 
@@ -1256,12 +1255,17 @@ class GameApp(UIElement):
     def __init__(self, code_editor, editor):
         self.code_editor = code_editor
         self.children = []
+        self.play_c1 = []
+        self.play_c2 = []
         self.editor = editor
         self.player_id = 10
         self.player = None
         editor.game_app = self
         self.io_hook = editor.io_hook
         editor.io_hook.game_app = self
+
+        self._available_buttons = "both" # for the play/online play buttons. options are "both" "online" "local"
+
         self.main_hud = Box(51, editor.height-106, editor.width-57, 85, (24, 24, 24))
         self.children.append(self.main_hud)
         self.main_hud_line = Box(51, editor.height-107, editor.width-52, 1, (70, 70, 70))
@@ -1269,6 +1273,7 @@ class GameApp(UIElement):
         self.player_inventory = None
         self.current_combat = None
         self.page = "inv"
+
         self.page_inv_icons = (
             Image(f"{PATH}/page_inv_icon.png", 0, 0, 50, 51),
             Image(f"{PATH}/page_inv_icon_hovered.png", 0, 0, 50, 51),
@@ -1277,6 +1282,7 @@ class GameApp(UIElement):
         self.page_inv_tab = Button(editor.width-(50*3), editor.height-107, 50, 51, "", self.page_inv_icons[2], hover_color=self.page_inv_icons[2], click_color=self.page_inv_icons[2])
         self.page_inv_tab.on_left_click = self.page_inv_onclick
         self.children.append(self.page_inv_tab)
+
         self.page_combat_icons = (
             Image(f"{PATH}/page_combat_icon.png", 0, 0, 50, 51),
             Image(f"{PATH}/page_combat_icon_hovered.png", 0, 0, 50, 51),
@@ -1285,6 +1291,7 @@ class GameApp(UIElement):
         self.page_combat_tab = Button(editor.width-(50*2), editor.height-107, 50, 51, "", self.page_combat_icons[0], hover_color=self.page_combat_icons[1], click_color=self.page_combat_icons[2])
         self.page_combat_tab.on_left_click = self.page_combat_onclick
         self.children.append(self.page_combat_tab)
+
         self.page_log_icons = (
             Image(f"{PATH}/page_log_icon.png", 0, 0, 50, 51),
             Image(f"{PATH}/page_log_icon_hovered.png", 0, 0, 50, 51),
@@ -1293,6 +1300,7 @@ class GameApp(UIElement):
         self.page_log_tab = Button(editor.width-(50), editor.height-107, 50, 51, "", self.page_log_icons[0], hover_color=self.page_log_icons[1], click_color=self.page_log_icons[2])
         self.page_log_tab.on_left_click = self.page_log_onclick
         self.children.append(self.page_log_tab)
+
         self.tab_buttons = (
             ("inv", self.page_inv_tab, self.page_inv_icons),
             ("combat", self.page_combat_tab, self.page_combat_icons),
@@ -1304,32 +1312,57 @@ class GameApp(UIElement):
             Image(f"{PATH}/pause_gray.png", 0, 0, 50, 50),
             Image(f"{PATH}/pause_solid.png", 0, 0, 50, 50)
         )
+        self.online_play_pause_buttons = (
+            Image(f"{PATH}/online_play_gray.png", 0, 0, 50, 50),
+            Image(f"{PATH}/online_play_solid.png", 0, 0, 50, 50),
+            Image(f"{PATH}/online_pause_gray.png", 0, 0, 50, 50),
+            Image(f"{PATH}/online_pause_solid.png", 0, 0, 50, 50)
+        )
+
         self.page_seperator_line = Box(editor.width-451, 21, 1, editor.height-128, (70, 70, 70))
         self.children.append(self.page_seperator_line)
+
         self.main_out_scrollable = Scrollable(52, 22, editor.width-504, editor.height-130, (31, 31, 31), left_bound=0, top_bound=0)
         self.main_output = MultilineText(0, 0, editor.width-504, editor.height-130, "", text_bg_color=(31, 31, 31))
         self.main_out_scrollable.children.append(self.main_output)
         self.children.append(self.main_out_scrollable)
+
         self.log_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130, (24, 24, 24), left_bound=0, top_bound=0)
         self.log_output = MultilineText(0, 0, 450, editor.height-130, "")
         self.log_scrollable.children.append(self.log_output)
+
         self.enemy_card_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130, left_bound=0, top_bound=0, right_bound=0)
         self.no_combat_text = Text(0, 0, 1, "You are not in combat", text_size=25)
         self.inventory_scrollable = Scrollable(editor.width-449, 22, 450, editor.height-130, left_bound=0, top_bound=0, right_bound=0, scroll_speed=30)
         self.empty_inventory_text = Text(0, 0, 1, "Your inventory is empty or not loaded", text_size=18)
-        self.buttons_left_bar = Box(editor.width-502, 21, 1, 50, (70, 70, 70))
-        self.buttons_bottom_bar = Box(editor.width-501, 71, 51, 1, (70, 70, 70))
+
+        self.buttons_left_bar = Box(editor.width-553, 21, 1, 50, (70, 70, 70))
+        self.buttons_middle_bar = Box(editor.width-502, 21, 1, 50, (70, 70, 70))
+        self.buttons_bottom_bar_left = Box(editor.width-552, 71, 51, 1, (70, 70, 70))
+        self.buttons_bottom_bar_right = Box(editor.width-501, 71, 51, 1, (70, 70, 70))
         self.children.append(self.buttons_left_bar)
-        self.children.append(self.buttons_bottom_bar)
+        self.children.append(self.buttons_middle_bar)
+        self.children.append(self.buttons_bottom_bar_left)
+        self.children.append(self.buttons_bottom_bar_right)
+
         self.play_pause = Button(editor.width-501, 21, 50, 50, "", self.play_pause_buttons[0], hover_color=self.play_pause_buttons[1])
         self.play_pause._alt_text = "Start Game"
         self.play_pause.on_left_click = self.play_pause_toggle
         self.children.append(self.play_pause)
+        self.play_c2 += [self.buttons_middle_bar, self.buttons_bottom_bar_right, self.play_pause]
+
+        self.online_play_pause = Button(editor.width-552, 21, 50, 50, "", self.online_play_pause_buttons[0], hover_color=self.online_play_pause_buttons[1])
+        self.online_play_pause._alt_text = "Play Online"
+        self.online_play_pause.on_left_click = self.online_play_click
+        self.children.append(self.online_play_pause)
+        self.play_c1 += [self.buttons_left_bar, self.buttons_bottom_bar_left, self.online_play_pause]
+
         self.input_marker = Text(52, editor.height-106, content="Input:", text_bg_color=(70, 70, 70))
         self.input_box = MultilineTextBox(52+self.input_marker.width, editor.height-106, editor.width-504-self.input_marker.width, self.input_marker.height, text_bg_color=(70, 70, 70))
         self.children.append(self.input_marker)
         self.children.append(self.input_box)
         self.input_box.on_enter(self.input_on_enter)
+
         self.id_refresh = Button(56, editor.height-75, 15, 15, "", Image(f"{PATH}/id_refresh.png", 0, 0, 15, 15), hover_color=Image(f"{PATH}/id_refresh_hovered.png", 0, 0, 15, 15))
         self.id_refresh.on_left_click = self.refresh_player_data
         self.id_input = MultilineTextBox(71, editor.height-75, 15, 15, "10", text_bg_color=(31, 31, 31))
@@ -1337,18 +1370,19 @@ class GameApp(UIElement):
         self.id_input.char_whitelist = [a for a in "0123456789"]
         self.children.append(self.id_refresh)
         self.children.append(self.id_input)
+
         self.player_name_display = Text(96, editor.height-75, content="[Start game to load player info]", text_size=15)
         self.player_location_display = Text(56, editor.height-55, 1, "[location]", text_size=12)
         self.player_money_display = Text(editor.width-200, editor.height-75, 1, "[money]", text_bg_color=None, text_size=13)
         self._old_location = ""
         self.player_health_bar = GameApp.HealthBar(80+self.player_name_display.width + self.id_input._text_width+self.id_refresh.width, editor.height-75, 200, self.player_name_display.height, 20, 20)
         self._old_health = 0
-        self.children.append(self.player_name_display)
-        self.children.append(self.player_location_display)
-        self.children.append(self.player_money_display)
+        self.children += [self.player_name_display, self.player_location_display, self.player_money_display]
+
         self.new_player_button = Button(50, editor.height-33, 85, 13, " + NEW PLAYER", (31, 31, 31), text_size=10, hover_color=(70, 70, 70))
         self.new_player_button.on_left_click = self.popup_createplayer
         self.children.append(self.new_player_button)
+
         self.new_player_id_label = Text(15, 25, 1, "Player ID:", text_bg_color=None)
         self.new_player_name_label = Text(125, 25, 1, "Player Name:", text_bg_color=None)
         self.new_player_id_box = MultilineTextBox(15, 50, 75, 1, "10", text_bg_color=(70, 70, 70))
@@ -1358,6 +1392,7 @@ class GameApp(UIElement):
         self.new_player_name_box = MultilineTextBox(125, 50, 450, 1, "", text_bg_color=(70, 70, 70))
         self.new_player_name_box.single_line = True
         self.new_player_name_box.on_enter(self.create_player)
+
         self.new_player_error = MultilineText(15, 75, 570, 300, "", text_color=(255, 180, 180), text_bg_color=None)
         self.new_player_popup = Popup(600, 400).add_children(
             self.new_player_id_label,
@@ -1488,6 +1523,7 @@ class GameApp(UIElement):
             self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[0]
             self.play_pause.hover_color = self.play_pause_buttons[1]
             self.play_pause._alt_text = "Start Game"
+            self._available_buttons = "both"
             self.updateInventory(None)
             self.updateCombat(None)
 
@@ -1499,6 +1535,19 @@ class GameApp(UIElement):
             self.play_pause.bg_color = self.play_pause._bg_color = self.play_pause_buttons[2]
             self.play_pause.hover_color = self.play_pause_buttons[3]
             self.play_pause._alt_text = "Stop Game"
+            self._available_buttons = "local"
+
+    def online_play_click(self, editor):
+        if self.online_play_pause._alt_text == "Play Online":
+            self.online_play_pause._alt_text = "Disconnect"
+            self.online_play_pause.bg_color = self.online_play_pause._bg_color = self.online_play_pause_buttons[2]
+            self.online_play_pause.hover_color = self.online_play_pause_buttons[3]
+            self._available_buttons = "online"
+        else:
+            self.online_play_pause._alt_text = "Play Online"
+            self.online_play_pause.bg_color = self.online_play_pause._bg_color = self.online_play_pause_buttons[0]
+            self.online_play_pause.hover_color = self.online_play_pause_buttons[1]
+            self._available_buttons = "both"
 
     def set_page(self, page:str):
 
@@ -1558,30 +1607,52 @@ class GameApp(UIElement):
         self.main_hud.width = editor.width-57
         self.main_hud_line.y = editor.height-107
         self.main_hud_line.width = editor.width - 52
+        
         self.main_output.min_width = self.main_out_scrollable.width = editor.width - 504
         self.main_output.min_height = self.main_out_scrollable.height = editor.height - 130
+        
         self.page_inv_tab.x = editor.width-(50*3)
         self.page_inv_tab.y = editor.height-107
+        
         self.page_combat_tab.x = editor.width-(50*2)
         self.page_combat_tab.y = editor.height-107
+        
         self.page_log_tab.x = editor.width-50
         self.page_log_tab.y = editor.height-107
+        
         self.page_seperator_line.x = editor.width - 451
         self.page_seperator_line.height = editor.height - (23 + 105)
+        
         self.input_marker.y = self.input_box.y = editor.height - 106
         self.input_box.min_width = self.main_out_scrollable.width - self.input_marker.width
+        
         self.enemy_card_scrollable.x = self.log_scrollable.x = self.inventory_scrollable.x = editor.width-449
+        
         self.log_output.min_height = self.log_scrollable.height = self.enemy_card_scrollable.height = self.inventory_scrollable.height = editor.height-130
-        self.play_pause.x = (editor.width-501)
+        
+        
         self.id_input.y = self.id_refresh.y = self.player_name_display.y = self.player_money_display.y = self.player_health_bar.y = editor.height-75
+        
         self.player_name_display.x = 70 + self.id_input._text_width + self.id_refresh.width
         self.player_health_bar.x = 80 + self.player_name_display.width + self.id_input._text_width + self.id_refresh.width
         self.player_location_display.y = editor.height - 55
         self.player_money_display.x = editor.width - self.player_money_display.width - 460
+        
         self.new_player_button.y = editor.height - 33
-        self.buttons_left_bar.x = self.buttons_bottom_bar.x = editor.width-502
+        
+        if self._available_buttons == "online":
+            self.buttons_left_bar.x = self.buttons_bottom_bar_left.x = editor.width-502
+            self.online_play_pause.x = (editor.width-501)
+        else:
+            self.buttons_left_bar.x = self.buttons_bottom_bar_left.x = editor.width-553
+            self.online_play_pause.x = (editor.width-552)
+        self.play_pause.x = (editor.width-501)
+        self.buttons_middle_bar.x = self.buttons_bottom_bar_right.x = editor.width - 502
+        
+        
         self.no_combat_text.x = (editor.width-224)-(self.no_combat_text.width/2)
         self.no_combat_text.y = self.log_scrollable.y + (self.log_output.min_height/2) - (self.no_combat_text.height/2)
+
         self.empty_inventory_text.x = (editor.width-224)-(self.empty_inventory_text.width/2)
         self.empty_inventory_text.y = self.log_scrollable.y + (self.log_output.min_height/2) - (self.empty_inventory_text.height/2)
 
@@ -1623,6 +1694,8 @@ class GameApp(UIElement):
     def _update(self, editor, X, Y):
 
         for child in self.children:
+            if (child in self.play_c1 and self._available_buttons == "local") or (child in self.play_c2 and self._available_buttons == "online"):
+                continue
             child._update(editor, X, Y)
             
         if self.page == "log":

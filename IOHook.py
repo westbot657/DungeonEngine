@@ -59,7 +59,7 @@ class IOHook:
         # o = Thread(target=self._output_loop)
         # o.start()
         i = Thread(target=self._input_loop)
-        i.daemon = True
+        # i.daemon = True
         i.start()
 
     def accepter(self, conn, addr):
@@ -77,7 +77,7 @@ class IOHook:
         while self.running:
             conn, addr = self._server.accept()
             acc = Thread(target=self.accepter, args=(conn, addr))
-            acc.daemon = True
+            # acc.daemon = True
             acc.start()
 
     def _input_loop(self):

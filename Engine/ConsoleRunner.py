@@ -72,7 +72,7 @@ except (ImportError, FileNotFoundError) as e:
             # o = Thread(target=self._output_loop)
             # o.start()
             i = Thread(target=self._input_loop)
-            i.daemon = True
+            # i.daemon = True
             i.start()
 
         def accepter(self, conn, addr):
@@ -90,7 +90,7 @@ except (ImportError, FileNotFoundError) as e:
             while self.running:
                 conn, addr = self._server.accept()
                 acc = Thread(target=self.accepter, args=(conn, addr))
-                acc.daemon = True
+                # acc.daemon = True
                 acc.start()
 
         def _input_loop(self):
@@ -193,5 +193,5 @@ if __name__ == "__main__":
         io_hook = IOHook()
         game_engine = Engine(io_hook)  # pylint: disable=[not-callable]
         # print("starting engine")
-        game_engine.run()
+        game_engine.start()
 

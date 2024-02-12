@@ -2323,6 +2323,9 @@ class WindowFrame(UIElement):
 
     def _event(self, editor:Editor, X, Y):
 
+        for child in self.children[::-1]:
+            child._event(editor, X, Y)
+
         if (self.top_bar.hovered and editor.mouse[0] and (not editor.previous_mouse[0])):
             self.window_drag_offset = editor.mouse_pos
 
@@ -2396,9 +2399,6 @@ class WindowFrame(UIElement):
 
         if (not editor.mouse[0]) and editor.previous_mouse[0]:
             self.selected_drag = ""  
-
-        for child in self.children[::-1]:
-            child._event(editor, X, Y)
 
 class CodeEditor(UIElement):
     

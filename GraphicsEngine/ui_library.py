@@ -3362,14 +3362,14 @@ if __name__ == "__main__":
         if argv[0] == "popout":
             PopoutWindow(content={"PORT": int(argv[1])})
         exit()
-    if platform.system() == "Windows":
-        if windows := gw.getWindowsWithTitle("Insert Dungeon Name Here"):
-            window = windows[0]
-            window.alwaysOnTop(True)
-            window.alwaysOnTop(False)
-            exit()
-    elif platform.system() == "Darwin":
-        macOSfocusWindow("Insert Dungeon Name Here")
+    # if platform.system() == "Windows":
+    #     if windows := gw.getWindowsWithTitle("Insert Dungeon Name Here"):
+    #         window = windows[0]
+    #         window.alwaysOnTop(True)
+    #         window.alwaysOnTop(False)
+    #         exit()
+    # elif platform.system() == "Darwin":
+    #     macOSfocusWindow("Insert Dungeon Name Here")
     try:
         from Engine import Engine
     except ImportError:

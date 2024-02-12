@@ -193,5 +193,5 @@ if __name__ == "__main__":
         io_hook = IOHook()
         game_engine = Engine(io_hook)  # pylint: disable=[not-callable]
         # print("starting engine")
-        game_engine.start()
+        game_engine.run()#.start()
 

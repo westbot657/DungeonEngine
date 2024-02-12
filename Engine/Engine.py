@@ -40,10 +40,15 @@ from Resources.ConsoleCommands      import ConsoleCommand # import the base clas
 from Resources.Position             import Position
 
 from threading import Thread
+# from multiprocessing import Process
 
 
 from typing import Any, Generator, Callable
 import time
+import sys
+import os
+os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
+from pygame.time import Clock
 #import asyncio
 
 class Engine:
@@ -76,6 +81,7 @@ class Engine:
         self._frame_start = 0
         self._frame_end = 0
         self.tps = []
+        self.clock = Clock()
         
         Log.engine = self
         #self.default_input_handler.send(None)
@@ -139,7 +145,7 @@ class Engine:
     def start(self):
         if not self.thread_running:
             t = Thread(target=self._main_loop_threaded)
-            # t.daemon = True # don't enable this, otherwise the main process ends, taking the engine with it
+            t.daemon = True # don't enable this, otherwise the main process ends, taking the engine with it
             self.thread_running = True
             self.running = True
             t.start()
@@ -363,14 +369,17 @@ class Engine:
             self.evaluateResult(self._default_input_handler, self.default_input_handler, EngineOperation.MovePlayer(player, player.location), player.uuid, "")
 
         while self.thread_running:
+            
+            self.clock.tick(60)
 
-            # self._frame_end = time.time()
-            # self._frame_times = self._frame_times[1:] + [self._frame_end - self._frame_start]
-            # if sum(self._frame_times) != 0:
-            #     self.tps = len(self._frame_times)/sum(self._frame_times)
-            # self._frame_start = time.time()
+            self._frame_end = time.time()
+            self._frame_times = self._frame_times[1:] + [self._frame_end - self._frame_start]
+            if sum(self._frame_times) != 0:
+                self.tps = len(self._frame_times)/sum(self._frame_times)
+            self._frame_start = time.time()
 
-            #print(f"\u001b[0F\u001b[30G{self.tps}\r")
+            # print(f"\u001b[0F\u001b[30G{self.tps}\r")
+            # sys.stdout.flush()
 
             if not self.running:
                 # Pause Menu thingy?

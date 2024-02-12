@@ -673,7 +673,7 @@ class Editor:
         self.clock = Clock()
 
         while self.running:
-            self.clock.tick(60)
+            self.clock.tick(120)
             self.screen.fill((24, 24, 24))
             self.previous_keys = self.keys.copy()
             self.previous_mouse = self.mouse

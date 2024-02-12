@@ -8,7 +8,7 @@ import pygame
 from pygame.time import Clock
 
 # useful utils
-from enum import Enum, auto
+# from enum import Enum, auto
 from mergedeep import merge
 import time
 import json
@@ -17,8 +17,8 @@ import sys
 import random
 import Stockings
 import socket
-import ast
-import webbrowser
+# import ast
+# import webbrowser
 import platform
 
 from subprocess import Popen, PIPE, STDOUT
@@ -28,7 +28,7 @@ from threading import Thread
 from shapely.geometry.polygon import Polygon as Poly
 
 # used to import the game engine with code
-import importlib
+# import importlib
 from importlib.machinery import SourceFileLoader
 
 # discord presence for game
@@ -86,7 +86,7 @@ if platform.system() == "Darwin":
     def macOSfocusWindow(window_name:str):
         ...
 
-from pygame._sdl2.video import Window, Texture # pylint: disable=no-name-in-module
+# from pygame._sdl2.video import Window, Texture # pylint: disable=no-name-in-module
 
 # import components
 try:

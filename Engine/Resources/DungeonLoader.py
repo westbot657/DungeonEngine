@@ -100,6 +100,10 @@ class DungeonLoader:
         self.abstract_tools: dict[str, AbstractTool] = {}
         self.abstract_weapons: dict[str, AbstractWeapon] = {}
         self.players = {}
+        
+        self._load_current = None
+        self._load_progress = [0, 0] # i0 = overall load progress; i1 = progress of _load_current
+        self._load_grid = [""]
 
         self.classes = { # This can't be serialized
             "Player": Player,
@@ -805,9 +809,15 @@ class DungeonLoader:
             self._element_types.get(element_type, None)
         )
 
+    def console_load_bars(self):
+        ...
+
     def loadGame(self, engine:Engine):
 
         start_time = time.time()
+
+        if engine.is_console:
+            Log.silent = True
 
         EngineScript.load()
         EngineScript.preCompileAll()
@@ -865,6 +875,8 @@ class DungeonLoader:
             "%dungeons": self.dungeons,
             "%players": self.players
         })
+
+        Log.silent = False
 
         Log["loadup"]["loader"]("Engine resource loading completed")
 

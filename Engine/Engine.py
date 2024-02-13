@@ -59,13 +59,14 @@ class Engine:
             self.init(*args, **kwargs)
         return cls._engine
 
-    def init(self, io_hook):
+    def init(self, io_hook, is_ui=False):
         self.running = False
         self.thread_running = False
         self.input_queue = {}
         self.cmd_queue = []
         self._loaded = False
         self.io_hook = io_hook
+        self.is_ui = is_ui
         self.loader: DungeonLoader = DungeonLoader()
         #self.function_memory: FunctionMemory = FunctionMemory()
         self._function_memory = FunctionMemory(self)

@@ -3377,7 +3377,7 @@ if __name__ == "__main__":
         _Engine = SourceFileLoader("Engine", "./Engine/Engine.py").load_module() # pylint: disable=no-value-for-parameter
         Engine = _Engine.Engine
     io_hook = IOHook()
-    engine = Engine(io_hook)
+    engine = Engine(io_hook, is_ui=True)
     editor = Editor(engine, io_hook)
     c = CodeEditor(editor.width, editor.height, editor)
     editor.layers[0] += [

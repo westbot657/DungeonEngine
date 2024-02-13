@@ -30,6 +30,8 @@ class _Log:
         self._file = None
 
         self.engine = None
+        self.tags = []
+        self.silent = False
 
     def log_to_file(self, file):
         self._file = open(file, "w+", encoding="utf-8")
@@ -43,8 +45,8 @@ class _Log:
         def __call__(self, *values): return None
     _off = _o_off()
 
-    def __init__(self):
-        self.tags = []
+    # def __init__(self):
+    #     self.tags = []
     
     def __getitem__(self, tag):
         if not self.enabled:
@@ -64,10 +66,11 @@ class _Log:
                 out += f"[{tag}]"
         out += f": \033[38;2;160;160;160m{sep.join(str(v) for v in values)}\033[0m"
         out = f"[{time.asctime()[11:19]}] " + out.strip()
-        if self.engine:
-            self.engine.sendOutput("log", out)
-        else:
-            print(out)#.encode()) # NOTE: print(out) for CMD version. print(out.encode()) for discord version
+        if not self.silent:
+            if self.engine:
+                self.engine.sendOutput("log", out)
+            else:
+                print(out)#.encode()) # NOTE: print(out) for CMD version. print(out.encode()) for external version
         
         if self._file:
             self._file.write(re.sub("\033\\[(?:\\d+;?)*m", "", f"{out}\n"))

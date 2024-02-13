@@ -80,6 +80,8 @@ class EngineScript:
 
     _scripts = {}
     script_files: list = []
+    _pre_compile_progress = [0, 0]
+
 
     @classmethod
     def load(cls):
@@ -401,11 +403,14 @@ class EngineScript:
 
     @classmethod
     def preCompileAll(cls):
-        Log["loadup"]["engine script"]("loading and compiling scripts")
+        l = len(cls.script_files)
+        Log["loadup"]["engine script"](f"loading and compiling {l} script{'' if l == 1 else 's'}")
+        cls._pre_compile_progress = [0, l]
         for script_file in cls.script_files:
-            Log["loadup"]["engine script"](f"compiling script '{script_file}'")
+            Log["loadup"]["engine script"](f"compiling script '{script_file}' {cls._pre_compile_progress[0]}/{l}")
             es = EngineScript(script_file)
             es.compile()
+            cls._pre_compile_progress[0] += 1
         Log["loadup"]["engine script"]("all scripts compiled")
 
     def setRawScript(self, script):

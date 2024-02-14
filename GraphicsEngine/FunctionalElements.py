@@ -1096,13 +1096,15 @@ class ProgressBar(UIElement):
         self.bg_color = bg_color
         self.ticks = []
         self._ticks = 0
+        self.bg = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
+        self.bg.fill(self.bg_color)
         
         if not colors:
             raise ValueError("Please define at least 1 color for the progress bar to use")
         
         self.colors = colors.copy()
         for key, val in self.colors.items():
-            self.colors.update({key, Color.color(val, False, False)})
+            self.colors.update({key, tuple(Color.color(val, False, False))})
     
     def tick(self, color:str=None, amount=1):
         if self._ticks + amount > self.max_progress:
@@ -1144,6 +1146,32 @@ class ProgressBar(UIElement):
             self.hovered = False
 
     def _update(self, editor, X, Y):
-        ...
+        editor.screen.blit(self.bg, (X+self.x, Y+self.y))
+        match self.load_direction:
+            case "down":
+                dpt = self.height/self.max_progress
+                y = 0
+                for color, size in self.ticks:
+                    editor.screen.fill(self.colors[color], (X+self.x, Y+self.y+y, self.width, size*dpt))
+                    y += size*dpt
+            case "up":
+                dpt = self.height/self.max_progress
+                y = 0
+                for color, size in self.ticks:
+                    y += size*dpt
+                    editor.screen.fill(self.colors[color], (X+self.x, Y+self.y+self.height-y, self.width, size*dpt))
+            case "left":
+                dpt = self.width/self.max_progress
+                x = 0
+                for color, size in self.ticks:
+                    x += size*dpt
+                    editor.screen.fill(self.colors[color], (X+self.x+self.width-x, Y+self.y, size*dpt, self.height))
+            case _:#right
+                dpt = self.width/self.max_progress
+                x = 0
+                for color, size in self.ticks:
+                    editor.screen.fill(self.colors[color], (X+self.x+x, Y+self.y, size*dpt, self.height))
+                    x += size*dpt
+        
 
 

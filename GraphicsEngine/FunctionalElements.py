@@ -1084,7 +1084,7 @@ class Collapsable:
             setattr(super().__getattribute__("_collapsable"), __name, __value)
 
 
-@PopoutElement
+@PopoutElement()
 class ProgressBar(UIElement):
     def __init__(self, x, y, width, height, load_direction="right", max_progress=100, bg_color=TEXT_BG_COLOR, **colors):
         self.x = x

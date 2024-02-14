@@ -853,6 +853,7 @@ class GameApp(UIElement):
             self.shadow_heal_bar = Box(0, 0, 0, height, self.shadow_heal)
             self.shadow_damage_bar = Box(0, 0, 0, height, self.shadow_damage)
             self.shadow = ""
+            self._alt_text = f"{self.current_health}/{self.max_health}"
     
         def set_current_health(self, health):
 
@@ -875,8 +876,16 @@ class GameApp(UIElement):
             else:
                 self.shadow = ""
             
+            self._alt_text = f"{self.current_health}/{self.max_health}"
+            
+            
         def _event(self, editor, X, Y):
-            pass
+            if editor.collides(editor.mouse_pos, (X+self.x, Y+self.y, self.width, self.height)):
+                if editor._hovering is None:
+                    self.hovered = editor._hovered = True
+                    editor._hovering = self
+            else:
+                self.hovered = False
     
         def _update(self, editor, X, Y):
             self.full_bar._update(editor, X+self.x, Y+self.y)
@@ -962,6 +971,7 @@ class GameApp(UIElement):
             self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
             self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
             self.damage_display = Text(5, 55, 100, f"{obj.damage.quickDisplay(self.game_app.editor.engine._function_memory)} damage", text_bg_color=None)
+            self.damage_display._alt_text = obj.damage.fullDisplay(self.game_app.editor.engine._function_memory)
             self.durability_bar = GameApp.HealthBar(295, 55, 100, 15, obj.max_durability, obj.durability)
             self.children.append(self.icon)
             self.children.append(self.name_display)
@@ -1044,6 +1054,7 @@ class GameApp(UIElement):
             self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
             dmg = obj.bonus_damage.quickDisplay(self.game_app.editor.engine._function_memory)
             self.damage_display = Text(5, 55, 100, f"{dmg} bonus damage", text_bg_color=None)
+            self.damage_display._alt_text = obj.bonus_damage.fullDisplay(self.game_app.editor.engine._function_memory)
             self.count_disp = f"{obj.count}/{obj.max_count}" if obj.max_count > 0 else f"{obj.count}"
             self.count_display = Text(0, 0, 1, self.count_disp, text_bg_color=None)
             self.count_display.x = 395 - self.count_display.width
@@ -1096,6 +1107,7 @@ class GameApp(UIElement):
             self.name_display = Text(30, 5, 370, obj.name, (255, 255, 255), text_bg_color=None)
             self.description_display = MultilineText(5, 30, 395, 20, obj.description or "", (206, 145, 120), None, text_size=10)
             self.damage_display = Text(5, 55, 100, f"{obj.damage_reduction.quickDisplay(self.game_app.editor.engine._function_memory)} defense", text_bg_color=None)
+            self.damage_display._alt_text = obj.damage_reduction.fullDisplay(self.game_app.editor.engine._function_memory)
             self.durability_bar = GameApp.HealthBar(295, 55, 100, 15, obj.max_durability, obj.durability)
             self.children.append(self.icon)
             self.children.append(self.name_display)

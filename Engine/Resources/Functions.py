@@ -1880,7 +1880,7 @@ class Engine_Random_Range(LoaderFunction):
 
     @classmethod
     def getFullDisplay(self, function_memory:FunctionMemory, data: dict) -> str:
-        return f"[{data['min']}-{data['max']}]"
+        return f"[random range]:\n{data['min']}-{data['max']}"
 
     @classmethod
     def getQuickDisplay(self, function_memory:FunctionMemory, data: dict) -> str:
@@ -1931,9 +1931,12 @@ class Engine_Random_Weighted(LoaderFunction):
         values = json.loads(data["values"].replace("'", ""))
         out = []
         total = sum(weights)
+        # max_width = 0
         for weight, val in zip(weights, values):
-            out.append(f"{f'{weight/total*100:.2f}'.rstrip('0').strip('.').lstrip('0')}%" + f":{val}")
-        return f"[{' '.join(out)}]"
+            line = f"{f'{weight/total*100:.2f}'.rstrip('0').strip('.').lstrip('0'): >5}%" + f" : {val}"
+            out.append(line)
+            # max_width = max(max_width, len(line))
+        return f"[weighted values]:\n{'\n'.join(out)}"
 
     @classmethod
     def getQuickDisplay(self, function_memory:FunctionMemory, data:dict) -> str:

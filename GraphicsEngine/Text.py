@@ -31,11 +31,18 @@ class Text(UIElement):
     def set_text(self, text:str):
         self.content = text
 
-    def _event(self, *_):
+    def _event(self, editor, X, Y):
         if self.content != self._content:
             self._content = self.content
             self.surface = self.font.render(self.content, True, tuple(self.text_color))
             self.width = self.surface.get_width()
+        
+        if editor.collides(editor.mouse_pos, (X+self.x, Y+self.y, self.width, self.height)):
+            if editor._hovering is None:
+                self.hovered = editor._hovered = True
+                editor._hovering = self
+        else:
+            self.hovered = False
         
     def _update(self, editor, X, Y):
         _x, _y = self.surface.get_size()

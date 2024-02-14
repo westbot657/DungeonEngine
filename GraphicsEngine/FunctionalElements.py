@@ -1083,3 +1083,67 @@ class Collapsable:
         else:
             setattr(super().__getattribute__("_collapsable"), __name, __value)
 
+
+@PopoutElement
+class ProgressBar(UIElement):
+    def __init__(self, x, y, width, height, load_direction="right", max_progress=100, bg_color=TEXT_BG_COLOR, **colors):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.load_direction=load_direction
+        self.max_progress = max_progress
+        self.bg_color = bg_color
+        self.ticks = []
+        self._ticks = 0
+        
+        if not colors:
+            raise ValueError("Please define at least 1 color for the progress bar to use")
+        
+        self.colors = colors.copy()
+        for key, val in self.colors.items():
+            self.colors.update({key, Color.color(val, False, False)})
+    
+    def tick(self, color:str=None, amount=1):
+        if self._ticks + amount > self.max_progress:
+            amount = self.max_progress - self._ticks
+        if amount < 1: return
+        if self.ticks and self.ticks[-1][0] == color:
+            self.ticks[-1][1] += amount
+        else:
+            self.ticks.append([color, amount])
+        self._ticks += amount
+
+    def untick(self, amount=1):
+        if amount < 1: return
+        for i in range(amount):
+            if self.ticks:
+                if self.ticks[-1][1] > 1:
+                    self.ticks[-1][1] -= 1
+                else:
+                    self.ticks.pop(-1)
+                self._ticks -= 1
+            else:
+                return
+
+    def reset(self):
+        self.ticks.clear()
+
+    def _event(self, editor, X, Y):
+        _x, _y = editor.mouse_pos
+        #if (max(editor.X, X + self.x) <= _x <= min(X + self.x + self.width, editor.Width) and max(editor.Y, Y + self.y) <= _y <= min(Y + self.y + self.height, editor.Height)):
+        for child in self.children[::-1]:
+            child._event(editor, X + self.x, Y + self.y)
+
+        
+        if editor.collides((_x, _y), (X+self.x, Y+self.y, self.width, self.height)):
+            if editor._hovering is None:
+                self.hovered = editor._hovered = True
+                editor._hovering = self
+        else:
+            self.hovered = False
+
+    def _update(self, editor, X, Y):
+        ...
+
+

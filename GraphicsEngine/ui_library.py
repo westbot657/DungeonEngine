@@ -799,8 +799,8 @@ class Editor:
                 Popup._popup._update(self, 0, 0)
             
             if self._alt:
-                self.screen.blit(self._alt_border, (self._alt_pos[0]-2, self._alt_pos[1]-2))
-                self._alt._update(self, *self._alt_pos)
+                self.screen.blit(self._alt_border, (min(max(0, self._alt_pos[0]), self.width-self._alt_border.get_width())-2, min(max(0, self._alt_pos[1]), self.height-self._alt_border.get_height())-2))
+                self._alt._update(self, min(max(0, self._alt_pos[0]), self.width-self._alt_border.get_width()), min(max(0, self._alt_pos[1]), self.height-self._alt_border.get_height()))
                 
             pygame.display.update()
 
@@ -1213,6 +1213,7 @@ class GameApp(UIElement):
         )
         self.page_inv_tab = Button(editor.width-(50*3), editor.height-107, 50, 51, "", self.page_inv_icons[2], hover_color=self.page_inv_icons[2], click_color=self.page_inv_icons[2])
         self.page_inv_tab.on_left_click = self.page_inv_onclick
+        self.page_inv_tab._alt_text = "Inventory"
         self.children.append(self.page_inv_tab)
 
         self.page_combat_icons = (
@@ -1222,6 +1223,7 @@ class GameApp(UIElement):
         )
         self.page_combat_tab = Button(editor.width-(50*2), editor.height-107, 50, 51, "", self.page_combat_icons[0], hover_color=self.page_combat_icons[1], click_color=self.page_combat_icons[2])
         self.page_combat_tab.on_left_click = self.page_combat_onclick
+        self.page_combat_tab._alt_text = "Combat Info"
         self.children.append(self.page_combat_tab)
 
         self.page_log_icons = (
@@ -1231,6 +1233,7 @@ class GameApp(UIElement):
         )
         self.page_log_tab = Button(editor.width-(50), editor.height-107, 50, 51, "", self.page_log_icons[0], hover_color=self.page_log_icons[1], click_color=self.page_log_icons[2])
         self.page_log_tab.on_left_click = self.page_log_onclick
+        self.page_log_tab._alt_text = "Game Output log"
         self.children.append(self.page_log_tab)
 
         self.tab_buttons = (
@@ -2271,10 +2274,8 @@ class WindowFrame(UIElement):
             x, y = mouse.position#.get_position()
             
             if y == 0:
-                self._is_fullscreen = True
-                self._recent_window_size = (editor.width, editor.height)
-                self._recent_window_pos = self.get_screen_pos(editor)
-                self.set_fullscreen(editor)
+                self._is_fullscreen = False
+                self.toggle_fullscreen(editor)
             
             self.window_drag_offset = None
 
@@ -2739,10 +2740,8 @@ class CodeEditor(UIElement):
             x, y = mouse.position#.get_position()
             
             if y == 0:
-                self._is_fullscreen = True
-                self._recent_window_size = (editor.width, editor.height)
-                self._recent_window_pos = self.get_screen_pos(editor)
-                self.set_fullscreen(editor)
+                self._is_fullscreen = False
+                self.toggle_fullscreen(editor)
             
             self.window_drag_offset = None
 

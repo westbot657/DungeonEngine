@@ -10,6 +10,7 @@ try:
     from .Logger import Log
     from .AbstractAmmo import AbstractAmmo, Ammo
     from .Serializer import Serializable, Serializer
+    from .YieldTools import YieldTools
 except ImportError:
     from GameObject import GameObject
     from Identifier import Identifier
@@ -20,6 +21,7 @@ except ImportError:
     from Logger import Log
     from AbstractAmmo import AbstractAmmo, Ammo
     from Serializer import Serializable, Serializer
+    from YieldTools import YieldTools
 
 import random
 
@@ -90,6 +92,8 @@ class Weapon(GameObject):
         
     def onAttack(self, function_memory:FunctionMemory, target, acc:int=None):
 
+        yieldTools = YieldTools(f"Weapon.onAttack#{id(self)}")
+
         player = self.owner
 
         damage = 0
@@ -120,15 +124,17 @@ class Weapon(GameObject):
                 "damage": damage,
                 "accuracy": acc
             })
-            ev = function_memory.generatorEvaluateFunction(on_attack)
-            v = None
-            try:
-                v = ev.send(None)
-                while isinstance(v, _EngineOperation):
-                    res = yield v
-                    v = ev.send(res)
-            except StopIteration as e:
-                v = function_memory.engine.loader.stopIterationEval(e.value, v)
+            
+            yield from yieldTools.call(function_memory.generatorEvaluateFunction, on_attack)
+            # ev = function_memory.generatorEvaluateFunction(on_attack)
+            # v = None
+            # try:
+            #     v = ev.send(None)
+            #     while isinstance(v, _EngineOperation):
+            #         res = yield v
+            #         v = ev.send(res)
+            # except StopIteration as e:
+            #     v = function_memory.engine.loader.stopIterationEval(e.value, v)
 
             damage = int(function_memory.ref("damage"))
             acc = int(function_memory.ref("accuracy"))
@@ -136,15 +142,17 @@ class Weapon(GameObject):
         Log["debug"]["weapon"](f"Weapon onAttack: damage:{damage}  accuracy:{acc}  target:{target}")
 
         function_memory.addContextData({"#damage": damage})
-        ev = target.onEvent(function_memory, None, "on_attacked")
-        v = None
-        try:
-            v = ev.send(None)
-            while isinstance(v, _EngineOperation):
-                res = yield v
-                v = ev.send(res)
-        except StopIteration as e:
-            v = function_memory.engine.loader.stopIterationEval(e.value, v)
+        
+        yield from yieldTools.call(target.onEvent, function_memory, None, "on_attacked")
+        # ev = target.onEvent(function_memory, None, "on_attacked")
+        # v = None
+        # try:
+        #     v = ev.send(None)
+        #     while isinstance(v, _EngineOperation):
+        #         res = yield v
+        #         v = ev.send(res)
+        # except StopIteration as e:
+        #     v = function_memory.engine.loader.stopIterationEval(e.value, v)
 
         if self.max_durability > 0:
             self.durability -= 1
@@ -155,98 +163,110 @@ class Weapon(GameObject):
 
     def onDamage(self, function_memory:FunctionMemory):
         if on_damage := self.events.get("on_damage", None):
+            yieldTools = YieldTools(f"Weapon.onDamage#{id(self)}")
             self.prepFunctionMemory(function_memory)
 
-            ev = function_memory.generatorEvaluateFunction(on_damage)
-            v = None
-            try:
-                v = ev.send(None)
-                while isinstance(v, _EngineOperation):
-                    res = yield v
-                    v = ev.send(res)
-            except StopIteration as e:
-                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            yield from yieldTools.call(function_memory.generatorEvaluateFunction, on_damage)
+            # ev = function_memory.generatorEvaluateFunction(on_damage)
+            # v = None
+            # try:
+            #     v = ev.send(None)
+            #     while isinstance(v, _EngineOperation):
+            #         res = yield v
+            #         v = ev.send(res)
+            # except StopIteration as e:
+            #     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
 
             self.postEvaluate(function_memory)
 
     def onBreak(self, function_memory:FunctionMemory):
         if on_break := self.events.get("on_break", None):
+            yieldTools = YieldTools(f"Weapon.onBreak#{id(self)}")
             self.prepFunctionMemory(function_memory)
 
-            ev = function_memory.generatorEvaluateFunction(on_break)
-            v = None
-            try:
-                v = ev.send(None)
-                while isinstance(v, _EngineOperation):
-                    res = yield v
-                    v = ev.send(res)
-            except StopIteration as e:
-                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            yield from yieldTools.call(function_memory.generatorEvaluateFunction, on_break)
+            # ev = function_memory.generatorEvaluateFunction(on_break)
+            # v = None
+            # try:
+            #     v = ev.send(None)
+            #     while isinstance(v, _EngineOperation):
+            #         res = yield v
+            #         v = ev.send(res)
+            # except StopIteration as e:
+            #     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
 
             self.postEvaluate(function_memory)
 
     def onEquip(self, function_memory:FunctionMemory):
         if on_equip := self.events.get("on_equip", None):
+            yieldTools = YieldTools(f"Weapon.onEquip#{id(self)}")
             self.prepFunctionMemory(function_memory)
 
-            ev = function_memory.generatorEvaluateFunction(on_equip)
-            v = None
-            try:
-                v = ev.send(None)
-                while isinstance(v, _EngineOperation):
-                    res = yield v
-                    v = ev.send(res)
-            except StopIteration as e:
-                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            yield from yieldTools.call(function_memory.generatorEvaluateFunction, on_equip)
+            # ev = function_memory.generatorEvaluateFunction(on_equip)
+            # v = None
+            # try:
+            #     v = ev.send(None)
+            #     while isinstance(v, _EngineOperation):
+            #         res = yield v
+            #         v = ev.send(res)
+            # except StopIteration as e:
+            #     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
 
             self.postEvaluate(function_memory)
 
     def onUnequip(self, function_memory:FunctionMemory):
         if on_unequip := self.events.get("on_unequip", None):
+            yieldTools = YieldTools(f"Weapon.onUnequip#{id(self)}")
             self.prepFunctionMemory(function_memory)
 
-            ev = function_memory.generatorEvaluateFunction(on_unequip)
-            v = None
-            try:
-                v = ev.send(None)
-                while isinstance(v, _EngineOperation):
-                    res = yield v
-                    v = ev.send(res)
-            except StopIteration as e:
-                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            yield from yieldTools.call(function_memory.generatorEvaluateFunction, on_unequip)
+            # ev = function_memory.generatorEvaluateFunction(on_unequip)
+            # v = None
+            # try:
+            #     v = ev.send(None)
+            #     while isinstance(v, _EngineOperation):
+            #         res = yield v
+            #         v = ev.send(res)
+            # except StopIteration as e:
+            #     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
 
             self.postEvaluate(function_memory)
 
     def onRepair(self, function_memory:FunctionMemory):
         if on_repair := self.events.get("on_repair", None):
+            yieldTools = YieldTools(f"Weapon.onRepair#{id(self)}")
             self.prepFunctionMemory(function_memory)
 
-            ev = function_memory.generatorEvaluateFunction(on_repair)
-            v = None
-            try:
-                v = ev.send(None)
-                while isinstance(v, _EngineOperation):
-                    res = yield v
-                    v = ev.send(res)
-            except StopIteration as e:
-                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            yield from yieldTools.call(function_memory.generatorEvaluateFunction, on_repair)
+            # ev = function_memory.generatorEvaluateFunction(on_repair)
+            # v = None
+            # try:
+            #     v = ev.send(None)
+            #     while isinstance(v, _EngineOperation):
+            #         res = yield v
+            #         v = ev.send(res)
+            # except StopIteration as e:
+            #     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
 
             self.postEvaluate(function_memory)
 
     def onPlayerHit(self, function_memory:FunctionMemory, damage:int):
         if on_player_hit := self.events.get("on_player_hit", None):
+            yieldTools = YieldTools(f"Weapon.onPlayerHit#{id(self)}")
             self.prepFunctionMemory(function_memory)
             #res = function_memory.evaluateFunction(on_unequip)
-            ev = function_memory.generatorEvaluateFunction(on_player_hit)
-            v = None
-            try:
-                v = ev.send(None)
-                while isinstance(v, _EngineOperation):
-                    res = yield v
-                    v = ev.send(res)
-            except StopIteration as e:
-                v = e.value or (v if not isinstance(v, _EngineOperation) else None)
-            res = v
+            yield from yieldTools.call(function_memory.generatorEvaluateFunction, on_player_hit)
+            # ev = function_memory.generatorEvaluateFunction(on_player_hit)
+            # v = None
+            # try:
+            #     v = ev.send(None)
+            #     while isinstance(v, _EngineOperation):
+            #         res = yield v
+            #         v = ev.send(res)
+            # except StopIteration as e:
+            #     v = e.value or (v if not isinstance(v, _EngineOperation) else None)
+            # res = v
             self.postEvaluate(function_memory)
 
     def _get_save(self, function_memory:FunctionMemory):

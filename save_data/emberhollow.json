@@ -4,15 +4,15 @@
             "interactions": {
                 "exit": {
                     "fields": {
-                        "target": "world:rooms/start",
-                        "travel_message": "You walk away from the front gate of Emberhollow",
+                        "target": null,
+                        "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
                     }
                 },
                 "road_1_0": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_0",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -24,7 +24,7 @@
             "interactions": {
                 "road_2_1": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_1",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -32,7 +32,7 @@
                 },
                 "road_2_2": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_2",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -40,7 +40,7 @@
                 },
                 "road_2_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -48,7 +48,7 @@
                 },
                 "road_2_4": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_4",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -56,7 +56,7 @@
                 },
                 "road_2_5": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_5",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -64,7 +64,7 @@
                 },
                 "road_2_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -72,7 +72,7 @@
                 },
                 "road_2_8": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_8",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -80,7 +80,7 @@
                 },
                 "road_2_12": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_12",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -88,7 +88,7 @@
                 },
                 "road_2_13": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_13",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -100,7 +100,7 @@
             "interactions": {
                 "road_1_1": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_1",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -108,7 +108,7 @@
                 },
                 "road_2_4": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_4",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -116,7 +116,7 @@
                 },
                 "road_2_1": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_1",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -128,7 +128,7 @@
             "interactions": {
                 "road_2_0": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_0",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -136,7 +136,7 @@
                 },
                 "road_2_4": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_4",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -144,7 +144,7 @@
                 },
                 "road_1_28": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_28",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -152,7 +152,7 @@
                 },
                 "road_1_26": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_26",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -160,7 +160,7 @@
                 },
                 "road_2_2": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_2",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -168,7 +168,7 @@
                 },
                 "park": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/park",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -180,7 +180,7 @@
             "interactions": {
                 "road_2_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -188,7 +188,7 @@
                 },
                 "road_2_9": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_9",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -196,7 +196,7 @@
                 },
                 "road_2_20": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_20",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -204,7 +204,7 @@
                 },
                 "road_2_21": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_21",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -212,7 +212,7 @@
                 },
                 "road_2_22": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_22",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -224,7 +224,7 @@
             "interactions": {
                 "road_2_8": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_8",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -232,7 +232,7 @@
                 },
                 "road_2_12": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_12",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -240,7 +240,7 @@
                 },
                 "road_2_20": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_20",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -248,7 +248,7 @@
                 },
                 "road_2_23": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_23",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -260,7 +260,7 @@
             "interactions": {
                 "road_2_8": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_8",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -268,7 +268,7 @@
                 },
                 "road_2_11": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_11",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -276,7 +276,7 @@
                 },
                 "road_2_13": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_13",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -284,7 +284,7 @@
                 },
                 "road_2_14": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_14",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -292,7 +292,7 @@
                 },
                 "park": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/park",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -304,7 +304,7 @@
             "interactions": {
                 "road_2_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -312,7 +312,7 @@
                 },
                 "road_2_12": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_12",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -320,7 +320,7 @@
                 },
                 "road_2_14": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_14",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -328,7 +328,7 @@
                 },
                 "park": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/park",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -340,7 +340,7 @@
             "interactions": {
                 "road_2_12": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_12",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -348,7 +348,7 @@
                 },
                 "road_2_13": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_13",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -356,7 +356,7 @@
                 },
                 "road_2_15": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_15",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -364,7 +364,7 @@
                 },
                 "road_2_24": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_24",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -376,7 +376,7 @@
             "interactions": {
                 "road_2_14": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_14",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -384,7 +384,7 @@
                 },
                 "road_2_16": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_16",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -392,7 +392,7 @@
                 },
                 "road_2_19": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_19",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -404,7 +404,7 @@
             "interactions": {
                 "road_2_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -412,7 +412,7 @@
                 },
                 "road_2_15": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_15",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -420,7 +420,7 @@
                 },
                 "road_2_17": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_17",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -428,7 +428,7 @@
                 },
                 "road_2_19": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_19",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -440,7 +440,7 @@
             "interactions": {
                 "road_2_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -448,7 +448,7 @@
                 },
                 "road_2_16": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_16",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -456,7 +456,7 @@
                 },
                 "road_2_18": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_18",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -468,7 +468,7 @@
             "interactions": {
                 "road_2_17": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_17",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -480,7 +480,7 @@
             "interactions": {
                 "road_2_15": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_15",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -488,7 +488,7 @@
                 },
                 "road_2_16": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_16",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -500,7 +500,7 @@
             "interactions": {
                 "road_2_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -508,7 +508,7 @@
                 },
                 "road_2_1": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_1",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -516,7 +516,7 @@
                 },
                 "road_1_28": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_28",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -524,7 +524,7 @@
                 },
                 "road_1_26": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_26",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -532,7 +532,7 @@
                 },
                 "park": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/park",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -544,7 +544,7 @@
             "interactions": {
                 "road_2_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -552,7 +552,7 @@
                 },
                 "road_2_11": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_11",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -560,7 +560,7 @@
                 },
                 "road_2_21": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_21",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -568,7 +568,7 @@
                 },
                 "road_2_22": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_22",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -576,7 +576,7 @@
                 },
                 "road_2_23": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_23",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -588,7 +588,7 @@
             "interactions": {
                 "road_2_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -596,7 +596,7 @@
                 },
                 "road_2_20": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_20",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -604,7 +604,7 @@
                 },
                 "road_2_22": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_22",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -616,7 +616,7 @@
             "interactions": {
                 "road_2_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -624,7 +624,7 @@
                 },
                 "road_2_20": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_20",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -632,7 +632,7 @@
                 },
                 "road_2_21": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_21",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -640,7 +640,7 @@
                 },
                 "road_2_26": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_26",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -648,7 +648,7 @@
                 },
                 "road_2_27": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_27",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -660,7 +660,7 @@
             "interactions": {
                 "road_2_11": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_11",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -668,7 +668,7 @@
                 },
                 "road_2_20": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_20",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -676,7 +676,7 @@
                 },
                 "road_2_14": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_14",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -684,7 +684,7 @@
                 },
                 "road_2_24": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_24",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -696,7 +696,7 @@
             "interactions": {
                 "road_3_5": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_5",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -704,7 +704,7 @@
                 },
                 "road_2_14": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_14",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -712,7 +712,7 @@
                 },
                 "road_2_23": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_23",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -720,7 +720,7 @@
                 },
                 "road_2_25": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_25",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -732,7 +732,7 @@
             "interactions": {
                 "road_2_24": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_24",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -740,7 +740,7 @@
                 },
                 "road_3_5": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_5",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -752,7 +752,7 @@
             "interactions": {
                 "road_2_22": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_22",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -760,7 +760,7 @@
                 },
                 "road_2_27": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_27",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -772,7 +772,7 @@
             "interactions": {
                 "road_2_22": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_22",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -780,7 +780,7 @@
                 },
                 "road_2_26": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_26",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -788,7 +788,7 @@
                 },
                 "road_2_28": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_28",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -800,7 +800,7 @@
             "interactions": {
                 "road_2_27": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_27",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -808,7 +808,7 @@
                 },
                 "road_2_29": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_29",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -820,7 +820,7 @@
             "interactions": {
                 "road_2_28": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_28",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -832,7 +832,7 @@
             "interactions": {
                 "road_2_2": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_2",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -840,7 +840,7 @@
                 },
                 "road_2_13": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_13",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -848,7 +848,7 @@
                 },
                 "road_2_16": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_16",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -856,7 +856,7 @@
                 },
                 "road_2_17": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_17",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -864,7 +864,7 @@
                 },
                 "park": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/park",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -876,7 +876,7 @@
             "interactions": {
                 "road_2_0": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_0",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -884,7 +884,7 @@
                 },
                 "road_2_1": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_1",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -892,7 +892,7 @@
                 },
                 "road_2_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -900,7 +900,7 @@
                 },
                 "road_2_5": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_5",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -908,7 +908,7 @@
                 },
                 "park": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/park",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -920,7 +920,7 @@
             "interactions": {
                 "road_2_4": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_4",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -928,7 +928,7 @@
                 },
                 "road_2_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -936,7 +936,7 @@
                 },
                 "park": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/park",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -948,7 +948,7 @@
             "interactions": {
                 "road_2_4": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_4",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -956,7 +956,7 @@
                 },
                 "road_2_5": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_5",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -964,7 +964,7 @@
                 },
                 "road_2_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -972,7 +972,7 @@
                 },
                 "road_2_8": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_8",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -980,7 +980,7 @@
                 },
                 "park": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/park",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -992,7 +992,7 @@
             "interactions": {
                 "road_2_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1000,7 +1000,7 @@
                 },
                 "road_2_8": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_8",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1008,7 +1008,7 @@
                 },
                 "road_2_9": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_9",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1016,7 +1016,7 @@
                 },
                 "road_2_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1028,7 +1028,7 @@
             "interactions": {
                 "road_2_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1036,7 +1036,7 @@
                 },
                 "road_2_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1044,7 +1044,7 @@
                 },
                 "road_2_11": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_11",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1052,7 +1052,7 @@
                 },
                 "road_2_12": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_12",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1060,7 +1060,7 @@
                 },
                 "park": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/park",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1072,7 +1072,7 @@
             "interactions": {
                 "road_2_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1080,7 +1080,7 @@
                 },
                 "road_2_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1092,7 +1092,7 @@
             "interactions": {
                 "road_1_25": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_25",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1100,7 +1100,7 @@
                 },
                 "road_3_2": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_2",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1112,7 +1112,7 @@
             "interactions": {
                 "road_3_8": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_8",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1120,7 +1120,7 @@
                 },
                 "road_3_9": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_9",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1128,7 +1128,7 @@
                 },
                 "road_3_11": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_11",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1136,7 +1136,7 @@
                 },
                 "road_3_12": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_12",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1148,7 +1148,7 @@
             "interactions": {
                 "road_3_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1156,7 +1156,7 @@
                 },
                 "road_3_12": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_12",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1168,7 +1168,7 @@
             "interactions": {
                 "road_3_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1176,7 +1176,7 @@
                 },
                 "road_3_11": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_11",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1184,7 +1184,7 @@
                 },
                 "road_3_13": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_13",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1192,7 +1192,7 @@
                 },
                 "road_3_14": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_14",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1204,7 +1204,7 @@
             "interactions": {
                 "road_3_12": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_12",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1212,7 +1212,7 @@
                 },
                 "road_3_14": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_14",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1224,7 +1224,7 @@
             "interactions": {
                 "road_3_12": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_12",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1232,7 +1232,7 @@
                 },
                 "road_3_13": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_13",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1244,7 +1244,7 @@
             "interactions": {
                 "road_3_1": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_1",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1252,7 +1252,7 @@
                 },
                 "road_3_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1264,7 +1264,7 @@
             "interactions": {
                 "road_3_2": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_2",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1272,7 +1272,7 @@
                 },
                 "road_3_4": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_4",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1280,7 +1280,7 @@
                 },
                 "road_3_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1292,7 +1292,7 @@
             "interactions": {
                 "road_3_5": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_5",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1300,7 +1300,7 @@
                 },
                 "road_3_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1308,7 +1308,7 @@
                 },
                 "road_3_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1316,7 +1316,7 @@
                 },
                 "road_3_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1328,7 +1328,7 @@
             "interactions": {
                 "road_2_24": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_24",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1336,7 +1336,7 @@
                 },
                 "road_2_25": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_25",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1344,7 +1344,7 @@
                 },
                 "road_3_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1356,7 +1356,7 @@
             "interactions": {
                 "road_3_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1364,7 +1364,7 @@
                 },
                 "road_3_4": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_4",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1372,7 +1372,7 @@
                 },
                 "road_3_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1380,7 +1380,7 @@
                 },
                 "road_3_8": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_8",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1392,7 +1392,7 @@
             "interactions": {
                 "road_3_4": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_4",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1400,7 +1400,7 @@
                 },
                 "road_3_5": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_5",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1408,7 +1408,7 @@
                 },
                 "road_3_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1416,7 +1416,7 @@
                 },
                 "road_3_8": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_8",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1428,7 +1428,7 @@
             "interactions": {
                 "road_3_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1436,7 +1436,7 @@
                 },
                 "road_3_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1444,7 +1444,7 @@
                 },
                 "road_3_9": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_9",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1452,7 +1452,7 @@
                 },
                 "road_3_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1464,7 +1464,7 @@
             "interactions": {
                 "road_3_8": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_8",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1472,7 +1472,7 @@
                 },
                 "road_3_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1484,7 +1484,7 @@
             "interactions": {
                 "road_1_1": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_1",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1492,7 +1492,7 @@
                 },
                 "road_1_2": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_2",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1500,7 +1500,7 @@
                 },
                 "front_gate": {
                     "fields": {
-                        "target": "emberhollow:rooms/front_gate",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1512,7 +1512,7 @@
             "interactions": {
                 "road_1_0": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_0",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1520,7 +1520,7 @@
                 },
                 "road_1_2": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_2",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1528,7 +1528,7 @@
                 },
                 "road_2_0": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_0",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1540,7 +1540,7 @@
             "interactions": {
                 "road_1_9": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_9",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1548,7 +1548,7 @@
                 },
                 "road_1_12": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_12",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1556,7 +1556,7 @@
                 },
                 "road_1_13": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_13",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1564,7 +1564,7 @@
                 },
                 "road_1_14": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_14",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1572,7 +1572,7 @@
                 },
                 "road_1_11": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_11",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1584,7 +1584,7 @@
             "interactions": {
                 "road_1_9": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_9",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1592,7 +1592,7 @@
                 },
                 "road_1_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1604,7 +1604,7 @@
             "interactions": {
                 "road_1_9": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_9",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1612,7 +1612,7 @@
                 },
                 "road_1_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1624,7 +1624,7 @@
             "interactions": {
                 "road_1_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1632,7 +1632,7 @@
                 },
                 "road_1_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1640,7 +1640,7 @@
                 },
                 "road_1_14": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_14",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1648,7 +1648,7 @@
                 },
                 "road_1_22": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_22",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1656,7 +1656,7 @@
                 },
                 "road_1_23": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_23",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1668,7 +1668,7 @@
             "interactions": {
                 "road_1_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1676,7 +1676,7 @@
                 },
                 "road_1_13": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_13",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1684,7 +1684,7 @@
                 },
                 "road_1_15": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_15",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1692,7 +1692,7 @@
                 },
                 "road_1_18": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_18",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1704,7 +1704,7 @@
             "interactions": {
                 "road_1_14": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_14",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1712,7 +1712,7 @@
                 },
                 "road_1_16": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_16",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1720,7 +1720,7 @@
                 },
                 "road_1_17": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_17",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1728,7 +1728,7 @@
                 },
                 "road_1_18": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_18",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1740,7 +1740,7 @@
             "interactions": {
                 "road_1_15": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_15",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1748,7 +1748,7 @@
                 },
                 "road_1_17": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_17",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1760,7 +1760,7 @@
             "interactions": {
                 "road_1_15": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_15",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1768,7 +1768,7 @@
                 },
                 "road_1_16": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_16",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1780,7 +1780,7 @@
             "interactions": {
                 "road_1_14": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_14",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1788,7 +1788,7 @@
                 },
                 "road_1_15": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_15",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1796,7 +1796,7 @@
                 },
                 "road_1_19": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_19",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1808,7 +1808,7 @@
             "interactions": {
                 "road_1_18": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_18",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1816,7 +1816,7 @@
                 },
                 "road_1_20": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_20",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1824,7 +1824,7 @@
                 },
                 "road_1_21": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_21",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1836,7 +1836,7 @@
             "interactions": {
                 "road_1_0": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_0",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1844,7 +1844,7 @@
                 },
                 "road_1_1": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_1",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1852,7 +1852,7 @@
                 },
                 "road_1_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1860,7 +1860,7 @@
                 },
                 "road_1_4": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_4",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1872,7 +1872,7 @@
             "interactions": {
                 "road_1_19": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_19",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1880,7 +1880,7 @@
                 },
                 "road_1_21": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_21",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1892,7 +1892,7 @@
             "interactions": {
                 "road_1_19": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_19",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1900,7 +1900,7 @@
                 },
                 "road_1_20": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_20",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1908,7 +1908,7 @@
                 },
                 "road_1_22": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_22",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1916,7 +1916,7 @@
                 },
                 "road_1_24": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_24",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1928,7 +1928,7 @@
             "interactions": {
                 "road_1_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1936,7 +1936,7 @@
                 },
                 "road_1_13": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_13",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1944,7 +1944,7 @@
                 },
                 "road_1_21": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_21",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1952,7 +1952,7 @@
                 },
                 "road_1_23": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_23",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1960,7 +1960,7 @@
                 },
                 "road_1_24": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_24",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1968,7 +1968,7 @@
                 },
                 "road_1_29": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_29",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1980,7 +1980,7 @@
             "interactions": {
                 "road_1_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1988,7 +1988,7 @@
                 },
                 "road_1_13": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_13",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -1996,7 +1996,7 @@
                 },
                 "road_1_22": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_22",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2004,7 +2004,7 @@
                 },
                 "road_1_27": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_27",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2016,7 +2016,7 @@
             "interactions": {
                 "road_1_21": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_21",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2024,7 +2024,7 @@
                 },
                 "road_1_22": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_22",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2032,7 +2032,7 @@
                 },
                 "road_1_25": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_25",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2040,7 +2040,7 @@
                 },
                 "road_1_26": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_26",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2052,7 +2052,7 @@
             "interactions": {
                 "road_1_24": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_24",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2060,7 +2060,7 @@
                 },
                 "road_1_26": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_26",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2068,7 +2068,7 @@
                 },
                 "road_3_1": {
                     "fields": {
-                        "target": "emberhollow:rooms/docks/roads/road_1",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2080,7 +2080,7 @@
             "interactions": {
                 "road_1_24": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_24",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2088,7 +2088,7 @@
                 },
                 "road_1_25": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_25",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2096,7 +2096,7 @@
                 },
                 "road_1_28": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_28",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2104,7 +2104,7 @@
                 },
                 "road_2_1": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_1",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2112,7 +2112,7 @@
                 },
                 "road_2_2": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_2",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2124,7 +2124,7 @@
             "interactions": {
                 "road_1_23": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_23",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2132,7 +2132,7 @@
                 },
                 "road_1_28": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_28",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2144,7 +2144,7 @@
             "interactions": {
                 "road_1_26": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_26",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2152,7 +2152,7 @@
                 },
                 "road_1_27": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_27",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2160,7 +2160,7 @@
                 },
                 "road_2_1": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_1",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2168,7 +2168,7 @@
                 },
                 "road_2_2": {
                     "fields": {
-                        "target": "emberhollow:rooms/commercial/roads/road_2",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2180,7 +2180,7 @@
             "interactions": {
                 "road_1_29": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_29",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2192,7 +2192,7 @@
             "interactions": {
                 "road_1_2": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_2",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2200,7 +2200,7 @@
                 },
                 "road_1_4": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_4",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2208,7 +2208,7 @@
                 },
                 "road_1_5": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_5",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2216,7 +2216,7 @@
                 },
                 "road_1_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2224,7 +2224,7 @@
                 },
                 "road_1_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2236,7 +2236,7 @@
             "interactions": {
                 "road_1_2": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_2",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2244,7 +2244,7 @@
                 },
                 "road_1_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2256,7 +2256,7 @@
             "interactions": {
                 "road_1_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2264,7 +2264,7 @@
                 },
                 "road_1_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2272,7 +2272,7 @@
                 },
                 "road_1_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2284,7 +2284,7 @@
             "interactions": {
                 "road_1_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2292,7 +2292,7 @@
                 },
                 "road_1_5": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_5",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2300,7 +2300,7 @@
                 },
                 "road_1_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2308,7 +2308,7 @@
                 },
                 "road_1_13": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_13",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2316,7 +2316,7 @@
                 },
                 "road_1_22": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_22",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2324,7 +2324,7 @@
                 },
                 "road_1_23": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_23",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2336,7 +2336,7 @@
             "interactions": {
                 "road_1_3": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_3",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2344,7 +2344,7 @@
                 },
                 "road_1_5": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_5",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2352,7 +2352,7 @@
                 },
                 "road_1_6": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_6",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2360,7 +2360,7 @@
                 },
                 "road_1_8": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_8",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2368,7 +2368,7 @@
                 },
                 "road_1_9": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_9",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2376,7 +2376,7 @@
                 },
                 "road_1_12": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_12",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2388,7 +2388,7 @@
             "interactions": {
                 "road_1_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2396,7 +2396,7 @@
                 },
                 "road_1_9": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_9",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2408,7 +2408,7 @@
             "interactions": {
                 "road_1_7": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_7",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2416,7 +2416,7 @@
                 },
                 "road_1_8": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_8",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2424,7 +2424,7 @@
                 },
                 "road_1_10": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_10",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2432,7 +2432,7 @@
                 },
                 "road_1_12": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_12",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null
@@ -2440,7 +2440,7 @@
                 },
                 "road_1_11": {
                     "fields": {
-                        "target": "emberhollow:rooms/residential/roads/road_11",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null

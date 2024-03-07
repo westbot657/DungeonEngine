@@ -44,7 +44,19 @@ class YieldTools:
             elif not isinstance(v, YieldTools.YieldResult):
                 v = None
         
-    
+    def handle(self, ev):
+        v = None
+        try:
+            v = ev.send(None) # start the iterator
+            while True:
+                res = yield v # pass v down, and store any result
+                v = ev.send(res) # pass result back up
+        except StopIteration as e:
+            if isinstance(e.value, YieldTools.YieldResult):
+                v = e.value
+            elif not isinstance(v, YieldTools.YieldResult):
+                v = None
+
 """
 How this should look:
 

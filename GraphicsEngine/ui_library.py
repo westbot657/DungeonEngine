@@ -110,6 +110,7 @@ try:
     from GraphicsEngine.FunctionalElements import Button, BorderedButton, Tabs, Scrollable, Collapsable, ProgressBar
     from GraphicsEngine.NumberedTextArea import NumberedTextArea
     from GraphicsEngine.PopoutInterface import PopoutInterface
+    from GraphicsEngine.SnapNode import SnapNode
 except ImportError:
     from Options import client_id, DO_RICH_PRESENCE, PATH, \
         FONT, SETTINGS, TEXT_SIZE, TEXT_COLOR, TEXT_BG_COLOR, \
@@ -131,6 +132,7 @@ except ImportError:
     from FunctionalElements import Button, BorderedButton, Tabs, Scrollable, Collapsable, ProgressBar
     from NumberedTextArea import NumberedTextArea
     from PopoutInterface import PopoutInterface
+    from SnapNode import SnapNode
 
 class fake_presence:
     def __init__(self, *_, **__): pass
@@ -593,6 +595,7 @@ class Editor:
         self.scroll = 0
         self.width = self.Width = width
         self.height = self.Height = height
+        self.held = None
         self.x = self.X = 0
         self.y = self.Y = 0
         self._fake_editor = self
@@ -607,6 +610,7 @@ class Editor:
         self._alt = None
         self._alt_border = None
         self._alt_pos = (0, 0)
+        self._frame = 0
         self.unicodes = {
             pygame.K_UP: "$↑",
             pygame.K_DOWN: "$↓",
@@ -686,6 +690,11 @@ class Editor:
             self.width, self.height = self.Width, self.Height = self.screen.get_size()
             self.typing.clear()
             self.scroll = 0
+            self._frame += 1
+            if self._frame >= 100:
+                self._frame = 1
+                
+            
 
             for event in pygame.event.get():
 
@@ -747,6 +756,8 @@ class Editor:
             for l in layers[::-1]:
                 for i in self.layers[l][::-1]:
                     i._event(self, 0, 0)
+
+            SnapNode.reset()
 
             lmd = self.left_mouse_down()
             rmd = self.right_mouse_down()

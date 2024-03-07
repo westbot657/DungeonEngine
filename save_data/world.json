@@ -4,7 +4,7 @@
             "interactions": {
                 "spawn_boat": {
                     "fields": {
-                        "target": "emberhollow:rooms/boats/spawn_boat",
+                        "target": null,
                         "travel_message": null,
                         "blocked": null,
                         "blocked_message": null

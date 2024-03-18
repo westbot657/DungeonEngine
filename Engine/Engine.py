@@ -38,6 +38,7 @@ from Resources.EngineErrors         import EngineError, EngineBreak, UnknownPlay
 from Resources.Util                 import Util
 from Resources.ConsoleCommands      import ConsoleCommand # import the base class through the file that adds sub classes
 from Resources.Position             import Position
+from Resources.YieldTools           import YieldTools
 
 from threading import Thread
 # from multiprocessing import Process
@@ -86,6 +87,9 @@ class Engine:
         self.clock = Clock()
         
         Log.engine = self
+        
+        self.genEvalFuncYieldTools = YieldTools(f"Engine.generatorEvaluateFunction#{id(self)}")
+        
         #self.default_input_handler.send(None)
 
     def evaluateFunction(self, data:dict, function_memory:FunctionMemory=None, context_data:dict=None, local_variables:dict=None):

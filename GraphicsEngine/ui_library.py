@@ -38,6 +38,8 @@ from pypresence import Presence
 # import mouse
 from pynput.mouse import Controller
 
+from typing import Any
+
 mouse = Controller()
 
 import pywinctl as gw
@@ -504,6 +506,8 @@ class DirectoryTree(UIElement):
         for child in self.children[::-1]:
             child._event(editor, X, Y)
 
+
+
 @PopoutElement()
 class Popup(UIElement):
     _popup = None
@@ -576,6 +580,8 @@ class Popup(UIElement):
         
         self.bg._event(editor, X+self.x, Y+self.y)
         self.mask._event(editor, X, Y)
+
+
 
 class Editor:
 
@@ -816,6 +822,8 @@ class Editor:
                 self._alt._update(self, min(max(0, self._alt_pos[0]), self.width-self._alt_border.get_width()), min(max(0, self._alt_pos[1]), self.height-self._alt_border.get_height()))
                 
             pygame.display.update()
+
+
 
 class DebugApp(UIElement):
 
@@ -1670,7 +1678,8 @@ class GameApp(UIElement):
         if self.player is not None:
             self.player_health_bar._update(editor, X, Y)
 
-# Dungeon Building Editors:
+
+
 
 @PopoutElement()
 class FileEditor(UIElement):
@@ -1832,85 +1841,8 @@ class FileEditor(UIElement):
         
         self.edit_area._event(editor, X, Y)
 
-# class ImageEditor(UIElement): # Text / Visual # not very important, could just have it launch piskel
 
-# class LootTableEditor(UIElement): # Visual
 
-class GameObjectEditor(UIElement): # this may need to be split into dedicated editors for each item type
-    def __init__(self):
-        ...
-    
-    def _update(self, editor, X, Y):
-        ...
-    
-    def _event(self, editor, X, Y):
-        ...
-
-# class StatusEffectEditor(UIElement): # Visual
-
-# class AttackEditor(UIElement): # Visual
-
-# class EnemyEditor(UIElement): # Visual
-
-# class CombatEditor(UIElement): # Text / Visual
-
-# class InteractableEditor(UIElement): # Visual
-
-# class RoomEditor(UIElement): # Visual
-
-class DungeonEditor(UIElement): # Visual
-    
-    class Dungeon(UIElement):
-        def __init__(self, dungeon_editor, dungeon):
-            self.dungeon_editor = dungeon_editor
-            self.dungeon = dungeon
-            self.rooms = []
-            self.x = 0
-            self.y = 0
-            self.children = []
-            
-        def _event(self, editor, X, Y):
-            c = self.children.copy()
-            c.reverse()
-
-            for _c in c:
-                _c._event(editor, X+self.x, Y+self.y)
-        
-        def _update(self, editor, X, Y):
-
-            for c in self.children:
-                c._update(editor, X+self.x, Y+self.y)
-
-    def __init__(self):
-        self.active = None
-        self.selectors = []
-        
-        # wanted features:
-        #   add/remove/modify dungeon variables
-        #   add/remove/modify dungeons
-        #   add/remove/modify rooms
-        #   modify dungeon namespace
-        #   drag and drop to set variables
-        #   rooms drawn with Polygons, can be modifed, and can be linked to other rooms easily
-        #     room linking:
-        #       a passage/door block with 1-2 leads
-        #       merging of 1-lead passages/doors
-        #       splitting of 2-lead passage/door into 2 1-lead passages/doors
-        #   pop-out code editor panels for scripts (if at all possible, these panels should not be bound to the app window)
-        
-    def _event(self, editor, X, Y):
-        ...
-    
-    def _update(self, editor, X, Y):
-        ...
-
-# class BlockCodeEditor(UIElement): # Visual # save this for last, it's a whole project on it's own
-
-# Debug Editors:
-
-# class PlayerEditor(UIElement):
-
-# class InventoryEditor(UIElement):
 
 class VisibilityToggle:
     def __init__(self, sub_app, typ, button, alt_text1, alt_text2, frames):
@@ -1935,6 +1867,124 @@ class VisibilityToggle:
             
         self.sub_app.visibility_toggled[self.typ] = not self.sub_app.visibility_toggled[self.typ]
 
+class ConstructionCanvas(UIElement):
+    
+    class _Canvas:
+        def __init__(self, editor, canvas):
+            super().__setattr__("_editor", editor)
+            super().__setattr__("_canvas", canvas)
+        
+        def __getattribute__(self, __name: str) -> Any:
+            if __name == "_editor":
+                return super().__getattribute__("_editor")
+            elif __name == "_canvas":
+                return super().__getattribute__("_canvas")
+            elif __name == "Width":
+                #co = getattr(super().__getattribute__("_scrollable"), "offsetX")
+                cx = getattr(super().__getattribute__("_canvas"), "x")# - getattr(super().__getattribute__("_scrollable"), "offsetX")
+                cw = getattr(super().__getattribute__("_canvas"), "width")# - getattr(super().__getattribute__("_scrollable"), "offsetX")
+                if hasattr(super().__getattribute__("_editor"), "x"):
+                    fx = getattr(super().__getattribute__("_editor"), "x")
+                else: fx = 0
+                if hasattr(super().__getattribute__("_editor"), "get_width"):
+                    fw = getattr(super().__getattribute__("_editor"), "get_width")()
+                else: fw = getattr(super().__getattribute__("_editor"), "width")
+                if fx + fw <= fx + cx + cw: return fw - cx
+                return cw# - co
+            elif __name == "Height":
+                #co = getattr(super().__getattribute__("_scrollable"), "offsetY")
+                cx = getattr(super().__getattribute__("_canvas"), "y")# - getattr(super().__getattribute__("_scrollable"), "offsetY")
+                cw = getattr(super().__getattribute__("_canvas"), "height")# - getattr(super().__getattribute__("_scrollable"), "offsetY")
+                if hasattr(super().__getattribute__("_editor"), "y"):
+                    fx = getattr(super().__getattribute__("_editor"), "y")
+                else: fx = 0
+                if hasattr(super().__getattribute__("_editor"), "get_height"):
+                    fw = getattr(super().__getattribute__("_editor"), "get_height")()
+                else: fw = getattr(super().__getattribute__("_editor"), "height")
+                if fx + fw <= fx + cx + cw: return fw - cx
+                return cw# - co
+            elif __name == "X":
+                return max(0, getattr(super().__getattribute__("_canvas"), "x"))
+            elif __name == "Y":
+                return max(0, getattr(super().__getattribute__("_canvas"), "y"))
+            elif hasattr(super().__getattribute__("_canvas"), __name):
+                return getattr(super().__getattribute__("_canvas"), __name)
+            elif hasattr(super().__getattribute__("_editor"), __name):
+                return getattr(super().__getattribute__("_editor"), __name)
+            else:
+                raise AttributeError
+        def __setattr__(self, __name: str, __value) -> None:
+            if __name == "_editor":
+                super().__setattr__("_editor", __value)
+            elif hasattr(super().__getattribute__("_canvas"), __name):
+                setattr(super().__getattribute__("_canvas"), __name, __value)
+            elif hasattr(super().__getattribute__("_editor"), __name):
+                setattr(super().__getattribute__("_editor"), __name, __value)
+            else:
+                setattr(super().__getattribute__("_canvas"), __name, __value)
+
+    
+    def __init__(self, advanced_editor, editor, x, y, width, height):
+        self.advanced_editor = advanced_editor
+        self.editor = editor
+        self.canvas = ConstructionCanvas._Canvas(editor, self)
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.offsetX = 0
+        self.offsetY = 0
+        self.scale = 1.0
+        self.grid_size = 100
+        # self.sub_grid_segments = 2 # cut each section in half n times
+        self.show_grid = True
+        self.children = []
+        self.panning = False
+        self.pan_origin = [0, 0]   # this is where the mouse clicked in relation to the canvas
+        self.pan_relative = [0, 0] # this is where the mouse clicked in relation to the screen
+    
+        # == scrollable canvas stuff ==
+        self.mouse_pos = [0, 0]
+        self.screen = pygame.Surface((width, height), pygame.SRCALPHA, 32)
+        
+        # =============================
+    
+    def override_values(self):
+        self.mouse_pos = list(self.editor.mouse_pos)
+        self.mouse_pos[0] -= self.x + self.offsetX
+        self.mouse_pos[1] -= self.y + self.offsetY
+    
+    def _event(self, editor, X, Y):
+        for group, visible in [i for i in self.advanced_editor.visibility_toggled.items()][::-1]:
+            if visible:
+                for child in self.advanced_editor.visibility_groups[group][::-1]:
+                    child._event(self.canvas, 0, 0)
+
+    def _update(self, editor, X, Y):
+        self.screen.fill(TEXT_BG_COLOR)
+        
+        if self.show_grid:
+            # draw grid
+            _x = -1
+            _y = -1
+            _width = self.width + (2*self.grid_size) # add one extra grid space off each side of the screen
+            _height = self.height + (2*self.grid_size)
+            _ex = int(_width // (self.grid_size * self.scale))
+            _ey = int(_height // (self.grid_size * self.scale))
+            for i in range(_x, _ex):
+                x = i * self.grid_size * self.scale
+                self.screen.fill(TEXT_BG2_COLOR, (x, -1, 1, _height))
+            for i in range(_y, _ey):
+                y = i * self.grid_size * self.scale
+                self.screen.fill(TEXT_BG2_COLOR, (-1, y, _width, 1))
+
+        for group, visible in self.advanced_editor.visibility_toggled.items():
+            if visible:
+                for child in self.advanced_editor.visibility_groups[group]:
+                    child._update(self.canvas, 0, 0)
+        
+        editor.screen.blit(self.screen, (X+self.x, Y+self.y))
+
 class AdvancedEditorSubApp(UIElement):
     
     def __init__(self, code_editor, editor):
@@ -1942,6 +1992,9 @@ class AdvancedEditorSubApp(UIElement):
         self.editor = editor
         self.children = []
         self.popouts = {}
+        
+        self.construction_canvas = ConstructionCanvas(self, editor, 102, 22, editor.width-102, editor.height-101)
+        self.children.append(self.construction_canvas)
         
         self.visibility_types = [
             None,
@@ -2011,6 +2064,9 @@ class AdvancedEditorSubApp(UIElement):
             button.y = editor.height-100
         for blank in self.empty_visibility_toggle_spots:
             blank.y = editor.height-100
+
+
+
 
 class Opener:
 
@@ -2179,6 +2235,8 @@ class FileEditorSubApp(UIElement):
         for child in self.children[::-1]:
             child._event(editor, X, Y)
 
+
+
 class EditorApp(UIElement):
     
     def __init__(self, code_editor, editor):
@@ -2267,6 +2325,8 @@ class EditorApp(UIElement):
         
         for child in self.children:
             child._update(editor, X, Y)
+
+
 
 class WindowFrame(UIElement):
     def __init__(self, width, height, editor, window_limits:list[int,int,int,int]=..., title=""):
@@ -2955,6 +3015,8 @@ class CodeEditor(UIElement):
         elif self.active_app == "editor":
             self.editor_app._event(editor, X, Y)
 
+
+
 class PopoutBehaviorPreset(UIElement):
     def __init__(self, preset:str, data, editor, popout):
         self.preset = preset
@@ -3290,6 +3352,8 @@ class PopoutWindow(UIElement):
             self.conn.close()
         except OSError:
             pass
+
+
 
 class IOHook:
 

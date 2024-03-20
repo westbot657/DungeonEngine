@@ -1964,7 +1964,7 @@ class ConstructionCanvas(UIElement):
         mx, my = mouse
         x, y, w, h = rect
         #print("Scrollable: v")
-        if self.canvas._editor.collides((mx, my), (self.x, self.y, self.width, self.height)):
+        if self.canvas._editor.collides(self.editor.mouse_pos, (self.x, self.y, self.width, self.height)):
             #print(f"Scrollable: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")
             if x <= (mx-self.offsetX) < x + w and y <= (my-self.offsetY) < y + h:
                 return True
@@ -1988,6 +1988,22 @@ class ConstructionCanvas(UIElement):
                     (self.offsetY * self.scale) + my
                 ]
                 self.panning = True
+            if editor.scroll != 0:
+                _mx, _my = self.mouse_pos
+                _scale = self.scale
+                self.scale = min(max(0.1, self.scale + (editor.scroll * 0.125)), 3)
+                # diff = self.scale - _scale
+                
+                pix_diff_w = (self.width / _scale) - (self.width / self.scale)
+                side_ratio_x = ((mx - self.x)) / self.width
+                self.offsetX += pix_diff_w * side_ratio_x
+                
+                
+                pix_diff_h = (self.height / _scale) - (self.height / self.scale)
+                side_ratio_y = ((my - self.y)) / self.height
+                self.offsetY += pix_diff_h * side_ratio_y
+                
+                self.screen = pygame.Surface((self.width/self.scale, self.height/self.scale), pygame.SRCALPHA, 32)
         if editor.middle_mouse_up():
             self.panning = False
         
@@ -1995,18 +2011,6 @@ class ConstructionCanvas(UIElement):
             dx, dy = self.pan_origin
             self.offsetX = (dx - mx) / self.scale
             self.offsetY = (dy - my) / self.scale
-        
-        if editor.scroll != 0:
-            
-            _scale = self.scale
-            self.scale = min(max(0.1, self.scale + (editor.scroll * 0.125)), 3)
-            diff = self.scale - _scale
-            
-            
-            
-            
-            self.screen = pygame.Surface((self.width/self.scale, self.height/self.scale), pygame.SRCALPHA, 32)
-            
         
         for group, visible in [i for i in self.advanced_editor.visibility_toggled.items()][::-1]:
             if visible:
@@ -2028,10 +2032,10 @@ class ConstructionCanvas(UIElement):
             dy = self.offsetY % (self.grid_size)
             for i in range(_x, _ex+1):
                 x = (i * self.grid_size) - dx
-                self.screen.fill(TEXT_BG2_COLOR, (x, -1, 2, _height))
+                self.screen.fill(TEXT_BG2_COLOR, (x-1, -1, 3, _height))
             for i in range(_y, _ey+1):
                 y = (i * self.grid_size) - dy
-                self.screen.fill(TEXT_BG2_COLOR, (-1, y, _width, 2))
+                self.screen.fill(TEXT_BG2_COLOR, (-1, y-1, _width, 3))
 
         for group, visible in self.advanced_editor.visibility_toggled.items():
             if visible:

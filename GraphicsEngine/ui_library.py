@@ -620,6 +620,7 @@ class Editor:
         self.unicode = {}
         self.keys = []
         self.typing = []
+        self._do_layout_update = False
 
     def add_event_listener(self, event, listener):
         # print(f"ADDING EVENT: {event} :: {listener}")
@@ -628,7 +629,8 @@ class Editor:
         
         self._listeners[event].append(listener)
 
-    def set_window_location(self, new_x, new_y):
+    def set_window_location(self, new_x, new_y): # This function also causes a window size change
+        self._do_layout_update = True
         if platform.system() in ["Windows", "Linux"]:
             window = gw.getWindowsWithTitle(self._caption)[0]
             if window is not None:
@@ -653,7 +655,7 @@ class Editor:
         mx, my = mouse
         x, y, w, h = rect
 
-        if x <= mx <= x + w and y <= my <= y + h:
+        if x <= mx < x + w and y <= my < y + h:
             return True
         
         return False
@@ -1604,7 +1606,8 @@ class GameApp(UIElement):
         self.empty_inventory_text.y = self.log_scrollable.y + (self.log_output.min_height/2) - (self.empty_inventory_text.height/2)
 
     def _event(self, editor, X, Y):
-        self._update_layout(editor)
+        if editor._do_layout_update:
+            self._update_layout(editor)
 
         for child in self.children[::-1]:
             child._event(editor, X, Y)
@@ -1819,7 +1822,8 @@ class FileEditor(UIElement):
     
     def _event(self, editor, X, Y):
         
-        self._update_layout(FileEditorSubApp)
+        if editor._do_layout_update:
+            self._update_layout(None)
         
         self.edit_area.x = self.x
         self.edit_area.y = self.y
@@ -1907,6 +1911,106 @@ class DungeonEditor(UIElement): # Visual
 # class PlayerEditor(UIElement):
 
 # class InventoryEditor(UIElement):
+
+class VisibilityToggle:
+    def __init__(self, sub_app, typ, button, alt_text1, alt_text2, frames):
+        self.sub_app = sub_app
+        self.typ = typ
+        self.button = button
+        self.alt_text1 = alt_text1
+        self.alt_text2 = alt_text2
+        self.frames = frames
+        
+    def __call__(self, *_, set=None, **__):
+        if set is not None:
+            self.sub_app.visibility_toggled[self.typ] = not set
+        if self.sub_app.visibility_toggled[self.typ]:
+            self.button._alt_text = self.alt_text2
+            self.button._bg_color = self.button.bg_color = self.frames[0]
+            self.button.hover_color = self.frames[1]
+        else:
+            self.button._alt_text = self.alt_text1
+            self.button._bg_color = self.button.bg_color = self.frames[2]
+            self.button.hover_color = self.frames[3]
+            
+        self.sub_app.visibility_toggled[self.typ] = not self.sub_app.visibility_toggled[self.typ]
+
+class AdvancedEditorSubApp(UIElement):
+    
+    def __init__(self, code_editor, editor):
+        self.code_editor = code_editor
+        self.editor = editor
+        self.children = []
+        self.popouts = {}
+        
+        self.visibility_types = [
+            None,
+            "weapon", "ammo", "armor", "item", None,
+            "road", "room", None,
+            "combat", "script",
+            None
+        ]
+        
+        self.visibility_offsets = {}
+        self.visibility_icons = {}
+        self.visibility_toggles = {}
+        self.visibility_toggled = {}
+        self.visibility_groups = {}
+        self.empty_visibility_toggle_spots = []
+        
+        base_x = 102
+        base_y = editor.height-100
+        x_offset = 0
+        seperator_width = 10
+        
+        for typ in self.visibility_types:
+            if typ is None:
+                img = Image(f"{PATH}/advanced_editor/empty_selector_spot.png", base_x+x_offset, base_y, seperator_width, 50)
+                self.empty_visibility_toggle_spots.append(img)
+                x_offset += seperator_width
+                self.children.append(img)
+                continue
+            
+            self.visibility_offsets.update({typ: x_offset})
+            frames = [
+                Image(f"{PATH}/advanced_editor/{typ}_visibility_selector.png", 0, 0, 50, 50),
+                Image(f"{PATH}/advanced_editor/{typ}_visibility_selector_hovered.png", 0, 0, 50, 50),
+                Image(f"{PATH}/advanced_editor/{typ}_visibility_selector_selected.png", 0, 0, 50, 50),
+                Image(f"{PATH}/advanced_editor/{typ}_visibility_selector_selected_hovered.png", 0, 0, 50, 50)
+            ]
+            self.visibility_icons.update({typ: frames})
+            
+            button = Button(base_x+x_offset, base_y, 50, 50, "", frames[2], hover_color=frames[3], click_color=frames[2])
+            alt_text1 = f"Hide {typ}" + ("" if typ.endswith(("r", "o")) else "s")
+            alt_text2 = f"Show {alt_text1[5:]}"
+            button._alt_text = alt_text1
+            self.visibility_toggled.update({typ: True})
+            
+            on_click = VisibilityToggle(self, typ, button, alt_text1, alt_text2, frames)
+            self.visibility_toggles.update({typ: (button, on_click)})
+                
+            button.on_left_click = on_click
+            self.children.append(button)
+            self.visibility_groups.update({typ: []})
+            x_offset += 50
+        
+        img = Image(f"{PATH}/advanced_editor/selector_block.png", base_x+x_offset, base_y, 25, 79)
+        self.children.append(img)
+        self.empty_visibility_toggle_spots.append(img)
+    
+    def _update(self, editor, X, Y):
+        for child in self.children:
+            child._update(editor, X, Y)
+    
+    def _event(self, editor, X, Y):
+        for child in self.children[::-1]:
+            child._event(editor, X, Y)
+            
+    def _update_layout(self, editor):
+        for button, _ in self.visibility_toggles.values():
+            button.y = editor.height-100
+        for blank in self.empty_visibility_toggle_spots:
+            blank.y = editor.height-100
 
 class Opener:
 
@@ -2090,13 +2194,29 @@ class EditorApp(UIElement):
             Image(f"{PATH}/file_editor_sub_app_hovered.png", 0, 0, 50, 50),
             Image(f"{PATH}/file_editor_sub_app_selected.png", 0, 0, 50, 50)
         ]
-        self.file_editor_sub_app_button = Button(51, 21, 50, 50, "", self.file_editor_icons[2], hover_color=self.file_editor_icons[2], click_color=self.file_editor_icons[2])
+        
+        self.file_editor_sub_app_button = Button(51, 71, 50, 50, "", self.file_editor_icons[0], hover_color=self.file_editor_icons[1], click_color=self.file_editor_icons[2])
         self.file_editor_sub_app_button.on_left_click = self.click_file_editor
         self.file_editor_sub_app_button._alt_text = "Basic File Editor"
         self.children.append(self.file_editor_sub_app_button)
         self.sub_app_file_editor = FileEditorSubApp(code_editor, editor)
         self.sub_apps.append((self.file_editor_sub_app_button, self.file_editor_icons))
-        self.active_app = self.sub_app_file_editor
+        
+        
+        self.advanced_editor_icons = [
+            Image(f"{PATH}/advanced_editor_sub_app.png", 0, 0, 50, 50),
+            Image(f"{PATH}/advanced_editor_sub_app_hovered.png", 0, 0, 50, 50),
+            Image(f"{PATH}/advanced_editor_sub_app_selected.png", 0, 0, 50, 50)
+        ]
+        
+        self.advanced_editor_sub_app_button = Button(51, 21, 50, 50, "", self.advanced_editor_icons[0], hover_color=self.advanced_editor_icons[1], click_color=self.advanced_editor_icons[2])
+        self.advanced_editor_sub_app_button.on_left_click = self.click_advanced_editor
+        self.advanced_editor_sub_app_button._alt_text = "Advanced Editor"
+        self.children.append(self.advanced_editor_sub_app_button)
+        self.sub_app_advanced_editor = AdvancedEditorSubApp(code_editor, editor)
+        self.sub_apps.append((self.advanced_editor_sub_app_button, self.advanced_editor_icons))
+        
+        self.active_app = None #self.sub_app_file_editor
     
     def click_file_editor(self, *_, **__):
 
@@ -2105,6 +2225,15 @@ class EditorApp(UIElement):
             self.active_app = self.sub_app_file_editor
             self.file_editor_sub_app_button._bg_color = self.file_editor_sub_app_button.bg_color = self.file_editor_sub_app_button.hover_color = self.file_editor_icons[2]
 
+        else:
+            self._reset_sub_apps()
+    
+    def click_advanced_editor(self, *_, **__):
+        if self.active_app != self.sub_app_advanced_editor:
+            self._reset_sub_apps()
+            self.active_app = self.sub_app_advanced_editor
+            self.advanced_editor_sub_app_button._bg_color = self.advanced_editor_sub_app_button.bg_color = self.advanced_editor_sub_app_button.hover_color = self.advanced_editor_icons[2]
+        
         else:
             self._reset_sub_apps()
     
@@ -2117,10 +2246,13 @@ class EditorApp(UIElement):
 
     def _update_layout(self, editor):
         self.sub_app_bar.height = self.sub_app_bar_line.height = editor.height - 42
-        self.sub_app_file_editor._update_layout(editor)
+        if self.active_app:
+            self.active_app._update_layout(editor)
+        
 
     def _event(self, editor, X, Y):
-        self._update_layout(editor)
+        if editor._do_layout_update:
+            self._update_layout(editor)
         
         if self.active_app:
             self.active_app._event(editor, X, Y)
@@ -2211,6 +2343,7 @@ class WindowFrame(UIElement):
         editor.width, editor.height = screen.width, screen.height
         editor.set_window_location(0, 0)
         self._update_layout(editor)
+        editor._do_layout_update = True
 
     def toggle_fullscreen(self, editor):
 
@@ -2233,6 +2366,7 @@ class WindowFrame(UIElement):
             self.set_fullscreen(editor)
 
         self._is_fullscreen = not self._is_fullscreen
+        editor._do_layout_update = True
 
     def close_window(self, editor):
         
@@ -2562,10 +2696,12 @@ class CodeEditor(UIElement):
         screen = get_monitors()[0]
         editor.width, editor.height = screen.width, screen.height
         editor.set_window_location(0, 0)
+        editor._do_layout_update = True
         self._update_layout(editor)
+        
 
     def toggle_fullscreen(self, editor):
-
+        editor._do_layout_update = True
         if self._is_fullscreen:
             self.fullscreen_toggle.bg_color = self.fullscreen_toggle._bg_color = self._fullscreen
             self.fullscreen_toggle.hover_color = self._fullscreen_hovered

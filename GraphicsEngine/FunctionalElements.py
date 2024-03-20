@@ -660,7 +660,7 @@ class Scrollable:
             #print("Scrollable: v")
             if self.parent._fake_editor.collides((mx+self.x+self.offsetX, my+self.y+self.offsetY), (self.x, self.y, self.width, self.height)):
                 #print(f"Scrollable: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")
-                if x <= mx <= x + w and y <= my <= y + h:
+                if x <= mx < x + w and y <= my < y + h:
                     return True
 
             return False

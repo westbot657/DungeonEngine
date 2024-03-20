@@ -1867,6 +1867,17 @@ class VisibilityToggle:
             
         self.sub_app.visibility_toggled[self.typ] = not self.sub_app.visibility_toggled[self.typ]
 
+class Test(UIElement):
+    def __init__(self):
+        self.surface = pygame.Surface((3, 3))
+        self.surface.fill((255, 0, 0))
+
+    def _event(self, editor, X, Y): pass
+    
+    def _update(self, editor, X, Y):
+        mx, my = editor.mouse_pos
+        editor.screen.blit(self.surface, (X+mx, Y+my))
+
 class ConstructionCanvas(UIElement):
     
     class _Canvas:
@@ -1940,8 +1951,7 @@ class ConstructionCanvas(UIElement):
         self.show_grid = True
         self.children = []
         self.panning = False
-        self.pan_origin = [0, 0]   # this is where the mouse clicked in relation to the canvas
-        self.pan_relative = [0, 0] # this is where the mouse clicked in relation to the screen
+        self.pan_origin = [0, 0]
     
         # == scrollable canvas stuff ==
         self.mouse_pos = [0, 0]
@@ -1949,16 +1959,59 @@ class ConstructionCanvas(UIElement):
         
         # =============================
     
+    
+    def collides(self, mouse, rect) -> bool:
+        mx, my = mouse
+        x, y, w, h = rect
+        #print("Scrollable: v")
+        if self.canvas._editor.collides((mx, my), (self.x, self.y, self.width, self.height)):
+            #print(f"Scrollable: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")
+            if x <= (mx-self.offsetX) < x + w and y <= (my-self.offsetY) < y + h:
+                return True
+
+        return False
+    
     def override_values(self):
         self.mouse_pos = list(self.editor.mouse_pos)
-        self.mouse_pos[0] -= self.x + self.offsetX
-        self.mouse_pos[1] -= self.y + self.offsetY
+        self.mouse_pos[0] -= self.x - (self.offsetX * self.scale)
+        self.mouse_pos[1] -= self.y - (self.offsetY * self.scale)
+        self.mouse_pos[0] /= self.scale
+        self.mouse_pos[1] /= self.scale
     
     def _event(self, editor, X, Y):
+        mx, my = editor.mouse_pos
+        self.override_values()
+        if editor.collides((mx, my), (self.x, self.y, self.width, self.height)):
+            if editor.middle_mouse_down():
+                self.pan_origin = [
+                    (self.offsetX * self.scale) + mx,
+                    (self.offsetY * self.scale) + my
+                ]
+                self.panning = True
+        if editor.middle_mouse_up():
+            self.panning = False
+        
+        if self.panning:
+            dx, dy = self.pan_origin
+            self.offsetX = (dx - mx) / self.scale
+            self.offsetY = (dy - my) / self.scale
+        
+        if editor.scroll != 0:
+            
+            _scale = self.scale
+            self.scale = min(max(0.1, self.scale + (editor.scroll * 0.125)), 3)
+            diff = self.scale - _scale
+            
+            
+            
+            
+            self.screen = pygame.Surface((self.width/self.scale, self.height/self.scale), pygame.SRCALPHA, 32)
+            
+        
         for group, visible in [i for i in self.advanced_editor.visibility_toggled.items()][::-1]:
             if visible:
                 for child in self.advanced_editor.visibility_groups[group][::-1]:
-                    child._event(self.canvas, 0, 0)
+                    child._event(self.canvas, -self.offsetX, -self.offsetY)
 
     def _update(self, editor, X, Y):
         self.screen.fill(TEXT_BG_COLOR)
@@ -1967,23 +2020,27 @@ class ConstructionCanvas(UIElement):
             # draw grid
             _x = -1
             _y = -1
-            _width = self.width + (2*self.grid_size) # add one extra grid space off each side of the screen
-            _height = self.height + (2*self.grid_size)
-            _ex = int(_width // (self.grid_size * self.scale))
-            _ey = int(_height // (self.grid_size * self.scale))
-            for i in range(_x, _ex):
-                x = i * self.grid_size * self.scale
-                self.screen.fill(TEXT_BG2_COLOR, (x, -1, 1, _height))
-            for i in range(_y, _ey):
-                y = i * self.grid_size * self.scale
-                self.screen.fill(TEXT_BG2_COLOR, (-1, y, _width, 1))
+            _width = (self.width/self.scale) + (2*self.grid_size) # add one extra grid space off each side of the screen
+            _height = (self.height/self.scale) + (2*self.grid_size)
+            _ex = int(_width // (self.grid_size))
+            _ey = int(_height // (self.grid_size))
+            dx = self.offsetX % (self.grid_size)
+            dy = self.offsetY % (self.grid_size)
+            for i in range(_x, _ex+1):
+                x = (i * self.grid_size) - dx
+                self.screen.fill(TEXT_BG2_COLOR, (x, -1, 2, _height))
+            for i in range(_y, _ey+1):
+                y = (i * self.grid_size) - dy
+                self.screen.fill(TEXT_BG2_COLOR, (-1, y, _width, 2))
 
         for group, visible in self.advanced_editor.visibility_toggled.items():
             if visible:
                 for child in self.advanced_editor.visibility_groups[group]:
-                    child._update(self.canvas, 0, 0)
+                    child._update(self.canvas, -self.offsetX, -self.offsetY)
         
-        editor.screen.blit(self.screen, (X+self.x, Y+self.y))
+        
+        sx, sy = self.screen.get_size()
+        editor.screen.blit(pygame.transform.scale(self.screen, (sx*self.scale, sy*self.scale)), (X+self.x, Y+self.y))
 
 class AdvancedEditorSubApp(UIElement):
     
@@ -2041,7 +2098,7 @@ class AdvancedEditorSubApp(UIElement):
             
             on_click = VisibilityToggle(self, typ, button, alt_text1, alt_text2, frames)
             self.visibility_toggles.update({typ: (button, on_click)})
-                
+
             button.on_left_click = on_click
             self.children.append(button)
             self.visibility_groups.update({typ: []})
@@ -2050,6 +2107,10 @@ class AdvancedEditorSubApp(UIElement):
         img = Image(f"{PATH}/advanced_editor/selector_block.png", base_x+x_offset, base_y, 25, 79)
         self.children.append(img)
         self.empty_visibility_toggle_spots.append(img)
+        
+        
+        self.visibility_groups["weapon"].append(Test())
+        self.visibility_groups["weapon"].append(button)
     
     def _update(self, editor, X, Y):
         for child in self.children:

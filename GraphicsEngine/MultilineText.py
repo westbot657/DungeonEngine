@@ -19,6 +19,10 @@ class MultilineText(UIElement):
     ]
     
     def __init__(self, x:int, y:int, min_width:int=1, min_height:int=1, content:str="", text_color:Color|tuple|int=TEXT_COLOR, text_bg_color:Color|tuple|int=TEXT_BG_COLOR, text_size=TEXT_SIZE):
+        """
+        MultilineText allows you to display text that contains newlines.
+        
+        """
         assert min_width >= 1, "Min width must be 1 or more"
         assert min_height >= 1, "Min height must be 1 or more"
         self.x = x

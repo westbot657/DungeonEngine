@@ -37,7 +37,9 @@ class Box(UIElement):
             self.color.width = self.width
             self.color.height = self.height
         elif self.color:
-            editor.screen.fill(tuple(self.color), (X + self.x, Y + self.y, self.width, self.height))
+            dx = X+self.x
+            dy = Y+self.y
+            editor.screen.fill(tuple(self.color), (max(dx, 0), max(dy, 0), self.width-min(dx, 0), self.height-min(dy, 0)))
         for child in self.children:
             child._update(editor, X + self.x, Y + self.y)
     

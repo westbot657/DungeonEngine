@@ -7,6 +7,7 @@ from MultilineText import MultilineText
 from FunctionalElements import Collapsable
 from MultilineTextBox import MultilineTextBox
 from Util import PopoutElement
+from Geometry import Box
 
 @PopoutElement()
 class NumberedTextArea(UIElement):
@@ -24,13 +25,15 @@ class NumberedTextArea(UIElement):
         self.height = height
         self.text_color = Color.color(text_color)
         self.text_bg_color = Color.color(text_bg_color)
-        self.lines = MultilineText(0, 0, 75, self.height, f"{'1': >9}", self.text_color, self.text_bg_color)
-        self.editable = MultilineTextBox(2, 0, self.width-75, self.height, "", self.text_color, self.text_bg_color)
+        self.lines = MultilineText(0, 0, 70, self.height, f"{'1': >5}", self.text_color, self.text_bg_color)
+        self._fill = Box(0, 0, 7, self.height, self.text_bg_color)
+        self.editable = MultilineTextBox(7, 0, self.width-80, self.height, "", self.text_color, self.text_bg_color)
 
         self.collapsable = Collapsable(
             self.x, self.y,
             self.width, self.height,
             [
+                self._fill,
                 self.editable
             ],
             [
@@ -38,7 +41,7 @@ class NumberedTextArea(UIElement):
             ],
             split_type=Collapsable.SplitType.VERTICAL_RIGHT,
             split_draggable=False,
-            split_size=75,
+            split_size=70,
             scroll_speed = scroll_speed,
         )
 
@@ -51,9 +54,9 @@ class NumberedTextArea(UIElement):
     def _update_layout(self):
         # print(f"Numbered text area _update_layout!")
         self.lines.min_height = self.editable.min_height = self.height
-        self.collapsable.height = self.collapsable.main_area.height = self.collapsable.aside.height = self.height-20
+        self.collapsable.height = self.collapsable.main_area.height = self.collapsable.aside.height = self._fill.height = self.height-20
         self.collapsable.width = self.width-5
-        self.editable.min_width = self.width-75
+        self.editable.min_width = self.width-80
 
     def get_content(self):
         return self.editable.get_content()
@@ -75,11 +78,11 @@ class NumberedTextArea(UIElement):
         if self.collapsable.aside.hovered:
             self.collapsable.main_area.offsetY = self.collapsable.aside.offsetY
 
-        lines = len(self.collapsable.main_area.children[0].get_lines())
+        lines = len(self.collapsable.main_area.children[1].get_lines())
 
         # print(f"Numbered Text Area lines: {lines}")
 
-        txt = [f"{i+1: >9}" for i in range(lines)]
+        txt = [f"{i+1: >5}" for i in range(lines)]
 
         # print(self.collapsable.aside.children[0])
         self.collapsable.aside.children[0].set_colored_content("\n".join(txt))
@@ -87,7 +90,7 @@ class NumberedTextArea(UIElement):
         # if lines == 0:
         #     raise Exception("Numbered Text Editor reached 0 lines, which is meant to be impossible!!")
 
-        d = self.collapsable.main_area.children[0].surfaces[0].get_height()
+        d = self.collapsable.main_area.children[1].surfaces[0].get_height()
 
         self.collapsable.main_area.bottom_bound = -d * (lines-1)
         self.collapsable.aside.bottom_bound = -d * (lines-1)

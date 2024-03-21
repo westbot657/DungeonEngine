@@ -7,6 +7,7 @@ try:
     from GraphicsEngine.AttributePanel import AttributePanel
     from GraphicsEngine.ConstructionCanvas import ConstructionCanvas
     from GraphicsEngine.FunctionalElements import Button
+    from GraphicsEngine.AdvancedPanels.PanelTree import PanelTree
 except ImportError:
     from UIElement import UIElement
     from RenderPrimitives import Image
@@ -14,6 +15,7 @@ except ImportError:
     from AttributePanel import AttributePanel
     from ConstructionCanvas import ConstructionCanvas
     from FunctionalElements import Button
+    from AdvancedPanels.PanelTree import PanelTree
 
 class VisibilityToggle:
     def __init__(self, sub_app, typ, button, alt_text1, alt_text2, frames):
@@ -48,7 +50,7 @@ class AdvancedEditorSubApp(UIElement):
         self.children = []
         self.popouts = {}
         
-        self.construction_canvas = ConstructionCanvas(self, editor, 102, 22, editor.width-352, editor.height-111)
+        self.construction_canvas = ConstructionCanvas(self, editor, 102, 22, editor.width-452, editor.height-111)
         self.children.append(self.construction_canvas)
         
         self.visibility_types = [
@@ -65,6 +67,8 @@ class AdvancedEditorSubApp(UIElement):
         self.visibility_toggled = {}
         self.visibility_groups = {}
         self.empty_visibility_toggle_spots = []
+        
+        self.object_tree = PanelTree(editor.width-352, 22, 350, editor.height-111)
         
         base_x = 102
         base_y = editor.height-100
@@ -132,6 +136,6 @@ class AdvancedEditorSubApp(UIElement):
         for blank in self.empty_visibility_toggle_spots:
             blank.y = editor.height-100
         
-        self.construction_canvas.width = editor.width-352
+        self.construction_canvas.width = editor.width-452
         self.construction_canvas.height = editor.height-111
         self.construction_canvas.rebuild()

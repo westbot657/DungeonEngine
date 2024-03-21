@@ -7,9 +7,7 @@ class ShelfPanel(UIElement):
         self.height = height
         self.label = label # Used for panel search filtering
         self.children = children
-        
         self.effective_height = height
-        
     
     def _update(self, editor, X, Y):
         

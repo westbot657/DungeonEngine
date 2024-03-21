@@ -2,7 +2,7 @@
 
 from UIElement import UIElement
 from RenderPrimitives import Color, Image, Animation
-from Options import TEXT_COLOR, TEXT_BG_COLOR, SCROLL_MULTIPLIER
+from Options import TEXT_COLOR, TEXT_BG_COLOR, SCROLL_MULTIPLIER, TEXT_SIZE
 from MultilineText import MultilineText
 from FunctionalElements import Collapsable
 from MultilineTextBox import MultilineTextBox
@@ -25,7 +25,7 @@ class NumberedTextArea(UIElement):
         self.height = height
         self.text_color = Color.color(text_color)
         self.text_bg_color = Color.color(text_bg_color)
-        self.lines = MultilineText(0, 0, 70, self.height, f"{'1': >5}", self.text_color, self.text_bg_color)
+        self.lines = MultilineText(0, 0, 70, self.height, f"{'1': >{(70 // TEXT_SIZE)+2}}", self.text_color, self.text_bg_color)
         self._fill = Box(0, 0, 7, self.height, self.text_bg_color)
         self.editable = MultilineTextBox(7, 0, self.width-80, self.height, "", self.text_color, self.text_bg_color)
 
@@ -82,7 +82,7 @@ class NumberedTextArea(UIElement):
 
         # print(f"Numbered Text Area lines: {lines}")
 
-        txt = [f"{i+1: >5}" for i in range(lines)]
+        txt = [f"{i+1: >{(70 // TEXT_SIZE)+2}}" for i in range(lines)]
 
         # print(self.collapsable.aside.children[0])
         self.collapsable.aside.children[0].set_colored_content("\n".join(txt))

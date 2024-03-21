@@ -518,7 +518,7 @@ class GameApp(UIElement):
 
         self.player_name_display = Text(96, editor.height-75, content="[Start game to load player info]", text_size=15)
         self.player_location_display = Text(56, editor.height-55, 1, "[location]", text_size=12)
-        self.player_money_display = Text(editor.width-200, editor.height-75, 1, "[money]", text_bg_color=None, text_size=13)
+        self.player_money_display = Text(editor.width - 460, editor.height-75, 1, "[money]", text_bg_color=None, text_size=13)
         self._old_location = ""
         self.player_health_bar = GameApp.HealthBar(80+self.player_name_display.width + self.id_input._text_width+self.id_refresh.width, editor.height-75, 200, self.player_name_display.height, 20, 20)
         self._old_health = 0

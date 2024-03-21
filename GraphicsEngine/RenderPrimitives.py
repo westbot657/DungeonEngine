@@ -40,6 +40,18 @@ class Image(UIElement):
         else:
             self.width, self.height = self._width, self._height = self.surface.get_size()
 
+    @classmethod
+    def from_pygameSurface(cls, surface:pygame.Surface, slice:tuple[int, int, int, int], rescale:None|tuple[int, int]=None):
+        self: Image = super().__new__(Image, cls)
+        self.surface = self._surface = surface.subsurface(slice)
+        self.x = self._x = 0
+        self.y = self._y = 0
+        self.file_location = "<internal>"
+        if rescale:
+            self.surface = pygame.transform.scale(self._surface, rescale)
+        self.width, self.height = self._width, self._height = self.surface.get_size()
+        return self
+
     def copy(self):
         i = Image(self.file_location)
         i.surface = i._surface = self.surface.copy()

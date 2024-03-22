@@ -21,6 +21,10 @@ class PanelTree(UIElement):
         self._canvas = ConstructionCanvas._Canvas(editor, self)
         self.offsetY = 0
         self.content_height = 0
+        self._search = ""
+    
+    def get_search(self):
+        return ""
     
     def override_values(self):
         self.mouse_pos = list(self.editor.mouse_pos)
@@ -42,11 +46,15 @@ class PanelTree(UIElement):
             if editor.scroll != 0:
                 self.offsetY = min(max(-self.content_height, self.offsetY + 0.5*SCROLL_MULTIPLIER*editor.scroll), 0)
         
+        self._search = self.get_search()
         
+        last = None
         for obj in self.tree:
-            obj._event(self._canvas, 5, y+self.offsetY)
-            y += obj.effective_height + 5
-        self.content_height = y-(obj.effective_height+5)
+            if obj.label.contains(self._search):
+                obj._event(self._canvas, 5, y+self.offsetY)
+                y += obj.effective_height + 5
+                last = obj
+        self.content_height = y-((last.effective_height)+5 if last else 0)
         
     
     def _update(self, editor, X, Y):
@@ -55,9 +63,9 @@ class PanelTree(UIElement):
         self.screen.fill((0, 0, 0, 0))
         
         for obj in self.tree:
-            obj._update(self._canvas, 5, y+self.offsetY)
-            y += obj.effective_height + 5
-        
+            if obj.label.contains(self._search):
+                obj._update(self._canvas, 5, y+self.offsetY)
+                y += obj.effective_height + 5
         editor.screen.blit(self.screen, (self.x, self.y))
     
 

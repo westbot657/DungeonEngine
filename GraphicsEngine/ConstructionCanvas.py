@@ -203,8 +203,6 @@ class ConstructionCanvas(UIElement):
             dx, dy = self.pan_origin
             self.offsetX = (dx - mx) / self.scale
             self.offsetY = (dy - my) / self.scale
-        
-        
 
     def rebuild(self):
         self.screen = pygame.Surface((self.width/self.scale, self.height/self.scale), pygame.SRCALPHA, 32)

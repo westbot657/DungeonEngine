@@ -70,7 +70,7 @@ class AdvancedEditorSubApp(UIElement):
         self.visibility_groups = {}
         self.empty_visibility_toggle_spots = []
         
-        self.object_tree = PanelTree(editor.width-352, 22, 350, editor.height-111, editor)
+        self.object_tree = PanelTree(editor.width-352, 57, 350, editor.height-111, editor)
         self.children.append(self.object_tree)
         
         base_x = 102

@@ -70,7 +70,7 @@ class AdvancedEditorSubApp(UIElement):
         self.visibility_groups = {}
         self.empty_visibility_toggle_spots = []
         
-        self.object_tree = PanelTree(editor.width-352, 22, 350, editor.height-111)
+        self.object_tree = PanelTree(editor.width-352, 22, 350, editor.height-111, editor)
         self.children.append(self.object_tree)
         
         base_x = 102
@@ -117,7 +117,7 @@ class AdvancedEditorSubApp(UIElement):
         a.scroll_directions = 0b1010
         a.rebuild()
         
-        a_shelf = ShelfPanel(340, 55, "Test 1", a, self.construction_canvas)
+        a_shelf = ShelfPanel(340, 35, "Test 1", a, self.construction_canvas)
 
         b = AttributePanel(500, 300, 300, 400, True)
         b.scroll_directions = 0b0110
@@ -125,7 +125,7 @@ class AdvancedEditorSubApp(UIElement):
         b.glowing = True
         b.rebuild()
         
-        b_shelf = ShelfPanel(340, 55, "Test2", b, self.construction_canvas)
+        b_shelf = ShelfPanel(340, 35, "Test 2", b, self.construction_canvas)
 
         self.object_tree.tree += [a_shelf, b_shelf]
 

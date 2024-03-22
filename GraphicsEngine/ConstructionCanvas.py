@@ -102,6 +102,8 @@ class ConstructionCanvas(UIElement):
         # =============================
     
     def setOffset(self, x, y, deltaTime, end_func=None):
+        if self.gotoF is not None:
+            self.gotoF()
         if self.offsetX == x and self.offsetY == y:
             if end_func: end_func()
             return
@@ -117,9 +119,11 @@ class ConstructionCanvas(UIElement):
         self.gotoE = 0
     
     def stopMove(self):
-        self.gotoX = self.gotoY = self.origX = self.origY = None
+        self.gotoX = self.gotoY = self.origX = self.origY = self.targetX = self.targetY = None
         self.gotoT = 0
-        self.gotoF = None
+        if self.gotoF is not None:
+            self.gotoF()
+            self.gotoF = None
     
     def _handleMove(self):
         dt = time.time()-self.gotoT
@@ -169,6 +173,7 @@ class ConstructionCanvas(UIElement):
         
         if editor.collides((mx, my), (self.x, self.y, self.width, self.height)):
             if editor.middle_mouse_down():
+                self.stopMove()
                 self.pan_origin = [
                     (self.offsetX * self.scale) + mx,
                     (self.offsetY * self.scale) + my

@@ -37,12 +37,16 @@ class ShelfPanel(UIElement):
         self.panel.texture_scale = 1
         self.panel.rebuild()
         self.label_text_box = MultilineTextBox(12, 10, 1, 1, label, single_line=True)
-        self.visibility_button = Button(self.width-80, (height-33)/2, 33, 33, "", self.visibility_frames[2], hover_color=self.visibility_frames[3], click_color=self.visibility_frames[3])
+        self.label_text_box.on_enter(self.set_label)
+        self.visibility_button = Button(self.width-68, (height-33)/2, 33, 33, "", self.visibility_frames[2], hover_color=self.visibility_frames[3], click_color=self.visibility_frames[3])
         self.visibility_button.on_left_click = self.visibility_toggle
-        self.focus_button = Button(self.width-47, (height-33)/2, 33, 33, "", self.refocus_frames[0], hover_color=self.refocus_frames[1], click_color=self.refocus_frames[2])
+        self.focus_button = Button(self.width-34, (height-33)/2, 33, 33, "", self.refocus_frames[0], hover_color=self.refocus_frames[1], click_color=self.refocus_frames[2])
         self.focus_button.on_left_click = self.focus_object
         self.attr_panel_visible = True
         self.children = []
+    
+    def set_label(self, textbox):
+        self.label = textbox.get_content()
     
     def visibility_toggle(self, editor, *_, **__):
         if self.attr_panel_visible:

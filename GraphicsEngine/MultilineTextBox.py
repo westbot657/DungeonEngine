@@ -5,6 +5,7 @@ from RenderPrimitives import Color, Image, Animation
 from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE, \
     FONT, CURSOR_BLINK_TIME, PATH, CURSOR_COLOR
 from Util import Cursor, Selection, expand_text_lists, PopoutElement
+from Geometry import Box
 
 import pygame
 import re
@@ -46,7 +47,7 @@ class MultilineTextBox(UIElement):
         self.highlights = []
         self._save = self._default_save_event
         self._on_enter = self._default_on_enter_event
-        
+        # self._bg_box = Box()
         self.char_whitelist: list[str] = None
         self.char_blacklist: list[str] = None
 
@@ -278,7 +279,11 @@ class MultilineTextBox(UIElement):
                 self.text_bg_color.height = max(self._text_height, self.min_height) + 2
                 self.text_bg_color._update(editor, X, Y)
             else:
-                editor.screen.fill(tuple(self.text_bg_color), (X+self.x-1, Y+self.y-1, max(self._text_width, self.min_width)+2, max(self._text_height, self.min_height)+2))
+                dx = X+self.x-1
+                dy = Y+self.y-1
+                w = max(self._text_width, self.min_width)+2
+                h_ = max(self._text_height, self.min_height)+2
+                editor.screen.fill(tuple(self.text_bg_color), (max(dx, 0), max(dy, 0), w+min(dx, 0), h_+min(dy, 0)))
 
         l = 0
         for s in self.surfaces:

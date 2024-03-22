@@ -1,4 +1,4 @@
-# pylint: disable=[W,R,C, no-member]
+# pylint: disable=[W,R,C, no-member, invalid-unary-operand-type]
 
 try:
     from GraphicsEngine.UIElement import UIElement
@@ -9,7 +9,8 @@ except ImportError:
 
 from typing import Any
 import pygame
-
+import time
+import math
 
 class ConstructionCanvas(UIElement):
     
@@ -67,7 +68,6 @@ class ConstructionCanvas(UIElement):
             else:
                 setattr(super().__getattribute__("_canvas"), __name, __value)
 
-    
     def __init__(self, advanced_editor, editor, x, y, width, height):
         self.advanced_editor = advanced_editor
         self.editor = editor
@@ -76,8 +76,8 @@ class ConstructionCanvas(UIElement):
         self.y = y
         self.width = width
         self.height = height
-        self.offsetX = 0
-        self.offsetY = 0
+        self.offsetX: int = 0
+        self.offsetY: int = 0
         self.scale = 1.0
         self.grid_size = 100
         # self.sub_grid_segments = 2 # cut each section in half n times
@@ -86,12 +86,56 @@ class ConstructionCanvas(UIElement):
         self.panning = False
         self.pan_origin = [0, 0]
     
+        self.targetX: int = None
+        self.targetY: int = None
+        self.gotoX = None
+        self.gotoY = None
+        self.gotoF = None
+        self.gotoT = None
+        self.gotoTS = 0
+        self.gotoE = 0
+    
         # == scrollable canvas stuff ==
         self.mouse_pos = [0, 0]
         self.screen = pygame.Surface((width, height), pygame.SRCALPHA, 32)
         
         # =============================
     
+    def setOffset(self, x, y, deltaTime, end_func=None):
+        if self.offsetX == x and self.offsetY == y:
+            if end_func: end_func()
+            return
+        self.targetX = x
+        self.targetY = y
+        self.gotoX = (x-self.offsetX)
+        self.gotoY = (y-self.offsetY)
+        self.origX = self.offsetX
+        self.origY = self.offsetY
+        self.gotoF = end_func
+        self.gotoT = time.time()
+        self.gotoTS = self.gotoT + deltaTime
+        self.gotoE = 0
+    
+    def stopMove(self):
+        self.gotoX = self.gotoY = self.origX = self.origY = None
+        self.gotoT = 0
+        self.gotoF = None
+    
+    def _handleMove(self):
+        dt = time.time()-self.gotoT
+        self.gotoE += dt
+        # print(self.gotoE)
+        self.gotoT = time.time()
+        self.offsetX = self.origX + (self.gotoX * math.sin(math.pi/2 * self.gotoE))
+        self.offsetY = self.origY + (self.gotoY * math.sin(math.pi/2 * self.gotoE))
+        if time.time() > self.gotoTS:
+            self.offsetX: int = self.targetX
+            self.offsetY: int = self.targetY
+            self.targetY = self.targetX = self.gotoX = self.gotoY = None
+            if self.gotoF:
+                self.gotoF()
+            self.gotoF = None
+            self.gotoT = 0
     
     def collides(self, mouse, rect) -> bool:
         mx, my = mouse
@@ -114,6 +158,9 @@ class ConstructionCanvas(UIElement):
     def _event(self, editor, X, Y):
         mx, my = editor.mouse_pos
         self.override_values()
+        
+        if self.targetX is not None:
+            self._handleMove()
         
         for group, visible in [i for i in self.advanced_editor.visibility_toggled.items()][::-1]:
             if visible:

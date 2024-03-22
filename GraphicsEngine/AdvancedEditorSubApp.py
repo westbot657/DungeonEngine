@@ -8,6 +8,7 @@ try:
     from GraphicsEngine.ConstructionCanvas import ConstructionCanvas
     from GraphicsEngine.FunctionalElements import Button
     from GraphicsEngine.AdvancedPanels.PanelTree import PanelTree
+    from GraphicsEngine.AdvancedPanels.ShelfPanel import ShelfPanel
 except ImportError:
     from UIElement import UIElement
     from RenderPrimitives import Image
@@ -16,6 +17,7 @@ except ImportError:
     from ConstructionCanvas import ConstructionCanvas
     from FunctionalElements import Button
     from AdvancedPanels.PanelTree import PanelTree
+    from AdvancedPanels.ShelfPanel import ShelfPanel
 
 class VisibilityToggle:
     def __init__(self, sub_app, typ, button, alt_text1, alt_text2, frames):
@@ -69,6 +71,7 @@ class AdvancedEditorSubApp(UIElement):
         self.empty_visibility_toggle_spots = []
         
         self.object_tree = PanelTree(editor.width-352, 22, 350, editor.height-111)
+        self.children.append(self.object_tree)
         
         base_x = 102
         base_y = editor.height-100
@@ -113,10 +116,21 @@ class AdvancedEditorSubApp(UIElement):
         a = AttributePanel(200, 200, 200, 400, True)
         a.scroll_directions = 0b1010
         a.rebuild()
+        
+        a_shelf = ShelfPanel(340, 55, "Test 1", a, self.construction_canvas)
+
         b = AttributePanel(500, 300, 300, 400, True)
         b.scroll_directions = 0b0110
+        b.glow_time = -1
+        b.glowing = True
         b.rebuild()
+        
+        b_shelf = ShelfPanel(340, 55, "Test2", b, self.construction_canvas)
+
+        self.object_tree.tree += [a_shelf, b_shelf]
+
         self.visibility_groups["weapon"] += [a, b]
+        
     
     def _update(self, editor, X, Y):
         for child in self.children:
@@ -139,3 +153,5 @@ class AdvancedEditorSubApp(UIElement):
         self.construction_canvas.width = editor.width-452
         self.construction_canvas.height = editor.height-111
         self.construction_canvas.rebuild()
+        self.object_tree.x = editor.width-352
+        self.object_tree.height = editor.height-111

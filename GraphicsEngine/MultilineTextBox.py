@@ -59,6 +59,10 @@ class MultilineTextBox(UIElement):
 
         self._width, self._height = self.font.render("_", True, (0, 0, 0)).get_size()
 
+    def set_text_color(self, color):
+        self.text_color = Color.color(color)
+        self._refresh_surfaces()
+
     def save_history(self):
         content = self.get_content()
         if self._history:

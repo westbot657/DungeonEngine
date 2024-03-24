@@ -4,6 +4,7 @@ from UIElement import UIElement
 from MultilineTextBox import MultilineTextBox
 from ConstructionCanvas import ConstructionCanvas
 from Text import Text
+from Options import TEXT_BG3_COLOR
 
 import pygame
 
@@ -20,12 +21,14 @@ class CursorFocusTextBox(UIElement):
         self.shadow_text = shadow_text
         self.editor = editor
         kwargs.update({"single_line": True})
-        self.text_box = MultilineTextBox(0, 0, 1, 1, "", *args, **kwargs)
+        self.text_box = MultilineTextBox(1, 1, width, height, *args, **kwargs)
         self.mouse_pos = [0, 0]
         self.screen = pygame.Surface((width, height), pygame.SRCALPHA, 32)
         self._canvas = ConstructionCanvas._Canvas(editor, self)
-        
+        self.shadow_text_obj = Text(4, 0, 1, self.shadow_text, text_color=TEXT_BG3_COLOR)
         self.offsetX = 0
+        self.last_X = 0
+        self.last_Y = 0
     
     def on_enter(self, method):
         self.text_box.on_enter(method)
@@ -35,11 +38,66 @@ class CursorFocusTextBox(UIElement):
     
     def get_content(self):
         return self.text_box.get_content()
+
+    def set_content(self, content):
+        self.text_box.set_content(content)
+    
+    def collides(self, mouse, rect) -> bool:
+        mx, my = mouse
+        x, y, w, h = rect
+        #print("Scrollable: v")
+        if self.shadow_text == "enter label...":
+            _x, _y = self.editor.mouse_pos
+        if self._canvas._editor.collides(self.editor.mouse_pos, (self.x+self.last_X, self.y+self.last_Y, self.width, self.height)):
+            print("COLLISION")
+            #print(f"Scrollable: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")
+            print((x, y, w, h), (mx-(self.x), my-(self.y)), (self.last_X, self.last_Y))
+            if x <= (mx-(self.x)) < x + w and y <= my-(self.y) < y + h:
+                return True
+
+        return False
+    
+    def set_text_color(self, color):
+        self.text_box.set_text_color(color)
+    
+    def override_values(self, X, Y):
+        self.mouse_pos = list(self.editor.mouse_pos)
+        self.mouse_pos[0] -= self.x - X
+        self.mouse_pos[1] -= self.y - Y# - self.offsetY
+        self.last_X = X
+        self.last_Y = Y
     
     def _event(self, editor, X, Y):
-        ...
+        self.override_values(X, Y)
+        
+        self.text_box._event(self._canvas, self.offsetX, 0)
+
+        cursor_x = self.text_box.cursor_location.col * self.text_box._width
+        
+        # if self.shadow_text == "enter label...":
+        #     print(editor.mouse_pos, self.x, self.y, self.width, self.height, self.text_box.hovered)
+        
+        # self.offsetX needs to be <= 0
+        
+        leftX = -self.offsetX
+        rightX = (-self.offsetX)+self.width
+        
+        if not (leftX + (self.text_box._width*2) < cursor_x < rightX - (self.text_box._width*2)):
+            if leftX + (self.text_box._width*2) > cursor_x:
+                dx = (leftX + (self.text_box._width*2)) - cursor_x
+                self.offsetX = min(self.offsetX + dx, 0)
+            if cursor_x > rightX - (self.text_box._width*2):
+                dx = (rightX - (self.text_box._width*2)) - cursor_x
+                self.offsetX = min(self.offsetX + dx, self.text_box._text_width)
+            
     
     def _update(self, editor, X, Y):
-        ...
+        self.screen.fill((0, 0, 0, 0))
+        self.text_box._update(self._canvas, self.offsetX, 0)
+        
+        if not self.text_box.get_content():
+            self.shadow_text_obj._update(self._canvas, self.offsetX, 0)
+        
+        editor.screen.blit(self.screen, (X+self.x, Y+self.y))
 
 

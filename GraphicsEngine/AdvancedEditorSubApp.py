@@ -1,23 +1,14 @@
-# pylint: disable=[W,R,C]
+# pylint: disable=[W,R,C, import-error]
 
-try:
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.RenderPrimitives import Image
-    from GraphicsEngine.Options import PATH
-    from GraphicsEngine.AttributePanel import AttributePanel
-    from GraphicsEngine.ConstructionCanvas import ConstructionCanvas
-    from GraphicsEngine.FunctionalElements import Button
-    from GraphicsEngine.AdvancedPanels.PanelTree import PanelTree
-    from GraphicsEngine.AdvancedPanels.ShelfPanel import ShelfPanel
-except ImportError:
-    from UIElement import UIElement
-    from RenderPrimitives import Image
-    from Options import PATH
-    from AttributePanel import AttributePanel
-    from ConstructionCanvas import ConstructionCanvas
-    from FunctionalElements import Button
-    from AdvancedPanels.PanelTree import PanelTree
-    from AdvancedPanels.ShelfPanel import ShelfPanel
+from UIElement import UIElement
+from RenderPrimitives import Image
+from Options import PATH
+from AttributePanel import AttributePanel
+from ConstructionCanvas import ConstructionCanvas
+from FunctionalElements import Button
+from AdvancedPanels.PanelTree import PanelTree
+from AdvancedPanels.ShelfPanel import ShelfPanel
+from CursorFocusTextBox import CursorFocusTextBox
 
 class VisibilityToggle:
     def __init__(self, sub_app, typ, button, alt_text1, alt_text2, frames):
@@ -70,8 +61,13 @@ class AdvancedEditorSubApp(UIElement):
         self.visibility_groups = {}
         self.empty_visibility_toggle_spots = []
         
+        self.search_box = CursorFocusTextBox(editor.width-350, 27, 348, 30, editor, "search...")
+        self.children.append(self.search_box)
+        
         self.object_tree = PanelTree(editor.width-352, 57, 350, editor.height-111, editor)
         self.children.append(self.object_tree)
+        
+        self.object_tree.get_search = self.search_box.get_content
         
         base_x = 102
         base_y = editor.height-100
@@ -117,20 +113,24 @@ class AdvancedEditorSubApp(UIElement):
         a.scroll_directions = 0b1010
         a.rebuild()
         
-        a_shelf = ShelfPanel(340, 35, "Test 1", a, self.construction_canvas)
+        # a_shelf = ShelfPanel(340, 35, "Test 1", a, self.construction_canvas.canvas, self.object_tree._canvas)
 
         b = AttributePanel(500, 300, 300, 400, True)
         b.scroll_directions = 0b0110
-        b.glow_time = -1
-        b.glowing = True
         b.rebuild()
         
-        b_shelf = ShelfPanel(340, 35, "Test 2", b, self.construction_canvas)
+        self.create_panel(a, "Test 1")
+        self.create_panel(b, "Test 2")
+        
+        # b_shelf = ShelfPanel(340, 35, "Test 2", b, self.construction_canvas.canvas, self.object_tree._canvas)
 
-        self.object_tree.tree += [a_shelf, b_shelf]
+        # self.object_tree.tree += [a_shelf]#, b_shelf]
 
         self.visibility_groups["weapon"] += [a, b]
-        
+    
+    def create_panel(self, attribute_panel, label, height=35):
+        shelf_panel = ShelfPanel(340, height, label, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas)
+        self.object_tree.tree.append(shelf_panel)
     
     def _update(self, editor, X, Y):
         for child in self.children:
@@ -153,5 +153,6 @@ class AdvancedEditorSubApp(UIElement):
         self.construction_canvas.width = editor.width-452
         self.construction_canvas.height = editor.height-111
         self.construction_canvas.rebuild()
+        self.search_box.x = editor.width-350
         self.object_tree.x = editor.width-352
         self.object_tree.height = editor.height-111

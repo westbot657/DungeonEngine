@@ -289,11 +289,14 @@ class MultilineTextBox(UIElement):
         for s in self.surfaces:
             s:pygame.Surface
             editor.screen.blit(s, (X+self.x, Y+self.y+h))
-            if l == self.cursor_location.line and self._cursor_visible:
-                _h = self.font.render(self.get_lines()[self.cursor_location.line][0:self.cursor_location.col], True, (0, 0, 0)) # This is not shown on screen, only used to get width
-                editor.screen.blit(self._cursor_surface, (X+self.x+_h.get_width(), Y+self.y+h))
+            # if l == self.cursor_location.line and self._cursor_visible:
+            #     _h = self.font.render(self.get_lines()[self.cursor_location.line][0:self.cursor_location.col], True, (0, 0, 0)) # This is not shown on screen, only used to get width
+            #     editor.screen.blit(self._cursor_surface, (X+self.x+_h.get_width(), Y+self.y+h))
             h += self._height#s.get_height()
             l += 1
+        
+        if self._cursor_visible:
+            editor.screen.blit(self._cursor_surface, (X+self.x+(self._width*self.cursor_location.col), Y+self.y+(self._height*self.cursor_location.line)))
 
         if self._text_selection_start and self._text_selection_end and self.highlights:
             # letter = self.font.render("_", True, (0, 0, 0)) # This is not shown on screen, only used to get width
@@ -589,3 +592,5 @@ class MultilineTextBox(UIElement):
 
             # self.surface = self.font.render(self.get_content(), True, self.text_color)
             self.refresh_surfaces()
+        elif self.single_line:
+            self.cursor_location.col = 0

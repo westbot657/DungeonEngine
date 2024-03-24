@@ -4,7 +4,8 @@ from RenderPrimitives import Image
 from FunctionalElements import Button
 from AttributePanel import AttributePanel
 from MultilineTextBox import MultilineTextBox
-from Options import PATH, TEXT_COLOR, TEXT_BG_COLOR, TEXT_BG3_COLOR
+from Options import PATH, TEXT_COLOR, TEXT_BG_COLOR, TEXT_BG3_COLOR, TEXT_SIZE
+from CursorFocusTextBox import CursorFocusTextBox
 
 import time
 
@@ -26,7 +27,7 @@ class ShelfPanel(UIElement):
         Image(f"{PATH}/advanced_editor/panel_ellipsis_menu_hovered.png", 0, 0, 33, 33),
     )
     
-    def __init__(self, width, height, label, attr_panel, canvas):
+    def __init__(self, width, height, label, attr_panel, canvas, editor):
         self.width = width
         self.height = height
         self.label = label # Used for panel search filtering
@@ -36,7 +37,7 @@ class ShelfPanel(UIElement):
         self.panel = AttributePanel(0, 0, width, height, False, TEXT_BG_COLOR)
         self.panel.texture_scale = 1
         self.panel.rebuild()
-        self.label_text_box = MultilineTextBox(12, 10, 1, 1, label, single_line=True)
+        self.label_text_box = CursorFocusTextBox(12, 9, 150, TEXT_SIZE+4, editor, "enter label...", content=label)
         self.label_text_box.on_enter(self.set_label)
         self.visibility_button = Button(self.width-68, (height-33)/2, 33, 33, "", self.visibility_frames[2], hover_color=self.visibility_frames[3], click_color=self.visibility_frames[3])
         self.visibility_button.on_left_click = self.visibility_toggle
@@ -49,6 +50,7 @@ class ShelfPanel(UIElement):
         self.label = textbox.get_content()
     
     def visibility_toggle(self, editor, *_, **__):
+        self.set_label(self.label_text_box)
         if self.attr_panel_visible:
             self.visibility_button._bg_color = self.visibility_button.bg_color = self.visibility_frames[0]
             self.visibility_button.hover_color = self.visibility_button.click_color = self.visibility_frames[1]
@@ -91,6 +93,7 @@ class ShelfPanel(UIElement):
                 child._update(editor, X, Y)
             
     def _event(self, editor, X, Y):
+        self.effective_height = self.height
         
         for child in self.children: # Can not reverse-iterate, as positions are constructed iteratively
             if hasattr(child, "effective_height"):
@@ -99,8 +102,8 @@ class ShelfPanel(UIElement):
             else:
                 child._event(editor, X, Y)
 
+        self.label_text_box._event(editor, X, Y)
         self.focus_button._event(editor, X, Y)
         self.visibility_button._event(editor, X, Y)
-        self.label_text_box._event(editor, X, Y)
         self.panel._event(editor, X, Y)
 

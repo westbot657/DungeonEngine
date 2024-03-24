@@ -53,6 +53,7 @@ class Draggable(UIElement):
         self.children = children
         self.lock_horizontal = lock_horizontal
         self.lock_vertical = lock_vertical
+        self.ignore_child_hovering = False
     
     def _event(self, editor, X, Y):
 
@@ -65,6 +66,10 @@ class Draggable(UIElement):
         if editor.collides((_x, _y), (X+self.x, Y+self.y, self.width, self.height)):
             if editor._hovering is None:
                 self.hovered = editor._hovered = True
+                editor._hovering = self
+            elif editor._hovering in self.children and self.ignore_child_hovering:
+                editor._hovering._hovered = False
+                self.hovered = True
                 editor._hovering = self
         else:
             self.hovered = False

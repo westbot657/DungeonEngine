@@ -46,8 +46,8 @@ class CursorFocusTextBox(UIElement):
         mx, my = mouse
         x, y, w, h = rect
         #print("Scrollable: v")
-        if self.shadow_text == "enter label...":
-            _x, _y = self.editor.mouse_pos
+        # if self.shadow_text == "enter label...":
+        #     _x, _y = self.editor.mouse_pos
         if self._canvas._editor.collides(self.editor.mouse_pos, (self.x+self.last_X, self.y+self.last_Y, self.width, self.height)):
             print("COLLISION")
             #print(f"Scrollable: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")

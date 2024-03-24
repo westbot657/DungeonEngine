@@ -746,6 +746,36 @@ if __name__ == "__main__":
     if argv:
         if argv[0] == "popout":
             PopoutWindow(content={"PORT": int(argv[1])})
+            exit()
+        elif argv[0] == "thumbnail":
+            print("thumbnail")
+            border1 = Box(0, 0, 1282, 642, (255, 0, 0))
+            border2 = Box(1, 1, 1280, 640, TEXT_BG_COLOR)
+            title_t = Text(0, 0, 1, "<Insert Dungeon Name Here>", text_size=65, text_bg_color=None)
+            description_t = Text(0, 0, 1, "A text-adventure game engine", text_size=50, text_bg_color=None)
+            icon_img = Image(f"{PATH}/dungeon_builder_iconx512.png", 0, 0, 512, 512)
+            copyright_t = Text(0, 0, 1, f"© Weston Day 2023-{time.localtime().tm_year}", text_size=35, text_bg_color=None)
+            socials_t = Text(0, 0, 1, "  Westbot657", text_size=25, text_bg_color=None)
+            socials_img = Image(f"{PATH}/credits/github-mark-white.png", 0, 0, 230/8, 225/8)
+            title = Draggable(50, 50, title_t.width, title_t.height, children=[title_t])
+            description = Draggable(200, 70, description_t.width, description_t.height, children=[description_t])
+            icon = Draggable(100, 100, icon_img.width, icon_img.height, children=[icon_img])
+            copy = Draggable(100, 200, copyright_t.width, copyright_t.height, children=[copyright_t])
+            socials = Draggable(100, 200, socials_t.width, socials_t.height, children=[socials_t, socials_img])
+            title.ignore_child_hovering = True
+            description.ignore_child_hovering = True
+            copy.ignore_child_hovering = True
+            socials.ignore_child_hovering = True
+            
+            editor = Editor(None, None, 1282, 642)
+            editor.add_layer(-1,
+                border1, border2
+            )
+            editor.layers[0] += [
+                icon, title, description, copy, socials
+            ]
+            editor.run()
+
         exit()
     # if platform.system() == "Windows":
     #     if windows := gw.getWindowsWithTitle("Insert Dungeon Name Here"):

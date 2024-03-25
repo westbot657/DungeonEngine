@@ -29,6 +29,8 @@ from pygame.time import Clock
 
 import platform
 import time
+import moderngl
+from array import array
 
 pygame.init()
 
@@ -37,10 +39,11 @@ class Editor:
     def __init__(self, engine, io_hook, width=1280, height=720) -> None:
         self.screen:pygame.Surface = None
         self.engine = engine
-        self.shader = None
-        self.shaded_screen = None
-        self.shader_screen = None
         self.io_hook = io_hook
+        
+        self.ctx = None
+        self.quad_buffer = None
+        
         self.game_app = None
         self.previous_mouse = [False, False, False]
         self.mouse = [False, False, False]
@@ -129,14 +132,101 @@ class Editor:
         for c in content:
             self.layers[layer].append(c)
 
+    def surf_to_texture(self, surf):
+        tex = self.ctx.texture(surf.get_size(), 4)
+        tex.filter = (moderngl.NEAREST, moderngl.NEAREST)
+        tex.swizzle = 'BGRA'
+        tex.write(surf.get_view('1'))
+        return tex
+
     def run(self):
         # print(f"making window of size: ({self.width}, {self.height})")
-        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME) # pylint: disable=no-member
+        
+        
+        self.gl_screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME | pygame.OPENGL | pygame.DOUBLEBUF) # pylint: disable=no-member
+        self.ctx = moderngl.create_context()
+        
+        self.quad_buffer = self.ctx.buffer(data=array('f', [
+            # position (x, y), uv coords (x, y)
+            -1.0, 1.0, 0.0, 0.0,  # topleft
+            1.0, 1.0, 1.0, 0.0,   # topright
+            -1.0, -1.0, 0.0, 1.0, # bottomleft
+            1.0, -1.0, 1.0, 1.0,  # bottomright
+        ]))
+        
+        vert_shader = '''
+        #version 330 core
+
+        in vec2 vert;
+        in vec2 texcoord;
+        out vec2 uvs;
+
+        void main() {
+            uvs = texcoord;
+            gl_Position = vec4(vert, 0.0, 1.0);
+        }
+        '''
+        
+        glow_shader = '''
+        #version 330 core
+
+        uniform sampler2D tex;
+        uniform vec2 mouse;
+        uniform float time;
+
+        in vec2 uvs;
+        out vec4 f_color;
+
+        void distence(in vec2 pos1, in vec2 pos2, out float ds) {
+            ds = clamp(2-(sqrt(pow(pos2.x-pos1.x, 2) + pow(pos2.y-pos1.y, 2))*4), 0.8313, 2.);
+        }
+
+        void main( void ) {
+            vec2 uv = uvs;
+            // Zooms out by a factor of 2.0
+            uv *= 2.0;
+            // Shifts every axis by -1.0
+            uv -= 1.0;
+            
+            float d = 0;
+            distence(mouse, uvs.xy, d);
+            // d = clamp(d, 0., 1.);
+
+            // Base color for the effect
+            vec3 color = vec3 ( 0, 0.470588, 0.8313725 );
+            
+            if (texture(tex, uvs).g > 0.470 && texture(tex, uvs).g < 0.473 && texture(tex, uvs).b > 0.830 && texture(tex, uvs).b < 0.834 && texture(tex, uvs).r == 0) {
+                // specify size of border. 0.0 - no border, 1.0 - border occupies the entire space
+                vec2 borderSize = vec2(0.3); 
+
+                // size of rectangle in terms of uv
+                vec2 rectangleSize = vec2(1.0) - borderSize; 
+
+                // distance field, 0.0 - point is inside rectangle, 1.0 point is on the far edge of the border.
+                float distanceField = length(max(abs(uv)-rectangleSize,0.0) / borderSize);
+
+                // calculate alpha accordingly to the value of the distance field
+                float alpha = 1.0 - distanceField;
+
+                f_color = vec4(color * d * (((sin((time+uvs.x)/50)/2)+3)/3), alpha);
+                
+            } else {
+                f_color = texture(tex, uvs);
+            }
+
+        }
+
+        '''
+        
         pygame.display.set_icon(pygame.image.load(f"{PATH}/dungeon_game_icon.png"))
         pygame.display.set_caption(self._caption)
         self.clock = Clock()
 
+        program = self.ctx.program(vertex_shader=vert_shader, fragment_shader=glow_shader)
+        render_object = self.ctx.vertex_array(program, [(self.quad_buffer, '2f 2f', 'vert, texcoord')])
+
         while self.running:
+            self.screen = pygame.Surface((self.width, self.height))
             self.clock.tick(120)
             self.screen.fill((24, 24, 24))
             self.previous_keys = self.keys.copy()
@@ -153,7 +243,7 @@ class Editor:
             self._frame += 1
             if self._frame >= 100:
                 self._frame = 1
-                
+
             
 
             for event in pygame.event.get():
@@ -273,7 +363,17 @@ class Editor:
                 self.screen.blit(self._alt_border, (min(max(0, self._alt_pos[0]), self.width-self._alt_border.get_width())-2, min(max(0, self._alt_pos[1]), self.height-self._alt_border.get_height())-2))
                 self._alt._update(self, min(max(0, self._alt_pos[0]), self.width-self._alt_border.get_width()), min(max(0, self._alt_pos[1]), self.height-self._alt_border.get_height()))
                 
+            
+            frame_tex = self.surf_to_texture(self.screen)
+            frame_tex.use(0)
+            program['tex'] = 0
+            program['mouse'] = array('f', self.mouse_pos)
+            
+            render_object.render(mode=moderngl.TRIANGLE_STRIP)
+                
             pygame.display.flip()
+            
+            frame_tex.release()
 
 
 

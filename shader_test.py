@@ -1,3 +1,4 @@
+# pylint: disable=[W,R,C,no-member, import-error]
 import sys
 from array import array
 
@@ -163,9 +164,101 @@ void main() {
 
 '''
 
+split_shader = '''
+#version 330 core
+
+in vec2 uvs;
+
+uniform sampler2D tex;
+
+
+layout (location = 0) out vec4 FragColor;
+layout (location = 1) out vec4 BrightColor;
+
+void main() {
+    
+    FragColor = texture(tex, uvs);
+    // check whether fragment output is higher than threshold, if so output as brightness color
+    
+    if (FragColor.g > 0.470 && FragColor.g < 0.473 && FragColor.b > 0.830 && FragColor.b < 0.834 && FragColor.r == 0) {
+        BrightColor = vec4(FragColor.rgb, 1.0);
+    }
+    else {
+        BrightColor = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+}
+'''
+
+gaussian_blur_shader = '''
+#version 330 core
+out vec4 FragColor;
+in vec2 uvs;
+
+uniform sampler2D tex;
+
+uniform bool horizontal;
+uniform float weight[5] = float[] (0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216);
+
+void main() {
+    vec2 tex_offset = 1.0 / textureSize(tex, 0); // gets size of single texel
+    vec3 result = texture(tex, uvs).rgb * weight[0]; // current fragment's contribution
+    if(horizontal) {
+        for(int i = 1; i < 5; ++i) {
+            result += texture(tex, uvs + vec2(tex_offset.x * i, 0.0)).rgb * weight[i];
+            result += texture(tex, uvs - vec2(tex_offset.x * i, 0.0)).rgb * weight[i];
+        }
+    }
+    else {
+        for(int i = 1; i < 5; ++i) {
+            result += texture(tex, uvs + vec2(0.0, tex_offset.y * i)).rgb * weight[i];
+            result += texture(tex, uvs - vec2(0.0, tex_offset.y * i)).rgb * weight[i];
+        }
+    }
+    FragColor = vec4(result, 1.0);
+}
+'''
+
+blend_shader = '''
+#version 330 core
+out vec4 FragColor;
+  
+in vec2 uvs;
+
+uniform sampler2D scene;
+uniform sampler2D bloomBlur;
+uniform float exposure;
+
+void main()
+{             
+    const float gamma = 2.2;
+    vec3 hdrColor = texture(scene, uvs).rgb;      
+    vec3 bloomColor = texture(bloomBlur, uvs).rgb;
+    hdrColor += bloomColor; // additive blending
+    // tone mapping
+    vec3 result = vec3(1.0) - exp(-hdrColor * exposure);
+    // also gamma correct while we're at it       
+    result = pow(result, vec3(1.0 / gamma));
+    FragColor = vec4(result, 1.0);
+}
+'''
+
+glow_shader_p1 = '''
+#version 330 core
+
+
+'''
+
+glow_shader_p2 = '''
+#version 330 core
+
+
+'''
 
 program = ctx.program(vertex_shader=vert_shader, fragment_shader=glow_shader)
 render_object = ctx.vertex_array(program, [(quad_buffer, '2f 2f', 'vert', 'texcoord')])
+# program2 = ctx.program(vertex_shader=vert_shader, fragment_shader=glow_shader_p2)
+# render_object2 = ctx.vertex_array(program2, [(quad_buffer2, '2f 2f', 'vert', 'texcoord')])
+
 
 def surf_to_texture(surf):
     tex = ctx.texture(surf.get_size(), 4)
@@ -188,12 +281,18 @@ while True:
             sys.exit()
     
     frame_tex = surf_to_texture(display)
+    # frame_tex2 = surf_to_texture(display)
     frame_tex.use(0)
+    # frame_tex.use(1)
+    # program0['tex'] = 0
     program['tex'] = 0
+    # program2['tex'] = 0
     pos = pygame.mouse.get_pos()
     program['mouse'] = array('f', (pos[0]/1080, pos[1]/720))
     # program['time'] = t
+    
     render_object.render(mode=moderngl.TRIANGLE_STRIP)
+    
     
     pygame.display.flip()
     

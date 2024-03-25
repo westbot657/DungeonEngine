@@ -747,8 +747,8 @@ if __name__ == "__main__":
         if argv[0] == "popout":
             PopoutWindow(content={"PORT": int(argv[1])})
             exit()
-        elif argv[0] == "thumbnail":
-            print("thumbnail")
+        elif argv[0] == "thumbnail" and not getattr(sys, "frozen", False):
+            # print("thumbnail")
             border1 = Box(0, 0, 1282, 642, (255, 0, 0))
             border2 = Box(1, 1, 1280, 640, TEXT_BG_COLOR)
             title_t = Text(0, 0, 1, "<Insert Dungeon Name Here>", text_size=65, text_bg_color=None)

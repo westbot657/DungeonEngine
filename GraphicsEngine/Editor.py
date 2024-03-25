@@ -37,6 +37,9 @@ class Editor:
     def __init__(self, engine, io_hook, width=1280, height=720) -> None:
         self.screen:pygame.Surface = None
         self.engine = engine
+        self.shader = None
+        self.shaded_screen = None
+        self.shader_screen = None
         self.io_hook = io_hook
         self.game_app = None
         self.previous_mouse = [False, False, False]
@@ -270,7 +273,7 @@ class Editor:
                 self.screen.blit(self._alt_border, (min(max(0, self._alt_pos[0]), self.width-self._alt_border.get_width())-2, min(max(0, self._alt_pos[1]), self.height-self._alt_border.get_height())-2))
                 self._alt._update(self, min(max(0, self._alt_pos[0]), self.width-self._alt_border.get_width()), min(max(0, self._alt_pos[1]), self.height-self._alt_border.get_height()))
                 
-            pygame.display.update()
+            pygame.display.flip()
 
 
 

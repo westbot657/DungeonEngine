@@ -7,7 +7,7 @@ import moderngl
 
 pygame.init()
 
-screen = pygame.display.set_mode((1080, 720), pygame.OPENGL | pygame.DOUBLEBUF)
+screen = pygame.display.set_mode((1080, 720), pygame.OPENGL | pygame.DOUBLEBUF | pygame.RESIZABLE)
 display = pygame.Surface((1080, 720))
 ctx = moderngl.create_context()
 

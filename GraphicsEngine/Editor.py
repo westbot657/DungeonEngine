@@ -10,6 +10,7 @@ try:
     from GraphicsEngine.MultilineTextBox import MultilineTextBox
     from GraphicsEngine.TextBox import TextBox
     from GraphicsEngine.FunctionalElements import Button
+    from GraphicsEngine.Text import Text
 except ImportError:
     from PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow
     from Options import PATH, TEXT_BG3_COLOR
@@ -20,6 +21,7 @@ except ImportError:
     from MultilineTextBox import MultilineTextBox
     from TextBox import TextBox
     from FunctionalElements import Button
+    from Text import Text
 
 
 import os
@@ -142,6 +144,11 @@ class Editor:
         pygame.display.set_caption(self._caption)
         self.clock = Clock()
 
+        _fps = time.time()
+        fps = _fps
+        
+        fps_display = Text(0, 0, 1, f"{fps}", text_size=10)
+
         while self.running:
             self.clock.tick(120)
             self.screen.fill((24, 24, 24))
@@ -160,7 +167,8 @@ class Editor:
             if self._frame >= 100:
                 self._frame = 1
 
-            
+            _fps = fps
+            fps = time.time()
 
             for event in pygame.event.get():
 
@@ -278,6 +286,10 @@ class Editor:
             if self._alt:
                 self.screen.blit(self._alt_border, (min(max(0, self._alt_pos[0]), self.width-self._alt_border.get_width())-2, min(max(0, self._alt_pos[1]), self.height-self._alt_border.get_height())-2))
                 self._alt._update(self, min(max(0, self._alt_pos[0]), self.width-self._alt_border.get_width()), min(max(0, self._alt_pos[1]), self.height-self._alt_border.get_height()))
+
+            fps_display.set_text(f"{fps-_fps}")
+            fps_display._event(self, 5, self.height-10)
+            fps_display._update(self, 5, self.height-10)
 
             pygame.display.flip()
 

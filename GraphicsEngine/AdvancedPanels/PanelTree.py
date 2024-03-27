@@ -36,7 +36,7 @@ class PanelTree(UIElement):
         if self._canvas._editor.collides(self.editor.mouse_pos, (self.x, self.y, self.width, self.height)):
             #print(f"Scrollable: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")
             # print((x, y, w, h), (mx, my-self.offsetY))
-            if x <= mx < x + w and y <= (my) < y + h:
+            if x <= mx < x + w and y <= my < y + h:
                 return True
 
         return False

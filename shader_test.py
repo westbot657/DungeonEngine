@@ -4,6 +4,7 @@ from array import array
 
 import pygame
 import moderngl
+import random
 
 pygame.init()
 
@@ -95,7 +96,8 @@ void main( void ) {
         f_color = vec4(color * d * (((sin((time+uvs.x)/50)/2)+3)/3), alpha);
         
     } else {
-        f_color = texture(tex, uvs);
+        f_color = texture(tex, uvs + (cos((time/100)), sin(mod((uvs.y*1080), 100)))); //* (1 + (sin(time/50 + ((uv.x + uv.y))) / 2)) * (1 + (sin(time/50 + ((uv.x - uv.y))) / 2));
+        
     }
 
 }
@@ -289,7 +291,8 @@ while True:
     # program2['tex'] = 0
     pos = pygame.mouse.get_pos()
     program['mouse'] = array('f', (pos[0]/1080, pos[1]/720))
-    # program['time'] = t
+    program['time'] = t
+    # program["rand"] = random.random()
     
     render_object.render(mode=moderngl.TRIANGLE_STRIP)
     

@@ -96,8 +96,7 @@ void main( void ) {
         f_color = vec4(color * d * (((sin((time+uvs.x)/50)/2)+3)/3), alpha);
         
     } else {
-        f_color = texture(tex, uvs + (cos((time/100)), sin(mod((uvs.y*1080), 100)))); //* (1 + (sin(time/50 + ((uv.x + uv.y))) / 2)) * (1 + (sin(time/50 + ((uv.x - uv.y))) / 2));
-        
+        f_color = texture(tex, uvs);
     }
 
 }

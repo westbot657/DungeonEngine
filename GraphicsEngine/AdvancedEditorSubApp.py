@@ -92,7 +92,7 @@ class AdvancedEditorSubApp(UIElement):
             self.visibility_icons.update({typ: frames})
             
             button = Button(base_x+x_offset, base_y, 50, 50, "", frames[2], hover_color=frames[3], click_color=frames[2])
-            alt_text1 = f"Hide {typ}" + ("" if typ.endswith(("r", "o")) else "s")
+            alt_text1 = f"Hide {typ}" + ("" if typ in ["armor", "ammo"] else "s")
             alt_text2 = f"Show {alt_text1[5:]}"
             button._alt_text = alt_text1
             self.visibility_toggled.update({typ: True})
@@ -109,31 +109,14 @@ class AdvancedEditorSubApp(UIElement):
         self.children.append(img)
         self.empty_visibility_toggle_spots.append(img)
         
-        a = AttributePanel(200, 200, 200, 400, True)
-        a.scroll_directions = 0b1010
-        a.rebuild()
-        
-        # a_shelf = ShelfPanel(340, 35, "Test 1", a, self.construction_canvas.canvas, self.object_tree._canvas)
-
-        b = AttributePanel(500, 300, 300, 400, True)
-        b.scroll_directions = 0b0110
-        b.rebuild()
-        
-        c = AttributePanel(900, 4000, 400, 300, False)
-        c.rebuild()
-        
-        self.create_panel(a, "Test 1")
-        self.create_panel(b, "Test 2")
-        self.create_panel(c, "Test 3")
-        
-        # b_shelf = ShelfPanel(340, 35, "Test 2", b, self.construction_canvas.canvas, self.object_tree._canvas)
-
-        # self.object_tree.tree += [a_shelf]#, b_shelf]
-
-        self.visibility_groups["weapon"] += [a, b, c]
     
-    def create_panel(self, attribute_panel, label, height=35):
-        shelf_panel = ShelfPanel(340, height, label, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas)
+    def create_panel(self, rect:tuple[int, int, int, int], label, bordered=False, tags=None, shelf_panel_height=35) -> AttributePanel:
+        attr_panel = AttributePanel(*rect, bordered=bordered)
+        self.create_shelf_panel(attr_panel, label, tags, shelf_panel_height)
+        return attr_panel
+    
+    def create_shelf_panel(self, attribute_panel, label, tags=None, height=35):
+        shelf_panel = ShelfPanel(340, height, label, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas, tags)
         self.object_tree.tree.append(shelf_panel)
     
     def _update(self, editor, X, Y):

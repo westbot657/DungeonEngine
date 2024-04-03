@@ -26,7 +26,7 @@ class PanelTree(UIElement):
         self.last_X = 0
         self.last_Y = 0
     
-    def get_search(self):
+    def get_search(self): # this method gets overwritten
         return ""
     
     def collides(self, mouse, rect) -> bool:
@@ -66,11 +66,12 @@ class PanelTree(UIElement):
         
         last = None
         for obj in self.tree:
-            if self._search in obj.label.lower():
+            if (self._search in obj.label.lower()) or any(tag.startswith(self._search) for tag in obj.tags):
                 obj._event(self._canvas, 5, self._y + self.offsetY)
                 # self.mouse_pos[1] -= obj.effective_height+5
                 self._y += obj.effective_height + 5
                 last = obj
+            
         self.content_height = self._y-((last.effective_height)+5 if last else 0)
         
     
@@ -80,7 +81,7 @@ class PanelTree(UIElement):
         self.screen.fill((0, 0, 0, 0))
         
         for obj in self.tree:
-            if self._search in obj.label.lower():
+            if (self._search in obj.label.lower()) or any(tag.startswith(self._search) for tag in obj.tags):
                 # self.mouse_pos[1] += obj.effective_height+5
                 
                 obj._update(self._canvas, 5, y+self.offsetY)

@@ -38,9 +38,29 @@ from pynput.mouse import Controller
 
 from typing import Any
 
+
+pygame.init() # pylint: disable=no-member
+pygame.font.init()
+
 mouse = Controller()
 
 # from pygame._sdl2.video import Window, Texture # pylint: disable=no-name-in-module
+
+# TODO: loading screen while everything actually imports and loads
+class LoadingScreen:
+    def __init__(self):
+        self.loading = True
+    
+    def run(self):
+        while self.loading:
+            ...
+        pygame.quit()
+        pygame.init()
+
+loader = LoadingScreen()
+t = Thread(target=loader.run)
+t.start()
+
 
 # import components
 try:
@@ -117,8 +137,6 @@ except ImportError:
     from EditorApp import EditorApp
 
 
-pygame.init() # pylint: disable=no-member
-pygame.font.init()
 
 class CodeEditor(UIElement):
     
@@ -742,6 +760,7 @@ class IOHook:
         self.engine.handleInput(player_id, text)
 
 if __name__ == "__main__":
+    loader.loading = False
     argv = sys.argv[1:]
     if argv:
         if argv[0] == "popout":

@@ -27,12 +27,13 @@ class ShelfPanel(UIElement):
         Image(f"{PATH}/advanced_editor/panel_ellipsis_menu_hovered.png", 0, 0, 33, 33),
     )
     
-    def __init__(self, width, height, label, attr_panel, canvas, editor):
+    def __init__(self, width, height, label, attr_panel, canvas, editor, tags:list|None=None):
         self.x = 0
         self.y = 0
         self.width = width
         self.height = height
         self.label = label # Used for panel search filtering
+        self.tags = tags or []
         self.attr_panel = attr_panel
         self.effective_height = height
         self.canvas = canvas

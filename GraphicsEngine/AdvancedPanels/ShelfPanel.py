@@ -126,8 +126,8 @@ class ShelfPanel(UIElement):
         self.y = Y
         self.label_text_box.y = (self.y+9) + (offsetY*3)
         self.label_text_box._event(editor, 0, offsetY)
-        self.y = Y+offsetY
         self.focus_button._event(editor, X, Y)
         self.visibility_button._event(editor, X, Y)
+        self.y = Y+offsetY
         self.panel._event(editor, X, Y)
 

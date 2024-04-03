@@ -322,6 +322,9 @@ class MultilineTextBox(UIElement):
         
         cls._focused = box
 
+    def clear_selection(self):
+        self._text_selection_start = self._text_selection_end = None
+
     def _event(self, editor, X, Y):
         w, h = max(self.min_width, self._text_width), max(self.min_height, self._text_height)
         _x, _y = editor.mouse_pos
@@ -361,6 +364,7 @@ class MultilineTextBox(UIElement):
             else:
                 self.focused = False
                 self._cursor_visible = False
+                self.clear_selection()
 
         elif editor.mouse[0] and self.hovered:
             letter = self.font.render("_", True, (0, 0, 0))
@@ -369,8 +373,8 @@ class MultilineTextBox(UIElement):
             dx = _x - (X + self.x)
             dy = _y - (Y + self.y)
             _old = self.cursor_location.copy()
-            self.cursor_location.line = min(int(dy//h), len(self._lines)-1)
-            self.cursor_location.col = max(min(int(round(dx/w)), len(self._lines[self.cursor_location.line])), 0)
+            self.cursor_location.line = max(0, min(int(dy//h), len(self._lines)-1))
+            self.cursor_location.col = max(0, min(int(round(dx/w)), len(self._lines[self.cursor_location.line])))
 
             if not self._text_selection_start:
                 self._text_selection_start = _old

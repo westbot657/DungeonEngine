@@ -105,6 +105,7 @@ class AttributePanel(UIElement):
         self.glowing = False
         self.glow_time = 0
         self.bg_color = bg_color
+        self.visible = True
         self.rebuild()
     
     def rebuild(self):
@@ -227,33 +228,36 @@ class AttributePanel(UIElement):
         # self.bg = pygame.transform.scale(self.bg, (self.width*self.texture_scale, self.height*self.texture_scale))
 
     def _event(self, editor, X, Y):
+        if self.visible:
         
-        for child in self.children[::-1]:
-            child._event(editor, X+self.x, Y+self.y)
+            for child in self.children[::-1]:
+                child._event(editor, X+self.x, Y+self.y)
 
-        if self.glowing:
-            if self.glow_time == 0:
-                self.glowing = False
-            elif time.time() >= self.glow_time > 0:
-                self.glow_time = 0
+            if self.glowing:
+                if self.glow_time == 0:
+                    self.glowing = False
+                elif time.time() >= self.glow_time > 0:
+                    self.glow_time = 0
 
-        if editor.collides(editor.mouse_pos, (X+self.x, Y+self.y, self.width, self.height)):
-            if editor._hovering is None:
-                self.hovered = editor._hovered = True
-                editor._hovering = self
+            if editor.collides(editor.mouse_pos, (X+self.x, Y+self.y, self.width, self.height)):
+                if editor._hovering is None:
+                    self.hovered = editor._hovered = True
+                    editor._hovering = self
+            else:
+                self.hovered = False
         else:
             self.hovered = False
         
     def _update(self, editor, X, Y):
+        if self.visible:
+            editor.screen.blit(self.bg, (X+self.x, Y+self.y))
+            
+            for child in self.children:
+                child._update(editor, X+self.x, Y+self.y)
         
-        editor.screen.blit(self.bg, (X+self.x, Y+self.y))
-        
-        for child in self.children:
-            child._update(editor, X+self.x, Y+self.y)
-    
-        if self.glowing:
-            editor.screen.blit(self.glow_surface, (X+self.x-(3*self.texture_scale), Y+self.y-(3*self.texture_scale)))
-        editor.screen.blit(self.surface, (X+self.x, Y+self.y))
+            if self.glowing:
+                editor.screen.blit(self.glow_surface, (X+self.x-(3*self.texture_scale), Y+self.y-(3*self.texture_scale)))
+            editor.screen.blit(self.surface, (X+self.x, Y+self.y))
         
     def get_collider(self):
         return (self.x, self.y, self.width, self.height)

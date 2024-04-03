@@ -66,7 +66,7 @@ class PanelTree(UIElement):
         last = None
         for obj in self.tree:
             if self._search in obj.label.lower():
-                obj._event(self._canvas, 5, self._y+self.offsetY)
+                obj._event(self._canvas, 5, self._y, self.offsetY)
                 # self.mouse_pos[1] -= obj.effective_height+5
                 self._y += obj.effective_height + 5
                 last = obj
@@ -81,6 +81,7 @@ class PanelTree(UIElement):
         for obj in self.tree:
             if self._search in obj.label.lower():
                 # self.mouse_pos[1] += obj.effective_height+5
+                
                 obj._update(self._canvas, 5, y+self.offsetY)
                 y += obj.effective_height + 5
         editor.screen.blit(self.screen, (self.x, self.y))

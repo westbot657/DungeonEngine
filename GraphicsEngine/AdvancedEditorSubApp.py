@@ -119,14 +119,18 @@ class AdvancedEditorSubApp(UIElement):
         b.scroll_directions = 0b0110
         b.rebuild()
         
+        c = AttributePanel(900, 4000, 400, 300, False)
+        c.rebuild()
+        
         self.create_panel(a, "Test 1")
         self.create_panel(b, "Test 2")
+        self.create_panel(c, "Test 3")
         
         # b_shelf = ShelfPanel(340, 35, "Test 2", b, self.construction_canvas.canvas, self.object_tree._canvas)
 
         # self.object_tree.tree += [a_shelf]#, b_shelf]
 
-        self.visibility_groups["weapon"] += [a, b]
+        self.visibility_groups["weapon"] += [a, b, c]
     
     def create_panel(self, attribute_panel, label, height=35):
         shelf_panel = ShelfPanel(340, height, label, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas)

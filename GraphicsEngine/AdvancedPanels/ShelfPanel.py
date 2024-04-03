@@ -28,6 +28,8 @@ class ShelfPanel(UIElement):
     )
     
     def __init__(self, width, height, label, attr_panel, canvas, editor):
+        self.x = 0
+        self.y = 0
         self.width = width
         self.height = height
         self.label = label # Used for panel search filtering
@@ -38,6 +40,7 @@ class ShelfPanel(UIElement):
         self.panel.texture_scale = 1
         self.panel.rebuild()
         self.label_text_box = CursorFocusTextBox(12, 9, 150, TEXT_SIZE+4, editor, "enter label...", content=label)
+        self.label_text_box.collides = self.collide_override
         self.label_text_box.on_enter(self.set_label)
         self.visibility_button = Button(self.width-68, (height-33)/2, 33, 33, "", self.visibility_frames[2], hover_color=self.visibility_frames[3], click_color=self.visibility_frames[3])
         self.visibility_button.on_left_click = self.visibility_toggle
@@ -45,6 +48,18 @@ class ShelfPanel(UIElement):
         self.focus_button.on_left_click = self.focus_object
         self.attr_panel_visible = True
         self.children = []
+    
+    def collide_override(self, mouse, rect):
+        # mx, my = mouse
+        # x, y, w, h = rect
+        if self.label_text_box.editor.collides(mouse, (self.x, (self.y % 40), self.label_text_box.width, self.label_text_box.height)): # WHY DOES % 40 WORK?!?!?!?!?!?! (works enough for now at least I guess...)
+            # print("COLLISION")
+            #print(f"Scrollable: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")
+            # print((x, y, w, h), (mx, my), (self.last_X, self.last_Y))
+        # if x <= mx < x + w and y <= my < y + h:
+            return True
+
+        return False
     
     def set_label(self, textbox):
         self.label = textbox.get_content()
@@ -60,7 +75,7 @@ class ShelfPanel(UIElement):
             self.visibility_button.hover_color = self.visibility_button.click_color = self.visibility_frames[3]
             self.label_text_box.set_text_color(TEXT_COLOR)
         self.label_text_box.set_content(self.label)
-        self.attr_panel_visible = not self.attr_panel_visible
+        self.attr_panel.visible = self.attr_panel_visible = not self.attr_panel_visible
     
     def focus_object(self, editor, *_, **__):
         self.focus_button._bg_color = self.focus_button.bg_color = self.focus_button.hover_color = self.refocus_frames[1]
@@ -80,7 +95,9 @@ class ShelfPanel(UIElement):
         
         # update
         self.panel._update(editor, X, Y)
-        self.label_text_box._update(editor, X, Y)
+        self.label_text_box.x = self.x+12
+        self.label_text_box.y = self.y+9
+        self.label_text_box._update(editor, 0, 0)
         self.visibility_button._update(editor, X, Y)
         self.focus_button._update(editor, X, Y)
         
@@ -92,7 +109,10 @@ class ShelfPanel(UIElement):
             else:
                 child._update(editor, X, Y)
             
-    def _event(self, editor, X, Y):
+    def _event(self, editor, X, Y, offsetY):
+        self.x = X
+        self.y = Y+offsetY
+        # print(f"offsetY: {offsetY}")
         self.effective_height = self.height
         
         for child in self.children: # Can not reverse-iterate, as positions are constructed iteratively
@@ -102,7 +122,11 @@ class ShelfPanel(UIElement):
             else:
                 child._event(editor, X, Y)
 
-        self.label_text_box._event(editor, X, Y)
+        self.label_text_box.x = self.x+12
+        self.y = Y
+        self.label_text_box.y = (self.y+9) + (offsetY*3)
+        self.label_text_box._event(editor, 0, offsetY)
+        self.y = Y+offsetY
         self.focus_button._event(editor, X, Y)
         self.visibility_button._event(editor, X, Y)
         self.panel._event(editor, X, Y)

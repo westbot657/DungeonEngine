@@ -40,7 +40,7 @@ class ShelfPanel(UIElement):
         self.panel.texture_scale = 1
         self.panel.rebuild()
         self.label_text_box = CursorFocusTextBox(12, 9, 150, TEXT_SIZE+4, editor, "enter label...", content=label)
-        self.label_text_box.collides = self.collide_override
+        # self.label_text_box.collides = self.collide_override
         self.label_text_box.on_enter(self.set_label)
         self.visibility_button = Button(self.width-68, (height-33)/2, 33, 33, "", self.visibility_frames[2], hover_color=self.visibility_frames[3], click_color=self.visibility_frames[3])
         self.visibility_button.on_left_click = self.visibility_toggle
@@ -49,17 +49,17 @@ class ShelfPanel(UIElement):
         self.attr_panel_visible = True
         self.children = []
     
-    def collide_override(self, mouse, rect):
-        # mx, my = mouse
-        # x, y, w, h = rect
-        if self.label_text_box.editor.collides(mouse, (self.x, (self.y % 40), self.label_text_box.width, self.label_text_box.height)): # WHY DOES % 40 WORK?!?!?!?!?!?! (works enough for now at least I guess...)
-            # print("COLLISION")
-            #print(f"Scrollable: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")
-            # print((x, y, w, h), (mx, my), (self.last_X, self.last_Y))
-        # if x <= mx < x + w and y <= my < y + h:
-            return True
+    # def collide_override(self, mouse, rect):
+    #     # mx, my = mouse
+    #     # x, y, w, h = rect
+    #     if self.label_text_box.editor.collides(mouse, (self.x, (self.y % 40), self.label_text_box.width, self.label_text_box.height)): # WHY DOES % 40 WORK?!?!?!?!?!?! (works enough for now at least I guess...)
+    #         # print("COLLISION")
+    #         #print(f"Scrollable: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")
+    #         # print((x, y, w, h), (mx, my), (self.last_X, self.last_Y))
+    #     # if x <= mx < x + w and y <= my < y + h:
+    #         return True
 
-        return False
+    #     return False
     
     def set_label(self, textbox):
         self.label = textbox.get_content()
@@ -109,9 +109,9 @@ class ShelfPanel(UIElement):
             else:
                 child._update(editor, X, Y)
             
-    def _event(self, editor, X, Y, offsetY):
+    def _event(self, editor, X, Y):
         self.x = X
-        self.y = Y+offsetY
+        self.y = Y
         # print(f"offsetY: {offsetY}")
         self.effective_height = self.height
         
@@ -120,14 +120,12 @@ class ShelfPanel(UIElement):
                 child._event(editor, X, Y+self.effective_height)
                 self.effective_height += child.effective_height
             else:
-                child._event(editor, X, Y)
+                child._event(editor, self.x, self.y)
 
         self.label_text_box.x = self.x+12
-        self.y = Y
-        self.label_text_box.y = (self.y+9) + (offsetY*3)
-        self.label_text_box._event(editor, 0, offsetY)
-        self.focus_button._event(editor, X, Y)
-        self.visibility_button._event(editor, X, Y)
-        self.y = Y+offsetY
-        self.panel._event(editor, X, Y)
+        self.label_text_box.y = self.y+9
+        self.label_text_box._event(editor, 0, 0)
+        self.focus_button._event(editor, self.x, self.y)
+        self.visibility_button._event(editor, self.x, self.y)
+        self.panel._event(editor, self.x, self.y)
 

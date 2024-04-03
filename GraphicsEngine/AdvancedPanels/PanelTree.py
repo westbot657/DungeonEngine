@@ -33,6 +33,7 @@ class PanelTree(UIElement):
         mx, my = mouse
         x, y, w, h = rect
         #print("Scrollable: v")
+        
         if self._canvas._editor.collides(self.editor.mouse_pos, (self.x, self.y, self.width, self.height)):
             #print(f"Scrollable: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")
             # print((x, y, w, h), (mx, my-self.offsetY))
@@ -44,7 +45,7 @@ class PanelTree(UIElement):
     def override_values(self, X, Y):
         self.mouse_pos = list(self.editor.mouse_pos)
         self.mouse_pos[0] -= self.x+5
-        self.mouse_pos[1] -= self.y - self.offsetY
+        self.mouse_pos[1] -= self.y
         
     def _update_layout(self, editor):
         self.screen = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
@@ -66,7 +67,7 @@ class PanelTree(UIElement):
         last = None
         for obj in self.tree:
             if self._search in obj.label.lower():
-                obj._event(self._canvas, 5, self._y, self.offsetY)
+                obj._event(self._canvas, 5, self._y + self.offsetY)
                 # self.mouse_pos[1] -= obj.effective_height+5
                 self._y += obj.effective_height + 5
                 last = obj

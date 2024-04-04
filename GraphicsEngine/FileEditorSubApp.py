@@ -177,7 +177,7 @@ class FileEditorSubApp(UIElement):
         
         if file_editor := self.file_tabs.tab_data.get(self.file_tabs.active_tab, [None])[0]:
             file_editor.width = editor.width-329
-            file_editor.height = editor.height-42
+            file_editor.height = editor.height-62
             file_editor._update_layout(editor)
         
     def _update(self, editor, X, Y):

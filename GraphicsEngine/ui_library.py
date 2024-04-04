@@ -42,23 +42,23 @@ if not any(x in sys.argv for x in ["popout", "thumbnail"]):
     t = Thread(target=loader.run)
     t.start()
 
-from pygame.time import Clock
+# from pygame.time import Clock
 # useful utils
 # from enum import Enum, auto
 from mergedeep import merge
-import json
+# import json
 import re
-import random
-import Stockings
-import socket
+# import random
+# import Stockings
+# import socket
 # import ast
 # import webbrowser
 import platform
 
-from subprocess import Popen, PIPE, STDOUT
+# from subprocess import Popen, PIPE, STDOUT
 
 # 3D rendering
-from shapely.geometry.polygon import Polygon as Poly
+# from shapely.geometry.polygon import Polygon as Poly
 
 # used to import the game engine with code
 # import importlib

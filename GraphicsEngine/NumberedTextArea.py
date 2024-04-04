@@ -72,13 +72,16 @@ class NumberedTextArea(UIElement):
         self.collapsable.aside.left_bound = 0
         self.collapsable.aside.top_bound = 0
         self.collapsable.aside.right_bound = 0
+        self.collapsable.main_area.right_bound = -self.editable._text_width
 
     def _update_layout(self):
         self.lines.min_height = self.editable.min_height = self.height
         self.collapsable.height = self.collapsable.main_area.height = self.collapsable.aside.height = self.height
         self._fill.height = self.editable.min_height = self.editable._text_height + self.height
         self.collapsable.width = self.width-28
-        self.editable.min_width = self.width-80
+        self.editable.min_width = self.editable._text_width+100
+        # self.editable.min_width = self.width-80
+        self.collapsable.main_area.right_bound = -(self.editable._text_width - (self.width - 2*self.lines.min_width) + self.editable._width)
 
     def get_content(self):
         return self.editable.get_content()

@@ -1,7 +1,7 @@
 # pylint: disable=[W,R,C]
 
 import pywinctl as gw
-import pyautogui
+
 from screeninfo import get_monitors
 import platform
 

@@ -147,6 +147,14 @@ class Editor:
         # _fps = time.time()
         # fps = _fps
         
+        if platform.system() in ["Windows", "Linux"]:
+            window = gw.getWindowsWithTitle(self._caption)[0]
+            if window is not None:
+                window.alwaysOnTop(True)
+                window.alwaysOnTop(False)
+        elif platform.system() == "Darwin":
+            macOSfocusWindow(self._caption)
+        
         # fps_display = Text(0, 0, 1, f"{fps}", text_size=10)
 
         while self.running:
@@ -265,6 +273,9 @@ class Editor:
                 
                 else:
                     self.override_cursor = False
+            elif self.override_cursor:
+                self.override_cursor = False
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
             
             self._hovering_last = self._hovering
 

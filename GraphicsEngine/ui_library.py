@@ -5,15 +5,49 @@
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 import pygame
-from pygame.time import Clock
+import time
+from threading import Thread
+import sys
 
+class LoadingScreen:
+    def __init__(self):
+        self.loading = False
+        self.done = False
+    
+    def run(self):
+        self.loading = True
+        logo = pygame.transform.scale(pygame.image.load("./ui_resources/idnh_logo_x144.png"), (288, 288))
+        load = [
+            pygame.image.load("./ui_resources/load_1.png"),
+            pygame.image.load("./ui_resources/load_2.png"),
+            pygame.image.load("./ui_resources/load_3.png"),
+            pygame.image.load("./ui_resources/load_4.png")
+        ]
+        disp = pygame.display.set_mode((350, 450), pygame.NOFRAME)
+        disp.fill((24, 24, 24))
+        disp.blit(logo, (31, 6))
+        while self.loading:
+            for _ in pygame.event.get():
+                pass
+            disp.fill((24, 24, 24), (0, 299, 350, 150))
+            disp.blit(load[int((time.time()*20)%4)], (124, 324))
+            pygame.display.flip()
+        pygame.display.quit()
+        # pygame.quit()
+        # pygame.init()
+        self.done = True
+
+if not any(x in sys.argv for x in ["popout", "thumbnail"]):
+    loader = LoadingScreen()
+    t = Thread(target=loader.run)
+    t.start()
+
+from pygame.time import Clock
 # useful utils
 # from enum import Enum, auto
 from mergedeep import merge
-import time
 import json
 import re
-import sys
 import random
 import Stockings
 import socket
@@ -22,7 +56,6 @@ import socket
 import platform
 
 from subprocess import Popen, PIPE, STDOUT
-from threading import Thread
 
 # 3D rendering
 from shapely.geometry.polygon import Polygon as Poly
@@ -47,19 +80,7 @@ mouse = Controller()
 # from pygame._sdl2.video import Window, Texture # pylint: disable=no-name-in-module
 
 # TODO: loading screen while everything actually imports and loads
-class LoadingScreen:
-    def __init__(self):
-        self.loading = True
-    
-    def run(self):
-        while self.loading:
-            ...
-        pygame.quit()
-        pygame.init()
 
-loader = LoadingScreen()
-t = Thread(target=loader.run)
-t.start()
 
 
 # import components
@@ -760,7 +781,6 @@ class IOHook:
         self.engine.handleInput(player_id, text)
 
 if __name__ == "__main__":
-    loader.loading = False
     argv = sys.argv[1:]
     if argv:
         if argv[0] == "popout":
@@ -817,6 +837,11 @@ if __name__ == "__main__":
     editor.layers[0] += [
         c
     ]
+    
+    if loader.loading:
+        loader.loading = False
+        while not loader.done: pass
+        # time.sleep(2)
     editor.run()
 
 """

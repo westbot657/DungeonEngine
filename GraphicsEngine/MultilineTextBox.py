@@ -366,7 +366,7 @@ class MultilineTextBox(UIElement):
                 self._cursor_visible = False
                 self.clear_selection()
 
-        elif editor.mouse[0] and self.hovered:
+        elif editor.mouse[0] and self.focused:
             letter = self.font.render("_", True, (0, 0, 0))
             w = letter.get_width()# - 1
             h = letter.get_height()

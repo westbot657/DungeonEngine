@@ -9,6 +9,8 @@ from FunctionalElements import Button
 from AdvancedPanels.PanelTree import PanelTree
 from AdvancedPanels.ShelfPanel import ShelfPanel
 from CursorFocusTextBox import CursorFocusTextBox
+import tkinter
+from threading import Thread
 
 class VisibilityToggle:
     def __init__(self, sub_app, typ, button, alt_text1, alt_text2, frames):
@@ -106,9 +108,15 @@ class AdvancedEditorSubApp(UIElement):
             x_offset += 50
         
         img = Image(f"{PATH}/advanced_editor/selector_block.png", base_x+x_offset, base_y, 25, 79)
+        x_offset += 25
         self.children.append(img)
         self.empty_visibility_toggle_spots.append(img)
         
+    def click_load_dungeon(self):
+        ...
+        
+    def load_dungeon(self):
+        ...
     
     def create_panel(self, rect:tuple[int, int, int, int], label, bordered=False, tags=None, shelf_panel_height=35) -> AttributePanel:
         attr_panel = AttributePanel(*rect, bordered=bordered)

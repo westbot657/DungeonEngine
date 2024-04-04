@@ -104,7 +104,7 @@ class NumberedTextArea(UIElement):
         if self.show_scrollbar:
             self.scroll_hovered = False
             self.scroll_bar_height = (self.height**2)/(self.editable._text_height + self.height - self.editable._height)
-            print(self.scroll_bar_height)
+            # print(self.scroll_bar_height)
             
             if editor.collides(editor.mouse_pos, ((self.x+self.width)-self.scroll_bar_width+self.scroll_collision_inset-4, self.y+self.scroll_bar_y, self.scroll_bar_width-(2*self.scroll_collision_inset), self.scroll_bar_height)):
                 if editor._hovering is None:

@@ -79,9 +79,6 @@ mouse = Controller()
 
 # from pygame._sdl2.video import Window, Texture # pylint: disable=no-name-in-module
 
-# TODO: loading screen while everything actually imports and loads
-
-
 
 # import components
 try:

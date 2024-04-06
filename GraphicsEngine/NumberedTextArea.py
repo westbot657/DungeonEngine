@@ -45,7 +45,7 @@ class NumberedTextArea(UIElement):
         self.scroll_click_offset = 0
         self.scroll_target = 0
         self.scroll_clicked = False
-        self.scroll_bar_width = 20 # this is the width of the full area where the scroll bar is, the bar itself will visibly be 2px thinner on each side (but will collide 1px thinner)
+        self.scroll_bar_width = 14 # this is the width of the full area where the scroll bar is, the bar itself will visibly be 2px thinner on each side (but will collide 1px thinner)
         self.scroll_visibility_inset = 2
         self.scroll_collision_inset = 1
         self.scroll_dragging = False
@@ -78,7 +78,7 @@ class NumberedTextArea(UIElement):
         self.lines.min_height = self.editable.min_height = self.height
         self.collapsable.height = self.collapsable.main_area.height = self.collapsable.aside.height = self.height
         self._fill.height = self.editable.min_height = self.editable._text_height + self.height
-        self.collapsable.width = self.width-28
+        self.collapsable.width = self.width-(8+self.scroll_bar_width)
         self.editable.min_width = self.editable._text_width+self.width
         # self.editable.min_width = self.width-80
         self.collapsable.main_area.right_bound = min(0, (self.collapsable.main_area.width-(4*self.editable._width))-self.editable._text_width)

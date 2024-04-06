@@ -1,11 +1,12 @@
 # pylint: disable=[W,R,C, import-error]
 
+import tkinter.filedialog
 from UIElement import UIElement
 from RenderPrimitives import Image
 from Options import PATH
 from AttributePanel import AttributePanel
 from ConstructionCanvas import ConstructionCanvas
-from FunctionalElements import Button
+from FunctionalElements import Button, BorderedButton
 from AdvancedPanels.PanelTree import PanelTree
 from AdvancedPanels.ShelfPanel import ShelfPanel
 from CursorFocusTextBox import CursorFocusTextBox
@@ -112,11 +113,33 @@ class AdvancedEditorSubApp(UIElement):
         self.children.append(img)
         self.empty_visibility_toggle_spots.append(img)
         
-    def click_load_dungeon(self):
+        self.open_dungeon_button = BorderedButton(base_x+x_offset+10, base_y+30, -1, None, " Open Dungeon... ")
+        self.open_dungeon_button.on_left_click = self.click_load_dungeon
+        self.children.append(self.open_dungeon_button)
+        self.to_open = ""
+        self.selected_directory = False
+        self.getting_directory = False
+    
+    def get_directory_task_thread(self):
+        self.getting_directory = True
+        self.selected_directory = False
+        self.to_open = tkinter.filedialog.askdirectory(initialdir="./Dungeons/", title="Open Dungeon...")
+        self.selected_directory = True
+        self.getting_directory = False
+    
+    def click_load_dungeon(self, *_, **__):
+        if not self.getting_directory:
+            t = Thread(target=self.get_directory_task_thread)
+            t.daemon = True
+            t.start()
+    
+    def _load_dungeon(self):
         ...
-        
+    
     def load_dungeon(self):
-        ...
+        t = Thread(target=self._load_dungeon)
+        t.daemon = True
+        t.start()
     
     def create_panel(self, rect:tuple[int, int, int, int], label, bordered=False, tags=None, shelf_panel_height=35) -> AttributePanel:
         attr_panel = AttributePanel(*rect, bordered=bordered)
@@ -132,6 +155,11 @@ class AdvancedEditorSubApp(UIElement):
             child._update(editor, X, Y)
     
     def _event(self, editor, X, Y):
+        
+        if self.selected_directory:
+            self.selected_directory = False
+            if self.to_open:
+                self.load_dungeon()
         
         if editor._do_layout_update:
             self._update_layout(editor)
@@ -151,3 +179,4 @@ class AdvancedEditorSubApp(UIElement):
         self.search_box.x = editor.width-350
         self.object_tree.x = editor.width-352
         self.object_tree.height = editor.height-111
+        self.open_dungeon_button.y = editor.height-70

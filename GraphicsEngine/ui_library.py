@@ -535,6 +535,7 @@ class CodeEditor(UIElement):
             child._update(editor, X, Y)
 
     def _update_layout(self, editor):
+        editor._do_layout_update = True
         pygame.display.set_mode((editor.width, editor.height), pygame.RESIZABLE | pygame.NOFRAME)
         self.top_bar.width = editor.width
         self.bottom_drag.width = editor.width-10

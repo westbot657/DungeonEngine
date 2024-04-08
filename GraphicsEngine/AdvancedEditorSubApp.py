@@ -10,7 +10,7 @@ from FunctionalElements import Button, BorderedButton
 from AdvancedPanels.PanelTree import PanelTree
 from AdvancedPanels.ShelfPanel import ShelfPanel
 from CursorFocusTextBox import CursorFocusTextBox
-from GraphicsEngine.VisualConfig import VisualConfig
+from VisualConfig import VisualConfig
 import tkinter
 from threading import Thread
 

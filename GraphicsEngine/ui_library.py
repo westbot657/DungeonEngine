@@ -1,4 +1,4 @@
-# pylint: disable=W,R,C,no-member
+# pylint: disable=W,R,C,no-member, import-error
 # (C) Weston Day 2024
 # pygame UI Library
 
@@ -81,78 +81,41 @@ mouse = Controller()
 
 
 # import components
-try:
-    from GraphicsEngine.Options import client_id, DO_RICH_PRESENCE, PATH, \
-        FONT, SETTINGS, TEXT_SIZE, TEXT_COLOR, TEXT_BG_COLOR, \
-        TEXT_HIGHLIGHT, TAB_SIZE, POPOUTS, TEXT_BG2_COLOR, TEXT_BG3_COLOR
-    from GraphicsEngine.Util import expand_text_lists, \
-        rotate, rotate3D, rotate3DV, \
-        quad_to_tris, invert_tris, \
-        angle_between, warp, safe_eval, \
-        Selection, Cursor, PopoutElement
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.RenderPrimitives import Color, Image, Animation
-    from GraphicsEngine.EditorMimic import EditorMimic
-    from GraphicsEngine.Text import Text
-    from GraphicsEngine.MultilineText import MultilineText
-    from GraphicsEngine.TextBox import TextBox
-    from GraphicsEngine.MultilineTextBox import MultilineTextBox
-    from GraphicsEngine.Geometry import Box, Polygon, Poly3D
-    from GraphicsEngine.Organizers import LayeredObjects, Draggable, Resizable, Tie, Link
-    from GraphicsEngine.FunctionalElements import Button, BorderedButton, Tabs, Scrollable, Collapsable, ProgressBar
-    from GraphicsEngine.NumberedTextArea import NumberedTextArea
-    from GraphicsEngine.PopoutInterface import PopoutInterface
-    from GraphicsEngine.SnapNode import SnapNode
-    from GraphicsEngine.DiscordPresence import RPC, RPCD
-    from GraphicsEngine.ContextTree import ContextTree
-    from GraphicsEngine.DirectoryTree import DirectoryTree
-    from GraphicsEngine.Popup import Popup
-    from GraphicsEngine.Editor import Editor
-    from GraphicsEngine.GameApp import GameApp
-    from GraphicsEngine.PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow, get_monitors
-    from GraphicsEngine.FileEditor import FileEditor
-    from GraphicsEngine.AttributePanel import AttributePanel
-    from GraphicsEngine.ConstructionCanvas import ConstructionCanvas
-    from GraphicsEngine.AdvancedEditorSubApp import AdvancedEditorSubApp
-    from GraphicsEngine.FileEditorSubApp import FileEditorSubApp
-    from GraphicsEngine.PopoutWindow import PopoutWindow
-    from GraphicsEngine.EditorApp import EditorApp
-except ImportError:
-    from Options import client_id, DO_RICH_PRESENCE, PATH, \
-        FONT, SETTINGS, TEXT_SIZE, TEXT_COLOR, TEXT_BG_COLOR, \
-        TEXT_HIGHLIGHT, TAB_SIZE, POPOUTS, TEXT_BG2_COLOR, TEXT_BG3_COLOR
-    from Util import expand_text_lists, \
-        rotate, rotate3D, rotate3DV, \
-        quad_to_tris, invert_tris, \
-        angle_between, warp, safe_eval, \
-        Selection, Cursor, PopoutElement
-    from UIElement import UIElement
-    from RenderPrimitives import Color, Image, Animation
-    from EditorMimic import EditorMimic
-    from Text import Text
-    from MultilineText import MultilineText
-    from TextBox import TextBox
-    from MultilineTextBox import MultilineTextBox
-    from Geometry import Box, Polygon, Poly3D
-    from Organizers import LayeredObjects, Draggable, Resizable, Tie, Link
-    from FunctionalElements import Button, BorderedButton, Tabs, Scrollable, Collapsable, ProgressBar
-    from NumberedTextArea import NumberedTextArea
-    from PopoutInterface import PopoutInterface
-    from SnapNode import SnapNode
-    from DiscordPresence import RPC, RPCD
-    from ContextTree import ContextTree
-    from DirectoryTree import DirectoryTree
-    from Popup import Popup
-    from Editor import Editor
-    from GameApp import GameApp
-    from PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow, get_monitors
-    from FileEditor import FileEditor
-    from AttributePanel import AttributePanel
-    from ConstructionCanvas import ConstructionCanvas
-    from AdvancedEditorSubApp import AdvancedEditorSubApp
-    from FileEditorSubApp import FileEditorSubApp
-    from PopoutWindow import PopoutWindow
-    from EditorApp import EditorApp
+from Options import client_id, DO_RICH_PRESENCE, PATH, \
+    FONT, SETTINGS, TEXT_SIZE, TEXT_COLOR, TEXT_BG_COLOR, \
+    TEXT_HIGHLIGHT, TAB_SIZE, POPOUTS, TEXT_BG2_COLOR, TEXT_BG3_COLOR
+from Util import expand_text_lists, \
+    rotate, rotate3D, rotate3DV, \
+    quad_to_tris, invert_tris, \
+    angle_between, warp, safe_eval, \
+    Selection, Cursor, PopoutElement
+from UIElement import UIElement
+from RenderPrimitives import Color, Image, Animation
+from EditorMimic import EditorMimic
+from Text import Text
+from MultilineText import MultilineText
+from TextBox import TextBox
+from MultilineTextBox import MultilineTextBox
+from Geometry import Box, Polygon, Poly3D
+from Organizers import LayeredObjects, Draggable, Resizable, Tie, Link
+from FunctionalElements import Button, BorderedButton, Tabs, Scrollable, Collapsable, ProgressBar
+from NumberedTextArea import NumberedTextArea
+from PopoutInterface import PopoutInterface
+from SnapNode import SnapNode
+from DiscordPresence import RPC, RPCD
+from ContextTree import ContextTree
+from DirectoryTree import DirectoryTree
+from Popup import Popup
+from Editor import Editor
+from GameApp import GameApp
+from PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow, get_monitors
+from FileEditor import FileEditor
+from AttributePanel import AttributePanel
+from ConstructionCanvas import ConstructionCanvas
+from AdvancedEditorSubApp import AdvancedEditorSubApp
+from FileEditorSubApp import FileEditorSubApp
+from PopoutWindow import PopoutWindow
+from EditorApp import EditorApp
 
 
 

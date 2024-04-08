@@ -1,27 +1,15 @@
-# pylint: disable=[W,R,C,no-member]
+# pylint: disable=[W,R,C,no-member, import-error]
 
-try:
-    from GraphicsEngine.PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow
-    from GraphicsEngine.Options import PATH, TEXT_BG3_COLOR
-    from GraphicsEngine.Popup import Popup
-    from GraphicsEngine.ContextTree import ContextTree
-    from GraphicsEngine.SnapNode import SnapNode
-    from GraphicsEngine.MultilineText import MultilineText
-    from GraphicsEngine.MultilineTextBox import MultilineTextBox
-    from GraphicsEngine.TextBox import TextBox
-    from GraphicsEngine.FunctionalElements import Button
-    from GraphicsEngine.Text import Text
-except ImportError:
-    from PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow
-    from Options import PATH, TEXT_BG3_COLOR
-    from Popup import Popup
-    from ContextTree import ContextTree
-    from SnapNode import SnapNode
-    from MultilineText import MultilineText
-    from MultilineTextBox import MultilineTextBox
-    from TextBox import TextBox
-    from FunctionalElements import Button
-    from Text import Text
+from PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow
+from Options import PATH, TEXT_BG3_COLOR
+from Popup import Popup
+from ContextTree import ContextTree
+from SnapNode import SnapNode
+from MultilineText import MultilineText
+from MultilineTextBox import MultilineTextBox
+from TextBox import TextBox
+from FunctionalElements import Button
+from Text import Text
 
 
 import os

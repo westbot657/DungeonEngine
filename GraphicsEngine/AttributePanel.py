@@ -1,13 +1,8 @@
-# pylint: disable=[W,R,C, no-member]
+# pylint: disable=[W,R,C, no-member, import-error]
 
-try:
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.Options import PATH, TEXT_BG2_COLOR
-    from GraphicsEngine.RenderPrimitives import Image
-except ImportError:
-    from UIElement import UIElement
-    from Options import PATH, TEXT_BG2_COLOR
-    from RenderPrimitives import Image
+from UIElement import UIElement
+from Options import PATH, TEXT_BG2_COLOR
+from RenderPrimitives import Image
 
 import pygame
 import time

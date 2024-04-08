@@ -10,12 +10,10 @@ from FunctionalElements import Button, BorderedButton
 from AdvancedPanels.PanelTree import PanelTree
 from AdvancedPanels.ShelfPanel import ShelfPanel
 from CursorFocusTextBox import CursorFocusTextBox
-from VisualCFG import VisualCFG
+from GraphicsEngine.VisualConfig import VisualConfig
 import tkinter
 from threading import Thread
 
-import json
-import os
 
 class VisibilityToggle:
     def __init__(self, sub_app, typ, button, alt_text1, alt_text2, frames):
@@ -141,7 +139,7 @@ class AdvancedEditorSubApp(UIElement):
             self.dir_getter = t
     
     def _load_dungeon(self):
-        VisualCFG.load(self.to_open)
+        VisualConfig.load(self.to_open)
         
     
     def load_dungeon(self):

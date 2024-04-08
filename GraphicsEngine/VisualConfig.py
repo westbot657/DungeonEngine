@@ -1,7 +1,10 @@
 # pylint: disable=W,R,C
 
 
-class VisualCFG:
+import json
+import os
+
+class VisualConfig:
     
     @classmethod
     def load(cls, root:str):
@@ -20,6 +23,7 @@ class VisualCFG:
             "enemies": [],
             "rooms": [],
             "roads": [],
-            "scripts": []
+            "scripts": [],
+            "error": None
         }
 

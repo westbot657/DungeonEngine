@@ -10,8 +10,12 @@ from FunctionalElements import Button, BorderedButton
 from AdvancedPanels.PanelTree import PanelTree
 from AdvancedPanels.ShelfPanel import ShelfPanel
 from CursorFocusTextBox import CursorFocusTextBox
+from VisualCFG import VisualCFG
 import tkinter
 from threading import Thread
+
+import json
+import os
 
 class VisibilityToggle:
     def __init__(self, sub_app, typ, button, alt_text1, alt_text2, frames):
@@ -53,7 +57,8 @@ class AdvancedEditorSubApp(UIElement):
             None,
             "weapon", "ammo", "armor", "item", None,
             "road", "room", None,
-            "combat", "script",
+            "enemies", "combat", None,
+            "script",
             None
         ]
         
@@ -95,7 +100,7 @@ class AdvancedEditorSubApp(UIElement):
             self.visibility_icons.update({typ: frames})
             
             button = Button(base_x+x_offset, base_y, 50, 50, "", frames[2], hover_color=frames[3], click_color=frames[2])
-            alt_text1 = f"Hide {typ}" + ("" if typ in ["armor", "ammo"] else "s")
+            alt_text1 = f"Hide {typ}" + ("" if typ in ["armor", "ammo", "enemies"] else "s")
             alt_text2 = f"Show {alt_text1[5:]}"
             button._alt_text = alt_text1
             self.visibility_toggled.update({typ: True})
@@ -119,6 +124,7 @@ class AdvancedEditorSubApp(UIElement):
         self.to_open = ""
         self.selected_directory = False
         self.getting_directory = False
+        self.dir_getter = None
     
     def get_directory_task_thread(self):
         self.getting_directory = True
@@ -132,9 +138,11 @@ class AdvancedEditorSubApp(UIElement):
             t = Thread(target=self.get_directory_task_thread)
             t.daemon = True
             t.start()
+            self.dir_getter = t
     
     def _load_dungeon(self):
-        ...
+        VisualCFG.load(self.to_open)
+        
     
     def load_dungeon(self):
         t = Thread(target=self._load_dungeon)

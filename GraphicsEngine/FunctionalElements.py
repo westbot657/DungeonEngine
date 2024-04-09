@@ -351,6 +351,17 @@ class Tabs(UIElement):
                 if c.text == label:
                     return c
 
+    def get_tabs(self) -> list[str]:
+        out = []
+        if self.scrollable_tabs:
+            for c in self._tabs_area.children:
+                out.append(c.text)
+        else:
+            for c in self._tab_objects:
+                out.append(c.text)
+        return out
+        
+
     def load_tabs(self):
         if self.scrollable_tabs:
             self._tabs_area.children.clear()

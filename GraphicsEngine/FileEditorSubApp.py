@@ -66,7 +66,7 @@ class Opener:
 
         self.file_tabs.active_tab = n
         self.file_tabs.reset_tab_colors()
-        self.focused_file = file_path
+        self.focused_file = n
 
     def rmb_click(self, *_, **__):
         self.ctx_tree.openAtMouse(self.editor)
@@ -141,7 +141,14 @@ class FileEditorSubApp(UIElement):
                 i += 1
 
             if self.focused_file == tab_name:
-                self.focused_file = None
+                names = self.file_tabs.get_tabs()
+                if names:
+                    tab_n = names[min(len(names)-2, i-1)]
+                    self.file_tabs.active_tab = tab_n
+                    self.focused_file = tab_n
+                    self.file_tabs.reset_tab_colors()
+                else:
+                    self.focused_file = None
         
         return remove_tab
         

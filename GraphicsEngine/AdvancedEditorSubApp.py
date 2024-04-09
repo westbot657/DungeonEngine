@@ -1,6 +1,5 @@
 # pylint: disable=[W,R,C, import-error]
 
-import tkinter.filedialog
 from UIElement import UIElement
 from RenderPrimitives import Image
 from Options import PATH
@@ -11,8 +10,11 @@ from AdvancedPanels.PanelTree import PanelTree
 from AdvancedPanels.ShelfPanel import ShelfPanel
 from CursorFocusTextBox import CursorFocusTextBox
 from VisualConfig import VisualConfig
-import tkinter
+from Toasts import Toasts
+
 from threading import Thread
+import tkinter.filedialog
+import tkinter
 
 
 class VisibilityToggle:
@@ -47,6 +49,8 @@ class AdvancedEditorSubApp(UIElement):
         self.editor = editor
         self.children = []
         self.popouts = {}
+        
+        self.toasts = Toasts(editor.width-255, editor.height-20, 250)
         
         self.construction_canvas = ConstructionCanvas(self, editor, 102, 22, editor.width-452, editor.height-111)
         self.children.append(self.construction_canvas)
@@ -137,8 +141,10 @@ class AdvancedEditorSubApp(UIElement):
             t.daemon = True
             t.start()
             self.dir_getter = t
+            self.toasts.toast("You clicked the button to load a dungeon!!!")
     
     def _load_dungeon(self):
+        self.toasts.toast("Loading dungeon!")
         VisualConfig.load(self.to_open)
         
     
@@ -159,11 +165,13 @@ class AdvancedEditorSubApp(UIElement):
     def _update(self, editor, X, Y):
         for child in self.children:
             child._update(editor, X, Y)
+        self.toasts._update(editor, X, Y)
     
     def _event(self, editor, X, Y):
         
         if self.selected_directory:
             self.selected_directory = False
+            self.toasts.toast(f"received path: '{self.to_open}'")
             if self.to_open:
                 self.load_dungeon()
         
@@ -172,6 +180,8 @@ class AdvancedEditorSubApp(UIElement):
         
         for child in self.children[::-1]:
             child._event(editor, X, Y)
+        
+        self.toasts._event(editor, X, Y)
             
     def _update_layout(self, editor):
         for button, _ in self.visibility_toggles.values():
@@ -186,3 +196,5 @@ class AdvancedEditorSubApp(UIElement):
         self.object_tree.x = editor.width-352
         self.object_tree.height = editor.height-111
         self.open_dungeon_button.y = editor.height-70
+        self.toasts.x = editor.width-255
+        self.toasts.y = editor.height-20

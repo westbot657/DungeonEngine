@@ -9,7 +9,7 @@ import pygame
 
 class Toasts(UIElement):
     
-    class Toast:
+    class Toast(UIElement):
         def __init__(self, toasts, text, border_color, max_width):
             lines = text.split("\n")
             new_lines = []
@@ -23,19 +23,27 @@ class Toasts(UIElement):
                 if line:
                     new_lines.append(line)
             
-            self.text_dsiplay = MultilineText(0, 0, 1, 1, "\n".join(new_lines))
+            self.text_dsiplay = MultilineText(1, 1, 1, 1, "\n".join(new_lines))
             self.bg = pygame.Surface((max_width, self.text_dsiplay._text_height))
             self.bg.fill(border_color)
             self.bg.fill(border_color, (1, 1, max_width-2, self.text_dsiplay._text_height-2))
+            self.height = self.text_dsiplay._text_height+5
+        
+        def _event(self, editor, X, Y):
+            pass
+        
+        def _update(self, editor, X, Y):
+            editor.screen.blit(self.bg, (X, Y))
+            self.text_dsiplay._update(X, Y)
     
     def __init__(self, x, y, width):
         self.x = x
         self.y = y
         self.width = width
-        self.appear_queue = []
-        self.appearing = None
-        self.toasts = []
-        self.disappearing = []
+        self.appear_queue: list[list[int, Toasts.Toast]] = []
+        self.appearing: list[int, list[int, Toasts.Toast]] = None
+        self.toasts: list[list[int, Toasts]] = []
+        self.disappearing: list[list[int, Toasts.Toast]] = []
         
         f = pygame.font.Font(FONT, TEXT_SIZE)
         self._char_size = f.render(" ", True, (0, 0, 0)).get_size()
@@ -47,7 +55,20 @@ class Toasts(UIElement):
     
     
     def _event(self, editor, X, Y):
-        ...
+        
+        if self.appearing is not None:
+            if self.appearing[0] <= time.time():
+                self.toasts.insert(0, [time.time() + self.appearing[1][0], self.appearing[1][1]])
+            
+        else:
+            if self.appear_queue:
+                a: list[int, Toasts.Toast] = self.appear_queue.pop(0)
+                t: int = a[1].height/100 # this is where time of slide-in is set
+                self.appearing = [t, a]
+        
+                
+            
+            
     
     def _update(self, editor, X, Y):
         ...

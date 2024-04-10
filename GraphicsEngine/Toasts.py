@@ -15,30 +15,40 @@ class Toasts(UIElement):
             self.keep_showing = False
             lines = text.split("\n")
             new_lines = []
+            self.width = max_width
             
             for line in lines:
-                while len(line)*toasts._char_size[0] > max_width-15:
-                    length = max_width//toasts._char_size[0]
+                while len(line)*toasts._char_size[0] > max_width-20:
+                    length = (max_width-20)//toasts._char_size[0]
                     pre = line[0:length]
                     line = line[length:]
                     new_lines.append(pre)
                 if line:
                     new_lines.append(line)
             
-            print(f"formatted lines to {new_lines}")
-            
             self.text_dsiplay = MultilineText(5, 5, 1, 1, "\n".join(new_lines))
-            self.bg = pygame.Surface((max_width, self.text_dsiplay._text_height+10))
-            self.bg.fill(border_color)
-            self.bg.fill(TEXT_BG_COLOR, (1, 1, max_width-2, self.text_dsiplay._text_height+8))
+            self.border_color = border_color
+            self.bg = pygame.Surface((self.width, self.text_dsiplay._text_height+10))
+            self.bg.fill(self.border_color)
+            self.bg.fill(TEXT_BG_COLOR, (1, 1, self.width-2, self.text_dsiplay._text_height+8))
             self.height = self.text_dsiplay._text_height+18
+            self.children = []
+            self.keep_showing = False
+        
+        def refresh(self):
+            self.bg = pygame.Surface((self.width, self.height-8))
+            self.bg.fill(self.border_color)
+            self.bg.fill(TEXT_BG_COLOR, (1, 1, self.width-2, self.height-10))
         
         def _event(self, editor, X, Y):
-            pass
+            for child in self.children[::-1]:
+                child._event(editor, X, Y)
         
         def _update(self, editor, X, Y):
             editor.screen.blit(self.bg, (X, Y))
             self.text_dsiplay._update(editor, X, Y)
+            for child in self.children:
+                child._update(editor, X, Y)
     
     def __init__(self, x, y, width):
         self.x = x
@@ -54,7 +64,7 @@ class Toasts(UIElement):
         
 
 
-    def toast(self, text:str, display_time:float=2, border_color=TEXT_BG3_COLOR) -> Toast:
+    def toast(self, text:str, display_time:float=2.5, border_color=TEXT_BG3_COLOR) -> Toast:
         toast = Toasts.Toast(self, text, border_color, self.width)
         self.appear_queue.append([display_time, toast])
         return toast
@@ -76,7 +86,7 @@ class Toasts(UIElement):
                 self.appearing = [tm, t, a, a[1].height]
         
         for toast in self.toasts.copy():
-            if toast[0] <= tm and toast[1].keep_showing == False:
+            if toast[0] <= tm and not toast[1].keep_showing:
                 self.toasts.remove(toast)
                 self.disappearing.insert(0, [tm, toast[1]])
         

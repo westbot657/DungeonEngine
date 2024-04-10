@@ -11,6 +11,7 @@ from AdvancedPanels.ShelfPanel import ShelfPanel
 from CursorFocusTextBox import CursorFocusTextBox
 from VisualConfig import VisualConfig
 from Toasts import Toasts
+from LoadingBar import LoadingBar
 
 from threading import Thread
 import tkinter.filedialog
@@ -50,7 +51,7 @@ class AdvancedEditorSubApp(UIElement):
         self.children = []
         self.popouts = {}
         
-        self.toasts = Toasts(editor.width-255, editor.height-20, 250)
+        self.toasts = Toasts(editor.width-355, editor.height-20, 350)
         
         self.construction_canvas = ConstructionCanvas(self, editor, 102, 22, editor.width-452, editor.height-111)
         self.children.append(self.construction_canvas)
@@ -141,11 +142,16 @@ class AdvancedEditorSubApp(UIElement):
             t.daemon = True
             t.start()
             self.dir_getter = t
-            self.toasts.toast("You clicked the button to load a dungeon!!!")
     
     def _load_dungeon(self):
-        self.toasts.toast("Loading dungeon!")
-        VisualConfig.load(self.to_open)
+        toast = self.toasts.toast("Loading dungeon...", 15, (10, 200, 30))
+        loading_bar = LoadingBar(5, toast.height-5, toast.width-10, 15)
+        toast.height += 25
+        toast.children.append(loading_bar)
+        toast.refresh()
+        toast.keep_showing = True
+        VisualConfig.load(self.to_open, loading_bar)
+        
         
     
     def load_dungeon(self):
@@ -171,7 +177,6 @@ class AdvancedEditorSubApp(UIElement):
         
         if self.selected_directory:
             self.selected_directory = False
-            self.toasts.toast(f"received path: '{self.to_open}'")
             if self.to_open:
                 self.load_dungeon()
         
@@ -196,5 +201,5 @@ class AdvancedEditorSubApp(UIElement):
         self.object_tree.x = editor.width-352
         self.object_tree.height = editor.height-111
         self.open_dungeon_button.y = editor.height-70
-        self.toasts.x = editor.width-255
+        self.toasts.x = editor.width-355
         self.toasts.y = editor.height-20

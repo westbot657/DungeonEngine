@@ -37,16 +37,22 @@ class Toasts(UIElement):
             self.keep_showing = False
         
         def remove(self):
-            ...
-            # if self in self.toasts.appear_queue:
-            #     self.toasts.appear_queue.remove(self)
-            # if self == self.toasts.appearing:
-            #     self.toasts.appearing = None
-            # if self in self.toasts.toasts:
-            #     self.toasts.toasts.remove(self)
-            # if self in self.toasts.disappearing:
-            #     self.toasts.disappearing.remove(self)
-                
+            for _, toast in self.toasts.appear_queue.copy():
+                if toast == self:
+                    self.toasts.appear_queue.remove([_, toast])
+                    return
+            if self.toasts.appearing and self.toasts.appearing[2][1] == self:
+                self.toasts.appearing = None
+                return
+            for _, toast in self.toasts.toasts.copy():
+                if toast == self:
+                    self.toasts.toasts.remove([_, toast])
+                    return
+            for _, toast in self.disappearing.copy():
+                if toast == self:
+                    self.toasts.toasts.remove([_, toast])
+                    return
+            
         def refresh(self):
             self.bg = pygame.Surface((self.width, self.height-8))
             self.bg.fill(self.border_color)
@@ -73,8 +79,6 @@ class Toasts(UIElement):
         
         f = pygame.font.Font(FONT, TEXT_SIZE)
         self._char_size = f.render(" ", True, (0, 0, 0)).get_size()
-        
-
 
     def toast(self, text:str, display_time:float=2.5, border_color=TEXT_BG3_COLOR) -> Toast:
         toast = Toasts.Toast(self, text, border_color, self.width)

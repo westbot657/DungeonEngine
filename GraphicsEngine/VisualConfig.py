@@ -3,6 +3,8 @@
 from LoadingBar import LoadingBar
 from Toasts import Toasts
 from FunctionalElements import Button
+from RenderPrimitives import Image
+from Options import PATH
 
 import math
 import time
@@ -27,7 +29,6 @@ class VisualConfig:
             return "Folder does not resemble expected dungeon structure"
         to_load.append(f"{root}/{dungeon_id}.json")
         
-        
         return to_load
     
     @staticmethod
@@ -38,9 +39,14 @@ class VisualConfig:
         loading_bar.fill_color = (255, 30, 30)
         loading_bar.set_max_progress(1)
         loading_bar.set_progress(1)
-        loading_bar.width -= 25
+        # loading_bar.width -= 25
         
-        close_toast_button = Button(loading_bar.x+loading_bar.width+5, loading_bar.y, 20, loading_bar.height, "X")
+        ctb_frames = [
+            Image(f"{PATH}/advanced_editor/close_button.png", 0, 0, 20, 20),
+            Image(f"{PATH}/advanced_editor/close_button_hovered.png", 0, 0, 20, 20)
+        ]
+        
+        close_toast_button = Button(loading_bar.x+loading_bar.width-20, loading_bar.y-25, 20, 20, "", ctb_frames[0], hover_color=ctb_frames[1], click_color=ctb_frames[1])
         toast2 = toasts.toast(msg, 0.1, (255, 30, 30))
         toast2.keep_showing = True
         

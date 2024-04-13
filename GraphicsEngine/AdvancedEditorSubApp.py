@@ -144,13 +144,13 @@ class AdvancedEditorSubApp(UIElement):
             self.dir_getter = t
     
     def _load_dungeon(self):
-        toast = self.toasts.toast("Loading dungeon...", 15, (10, 200, 30))
+        toast = self.toasts.toast("Loading dungeon...", 0, (10, 200, 30))
         loading_bar = LoadingBar(5, toast.height-5, toast.width-10, 15)
         toast.height += 25
         toast.children.append(loading_bar)
         toast.refresh()
         toast.keep_showing = True
-        VisualConfig.load(self.to_open, loading_bar)
+        VisualConfig.load(self.to_open, loading_bar, toast, self.toasts)
         
         
     

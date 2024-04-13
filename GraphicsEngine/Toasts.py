@@ -12,6 +12,7 @@ class Toasts(UIElement):
     
     class Toast(UIElement):
         def __init__(self, toasts, text, border_color, max_width):
+            self.toasts = toasts
             self.keep_showing = False
             lines = text.split("\n")
             new_lines = []
@@ -35,6 +36,17 @@ class Toasts(UIElement):
             self.children = []
             self.keep_showing = False
         
+        def remove(self):
+            ...
+            # if self in self.toasts.appear_queue:
+            #     self.toasts.appear_queue.remove(self)
+            # if self == self.toasts.appearing:
+            #     self.toasts.appearing = None
+            # if self in self.toasts.toasts:
+            #     self.toasts.toasts.remove(self)
+            # if self in self.toasts.disappearing:
+            #     self.toasts.disappearing.remove(self)
+                
         def refresh(self):
             self.bg = pygame.Surface((self.width, self.height-8))
             self.bg.fill(self.border_color)
@@ -94,6 +106,21 @@ class Toasts(UIElement):
             if toast[0]+1 <= tm:
                 self.disappearing.remove(toast)
 
+        y_offset = 0
+        tm = time.time()
+        if (toast := self.appearing) is not None:
+            # y_offset = toast[3]
+            y_offset = (tm-toast[0])/toast[1] * toast[3]
+            toast[2][1]._event(editor, X+self.x, Y+self.y-y_offset)
+
+        for toast in self.toasts:
+            y_offset += toast[1].height
+            toast[1]._event(editor, X+self.x, Y+self.y-y_offset)
+        
+        for toast in self.disappearing:
+            y_offset += toast[1].height
+            x_offset = (tm-toast[0]) * self.width
+            toast[1]._event(editor, X+self.x+x_offset, Y+self.y-y_offset)
 
 
 

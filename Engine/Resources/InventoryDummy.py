@@ -1,9 +1,6 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .EngineDummy import Engine
-except ImportError:
-    from EngineDummy import Engine
+from .EngineDummy import Engine
 
 class Inventory:
     def __init__(self):

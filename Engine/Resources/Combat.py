@@ -1,18 +1,18 @@
 # pylint: disable=[W,R,C,import-error]
 
-from AbstractEnemy import AbstractEnemy, Enemy
-from FunctionMemory import FunctionMemory
-from FunctionalElement import FunctionalElement
-from Player import Player
-from EngineErrors import CombatError
-from EngineOperation import EngineOperation, _EngineOperation
-from TextPattern import TextPattern
-from Util import Util
-from Logger import Log
-from Location import Location
-from Position import Position
-from Map import Map
-from Serializer import Serializer, Serializable
+from .AbstractEnemy import AbstractEnemy, Enemy
+from .FunctionMemory import FunctionMemory
+from .FunctionalElement import FunctionalElement
+from .Player import Player
+from .EngineErrors import CombatError
+from .EngineOperation import EngineOperation, _EngineOperation
+from .TextPattern import TextPattern
+from .Util import Util
+from .Logger import Log
+from .Location import Location
+from .Position import Position
+from .Map import Map
+from .Serializer import Serializer, Serializable
 
 from enum import Enum, auto
 

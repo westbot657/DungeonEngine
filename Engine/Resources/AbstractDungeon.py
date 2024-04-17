@@ -1,18 +1,18 @@
 # pylint: disable=[W,R,C,import-error]
 
-from Dungeon import Dungeon
-from Identifier import Identifier
-from EngineErrors import InvalidObjectError
-from Logger import Log
-from AbstractRoom import AbstractRoom
-from Environment import Environment
-from FunctionMemory import FunctionMemory
-from DynamicValue import DynamicValue
-from Util import Util
-from Location import Location
-from Map import Map
-from Loader import Loader
-from Serializer import Serializer, Serializable
+from .Dungeon import Dungeon
+from .Identifier import Identifier
+from .EngineErrors import InvalidObjectError
+from .Logger import Log
+from .AbstractRoom import AbstractRoom
+from .Environment import Environment
+from .FunctionMemory import FunctionMemory
+from .DynamicValue import DynamicValue
+from .Util import Util
+from .Location import Location
+from .Map import Map
+from .Loader import Loader
+from .Serializer import Serializer, Serializable
 
 import glob, json, re
 

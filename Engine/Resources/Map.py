@@ -1,9 +1,9 @@
 # pylint: disable=[W,R,C,import-error]
 
-from Location import Location
-from Position import Position
-from Region import Region
-from Serializer import Serializer, Serializable
+from .Location import Location
+from .Position import Position
+from .Region import Region
+from .Serializer import Serializer, Serializable
 
 
 @Serializable("Map")

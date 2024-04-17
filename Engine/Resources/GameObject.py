@@ -1,8 +1,8 @@
 # pylint: disable=[W,R,C,import-error]
 
-from Identifier import Identifier
-from EngineErrors import EngineError, IdentifierError
-from FunctionalElement import FunctionalElement
+from .Identifier import Identifier
+from .EngineErrors import EngineError, IdentifierError
+from .FunctionalElement import FunctionalElement
 
 class GameObject(FunctionalElement):
     _game_object_types = {}

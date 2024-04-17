@@ -1,6 +1,6 @@
 # pylint: disable=[W,R,C, import-error]
 
-from Serializer import Serializable, Serializer
+from .Serializer import Serializable, Serializer
 
 
 

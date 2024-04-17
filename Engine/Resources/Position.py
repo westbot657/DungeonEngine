@@ -1,7 +1,7 @@
 # pylint: disable=[W,R,C,import-error]
 
-from FunctionalElement import FunctionalElement
-from Serializer import Serializer, Serializable
+from .FunctionalElement import FunctionalElement
+from .Serializer import Serializer, Serializable
 
 
 @Serializable("Position")

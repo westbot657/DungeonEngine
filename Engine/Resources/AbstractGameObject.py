@@ -1,9 +1,9 @@
 # pylint: disable=[W,R,C,import-error]
 
-from GameObject import GameObject
-from Identifier import Identifier
-from EngineErrors import IdentifierError
-from Serializer import Serializer, Serializable
+from .GameObject import GameObject
+from .Identifier import Identifier
+from .EngineErrors import IdentifierError
+from .Serializer import Serializer, Serializable
 
 @Serializable("AbstractGameObject")
 class AbstractGameObject:

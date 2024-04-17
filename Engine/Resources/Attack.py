@@ -1,11 +1,11 @@
 # pylint: disable=[W,R,C,import-error]
 
-from FunctionMemory import FunctionMemory
-from FunctionalElement import FunctionalElement
-from DynamicValue import DynamicValue
-from EngineOperation import _EngineOperation
-from Logger import Log
-from Serializer import Serializer, Serializable
+from .FunctionMemory import FunctionMemory
+from .FunctionalElement import FunctionalElement
+from .DynamicValue import DynamicValue
+from .EngineOperation import _EngineOperation
+from .Logger import Log
+from .Serializer import Serializer, Serializable
 
 import random
 

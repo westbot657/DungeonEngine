@@ -1,10 +1,10 @@
 # pylint: disable=[W,R,C,import-error]
 
-from GameObject import GameObject
-from Identifier import Identifier
-from DynamicValue import DynamicValue
-from FunctionMemory import FunctionMemory
-from Serializer import Serializer, Serializable
+from .GameObject import GameObject
+from .Identifier import Identifier
+from .DynamicValue import DynamicValue
+from .FunctionMemory import FunctionMemory
+from .Serializer import Serializer, Serializable
 
 
 @Serializable("Ammo")

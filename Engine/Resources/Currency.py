@@ -1,7 +1,7 @@
 # pylint: disable=[W,R,C,import-error]
 
-from EngineErrors import CurrencyError
-from Serializer import Serializer, Serializable
+from .EngineErrors import CurrencyError
+from .Serializer import Serializer, Serializable
 
 @Serializable("Currency")
 class Currency:

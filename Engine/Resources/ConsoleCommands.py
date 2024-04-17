@@ -1,12 +1,12 @@
 # pylint: disable=[W,R,C,import-error]
 
-from ConsoleCommand import ConsoleCommand
-from Identifier import Identifier
-from Player import Player
-from Inventory import Inventory
-from FunctionMemory import FunctionMemory
-from Logger import Log
-from EngineErrors import EngineError
+from .ConsoleCommand import ConsoleCommand
+from .Identifier import Identifier
+from .Player import Player
+from .Inventory import Inventory
+from .FunctionMemory import FunctionMemory
+from .Logger import Log
+from .EngineErrors import EngineError
 
 @ConsoleCommand(
     Identifier("engine", "", "save-game"),

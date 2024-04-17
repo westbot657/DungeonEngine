@@ -1,10 +1,10 @@
 # pylint: disable=[W,R,C,import-error]
 
-from EngineDummy import Engine
-from FunctionMemory import FunctionMemory
-from EngineOperation import _EngineOperation
-from FunctionalElement import FunctionalElement
-from Serializer import Serializer, Serializable
+from .EngineDummy import Engine
+from .FunctionMemory import FunctionMemory
+from .EngineOperation import _EngineOperation
+from .FunctionalElement import FunctionalElement
+from .Serializer import Serializer, Serializable
 
 
 @Serializable("DynamicValue")

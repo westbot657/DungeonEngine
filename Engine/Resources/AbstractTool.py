@@ -1,14 +1,14 @@
 # pylint: disable=[W,R,C,import-error]
 
-from Identifier import Identifier
-from Tool import Tool
-from EngineErrors import InvalidObjectError
-from EngineDummy import Engine
-from AbstractGameObject import AbstractGameObject
-from DynamicValue import DynamicValue
-from Logger import Log
-from Loader import Loader
-from Serializer import Serializer, Serializable
+from .Identifier import Identifier
+from .Tool import Tool
+from .EngineErrors import InvalidObjectError
+from .EngineDummy import Engine
+from .AbstractGameObject import AbstractGameObject
+from .DynamicValue import DynamicValue
+from .Logger import Log
+from .Loader import Loader
+from .Serializer import Serializer, Serializable
 
 import glob, json, random
 

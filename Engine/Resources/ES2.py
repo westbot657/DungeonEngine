@@ -2,13 +2,13 @@
 
 # This is attampt 2 at a Engine Script parser but with syntax error position finding
 
-from LoaderFunction import LoaderFunction
-from Functions import *
-from Identifier import Identifier
-from Logger import Log
-from EngineErrors import FinalScriptError, ScriptError, EOF
-from Loader import Loader
-from Serializer import Serializer, Serializable
+from .LoaderFunction import LoaderFunction
+from .Functions import *
+from .Identifier import Identifier
+from .Logger import Log
+from .EngineErrors import FinalScriptError, ScriptError, EOF
+from .Loader import Loader
+from .Serializer import Serializer, Serializable
 
 import re, glob, json
 

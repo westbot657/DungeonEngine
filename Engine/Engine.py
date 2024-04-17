@@ -1,6 +1,8 @@
 # pylint: disable=[W,R,C,import-error]
 from Resources.Logger import Log
 
+import sys, os
+
 Log._tag_colors = {
     "loadup": "\u001b[38;2;10;200;80m",
     "player": "\u001b[38;2;10;40;180m",
@@ -18,6 +20,8 @@ Log._tag_colors = {
 }
 
 Log.log_to_file("./latest.log")
+
+sys.path.append(os.getcwd())
 
 from Resources.AbstractAmmo         import AbstractAmmo, Ammo
 from Resources.AbstractArmor        import AbstractArmor, Armor

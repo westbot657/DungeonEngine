@@ -1,9 +1,9 @@
 # pylint: disable=[W,R,C,import-error]
 
-from EngineDummy import Engine
-from Logger import Log
-from EngineOperation import EngineOperation, _EngineOperation
-from Serializer import Serializer, Serializable
+from .EngineDummy import Engine
+from .Logger import Log
+from .EngineOperation import EngineOperation, _EngineOperation
+from .Serializer import Serializer, Serializable
 
 
 from enum import Enum, auto

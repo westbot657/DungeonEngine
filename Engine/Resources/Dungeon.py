@@ -1,21 +1,21 @@
 # pylint: disable=[W,R,C,import-error]
 
-from FunctionalElement import FunctionalElement
-from FunctionMemory import FunctionMemory
-from Environment import Environment
-from Identifier import Identifier
-from DynamicValue import DynamicValue
-from Room import Room
-from Player import Player
-from EngineOperation import _EngineOperation
-from ConsoleCommand import ConsoleCommand
-from Logger import Log
-from TextPattern import TextPattern
-from EngineOperation import EngineOperation, _EngineOperation
-from EngineErrors import EngineError, EngineBreak
-from Location import Location
-from Map import Map
-from Serializer import Serializer, Serializable
+from .FunctionalElement import FunctionalElement
+from .FunctionMemory import FunctionMemory
+from .Environment import Environment
+from .Identifier import Identifier
+from .DynamicValue import DynamicValue
+from .Room import Room
+from .Player import Player
+from .EngineOperation import _EngineOperation
+from .ConsoleCommand import ConsoleCommand
+from .Logger import Log
+from .TextPattern import TextPattern
+from .EngineOperation import EngineOperation, _EngineOperation
+from .EngineErrors import EngineError, EngineBreak
+from .Location import Location
+from .Map import Map
+from .Serializer import Serializer, Serializable
 
 from typing import Generator
 

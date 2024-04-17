@@ -1,16 +1,16 @@
 # pylint: disable=[W,R,C,import-error]
 
-from FunctionalElement import FunctionalElement
-from DynamicValue import DynamicValue
-from Interactable import Interactable
-from FunctionMemory import FunctionMemory
-from Player import Player
-from EngineOperation import EngineOperation, _EngineOperation
-from Location import Location
-from Environment import Environment
-from Map import Map
-from Logger import Log
-from Serializer import Serializer, Serializable
+from .FunctionalElement import FunctionalElement
+from .DynamicValue import DynamicValue
+from .Interactable import Interactable
+from .FunctionMemory import FunctionMemory
+from .Player import Player
+from .EngineOperation import EngineOperation, _EngineOperation
+from .Location import Location
+from .Environment import Environment
+from .Map import Map
+from .Logger import Log
+from .Serializer import Serializer, Serializable
 
 @Serializable("Room")
 class Room(FunctionalElement):

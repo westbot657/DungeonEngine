@@ -1,31 +1,31 @@
 # pylint: disable=[W,R,C,import-error]
 
-from LoaderFunction import LoaderFunction
-from Identifier import Identifier
-from LootTable import LootTable
-from EngineDummy import Engine
-from EngineOperation import EngineOperation, _EngineOperation
-from EngineErrors import LocationError, FunctionError, FunctionCallError
-from AbstractAmmo import AbstractAmmo, Ammo
-from AbstractArmor import AbstractArmor, Armor
-from AbstractAttack import AbstractAttack, Attack
-from AbstractCombat import AbstractCombat, Combat
-from AbstractDungeon import AbstractDungeon, Dungeon
-from AbstractEnemy import AbstractEnemy, Enemy
-from AbstractItem import AbstractItem, Item
-from AbstractRoom import AbstractRoom, Room
-from AbstractStatusEffect import AbstractStatusEffect, StatusEffect
-from AbstractTool import AbstractTool, Tool
-from AbstractWeapon import AbstractWeapon, Weapon
-from AbstractGameObject import AbstractGameObject, GameObject
-from FunctionMemory import FunctionMemory
-from Currency import Currency
-from Player import Player
-from Logger import Log
-from Interactable import Interactable
-from Util import Util
-from Location import Location
-from Time import Time
+from .LoaderFunction import LoaderFunction
+from .Identifier import Identifier
+from .LootTable import LootTable
+from .EngineDummy import Engine
+from .EngineOperation import EngineOperation, _EngineOperation
+from .EngineErrors import LocationError, FunctionError, FunctionCallError
+from .AbstractAmmo import AbstractAmmo, Ammo
+from .AbstractArmor import AbstractArmor, Armor
+from .AbstractAttack import AbstractAttack, Attack
+from .AbstractCombat import AbstractCombat, Combat
+from .AbstractDungeon import AbstractDungeon, Dungeon
+from .AbstractEnemy import AbstractEnemy, Enemy
+from .AbstractItem import AbstractItem, Item
+from .AbstractRoom import AbstractRoom, Room
+from .AbstractStatusEffect import AbstractStatusEffect, StatusEffect
+from .AbstractTool import AbstractTool, Tool
+from .AbstractWeapon import AbstractWeapon, Weapon
+from .AbstractGameObject import AbstractGameObject, GameObject
+from .FunctionMemory import FunctionMemory
+from .Currency import Currency
+from .Player import Player
+from .Logger import Log
+from .Interactable import Interactable
+from .Util import Util
+from .Location import Location
+from .Time import Time
 
 from typing import Any
 

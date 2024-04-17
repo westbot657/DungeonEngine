@@ -49,19 +49,7 @@ class ShelfPanel(UIElement):
         self.focus_button.on_left_click = self.focus_object
         self.attr_panel_visible = True
         self.children = []
-    
-    # def collide_override(self, mouse, rect):
-    #     # mx, my = mouse
-    #     # x, y, w, h = rect
-    #     if self.label_text_box.editor.collides(mouse, (self.x, (self.y % 40), self.label_text_box.width, self.label_text_box.height)): # WHY DOES % 40 WORK?!?!?!?!?!?! (works enough for now at least I guess...)
-    #         # print("COLLISION")
-    #         #print(f"Scrollable: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")
-    #         # print((x, y, w, h), (mx, my), (self.last_X, self.last_Y))
-    #     # if x <= mx < x + w and y <= my < y + h:
-    #         return True
 
-    #     return False
-    
     def set_label(self, textbox):
         self.label = textbox.get_content()
     

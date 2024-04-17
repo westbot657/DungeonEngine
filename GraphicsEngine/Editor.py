@@ -11,7 +11,6 @@ from TextBox import TextBox
 from FunctionalElements import Button
 from Text import Text
 
-
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
 import pygame
@@ -29,10 +28,6 @@ class Editor:
         self.screen:pygame.Surface = None
         self.engine = engine
         self.io_hook = io_hook
-        
-        self.ctx = None
-        self.quad_buffer = None
-        
         self.game_app = None
         self.previous_mouse = [False, False, False]
         self.mouse = [False, False, False]
@@ -125,8 +120,9 @@ class Editor:
         # print(f"making window of size: ({self.width}, {self.height})")
         
         
-        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME) # pylint: disable=no-member
-        
+        self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME)# | pygame.OPENGL | pygame.DOUBLEBUF) # pylint: disable=no-member
+        # self.screen_shader = pygame_shaders.DefaultScreenShader(self.screen) # <- Here we supply our default display, it's this display which will be displayed onto the opengl context via the screen_shader
+
         
         pygame.display.set_icon(pygame.image.load(f"{PATH}/dungeon_game_icon.png"))
         pygame.display.set_caption(self._caption)
@@ -289,6 +285,8 @@ class Editor:
             # fps_display.set_text(f"{fps-_fps}")
             # fps_display._event(self, 5, self.height-10)
             # fps_display._update(self, 5, self.height-10)
+
+            # self.screen_shader.render()
 
             pygame.display.flip()
 

@@ -8,6 +8,9 @@ import pygame
 
 from enum import Enum, auto
 
+
+
+
 class ConnectorLine(UIElement):
     
     class Pathing(Enum):
@@ -43,6 +46,7 @@ class ConnectorLine(UIElement):
 
     def _event(self, editor, X, Y):
         if self.path:
+            # handle line segment moving
             ...
         
     def _update(self, editor, X, Y):

@@ -7,7 +7,7 @@ class Pathfinding:
     
     class Plane:
         
-        class _intermediate:
+        class _intermediate(list):
             instance = None
             def __init__(self, plane):
                 self.plane = plane
@@ -15,14 +15,18 @@ class Pathfinding:
             
             def __getitem__(self, y):
                 return self.plane.get_point(self.x, y)
-        
+            
+            # def __setitem__(self, index, val):
+            #     print(f"set {self.x}, {index} to {val}")
+
         def convert(self, grid, offset:tuple[int, int]=None):
-            x, y = offset or (0, 0)
+            x, y = offset = offset or (0, 0)
             points = []
             for h in grid:
+                y = offset[1]
                 for val in h:
                     if val:
-                        points.append((x, y))
+                        points.append((y, x))
                     y += 1
                     
                 x += 1
@@ -34,23 +38,25 @@ class Pathfinding:
             self.intermediate = Pathfinding.Plane._intermediate(self)
 
             self.map = set()
-            self.minX = 0
-            self.maxX = 0
-            self.minY = 0
-            self.maxY = 0
+            if points:
+                self.minX, self.minY = self.maxY, self.maxY = points[0]
+                self.maxX += 1
+                self.maxY += 1
+            else:
+                self.minX, self.minY = self.maxX, self.maxY = (0, 0)
 
             self.add_points(points)
-            
 
         def add_points(self, points):
             for point in points:
                 self.minX = min(self.minX, point[0])
-                self.maxX = max(self.maxX, point[0])
+                self.maxX = max(self.maxX, point[0]+1)
                 self.minY = min(self.minY, point[1])
-                self.maxY = max(self.maxY, point[1])
-            self.shape = [self.minX, self.minY, self.maxX, self.maxY]
+                self.maxY = max(self.maxY, point[1]+2)
+            self.shape = [self.minX, self.minY, self.maxX+1, self.maxY+1]
             self.map.update(points)
             
+
 
         def get_point(self, x, y):
             if (x, y) in self.map:
@@ -60,6 +66,8 @@ class Pathfinding:
         def __getitem__(self, x):
             self.intermediate.x = x
             return self.intermediate
+        
+        
 
     @classmethod
     def astar_heuristic(cls, x:tuple[int, int], y:tuple[int, int]):
@@ -78,7 +86,7 @@ class Pathfinding:
         while oheap:
             current = heapq.heappop(oheap)[1]
             if current == goal:
-                data = []
+                data = [start]
                 while current in came_from:
                     data.append(current)
                     current = came_from[current]
@@ -121,7 +129,7 @@ class Pathfinding:
         while oheap:
             current = heapq.heappop(oheap)[1]
             if current == goal:
-                data = []
+                data = [start]
                 while current in came_from:
                     data.append(current)
                     current = came_from[current]

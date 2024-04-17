@@ -1,49 +1,26 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .Inventory import Inventory
-    from .Entity import Entity
-    from .Location import Location
-    from .StatusEffectManager import StatusEffectManager
-    from .EngineDummy import Engine
-    from .Logger import Log
-    from .Position import Position
-    from .EngineErrors import MemoryError, UnknownPlayerError
-    from .FunctionalElement import FunctionalElement
-    from .FunctionMemory import FunctionMemory
-    from .AbstractWeapon import AbstractWeapon, Weapon
-    from .AbstractTool import AbstractTool, Tool
-    from .AbstractItem import AbstractItem, Item
-    from .AbstractAmmo import AbstractAmmo, Ammo
-    from .AbstractArmor import AbstractArmor, Armor
-    from .EngineOperation import _EngineOperation
-    from .Currency import Currency
-    from .EngineOperation import EngineOperation
-    from .Util import Util
-    from .LootTable import LootTable
-    from .Serializer import Serializable, Serializer
-except ImportError:
-    from Inventory import Inventory
-    from Entity import Entity
-    from Location import Location
-    from StatusEffectManager import StatusEffectManager
-    from EngineDummy import Engine
-    from Logger import Log
-    from Position import Position
-    from EngineErrors import MemoryError, UnknownPlayerError
-    from FunctionalElement import FunctionalElement
-    from FunctionMemory import FunctionMemory
-    from AbstractWeapon import AbstractWeapon, Weapon
-    from AbstractTool import AbstractTool, Tool
-    from AbstractItem import AbstractItem, Item
-    from AbstractAmmo import AbstractAmmo, Ammo
-    from AbstractArmor import AbstractArmor, Armor
-    from EngineOperation import _EngineOperation
-    from Currency import Currency
-    from EngineOperation import EngineOperation
-    from Util import Util
-    from LootTable import LootTable
-    from Serializer import Serializable, Serializer
+from Inventory import Inventory
+from Entity import Entity
+from Location import Location
+from StatusEffectManager import StatusEffectManager
+from EngineDummy import Engine
+from Logger import Log
+from Position import Position
+from EngineErrors import MemoryError, UnknownPlayerError
+from FunctionalElement import FunctionalElement
+from FunctionMemory import FunctionMemory
+from AbstractWeapon import AbstractWeapon, Weapon
+from AbstractTool import AbstractTool, Tool
+from AbstractItem import AbstractItem, Item
+from AbstractAmmo import AbstractAmmo, Ammo
+from AbstractArmor import AbstractArmor, Armor
+from EngineOperation import _EngineOperation
+from Currency import Currency
+from EngineOperation import EngineOperation
+from Util import Util
+from LootTable import LootTable
+from Serializer import Serializable, Serializer
 
 from typing import Any
 

@@ -1,17 +1,10 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .EngineErrors import FunctionCallError, ParseError, IdentifierError, UnknownPlayerError
-    from .Identifier import Identifier
-    from .GameObject import GameObject
-    from .Logger import Log
-    from .Player import Player
-except ImportError:
-    from EngineErrors import FunctionCallError, ParseError, IdentifierError, UnknownPlayerError
-    from Identifier import Identifier
-    from GameObject import GameObject
-    from Logger import Log
-    from Player import Player
+from EngineErrors import FunctionCallError, ParseError, IdentifierError, UnknownPlayerError
+from Identifier import Identifier
+from GameObject import GameObject
+from Logger import Log
+from Player import Player
 
 import json, re
 

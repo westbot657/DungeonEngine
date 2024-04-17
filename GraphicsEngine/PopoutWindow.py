@@ -1,28 +1,16 @@
-# pylint: disable=[W,R,C,no-member]
-try:
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.NumberedTextArea import NumberedTextArea
-    from GraphicsEngine.FileEditor import FileEditor
-    from GraphicsEngine.Text import Text
-    from GraphicsEngine.FunctionalElements import BorderedButton
-    from GraphicsEngine.Popup import Popup
-    from GraphicsEngine.Editor import Editor
-    from GraphicsEngine.WindowFrame import WindowFrame
-    from GraphicsEngine.Util import PopoutElement, safe_eval
-    from GraphicsEngine.Organizers import Link
-    from GraphicsEngine.PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow, get_monitors
-except ImportError:
-    from UIElement import UIElement
-    from NumberedTextArea import NumberedTextArea
-    from FileEditor import FileEditor
-    from Text import Text
-    from FunctionalElements import BorderedButton
-    from Popup import Popup
-    from Editor import Editor
-    from WindowFrame import WindowFrame
-    from Util import PopoutElement, safe_eval
-    from Organizers import Link
-    from PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow, get_monitors
+# pylint: disable=[W,R,C,no-member, import-error]
+
+from UIElement import UIElement
+from NumberedTextArea import NumberedTextArea
+from FileEditor import FileEditor
+from Text import Text
+from FunctionalElements import BorderedButton
+from Popup import Popup
+from Editor import Editor
+from WindowFrame import WindowFrame
+from Util import PopoutElement, safe_eval
+from Organizers import Link
+from PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow, get_monitors
 
 from mergedeep import merge
 from subprocess import Popen

@@ -1,9 +1,6 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from Serializer import Serializer, Serializable
+from Serializer import Serializer, Serializable
 
 
 @Serializable("Region")

@@ -1,11 +1,7 @@
-# pylint: disable=[W,R,C, no-member, invalid-unary-operand-type]
+# pylint: disable=[W,R,C, no-member, invalid-unary-operand-type, import-error]
 
-try:
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.Options import TEXT_BG_COLOR, TEXT_BG2_COLOR
-except ImportError:
-    from UIElement import UIElement
-    from Options import TEXT_BG_COLOR, TEXT_BG2_COLOR
+from UIElement import UIElement
+from Options import TEXT_BG_COLOR, TEXT_BG2_COLOR
 
 from typing import Any
 import pygame

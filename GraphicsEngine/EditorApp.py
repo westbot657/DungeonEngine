@@ -1,21 +1,12 @@
-# pylint: disable=[W,R,C]
+# pylint: disable=[W,R,C, import-error]
 
-try:
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.Geometry import Box
-    from GraphicsEngine.RenderPrimitives import Image
-    from GraphicsEngine.Options import PATH
-    from GraphicsEngine.FunctionalElements import Button
-    from GraphicsEngine.FileEditorSubApp import FileEditorSubApp
-    from GraphicsEngine.AdvancedEditorSubApp import AdvancedEditorSubApp
-except ImportError:
-    from UIElement import UIElement
-    from Geometry import Box
-    from RenderPrimitives import Image
-    from Options import PATH
-    from FunctionalElements import Button
-    from FileEditorSubApp import FileEditorSubApp
-    from AdvancedEditorSubApp import AdvancedEditorSubApp
+from UIElement import UIElement
+from Geometry import Box
+from RenderPrimitives import Image
+from Options import PATH
+from FunctionalElements import Button
+from FileEditorSubApp import FileEditorSubApp
+from AdvancedEditorSubApp import AdvancedEditorSubApp
 
 
 class EditorApp(UIElement):

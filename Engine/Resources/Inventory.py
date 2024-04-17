@@ -1,35 +1,19 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .AbstractAmmo import AbstractAmmo, Ammo
-    from .AbstractArmor import AbstractArmor, Armor
-    from .Identifier import Identifier
-    from .AbstractItem import AbstractItem, Item
-    from .AbstractStatusEffect import AbstractStatusEffect, StatusEffect
-    from .AbstractTool import AbstractTool, Tool
-    from .AbstractWeapon import AbstractWeapon, Weapon
-    from .AbstractGameObject import AbstractGameObject, GameObject
-    from .EngineDummy import Engine
-    from .EngineErrors import InvalidObjectError
-    from .Logger import Log
-    from .FunctionMemory import FunctionMemory
-    from .FunctionalElement import FunctionalElement
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from AbstractAmmo import AbstractAmmo, Ammo
-    from AbstractArmor import AbstractArmor, Armor
-    from Identifier import Identifier
-    from AbstractItem import AbstractItem, Item
-    from AbstractStatusEffect import AbstractStatusEffect, StatusEffect
-    from AbstractTool import AbstractTool, Tool
-    from AbstractWeapon import AbstractWeapon, Weapon
-    from AbstractGameObject import AbstractGameObject, GameObject
-    from EngineDummy import Engine
-    from EngineErrors import InvalidObjectError
-    from Logger import Log
-    from FunctionMemory import FunctionMemory
-    from FunctionalElement import FunctionalElement
-    from Serializer import Serializer, Serializable
+from AbstractAmmo import AbstractAmmo, Ammo
+from AbstractArmor import AbstractArmor, Armor
+from Identifier import Identifier
+from AbstractItem import AbstractItem, Item
+from AbstractStatusEffect import AbstractStatusEffect, StatusEffect
+from AbstractTool import AbstractTool, Tool
+from AbstractWeapon import AbstractWeapon, Weapon
+from AbstractGameObject import AbstractGameObject, GameObject
+from EngineDummy import Engine
+from EngineErrors import InvalidObjectError
+from Logger import Log
+from FunctionMemory import FunctionMemory
+from FunctionalElement import FunctionalElement
+from Serializer import Serializer, Serializable
 
 @Serializable("Inventory")
 class Inventory(FunctionalElement):

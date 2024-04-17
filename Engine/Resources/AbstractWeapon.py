@@ -1,27 +1,15 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .Identifier import Identifier
-    from .Weapon import Weapon
-    from .AbstractAmmo import AbstractAmmo
-    from .EngineErrors import InvalidObjectError
-    from .DynamicValue import DynamicValue
-    from .EngineDummy import Engine
-    from .AbstractGameObject import AbstractGameObject
-    from .Logger import Log
-    from .Loader import Loader
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from Identifier import Identifier
-    from Weapon import Weapon
-    from AbstractAmmo import AbstractAmmo
-    from EngineErrors import InvalidObjectError
-    from DynamicValue import DynamicValue
-    from EngineDummy import Engine
-    from AbstractGameObject import AbstractGameObject
-    from Logger import Log
-    from Loader import Loader
-    from Serializer import Serializer, Serializable
+from Identifier import Identifier
+from Weapon import Weapon
+from AbstractAmmo import AbstractAmmo
+from EngineErrors import InvalidObjectError
+from DynamicValue import DynamicValue
+from EngineDummy import Engine
+from AbstractGameObject import AbstractGameObject
+from Logger import Log
+from Loader import Loader
+from Serializer import Serializer, Serializable
 
 import glob, json, random
 

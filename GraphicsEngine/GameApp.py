@@ -1,27 +1,15 @@
-# pylint: disable=[W,R,C]
+# pylint: disable=[W,R,C, import-error]
 
-try:
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.Geometry import Box
-    from GraphicsEngine.RenderPrimitives import Image
-    from GraphicsEngine.Options import PATH, SETTINGS
-    from GraphicsEngine.Text import Text
-    from GraphicsEngine.MultilineText import MultilineText
-    from GraphicsEngine.FunctionalElements import Button, Scrollable
-    from GraphicsEngine.MultilineTextBox import MultilineTextBox
-    from GraphicsEngine.Popup import Popup
-    from GraphicsEngine.DiscordPresence import RPC, RPCD
-except ImportError:
-    from UIElement import UIElement
-    from Geometry import Box
-    from RenderPrimitives import Image
-    from Options import PATH, SETTINGS
-    from Text import Text
-    from MultilineText import MultilineText
-    from FunctionalElements import Button, Scrollable
-    from MultilineTextBox import MultilineTextBox
-    from Popup import Popup
-    from DiscordPresence import RPC, RPCD
+from UIElement import UIElement
+from Geometry import Box
+from RenderPrimitives import Image
+from Options import PATH, SETTINGS
+from Text import Text
+from MultilineText import MultilineText
+from FunctionalElements import Button, Scrollable
+from MultilineTextBox import MultilineTextBox
+from Popup import Popup
+from DiscordPresence import RPC, RPCD
 
 import random
 

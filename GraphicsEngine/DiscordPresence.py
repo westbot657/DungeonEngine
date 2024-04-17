@@ -1,9 +1,6 @@
-# pylint: disable=[W,R,C]
+# pylint: disable=[W,R,C, import-error]
 
-try:
-    from GraphicsEngine.Options import DO_RICH_PRESENCE, client_id
-except ImportError:
-    from Options import DO_RICH_PRESENCE, client_id
+from Options import DO_RICH_PRESENCE, client_id
     
 # discord presence for game
 from pypresence import Presence

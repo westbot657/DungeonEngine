@@ -1,15 +1,9 @@
-# pylint: disable=[W,R,C]
+# pylint: disable=[W,R,C, import-error]
 
-try:
-    from GraphicsEngine.Util import PopoutElement
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.FunctionalElements import Button
-    from GraphicsEngine.MultilineTextBox import MultilineTextBox
-except ImportError:
-    from Util import PopoutElement
-    from UIElement import UIElement
-    from FunctionalElements import Button
-    from MultilineTextBox import MultilineTextBox
+from Util import PopoutElement
+from UIElement import UIElement
+from FunctionalElements import Button
+from MultilineTextBox import MultilineTextBox
 
 @PopoutElement()
 class Popup(UIElement):

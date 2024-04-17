@@ -1,11 +1,7 @@
 # pylint: disable=[W,R,C,import-error,assignment-from-none]
 
-try:
-    from .FunctionalElement import FunctionalElement
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from FunctionalElement import FunctionalElement
-    from Serializer import Serializer, Serializable
+from FunctionalElement import FunctionalElement
+from Serializer import Serializer, Serializable
 
 @Serializable("StatusEffectCause")
 class StatusEffectCause(FunctionalElement):

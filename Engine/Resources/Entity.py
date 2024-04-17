@@ -1,14 +1,9 @@
 # pylint: disable=[W,R,C,import-error]
 
 
-try:
-    from .Location import Location
-    from .Position import Position
-    from .FunctionalElement import FunctionalElement
-except ImportError:
-    from Location import Location
-    from Position import Position
-    from FunctionalElement import FunctionalElement
+from Location import Location
+from Position import Position
+from FunctionalElement import FunctionalElement
 
 
 class Entity(FunctionalElement):

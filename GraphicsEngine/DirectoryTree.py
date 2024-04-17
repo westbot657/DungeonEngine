@@ -1,19 +1,11 @@
-# pylint: disable=[W,R,C]
+# pylint: disable=[W,R,C, import-error]
 
-try:
-    from GraphicsEngine.Util import PopoutElement
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.RenderPrimitives import Image
-    from GraphicsEngine.Options import PATH
-    from GraphicsEngine.FunctionalElements import Button, Scrollable
-    from GraphicsEngine.Text import Text
-except ImportError:
-    from Util import PopoutElement
-    from UIElement import UIElement
-    from RenderPrimitives import Image
-    from Options import PATH
-    from FunctionalElements import Button, Scrollable
-    from Text import Text
+from Util import PopoutElement
+from UIElement import UIElement
+from RenderPrimitives import Image
+from Options import PATH
+from FunctionalElements import Button, Scrollable
+from Text import Text
     
 @PopoutElement()
 class DirectoryTree(UIElement):

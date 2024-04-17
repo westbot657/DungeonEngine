@@ -1,29 +1,16 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .Entity import Entity
-    from .Identifier import Identifier
-    from .Location import Location
-    from .EngineDummy import Engine
-    from .Position import Position
-    from .FunctionMemory import FunctionMemory
-    from .Util import Util
-    from .AbstractAttack import AbstractAttack, Attack
-    from .EngineOperation import _EngineOperation
-    from .Logger import Log
-    from .Serializer import Serializer, Serializable
-except:
-    from Entity import Entity
-    from Identifier import Identifier
-    from Location import Location
-    from EngineDummy import Engine
-    from Position import Position
-    from FunctionMemory import FunctionMemory
-    from Util import Util
-    from AbstractAttack import AbstractAttack, Attack
-    from EngineOperation import _EngineOperation
-    from Logger import Log
-    from Serializer import Serializer, Serializable
+from Entity import Entity
+from Identifier import Identifier
+from Location import Location
+from EngineDummy import Engine
+from Position import Position
+from FunctionMemory import FunctionMemory
+from Util import Util
+from AbstractAttack import AbstractAttack, Attack
+from EngineOperation import _EngineOperation
+from Logger import Log
+from Serializer import Serializer, Serializable
 
 import json, random
 

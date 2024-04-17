@@ -1,21 +1,12 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .GameObject import GameObject
-    from .Identifier import Identifier
-    from .Util import Util
-    from .EngineDummy import Engine
-    from .EngineOperation import EngineOperation, _EngineOperation
-    from .FunctionMemory import FunctionMemory
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from GameObject import GameObject
-    from Identifier import Identifier
-    from Util import Util
-    from EngineDummy import Engine
-    from EngineOperation import EngineOperation, _EngineOperation
-    from FunctionMemory import FunctionMemory
-    from Serializer import Serializer, Serializable
+from GameObject import GameObject
+from Identifier import Identifier
+from Util import Util
+from EngineDummy import Engine
+from EngineOperation import EngineOperation, _EngineOperation
+from FunctionMemory import FunctionMemory
+from Serializer import Serializer, Serializable
 
 from enum import Enum, auto
 

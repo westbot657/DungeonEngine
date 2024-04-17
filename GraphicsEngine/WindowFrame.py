@@ -1,20 +1,12 @@
-# pylint: disable=[W,R,C, no-member]
-try:
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.Geometry import Box
-    from GraphicsEngine.RenderPrimitives import Color, Image
-    from GraphicsEngine.Options import PATH
-    from GraphicsEngine.Text import Text
-    from GraphicsEngine.FunctionalElements import Button
-    from GraphicsEngine.PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow, get_monitors
-except ImportError:
-    from UIElement import UIElement
-    from Geometry import Box
-    from RenderPrimitives import Color, Image
-    from Options import PATH
-    from Text import Text
-    from FunctionalElements import Button
-    from PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow, get_monitors
+# pylint: disable=[W,R,C, no-member, import-error]
+
+from UIElement import UIElement
+from Geometry import Box
+from RenderPrimitives import Color, Image
+from Options import PATH
+from Text import Text
+from FunctionalElements import Button
+from PlatformDependencies import gw, macOSfocusWindow, macOSgetWindowPos, macOSsetWindow, get_monitors
 
 
 import platform

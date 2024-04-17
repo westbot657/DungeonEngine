@@ -1,25 +1,14 @@
-# pylint: disable=[W,R,C]
+# pylint: disable=[W,R,C, import-error]
 
-try:
-    from GraphicsEngine.ContextTree import ContextTree
-    from GraphicsEngine.Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE
-    from GraphicsEngine.FileEditor import FileEditor
-    from GraphicsEngine.Organizers import LayeredObjects
-    from GraphicsEngine.DirectoryTree import DirectoryTree
-    from GraphicsEngine.FunctionalElements import Button, Tabs
-    from GraphicsEngine.PopoutWindow import PopoutWindow
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.Geometry import Box
-except ImportError:
-    from ContextTree import ContextTree
-    from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE
-    from FileEditor import FileEditor
-    from Organizers import LayeredObjects
-    from DirectoryTree import DirectoryTree
-    from FunctionalElements import Button, Tabs
-    from PopoutWindow import PopoutWindow
-    from UIElement import UIElement
-    from Geometry import Box
+from ContextTree import ContextTree
+from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE
+from FileEditor import FileEditor
+from Organizers import LayeredObjects
+from DirectoryTree import DirectoryTree
+from FunctionalElements import Button, Tabs
+from PopoutWindow import PopoutWindow
+from UIElement import UIElement
+from Geometry import Box
 
 import os
 

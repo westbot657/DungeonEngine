@@ -1,17 +1,10 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .EngineDummy import Engine
-    from .StatusEffectCause import StatusEffectCause
-    from .FunctionalElement import FunctionalElement
-    from .FunctionMemory import FunctionMemory
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from EngineDummy import Engine
-    from StatusEffectCause import StatusEffectCause
-    from FunctionalElement import FunctionalElement
-    from FunctionMemory import FunctionMemory
-    from Serializer import Serializer, Serializable
+from EngineDummy import Engine
+from StatusEffectCause import StatusEffectCause
+from FunctionalElement import FunctionalElement
+from FunctionMemory import FunctionMemory
+from Serializer import Serializer, Serializable
 
 
 @Serializable("StatusEffect")

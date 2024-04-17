@@ -1,9 +1,6 @@
-# pylint: disable=[W,R,C]
+# pylint: disable=[W,R,C, import-error]
 
-try:
-    from .UIElement import UIElement
-except ImportError:
-    from UIElement import UIElement
+from UIElement import UIElement
 
 import inspect
 

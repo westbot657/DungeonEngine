@@ -1,23 +1,14 @@
-# pylint: disable=[W,R,C,assignment-from-no-return]
+# pylint: disable=[W,R,C,assignment-from-no-return, import-error]
 
 # This is attampt 2 at a Engine Script parser but with syntax error position finding
 
-try:
-    from .LoaderFunction import LoaderFunction
-    from .Functions import *
-    from .Identifier import Identifier
-    from .Logger import Log
-    from .EngineErrors import FinalScriptError, ScriptError, EOF
-    from .Loader import Loader
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from LoaderFunction import LoaderFunction
-    from Functions import *
-    from Identifier import Identifier
-    from Logger import Log
-    from EngineErrors import FinalScriptError, ScriptError, EOF
-    from Loader import Loader
-    from Serializer import Serializer, Serializable
+from LoaderFunction import LoaderFunction
+from Functions import *
+from Identifier import Identifier
+from Logger import Log
+from EngineErrors import FinalScriptError, ScriptError, EOF
+from Loader import Loader
+from Serializer import Serializer, Serializable
 
 import re, glob, json
 

@@ -6,12 +6,9 @@
 # temperature
 # what can live where
 # other descriptors, made as needed
-try:
-    from .Util import Util
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from Util import Util
-    from Serializer import Serializer, Serializable
+
+from Util import Util
+from Serializer import Serializer, Serializable
     
 
 @Serializable("Environment")

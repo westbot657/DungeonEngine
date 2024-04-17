@@ -1,11 +1,7 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .EngineErrors import IdentifierError
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from EngineErrors import IdentifierError
-    from Serializer import Serializer, Serializable
+from EngineErrors import IdentifierError
+from Serializer import Serializer, Serializable
 
 
 import re

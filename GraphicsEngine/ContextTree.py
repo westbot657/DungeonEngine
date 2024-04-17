@@ -1,17 +1,10 @@
-# pylint: disable=[W,R,C]
+# pylint: disable=[W,R,C, import-error]
 
-try:
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.Util import PopoutElement
-    from GraphicsEngine.Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE
-    from GraphicsEngine.FunctionalElements import Button
-    from GraphicsEngine.Geometry import Box
-except ImportError:
-    from UIElement import UIElement
-    from Util import PopoutElement
-    from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE
-    from FunctionalElements import Button
-    from Geometry import Box
+from UIElement import UIElement
+from Util import PopoutElement
+from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE
+from FunctionalElements import Button
+from Geometry import Box
 
 @PopoutElement()
 class ContextTree(UIElement):

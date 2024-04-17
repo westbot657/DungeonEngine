@@ -1,25 +1,14 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .StatusEffect import StatusEffect
-    from .EngineErrors import InvalidObjectError
-    from .Identifier import Identifier
-    from .DynamicValue import DynamicValue
-    from .StatusEffectCause import StatusEffectCause
-    from .FunctionMemory import FunctionMemory
-    from .Logger import Log
-    from .Loader import Loader
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from StatusEffect import StatusEffect
-    from EngineErrors import InvalidObjectError
-    from Identifier import Identifier
-    from DynamicValue import DynamicValue
-    from StatusEffectCause import StatusEffectCause
-    from FunctionMemory import FunctionMemory
-    from Logger import Log
-    from Loader import Loader
-    from Serializer import Serializer, Serializable
+from StatusEffect import StatusEffect
+from EngineErrors import InvalidObjectError
+from Identifier import Identifier
+from DynamicValue import DynamicValue
+from StatusEffectCause import StatusEffectCause
+from FunctionMemory import FunctionMemory
+from Logger import Log
+from Loader import Loader
+from Serializer import Serializer, Serializable
 
 
 import glob, json, re

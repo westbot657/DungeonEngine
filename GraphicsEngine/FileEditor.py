@@ -1,15 +1,9 @@
-# pylint: disable=[W,R,C]
+# pylint: disable=[W,R,C, import-error]
 
-try:
-    from GraphicsEngine.Util import PopoutElement
-    from GraphicsEngine.UIElement import UIElement
-    from GraphicsEngine.NumberedTextArea import NumberedTextArea
-    from GraphicsEngine.MultilineTextBox import MultilineTextBox, Selection, Cursor
-except ImportError:
-    from Util import PopoutElement
-    from UIElement import UIElement
-    from NumberedTextArea import NumberedTextArea
-    from MultilineTextBox import MultilineTextBox, Selection, Cursor
+from Util import PopoutElement
+from UIElement import UIElement
+from NumberedTextArea import NumberedTextArea
+from MultilineTextBox import MultilineTextBox, Selection, Cursor
 
 import re
 

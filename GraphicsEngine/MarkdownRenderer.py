@@ -3,16 +3,10 @@
 import re
 import webbrowser
 
-try:
-    from .Geometry import Box
-    from .RenderPrimitives import Color, Image
-    from .Text import Text
-    from .Organizers import Link
-except ImportError:
-    from Geometry import Box
-    from RenderPrimitives import Color, Image
-    from Text import Text
-    from Organizers import Link
+from Geometry import Box
+from RenderPrimitives import Color, Image
+from Text import Text
+from Organizers import Link
 
 # webbrowser.open(url)
 

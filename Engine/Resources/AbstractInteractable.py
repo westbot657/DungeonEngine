@@ -1,27 +1,15 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .Location import Location
-    from .Identifier import Identifier
-    from .EngineErrors import IdentifierError, InvalidObjectError
-    from .Interactable import Interactable
-    from .FunctionMemory import FunctionMemory
-    from .EngineOperation import _EngineOperation
-    from .Logger import Log
-    from .Util import Util
-    from .Loader import Loader
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from Location import Location
-    from Identifier import Identifier
-    from EngineErrors import IdentifierError, InvalidObjectError
-    from Interactable import Interactable
-    from FunctionMemory import FunctionMemory
-    from EngineOperation import _EngineOperation
-    from Logger import Log
-    from Util import Util
-    from Loader import Loader
-    from Serializer import Serializer, Serializable
+from Location import Location
+from Identifier import Identifier
+from EngineErrors import IdentifierError, InvalidObjectError
+from Interactable import Interactable
+from FunctionMemory import FunctionMemory
+from EngineOperation import _EngineOperation
+from Logger import Log
+from Util import Util
+from Loader import Loader
+from Serializer import Serializer, Serializable
 
 from typing import Any
 

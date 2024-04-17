@@ -1,33 +1,18 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .AbstractEnemy import AbstractEnemy, Enemy
-    from .FunctionMemory import FunctionMemory
-    from .FunctionalElement import FunctionalElement
-    from .Player import Player
-    from .EngineErrors import CombatError
-    from .EngineOperation import EngineOperation, _EngineOperation
-    from .TextPattern import TextPattern
-    from .Util import Util
-    from .Logger import Log
-    from .Location import Location
-    from .Position import Position
-    from .Map import Map
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from AbstractEnemy import AbstractEnemy, Enemy
-    from FunctionMemory import FunctionMemory
-    from FunctionalElement import FunctionalElement
-    from Player import Player
-    from EngineErrors import CombatError
-    from EngineOperation import EngineOperation, _EngineOperation
-    from TextPattern import TextPattern
-    from Util import Util
-    from Logger import Log
-    from Location import Location
-    from Position import Position
-    from Map import Map
-    from Serializer import Serializer, Serializable
+from AbstractEnemy import AbstractEnemy, Enemy
+from FunctionMemory import FunctionMemory
+from FunctionalElement import FunctionalElement
+from Player import Player
+from EngineErrors import CombatError
+from EngineOperation import EngineOperation, _EngineOperation
+from TextPattern import TextPattern
+from Util import Util
+from Logger import Log
+from Location import Location
+from Position import Position
+from Map import Map
+from Serializer import Serializer, Serializable
 
 from enum import Enum, auto
 
@@ -139,7 +124,7 @@ class Combat(FunctionalElement):
             return cls._combats[abstract.identifier.full()]
         else:
             # print("creating new combat!")
-            self = super().__new__(cls)
+            self = super().__new__(cls) # pylint: disable=no-value-for-parameter
             self._init_(abstract, enemies, sequence, data, respawn_point)
             cls._combats.update({abstract.identifier.full(): self})
             return self

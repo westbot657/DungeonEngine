@@ -1,9 +1,6 @@
-# pylint: disable=[W,R,C]
+# pylint: disable=[W,R,C, import-error]
 
-try:
-    from Serializable import Serializable
-except ImportError:
-    from .Serializable import Serializable
+from Serializable import Serializable
 
 from typing import Any
 

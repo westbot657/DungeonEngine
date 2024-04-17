@@ -1,75 +1,39 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .AbstractAmmo import AbstractAmmo, Ammo
-    from .AbstractArmor import AbstractArmor, Armor
-    from .AbstractAttack import AbstractAttack, Attack
-    from .AbstractCombat import AbstractCombat, Combat
-    from .AbstractDungeon import AbstractDungeon, Dungeon
-    from .AbstractEnemy import AbstractEnemy, Enemy
-    from .AbstractItem import AbstractItem, Item
-    from .AbstractRoom import AbstractRoom, Room
-    from .AbstractStatusEffect import AbstractStatusEffect, StatusEffect, StatusEffectCause
-    from .StatusEffectManager import StatusEffectManager
-    from .AbstractTool import AbstractTool, Tool
-    from .AbstractWeapon import AbstractWeapon, Weapon
-    from .Functions import LoaderFunction
-    from .Identifier import Identifier
-    from .EngineDummy import Engine
-    from .EngineErrors import InvalidObjectError, FunctionLoadError, LocationError
-    from .LootTable import LootTable
-    from .TextPattern import TextPattern
-    from .Player import Player
-    from .AbstractGameObject import AbstractGameObject, GameObject
-    from .Util import Util
-    from .Currency import Currency
-    from .Logger import Log
-    from .FunctionMemory import FunctionMemory
-    from .EngineOperation import EngineOperation, _EngineOperation
-    from .Location import Location
-    from .Position import Position
-    from .Environment import Environment
-    from .AbstractInteractable import AbstractInteractable, Interactable
-    from .Entity import Entity
-    from .DynamicValue import DynamicValue
-    from .ES2 import EngineScript
-    from .Serializer import Serializer, Serializable
-    from .YieldTools import YieldTools
-except ImportError:
-    from AbstractAmmo import AbstractAmmo, Ammo
-    from AbstractArmor import AbstractArmor, Armor
-    from AbstractAttack import AbstractAttack, Attack
-    from AbstractEnemy import AbstractEnemy, Enemy
-    from AbstractCombat import AbstractCombat, Combat
-    from AbstractDungeon import AbstractDungeon, Dungeon
-    from AbstractItem import AbstractItem, Item
-    from AbstractRoom import AbstractRoom, Room
-    from AbstractStatusEffect import AbstractStatusEffect, StatusEffect, StatusEffectCause
-    from StatusEffectManager import StatusEffectManager
-    from AbstractTool import AbstractTool, Tool
-    from AbstractWeapon import AbstractWeapon, Weapon
-    from Functions import LoaderFunction
-    from Identifier import Identifier
-    from EngineDummy import Engine
-    from EngineErrors import InvalidObjectError, FunctionLoadError, LocationError
-    from LootTable import LootTable
-    from TextPattern import TextPattern
-    from Player import Player
-    from AbstractGameObject import AbstractGameObject, GameObject
-    from Util import Util
-    from Currency import Currency
-    from Logger import Log
-    from FunctionMemory import FunctionMemory
-    from EngineOperation import EngineOperation, _EngineOperation
-    from Location import Location
-    from Position import Position
-    from Environment import Environment
-    from AbstractInteractable import AbstractInteractable, Interactable
-    from Entity import Entity
-    from DynamicValue import DynamicValue
-    from ES2 import EngineScript
-    from Serializer import Serializer, Serializable
-    from YieldTools import YieldTools
+from AbstractAmmo import AbstractAmmo, Ammo
+from AbstractArmor import AbstractArmor, Armor
+from AbstractAttack import AbstractAttack, Attack
+from AbstractEnemy import AbstractEnemy, Enemy
+from AbstractCombat import AbstractCombat, Combat
+from AbstractDungeon import AbstractDungeon, Dungeon
+from AbstractItem import AbstractItem, Item
+from AbstractRoom import AbstractRoom, Room
+from AbstractStatusEffect import AbstractStatusEffect, StatusEffect, StatusEffectCause
+from StatusEffectManager import StatusEffectManager
+from AbstractTool import AbstractTool, Tool
+from AbstractWeapon import AbstractWeapon, Weapon
+from Functions import LoaderFunction
+from Identifier import Identifier
+from EngineDummy import Engine
+from EngineErrors import InvalidObjectError, FunctionLoadError, LocationError
+from LootTable import LootTable
+from TextPattern import TextPattern
+from Player import Player
+from AbstractGameObject import AbstractGameObject, GameObject
+from Util import Util
+from Currency import Currency
+from Logger import Log
+from FunctionMemory import FunctionMemory
+from EngineOperation import EngineOperation, _EngineOperation
+from Location import Location
+from Position import Position
+from Environment import Environment
+from AbstractInteractable import AbstractInteractable, Interactable
+from Entity import Entity
+from DynamicValue import DynamicValue
+from ES2 import EngineScript
+from Serializer import Serializer, Serializable
+from YieldTools import YieldTools
 
 
 from typing import Any, Generator

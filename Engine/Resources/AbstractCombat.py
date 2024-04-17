@@ -1,29 +1,16 @@
 # pylint: disable=[W,R,C,import-error]
 
-try:
-    from .Combat import Combat
-    from .Identifier import Identifier
-    from .FunctionMemory import FunctionMemory
-    from .EngineErrors import CombatError
-    from .Util import Util
-    from .AbstractEnemy import AbstractEnemy, Enemy
-    from .Location import Location
-    from .Position import Position
-    from .Logger import Log
-    from .Loader import Loader
-    from .Serializer import Serializer, Serializable
-except ImportError:
-    from Combat import Combat
-    from Identifier import Identifier
-    from FunctionMemory import FunctionMemory
-    from EngineErrors import CombatError
-    from Util import Util
-    from AbstractEnemy import AbstractEnemy, Enemy
-    from Location import Location
-    from Position import Position
-    from Logger import Log
-    from Loader import Loader
-    from Serializer import Serializer, Serializable
+from Combat import Combat
+from Identifier import Identifier
+from FunctionMemory import FunctionMemory
+from EngineErrors import CombatError
+from Util import Util
+from AbstractEnemy import AbstractEnemy, Enemy
+from Location import Location
+from Position import Position
+from Logger import Log
+from Loader import Loader
+from Serializer import Serializer, Serializable
 
 import glob, json, re
 

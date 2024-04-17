@@ -86,12 +86,18 @@ class AdvancedEditorSubApp(UIElement):
         x_offset = 0
         seperator_width = 10
         
+        empty = Image(f"{PATH}/advanced_editor/empty_selector_spot.png", base_x+x_offset, base_y, seperator_width, 50)
+        
+        self.end_fill = empty.resize(editor.width-base_x+x_offset, empty.height)
+        self.children.append(self.end_fill)
+        self.empty_visibility_toggle_spots.append(self.end_fill)
+        
         for typ in self.visibility_types:
             if typ is None:
-                img = Image(f"{PATH}/advanced_editor/empty_selector_spot.png", base_x+x_offset, base_y, seperator_width, 50)
-                self.empty_visibility_toggle_spots.append(img)
+                # e = empty.copy()
+                # self.empty_visibility_toggle_spots.append(e)
                 x_offset += seperator_width
-                self.children.append(img)
+                # self.children.append(e)
                 continue
             
             self.visibility_offsets.update({typ: x_offset})
@@ -121,6 +127,7 @@ class AdvancedEditorSubApp(UIElement):
         x_offset += 25
         self.children.append(img)
         self.empty_visibility_toggle_spots.append(img)
+        
         
         self.open_dungeon_button = BorderedButton(base_x+x_offset+10, base_y+30, -1, None, " Open Dungeon... ")
         self.open_dungeon_button.on_left_click = self.click_load_dungeon
@@ -194,6 +201,7 @@ class AdvancedEditorSubApp(UIElement):
             button.y = editor.height-100
         for blank in self.empty_visibility_toggle_spots:
             blank.y = editor.height-100
+        self.end_fill.width = editor.width - 450
         
         self.construction_canvas.width = editor.width-452
         self.construction_canvas.height = editor.height-111

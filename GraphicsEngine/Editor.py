@@ -48,6 +48,11 @@ class Editor:
         self._hovered = False
         self._hovering = None
         self._hovering_last = None
+        self.held = None
+        self.holding = False
+        self.hold_offset = (0, 0)
+        self.drop_requested = False
+        self.drop_state = 0
         self._hover_time = 0
         self._hovering_ctx_tree = False
         self._listeners = {}
@@ -65,7 +70,7 @@ class Editor:
         self.unicode = {}
         self.keys = []
         self.typing = []
-        self._do_layout_update = False
+        self._do_layout_update = True
 
     def add_event_listener(self, event, listener):
         # print(f"ADDING EVENT: {event} :: {listener}")
@@ -163,7 +168,6 @@ class Editor:
             # fps = time.time()
 
             for event in pygame.event.get():
-
                 if event.type == pygame.MOUSEWHEEL: # pylint: disable=no-member
                     self.scroll = event.y
                     
@@ -171,23 +175,19 @@ class Editor:
                     self._alt = None
 
                 elif event.type == pygame.KEYDOWN: # pylint: disable=no-member
-
                     if event.key not in self.keys:
                         self.keys.append(event.key)
 
                     un = self.unicodes.get(event.key, event.unicode)
-
                     if un:
                         self.unicode.update({un: time.time()})
                         self.typing.append(un)
                         
                 elif event.type == pygame.KEYUP: # pylint: disable=no-member
-
                     if event.key in self.keys:
                         self.keys.remove(event.key)
 
                     un = self.unicodes.get(event.key, event.unicode)
-
                     if un and un in self.unicode.keys():
                         self.unicode.pop(un)
 
@@ -195,24 +195,20 @@ class Editor:
                     if "WINDOW_CLOSED" in self._listeners:
                         for listener in self._listeners.get("WINDOW_CLOSED", []):
                             listener()
+                    
                     else:
                         pygame.quit() # pylint: disable=no-member
                         self.running = False
                         return
 
             nt = time.time()
-
             for key, t in self.unicode.items():
-
                 if (nt - t) > 0.8:
-
                     if int(((nt - t) * 1000) % 5) == 0:
                         self.typing.append(key)
 
             layers = [*self.layers.keys()]
             layers.sort()
-
-
             if Popup._popup:
                 Popup._popup._update_layout(self)
                 Popup._popup._event(self, 0, 0)
@@ -229,7 +225,6 @@ class Editor:
             rmd = self.right_mouse_down()
             if self._hovering is not None:
                 # print(f"Hovering: {self._hovering}  alt: {getattr(self._hovering, "_alt_text", "")}")
-
                 if self._hovering != self._hovering_last:
                     self._alt = None
                     self._hover_time = time.time()
@@ -244,7 +239,6 @@ class Editor:
 
                 if rmd:
                     if hasattr(self._hovering, "on_right_click") and not isinstance(self._hovering, Button):
-
                         try:
                             self._hovering.on_right_click(self, self._hovering)
 
@@ -257,6 +251,7 @@ class Editor:
                 
                 else:
                     self.override_cursor = False
+
             elif self.override_cursor:
                 self.override_cursor = False
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
@@ -269,7 +264,6 @@ class Editor:
                     ContextTree.closeAll()
 
             for l in layers:
-
                 for i in self.layers[l]:
                     i._update(self, 0, 0)
 
@@ -287,6 +281,18 @@ class Editor:
             # fps_display._update(self, 5, self.height-10)
 
             # self.screen_shader.render()
+            
+            if self.held:
+                self.holding._update(self, self.mouse_pos[0]-self.hold_offset[0], self.mouse_pos[1]-self.hold_offset[1])
+            
+            if self.drop_requested:
+                if self.drop_state > 0:
+                    self.drop_requested = False
+                elif self.drop_state < 0:
+                    self.drop_requested = False
+                    self.drop_state = 0
+                else:
+                    self.drop_state = -1
 
             pygame.display.flip()
 

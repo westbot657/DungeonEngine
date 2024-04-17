@@ -42,7 +42,8 @@ class ConnectorLine(UIElement):
             }
 
     def _event(self, editor, X, Y):
-        ...
+        if self.path:
+            ...
         
     def _update(self, editor, X, Y):
         

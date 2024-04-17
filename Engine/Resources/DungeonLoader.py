@@ -112,7 +112,7 @@ class DungeonLoader:
     @classmethod
     def deserialize(cls, instance, data:dict):
         cls._loader = instance
-        Serializer.smartDeserialize(data)
+        Serializer.smartDeserialize(instance, data)
         
         instance.loader_function = LoaderFunction # this can't be serialized
         instance.classes = { # This can't be serialized

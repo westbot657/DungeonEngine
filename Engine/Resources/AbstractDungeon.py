@@ -40,7 +40,7 @@ class AbstractDungeon:
         self.data: dict = data.get("data", {})
         self.recovery_location: Location = Location.fromString(l) if (l := data.get("recovery_location", None)) is not None else Location.fromString("world:rooms/start")
 
-        if map := data.get("map", None): self.map = Map(map)
+        if map := data.get("map", None): self.map = Map(**map)
         else: self.map = None
 
     def createRooms(self, function_memory:FunctionMemory):

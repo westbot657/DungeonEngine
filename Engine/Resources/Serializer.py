@@ -13,6 +13,7 @@ class Serializer:
         
     @classmethod
     def serialize(cls, obj:Any) -> dict:
+        
         if isinstance(obj, (int, float, str, bool, bytes)):
             return {"literal": obj}
         elif isinstance(obj, dict):
@@ -24,7 +25,7 @@ class Serializer:
             return {"list": [cls.serialize(x) for x in obj]}
         elif isinstance(obj, tuple):
             return {"tuple": [cls.serialize(x) for x in obj]}
-        elif Serializable.isSerializable(obj):
+        elif Serializable.isSerealizable(obj):
             if id(obj) in cls._serialized:
                 return {"serial-reference": id(obj)}
             else:

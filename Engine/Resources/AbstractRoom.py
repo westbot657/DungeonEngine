@@ -37,7 +37,7 @@ class AbstractRoom:
 
         self.is_template: bool = data.get("template", False)
 
-        if map := data.get("map", None): self.map = Map(map)
+        if map := data.get("map", None): self.map = Map(**map)
         else: self.map = None
 
     def _set_parent(self, parent):

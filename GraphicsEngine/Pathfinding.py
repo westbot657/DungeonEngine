@@ -19,7 +19,7 @@ class Pathfinding:
             # def __setitem__(self, index, val):
             #     print(f"set {self.x}, {index} to {val}")
 
-        def convert(self, grid, offset:tuple[int, int]=None):
+        def add_shape(self, grid, offset:tuple[int, int]=None):
             x, y = offset = offset or (0, 0)
             points = []
             for h in grid:
@@ -36,6 +36,7 @@ class Pathfinding:
         def __init__(self, points:list[tuple[int, int]]=None):
             points = points if points is not None else []
             self.intermediate = Pathfinding.Plane._intermediate(self)
+            self.regions = set()
 
             self.map = set()
             if points:
@@ -56,18 +57,68 @@ class Pathfinding:
             self.shape = [self.minX, self.minY, self.maxX+1, self.maxY+1]
             self.map.update(points)
             
-
+        def add_region(self, rect:tuple[int, int, int, int]):
+            self.regions.add(rect)
 
         def get_point(self, x, y):
             if (x, y) in self.map:
                 return 1
+            else:
+                for x1, y1, w, h in self.regions:
+                    if x1 <= x < x1+w and y1 <= y < y1+h:
+                        return 1
             return 0
             
         def __getitem__(self, x):
             self.intermediate.x = x
             return self.intermediate
         
+    @classmethod
+    def vectorize(cls, path_points:set):
+        """
+        Takes a list of points chosen by pathfinding, and returns the smallest list of points that when connected, draw the same line
+        """
+        direction = None
+        output = set()
+        i = 0
+        for point in path_points[1:]:
+            prev_point = path_points[i]
+            
+            if direction is None:
+                output.add(prev_point)
+            
+            if prev_point[0] < point[0]:
+                if prev_point[1] < point[1]:
+                    new_dir = 1 # tl-br
+                elif prev_point[1] > point[1]:
+                    new_dir = 2 # bl-tr
+                else:
+                    new_dir = 3 # l-r
+            elif prev_point[0] > point[0]:
+                if prev_point[1] < point[1]:
+                    new_dir = 4 # tr-bl
+                elif prev_point[1] > point[1]:
+                    new_dir = 5 # br-tl
+                else:
+                    new_dir = 6 # r-l
+            
+            else:
+                if prev_point[1] < point[1]:
+                    new_dir = 7 # t-b
+                else:
+                    new_dir = 8 # b-t
+
+            if new_dir != direction:
+                output.add(prev_point)
+                direction = new_dir
+            
+            
+            if point == path_points[-1]:
+                output.add(point)
+            
+            i += 1
         
+        return output
 
     @classmethod
     def astar_heuristic(cls, x:tuple[int, int], y:tuple[int, int]):

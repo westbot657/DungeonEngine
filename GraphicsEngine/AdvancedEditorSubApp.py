@@ -12,6 +12,7 @@ from CursorFocusTextBox import CursorFocusTextBox
 from VisualConfig import VisualConfig
 from Toasts import Toasts
 from LoadingBar import LoadingBar
+from Pathfinding import Pathfinding
 
 from threading import Thread
 import tkinter.filedialog

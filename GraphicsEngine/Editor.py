@@ -101,6 +101,17 @@ class Editor:
 
     def right_mouse_up(self): return (self.previous_mouse[2] is True) and (self.mouse[2] is False)
 
+    def check_hover(self, editor, rect, obj):
+        """editor needs to be passed in due to Editor Mimicing"""
+        if editor.collides(editor.mouse_pos, rect):
+            if editor._hovering is None:
+                obj.hovered = editor._hovered = True
+                editor._hovering = obj
+        else:
+            obj.hovered = False
+        
+        return obj.hovered
+
     def collides(self, mouse, rect) -> bool:
         mx, my = mouse
         x, y, w, h = rect

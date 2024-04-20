@@ -222,7 +222,7 @@ class AdvancedEditorSubApp(UIElement):
         for child in self.children[::-1]:
             child._event(editor, X, Y)
         
-        if editor.drop_requested and isinstance(editor.held, PanelPlacer):
+        if editor.drop_requested and isinstance(editor.held, PanelPlacer) and editor.collides(editor.mouse_pos, (self.construction_canvas.x, self.construction_canvas.y, self.construction_canvas.width, self.construction_canvas.height)):
             editor.accept_drop(1, self.panel_placer_acceptor)
         
         self.toasts._event(editor, X, Y)

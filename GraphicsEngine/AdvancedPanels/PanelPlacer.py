@@ -20,6 +20,7 @@ class PanelPlacer(UIElement):
         self.height = 33
         self.frame = 0
         self.hovered = False
+        self._alt_text = "Drag & drop panel on to\nconstruction canvas"
         
     def _event(self, editor, X, Y):
         # print(f"event: {X}, {Y}")

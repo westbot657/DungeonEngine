@@ -116,6 +116,7 @@ from AdvancedEditorSubApp import AdvancedEditorSubApp
 from FileEditorSubApp import FileEditorSubApp
 from PopoutWindow import PopoutWindow
 from EditorApp import EditorApp
+from SettingsApp import SettingsApp
 
 
 
@@ -154,9 +155,11 @@ class CodeEditor(UIElement):
         self.children.append(self.bottom_bar)
         self.bottom_bar_line = Box(0, height-21, width, 1, (70, 70, 70))
         self.children.append(self.bottom_bar_line)
+        
         self._error_message = MultilineText(25, 25, 1, 1, "", text_color=(255, 200, 200), text_bg_color=None)
         self._error_popup = Popup(400, 30).add_children(self._error_message)
         self._error_popup._update_layout = self._error_message_update_layout
+        
         self._app_game_icon = Image(f"{PATH}/dungeon_game_app_icon.png", 0, 0, 50, 50)
         self._app_game_icon_hovered = Image(f"{PATH}/dungeon_game_app_icon_hovered.png", 0, 0, 50, 50)
         self._app_game_icon_selected = Image(f"{PATH}/dungeon_game_app_icon_selected.png", 0, 0, 50, 50)
@@ -164,13 +167,25 @@ class CodeEditor(UIElement):
         self.app_game_selector.on_left_click = self.select_game_app
         self.app_game_selector._alt_text = "IDNH Game Menu"
         self.children.append(self.app_game_selector)
+        
         self._app_editor_icon = Image(f"{PATH}/dungeon_editor_app_icon.png", 0, 0, 50, 50)
         self._app_editor_icon_hovered = Image(f"{PATH}/dungeon_editor_app_icon_hovered.png", 0, 0, 50, 50)
         self._app_editor_icon_selected = Image(f"{PATH}/dungeon_editor_app_icon_selected.png", 0, 0, 50, 50)
-        self.app_editor_selector = Button(0, 22+50, 50, 50, "", self._app_editor_icon, hover_color=self._app_editor_icon_hovered, click_color=self._app_editor_icon_selected)
+        self.app_editor_selector = Button(0, 72, 50, 50, "", self._app_editor_icon, hover_color=self._app_editor_icon_hovered, click_color=self._app_editor_icon_selected)
         self.app_editor_selector.on_left_click = self.select_editor_app
         self.app_editor_selector._alt_text = "IDNH Dungeon Editor"
         self.children.append(self.app_editor_selector)
+        
+        self.app_settings_icons = (
+            Image(f"{PATH}/settings_app_icon.png", 0, 0, 50, 50),
+            Image(f"{PATH}/settings_app_icon_hovered.png", 0, 0, 50, 50),
+            Image(f"{PATH}/settings_app_icon_selected.png", 0, 0, 50, 50)
+        )
+        self.app_settings_selector = Button(0, editor.height-72, 50, 50, "", self.app_settings_icons[0], hover_color=self.app_settings_icons[1], click_color=self.app_settings_icons[2])
+        self.app_settings_selector.on_left_click = self.select_settings_app
+        self.app_settings_selector._alt_text = "Settings"
+        self.children.append(self.app_settings_selector)
+        
         self.top_bar = Box(0, 0, width, 20, Color(24, 24, 24))
         self.children.append(self.top_bar)
         self.top_bar_icon = Image(f"{PATH}/dungeon_game_icon.png", 2, 2, 16, 16)
@@ -260,6 +275,7 @@ class CodeEditor(UIElement):
         self.children.append(self.minimize_button)
         self.game_app = GameApp(self, editor)
         self.editor_app = EditorApp(self, editor)
+        self.settings_app = SettingsApp(self, editor)
         self._is_fullscreen = False
         self._fullscreen = Image(f"{PATH}/full_screen.png", 0, 0, 26, 20)
         self._fullscreen_hovered = Image(f"{PATH}/full_screen_hovered.png", 0, 0, 26, 20)
@@ -291,19 +307,22 @@ class CodeEditor(UIElement):
         self.app_game_selector.hover_color = self._app_game_icon_hovered
         self.app_editor_selector.bg_color = self.app_editor_selector._bg_color = self._app_editor_icon
         self.app_editor_selector.hover_color = self._app_editor_icon_hovered
+        self.app_settings_selector.bg_color = self.app_settings_selector._bg_color = self.app_settings_icons[0]
+        self.app_settings_selector.hover_color = self.app_settings_icons[1]
+        
         
     def select_game_app(self, editor):
         self.reset_app_selectors()
 
         if self.active_app != "game":
             self.active_app = "game"
-            RPCD["details"] = "Playing <Insert Dungeon Name Here>"
-            RPC.update(**RPCD)
+            # RPCD["details"] = "Playing <Insert Dungeon Name Here>"
+            # RPC.update(**RPCD)
             self.app_game_selector.bg_color = self.app_game_selector._bg_color = self.app_game_selector.hover_color = self._app_game_icon_selected
 
         else:
-            RPCD["details"] = "Just staring at a blank screen..."
-            RPC.update(**RPCD)
+            # RPCD["details"] = "Just staring at a blank screen..."
+            # RPC.update(**RPCD)
             self.active_app = ""
     
     def select_editor_app(self, editor):
@@ -311,13 +330,21 @@ class CodeEditor(UIElement):
 
         if self.active_app != "editor":
             self.active_app = "editor"
-            RPCD["details"] = "Editing a Dungeon"
-            RPC.update(**RPCD)
+            # RPCD["details"] = "Editing a Dungeon"
+            # RPC.update(**RPCD)
             self.app_editor_selector.bg_color = self.app_editor_selector._bg_color = self.app_editor_selector.hover_color = self._app_editor_icon_selected
             
         else:
-            RPCD["details"] = "Just staring at a blank screen..."
-            RPC.update(**RPCD)
+            # RPCD["details"] = "Just staring at a blank screen..."
+            # RPC.update(**RPCD)
+            self.active_app = ""
+
+    def select_settings_app(self, editor):
+        self.reset_app_selectors()
+        if self.active_app != "settings":
+            self.active_app = "settings"
+            self.app_settings_selector.bg_color = self.app_settings_selector._bg_color = self.app_settings_selector.hover_color = self.app_settings_icons[2]
+        else:
             self.active_app = ""
 
     def minimize(self, *_, **__):
@@ -494,6 +521,9 @@ class CodeEditor(UIElement):
         elif self.active_app == "editor":
             self.editor_app._update(editor, X, Y)
             
+        elif self.active_app == "settings":
+            self.settings_app._update(editor, X, Y)
+            
         for child in self.children:
             child._update(editor, X, Y)
 
@@ -513,6 +543,7 @@ class CodeEditor(UIElement):
         self.minimize_button.x = editor.width - (26*3)
         self.fullscreen_toggle.x = editor.width - (26*2)
         self.close_button.x = editor.width - 26
+        self.app_settings_selector.y = editor.height-72
 
     def _event(self, editor:Editor, X, Y):
 
@@ -596,6 +627,9 @@ class CodeEditor(UIElement):
 
         elif self.active_app == "editor":
             self.editor_app._event(editor, X, Y)
+        
+        elif self.active_app == "settings":
+            self.settings_app._event(editor, X, Y)
 
 
 class IOHook:

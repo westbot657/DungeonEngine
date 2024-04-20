@@ -46,8 +46,10 @@ class ShelfPanel(UIElement):
         self.label_text_box.on_enter(self.set_label)
         self.visibility_button = Button(self.width-68, (height-33)/2, 33, 33, "", self.visibility_frames[2], hover_color=self.visibility_frames[3], click_color=self.visibility_frames[3])
         self.visibility_button.on_left_click = self.visibility_toggle
+        self.visibility_button._alt_text = "Toggle panel visibility"
         self.focus_button = Button(self.width-34, (height-33)/2, 33, 33, "", self.refocus_frames[0], hover_color=self.refocus_frames[1], click_color=self.refocus_frames[2])
         self.focus_button.on_left_click = self.focus_object
+        self.focus_button._alt_text = "Center canvas on panel"
         self.attr_panel_visible = True
         self.placer = self._placer = None
         self.placer_offset = (self.width-35, (height-33)/2)

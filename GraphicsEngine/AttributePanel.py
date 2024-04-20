@@ -222,6 +222,10 @@ class AttributePanel(UIElement):
         # self.surface = pygame.transform.scale(self.surface, (self.width*self.texture_scale, self.height*self.texture_scale))
         # self.bg = pygame.transform.scale(self.bg, (self.width*self.texture_scale, self.height*self.texture_scale))
 
+    def set_glow(self, duration:int):
+        self.glow_time = time.time()+duration
+        self.glowing = True
+
     def _event(self, editor, X, Y):
         if self.visible:
         

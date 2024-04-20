@@ -27,12 +27,13 @@ class ShelfPanel(UIElement):
         Image(f"{PATH}/advanced_editor/panel_ellipsis_menu_hovered.png", 0, 0, 33, 33),
     )
     
-    def __init__(self, width, height, label, attr_panel, canvas, editor, tags:list|None=None):
+    def __init__(self, width, height, label, category, attr_panel, canvas, editor, tags:list|None=None):
         self.x = 0
         self.y = 0
         self.width = width
         self.height = height
         self.label = label # Used for panel search filtering
+        self.category = category
         self.tags = tags or []
         self.attr_panel = attr_panel
         self.effective_height = height
@@ -48,6 +49,8 @@ class ShelfPanel(UIElement):
         self.focus_button = Button(self.width-34, (height-33)/2, 33, 33, "", self.refocus_frames[0], hover_color=self.refocus_frames[1], click_color=self.refocus_frames[2])
         self.focus_button.on_left_click = self.focus_object
         self.attr_panel_visible = True
+        self.placer = self._placer = None
+        self.placer_offset = (self.width-33, (height-33)/2)
         self.children = []
 
     def set_label(self, textbox):
@@ -87,8 +90,11 @@ class ShelfPanel(UIElement):
         self.label_text_box.x = self.x+12
         self.label_text_box.y = self.y+9
         self.label_text_box._update(editor, 0, 0)
-        self.visibility_button._update(editor, X, Y)
-        self.focus_button._update(editor, X, Y)
+        if self.placer is not None:
+            self.placer._update(editor, X+self.placer_offset[0], Y+self.placer_offset[1])
+        else:
+            self.visibility_button._update(editor, X, Y)
+            self.focus_button._update(editor, X, Y)
         
         self.effective_height = self.height
         for child in self.children:
@@ -97,12 +103,20 @@ class ShelfPanel(UIElement):
                 self.effective_height += child.effective_height
             else:
                 child._update(editor, X, Y)
-            
+                
+        
+    
+    def drop_acceptor(self, _, __):
+        self.placer = self._placer
+        return True
+    
     def _event(self, editor, X, Y):
         self.x = X
         self.y = Y
         # print(f"offsetY: {offsetY}")
         self.effective_height = self.height
+        
+        
         
         for child in self.children: # Can not reverse-iterate, as positions are constructed iteratively
             if hasattr(child, "effective_height"):
@@ -114,7 +128,17 @@ class ShelfPanel(UIElement):
         self.label_text_box.x = self.x+12
         self.label_text_box.y = self.y+9
         self.label_text_box._event(editor, 0, 0)
-        self.focus_button._event(editor, self.x, self.y)
-        self.visibility_button._event(editor, self.x, self.y)
+        
+        if self.placer is not None:
+            self.placer._event(editor, X+self.placer_offset[0], Y+self.placer_offset[1])
+        
+        else:
+            if editor.drop_requested and editor.held is self._placer:
+                editor.accept_drop(0, self.drop_acceptor)
+                
+            self.focus_button._event(editor, self.x, self.y)
+            self.visibility_button._event(editor, self.x, self.y)
+            
         self.panel._event(editor, self.x, self.y)
+        
 

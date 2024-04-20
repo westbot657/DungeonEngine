@@ -40,7 +40,6 @@ class Editor:
         self.scroll = 0
         self.width = self.Width = width
         self.height = self.Height = height
-        self.held = None
         self.x = self.X = 0
         self.y = self.Y = 0
         self._fake_editor = self
@@ -53,6 +52,7 @@ class Editor:
         self.hold_offset = (0, 0)
         self.drop_requested = False
         self.drop_state = 0
+        self.drop_acceptors = {} # Make sure every acceptor has a unique priority {priority: acceptor function}
         self._hover_time = 0
         self._hovering_ctx_tree = False
         self._listeners = {}
@@ -71,6 +71,9 @@ class Editor:
         self.keys = []
         self.typing = []
         self._do_layout_update = True
+
+    def accept_drop(self, priority, drop_handler):
+        self.drop_acceptors.update({priority: drop_handler})
 
     def add_event_listener(self, event, listener):
         # print(f"ADDING EVENT: {event} :: {listener}")
@@ -293,17 +296,21 @@ class Editor:
 
             # self.screen_shader.render()
             
-            if self.held:
-                self.holding._update(self, self.mouse_pos[0]-self.hold_offset[0], self.mouse_pos[1]-self.hold_offset[1])
+            if self.holding:
+                # self.held._event(self, self.mouse_pos[0]-self.hold_offset[0], self.mouse_pos[1]-self.hold_offset[1])
+                self.held._update(self, self.mouse_pos[0]-self.hold_offset[0], self.mouse_pos[1]-self.hold_offset[1])
+
+                if self.left_mouse_up():
+                    self.drop_requested = True
+                    self.drop_acceptors.clear()
+                    self.holding = False
             
-            if self.drop_requested:
-                if self.drop_state > 0:
-                    self.drop_requested = False
-                elif self.drop_state < 0:
-                    self.drop_requested = False
-                    self.drop_state = 0
-                else:
-                    self.drop_state = -1
+            elif self.drop_requested:
+                highest = max(self.drop_acceptors.keys())
+                self.drop_acceptors[highest](self.held, self)
+                self.held = None
+                self.drop_acceptors.clear()
+                self.drop_requested = False
 
             pygame.display.flip()
 

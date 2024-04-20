@@ -14,6 +14,8 @@ from Toasts import Toasts
 from LoadingBar import LoadingBar
 from Pathfinding import Pathfinding
 
+from AdvancedPanels.PanelPlacer import PanelPlacer
+
 from threading import Thread
 import tkinter.filedialog
 import tkinter
@@ -129,13 +131,19 @@ class AdvancedEditorSubApp(UIElement):
         self.empty_visibility_toggle_spots.append(img)
         
         
-        self.open_dungeon_button = BorderedButton(base_x+x_offset+10, base_y+30, -1, None, " Open Dungeon... ")
+        self.open_dungeon_button = BorderedButton(base_x+x_offset+10, base_y+30, -1, None, " Open Dungeon ")
         self.open_dungeon_button.on_left_click = self.click_load_dungeon
         self.children.append(self.open_dungeon_button)
         self.to_open = ""
         self.selected_directory = False
         self.getting_directory = False
         self.dir_getter = None
+        
+        self.create_stashed_panel("weapon", (200, 400), "Longsword", True, ["weapon", "melee"])
+        self.create_stashed_panel("weapon", (300, 400), "Shortsword", True, ["weapon", "melee"])
+        self.create_stashed_panel("weapon", (300, 400), "Broadsword", True, ["weapon", "melee"])
+        self.create_stashed_panel("weapon", (300, 400), "Bow", True, ["weapon", "ranged"])
+        self.create_stashed_panel("weapon", (300, 400), "Crossbow", True, ["weapon", "ranged"])
     
     def get_directory_task_thread(self):
         self.getting_directory = True
@@ -167,19 +175,39 @@ class AdvancedEditorSubApp(UIElement):
         t.daemon = True
         t.start()
     
-    def create_panel(self, rect:tuple[int, int, int, int], label, bordered=False, tags=None, shelf_panel_height=35) -> AttributePanel:
+    def create_stashed_panel(self, category, size:tuple[int, int], label:str, bordered=False, tags=None, shelf_panel_height=35):
+        panel = self.create_panel(category, (0, 0, size[0], size[1]), label, bordered, tags, shelf_panel_height)
+        shelf_panel = self.object_tree.tree[-1]
+        placer = PanelPlacer(shelf_panel)
+        shelf_panel.placer = shelf_panel._placer = placer
+    
+    def create_panel(self, category, rect:tuple[int, int, int, int], label, bordered=False, tags=None, shelf_panel_height=35) -> AttributePanel:
         attr_panel = AttributePanel(*rect, bordered=bordered)
-        self.create_shelf_panel(attr_panel, label, tags, shelf_panel_height)
+        self.create_shelf_panel(category, attr_panel, label, tags, shelf_panel_height)
         return attr_panel
     
-    def create_shelf_panel(self, attribute_panel, label, tags=None, height=35):
-        shelf_panel = ShelfPanel(340, height, label, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas, tags)
+    def create_shelf_panel(self, category, attribute_panel, label, tags=None, height=35):
+        shelf_panel = ShelfPanel(340, height, label, category, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas, tags)
         self.object_tree.tree.append(shelf_panel)
     
     def _update(self, editor, X, Y):
         for child in self.children:
             child._update(editor, X, Y)
         self.toasts._update(editor, X, Y)
+    
+    def panel_placer_acceptor(self, panel_placer, editor):
+        shelf = panel_placer.parent_shelf
+        panel = shelf.attr_panel
+        mx, my = self.construction_canvas.get_relative_mouse(*editor.mouse_pos)
+        x = (mx-(panel.width/2)) + 50
+        y = (my-(panel.height/2)) + 50
+        
+        panel.x = (100*(x//100))
+        panel.y = (100*(y//100))
+        
+        panel.set_glow(0.75)
+        
+        self.visibility_groups[shelf.category].append(panel)
     
     def _event(self, editor, X, Y):
         
@@ -193,6 +221,9 @@ class AdvancedEditorSubApp(UIElement):
         
         for child in self.children[::-1]:
             child._event(editor, X, Y)
+        
+        if editor.drop_requested and isinstance(editor.held, PanelPlacer):
+            editor.accept_drop(1, self.panel_placer_acceptor)
         
         self.toasts._event(editor, X, Y)
             

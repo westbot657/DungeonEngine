@@ -81,7 +81,7 @@ class ConstructionCanvas(UIElement):
         self.children = []
         self.panning = False
         self.pan_origin = [0, 0]
-    
+        self.canvas_hovered = False
         self.targetX: int = None
         self.targetY: int = None
         self.gotoX = None
@@ -148,6 +148,13 @@ class ConstructionCanvas(UIElement):
 
         return False
     
+    def get_relative_mouse(self, mx, my):
+        mx -= self.x - (self.offsetX * self.scale)
+        my -= self.y - (self.offsetY * self.scale)
+        mx /= self.scale
+        my /= self.scale
+        return (mx, my)
+    
     def override_values(self):
         self.mouse_pos = list(self.editor.mouse_pos)
         self.mouse_pos[0] -= self.x - (self.offsetX * self.scale)
@@ -168,6 +175,7 @@ class ConstructionCanvas(UIElement):
                     child._event(self.canvas, -self.offsetX, -self.offsetY)
         
         if editor.collides((mx, my), (self.x, self.y, self.width, self.height)):
+            self.canvas_hovered = True
             if editor.middle_mouse_down():
                 self.stopMove()
                 self.pan_origin = [
@@ -193,6 +201,7 @@ class ConstructionCanvas(UIElement):
                 self.screen = pygame.Surface((self.width/self.scale, self.height/self.scale), pygame.SRCALPHA, 32)
         
         if editor.middle_mouse_up():
+            self.canvas_hovered = False
             self.panning = False
         
         if self.panning:

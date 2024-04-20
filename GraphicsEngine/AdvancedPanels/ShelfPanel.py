@@ -50,7 +50,7 @@ class ShelfPanel(UIElement):
         self.focus_button.on_left_click = self.focus_object
         self.attr_panel_visible = True
         self.placer = self._placer = None
-        self.placer_offset = (self.width-33, (height-33)/2)
+        self.placer_offset = (self.width-35, (height-33)/2)
         self.children = []
 
     def set_label(self, textbox):

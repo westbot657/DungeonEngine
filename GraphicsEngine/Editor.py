@@ -38,6 +38,7 @@ class Editor:
         self._updates = []
         self.layers = {0: []}
         self.scroll = 0
+        self.scrollx = 0
         self.width = self.Width = width
         self.height = self.Height = height
         self.x = self.X = 0
@@ -174,6 +175,7 @@ class Editor:
             self.width, self.height = self.Width, self.Height = self.screen.get_size()
             self.typing.clear()
             self.scroll = 0
+            self.scrollx = 0
             # self._frame += 1
             # if self._frame >= 100:
             #     self._frame = 1
@@ -184,6 +186,7 @@ class Editor:
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEWHEEL: # pylint: disable=no-member
                     self.scroll = event.y
+                    self.scrollx = event.x
                     
                 if event.type == pygame.MOUSEMOTION:
                     self._alt = None

@@ -4,8 +4,8 @@ from UIElement import UIElement
 from Text import Text
 from CursorFocusTextBox import CursorFocusTextBox
 from ConstructionCanvas import ConstructionCanvas
-from Options import TEXT_BG_COLOR, TEXT_BG2_COLOR
-
+from Options import TEXT_BG_COLOR, TEXT_BG2_COLOR, SCROLL_MULTIPLIER
+from NumberedTextArea import NumberedTextArea
 
 import pygame
 
@@ -17,6 +17,9 @@ class SettingsApp(UIElement):
         self.screen = pygame.Surface((editor.width-50, editor.height-40))
         self.center = self.screen.get_width()/2
         
+        
+        self.x = 50
+        self.y = 20
         self.show_scrollbar = False
         self.scroll_bg = TEXT_BG2_COLOR
         self.scroll_bar_color = (100, 100, 100)
@@ -33,44 +36,132 @@ class SettingsApp(UIElement):
         self.scroll_dragging = False
         self.scroll_hovered = False
         
+        self.width = editor.width - 66
+        self.height = editor.height - 40
+        
         y_offset = 20
         
         self.general_settings_label = Text(20, y_offset, 1, "General Settings", text_size=30)
         self.children.append(self.general_settings_label)
         y_offset += self.general_settings_label.height + 10
+        ### XXX General Settigns XXX ###
+        
+        y_offset += 300
         
         
+        self.game_settings_label = Text(20, y_offset, 1, "Game Settings", text_size=30)
+        self.children.append(self.game_settings_label)
+        y_offset += self.game_settings_label.height + 10
+        ### XXX Game Settings XXX ###
         
-        self.x = 50
-        self.y = 20
-        self.width = editor.width - 50
-        self.height = editor.height - 40
+        y_offset += 300
         
-        self.settings_height = max(0, y_offset-self.height)
+        self.editor_settings_label = Text(20, y_offset, 1, "Editor Settings", text_size=30)
+        self.children.append(self.editor_settings_label)
+        y_offset += self.editor_settings_label.height + 10
+        ### XXX Editor Settings XXX ###
+        
+        y_offset += 300
+        
+        
+        self.total_scroll = max(0, min(y_offset, self.height)-self.height/2)
+        
         self.mouse_pos = [0, 0]
         self.scroll = 0
+
+    def position_objects(self, editor):
+        y_offset = 20
         
+        self.general_settings_label.y = y_offset
+        y_offset += self.general_settings_label.height + 10
+        ### XXX General Settigns XXX ###
+        
+        y_offset += 300
+        
+        
+        self.game_settings_label.y = y_offset
+        y_offset += self.game_settings_label.height + 10
+        ### XXX Game Settings XXX ###
+        
+        y_offset += 300
+        
+        self.editor_settings_label.y = y_offset
+        y_offset += self.editor_settings_label.height + 10
+        ### XXX Editor Settings XXX ###
+        
+        y_offset += 300
+        
+        
+        self.total_scroll = max(0, min(y_offset, self.height)-self.height/2)
+        self.width = editor.width
+        self.height = editor.height
+
     def _update_layout(self, editor):
-        self.width = editor.width - 50
+        self.width = editor.width - 66
         self.height = editor.height - 40
         self.screen = pygame.Surface((self.width, self.height))
         self.center = self.screen.get_width()/2
 
-        
-        
     def override_values(self, editor):
         self.mouse_pos = list(editor.mouse_pos)
         self.mouse_pos[0] -= self.x - self.scroll
         self.mouse_pos[1] -= self.y
         
     def _event(self, editor, X, Y):
+        if editor._do_layout_update:
+            self._update_layout(editor)
+        
         self.override_values(editor)
         
         for child in self.children[::-1]:
             child._event(self._canvas, 0, -self.scroll)
             
-        if editor.collides(editor.mouse_pos, (self.x, self.y, self.width, self.height)): ...
+        if editor.collides(editor.mouse_pos, (self.x, self.y, self.width, self.height)):
+            if editor.scroll is not None:
+                self.scroll -= editor.scroll * SCROLL_MULTIPLIER
+                
+                self.scroll = min(max(0, self.scroll), self.total_scroll)
         
+        self.show_scrollbar = self.total_scroll != 0
+        
+        if self.show_scrollbar:
+            self.scroll_hovered = False
+            self.scroll_bar_height = (self.height**2)/(self.total_scroll + self.height)
+            # print(self.scroll_bar_height)
+        
+            if editor.collides(editor.mouse_pos, ((self.x+self.width)+self.scroll_collision_inset, self.y+self.scroll_bar_y, self.scroll_bar_width-(2*self.scroll_collision_inset), self.scroll_bar_height)):
+                if editor._hovering is None:
+                    editor._hovering = NumberedTextArea.fake_hover
+                    editor._hovered = NumberedTextArea.fake_hover._hovered = True
+                self.scroll_hovered = True
+                if editor.left_mouse_down():
+                    self.scroll_dragging = True
+                    self.scroll_click_offset = editor.mouse_pos[1]-self.scroll_bar_y
+            elif editor.collides(editor.mouse_pos, ((self.x+self.width)+self.scroll_collision_inset, self.y, self.scroll_bar_width-(2*self.scroll_collision_inset), self.height)):
+                if editor._hovering is None:
+                    editor._hovering = NumberedTextArea.fake_hover
+                    editor._hovered = NumberedTextArea.fake_hover._hovered = True
+                if editor.left_mouse_down():
+                    self.scroll_dragging = True
+                    self.scroll_bar_y = min(max(0, editor.mouse_pos[1]-self.y-(self.scroll_bar_height/2)), self.height-self.scroll_bar_height)
+                    self.scroll_click_offset = editor.mouse_pos[1]-self.scroll_bar_y
+
+            if not editor.mouse[0]:
+                self.scroll_dragging = False
+        
+        else:
+            self.scroll_dragging = False
+
+        if self.scroll_dragging:
+            self.scroll_bar_y = min(max(0, editor.mouse_pos[1]-self.scroll_click_offset), self.height-self.scroll_bar_height)
+            
+            ratio = self.scroll_bar_y / ((self.height-self.scroll_bar_height))
+            self.scroll = ((self.total_scroll)*ratio)
+        elif self.total_scroll:
+            ratio = self.scroll / (self.total_scroll) #
+            self.scroll_bar_y = (self.height-self.scroll_bar_height) * ratio
+        
+
     def _update(self, editor, X, Y):
         self.screen.fill(TEXT_BG_COLOR)
 
@@ -81,7 +172,7 @@ class SettingsApp(UIElement):
         
         
         if self.show_scrollbar:
-            editor.screen.fill(self.scroll_bg, ((self.x+self.width)-self.scroll_bar_width+self.scroll_collision_inset-4, self.y, self.scroll_bar_width-(2*self.scroll_collision_inset), self.height))
-            editor.screen.fill((self.scroll_bar_click_color if self.scroll_dragging else (self.scroll_bar_hover_color if self.scroll_hovered else self.scroll_bar_color)), ((self.x+self.width)-self.scroll_bar_width+self.scroll_visibility_inset-4, self.y+self.scroll_bar_y, self.scroll_bar_width-(2*self.scroll_visibility_inset), self.scroll_bar_height))
+            editor.screen.fill(self.scroll_bg, ((self.x+self.width)+self.scroll_collision_inset, self.y, self.scroll_bar_width-(2*self.scroll_collision_inset), self.height))
+            editor.screen.fill((self.scroll_bar_click_color if self.scroll_dragging else (self.scroll_bar_hover_color if self.scroll_hovered else self.scroll_bar_color)), ((self.x+self.width)+self.scroll_visibility_inset, self.y+self.scroll_bar_y, self.scroll_bar_width-(2*self.scroll_visibility_inset), self.scroll_bar_height))
         
         

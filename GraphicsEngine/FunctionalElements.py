@@ -718,16 +718,19 @@ class Scrollable:
                     if editor.scroll is not None:
                         if (pygame.K_LSHIFT in editor.keys and not self.swap_scroll) or (self.swap_scroll): # pylint: disable=no-member
                             self.offsetX += editor.scroll * self.scroll_speed
-                            if self.left_bound is not None:
-                                self.offsetX = min(self.offsetX, self.left_bound)
-                            if self.right_bound is not None:
-                                self.offsetX = max(self.offsetX, self.right_bound)
+                            self.offsetY += editor.scrollx * self.scroll_speed
                         elif (pygame.K_LSHIFT in editor.keys and self.swap_scroll) or (not self.swap_scroll):
                             self.offsetY += editor.scroll * self.scroll_speed
-                            if self.top_bound is not None:
-                                self.offsetY = min(self.offsetY, self.top_bound)
-                            if self.bottom_bound is not None:
-                                self.offsetY = max(self.offsetY, self.bottom_bound)
+                            self.offsetX += editor.scrollx * self.scroll_speed
+                            
+                        if self.left_bound is not None:
+                            self.offsetX = min(self.offsetX, self.left_bound)
+                        if self.right_bound is not None:
+                            self.offsetX = max(self.offsetX, self.right_bound)
+                        if self.top_bound is not None:
+                            self.offsetY = min(self.offsetY, self.top_bound)
+                        if self.bottom_bound is not None:
+                            self.offsetY = max(self.offsetY, self.bottom_bound)
             else:
                 self.hovered = False
 

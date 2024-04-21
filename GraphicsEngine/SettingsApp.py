@@ -69,7 +69,7 @@ class SettingsApp(UIElement):
         for child in self.children[::-1]:
             child._event(self._canvas, 0, -self.scroll)
             
-        if editor.collides(editor.mouse_pos, (self.x, self.y, self.width, self.height))
+        if editor.collides(editor.mouse_pos, (self.x, self.y, self.width, self.height)): ...
         
     def _update(self, editor, X, Y):
         self.screen.fill(TEXT_BG_COLOR)

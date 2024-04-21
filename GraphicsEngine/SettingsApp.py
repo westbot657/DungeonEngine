@@ -15,7 +15,7 @@ class SettingsApp(UIElement):
         self.children = []
         self._canvas = ConstructionCanvas._Canvas(editor, self)
         self.screen = pygame.Surface((editor.width-50, editor.height-40))
-        self.center = self.screen.width/2
+        self.center = self.screen.get_width()/2
         
         self.show_scrollbar = False
         self.scroll_bg = TEXT_BG2_COLOR
@@ -54,7 +54,7 @@ class SettingsApp(UIElement):
         self.width = editor.width - 50
         self.height = editor.height - 40
         self.screen = pygame.Surface((self.width, self.height))
-        self.center = self.screen.width/2
+        self.center = self.screen.get_width()/2
 
         
         

@@ -11,6 +11,8 @@ import pygame
 import re
 import time
 import pyperclip
+import numpy
+
 
 @PopoutElement()
 class MultilineTextBox(UIElement):

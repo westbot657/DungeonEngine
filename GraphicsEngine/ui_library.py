@@ -8,6 +8,7 @@ import pygame
 import time
 from threading import Thread
 import sys
+import cython
 
 class LoadingScreen:
     def __init__(self):
@@ -711,7 +712,7 @@ class IOHook:
     def ascii_colors(self, text:str) -> str:
         return re.sub(r"([│┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌]+)", "\033[38;2;100;100;100m\\1\033[0m", text)
 
-    def sendOutput(self, target, text):
+    def sendOutput(self, target: cython.int, text: str):
 
         if target in ["log", 0, 1, 5, 6, 7, 8]:
             cl = self.game_app.log_output.colored_content.split("\n")

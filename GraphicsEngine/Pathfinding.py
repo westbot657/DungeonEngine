@@ -1,7 +1,8 @@
-# pylint: disable=W,R,C,import-error
+# pylint: disable=W,R,C,import-error, no-member
 
 import heapq
 import math
+import cython
 
 class Pathfinding:
     
@@ -11,9 +12,9 @@ class Pathfinding:
             instance = None
             def __init__(self, plane):
                 self.plane = plane
-                self.x = 0
+                self.x: cython.int = 0
             
-            def __getitem__(self, y):
+            def __getitem__(self, y: cython.int):
                 return self.plane.get_point(self.x, y)
             
             # def __setitem__(self, index, val):
@@ -21,7 +22,11 @@ class Pathfinding:
 
         def add_shape(self, grid, offset:tuple[int, int]=None):
             x, y = offset = offset or (0, 0)
+            x: cython.int
+            y: cython.int
             points = []
+            
+            
             for h in grid:
                 y = offset[1]
                 for val in h:
@@ -37,6 +42,11 @@ class Pathfinding:
             points = points if points is not None else []
             self.intermediate = Pathfinding.Plane._intermediate(self)
             self.regions = set()
+
+            self.minX: cython.int
+            self.minY: cython.int
+            self.maxX: cython.int
+            self.maxY: cython.int
 
             self.map = set()
             if points:
@@ -57,10 +67,10 @@ class Pathfinding:
             self.shape = [self.minX, self.minY, self.maxX+1, self.maxY+1]
             self.map.update(points)
             
-        def add_region(self, rect:tuple[int, int, int, int]):
+        def add_region(self, rect:tuple[int, int, int, int]) -> cython.void:
             self.regions.add(rect)
 
-        def get_point(self, x, y):
+        def get_point(self, x, y) -> cython.int:
             if (x, y) in self.map:
                 return 1
             else:
@@ -74,7 +84,7 @@ class Pathfinding:
             return self.intermediate
         
     @classmethod
-    def vectorize(cls, path_points:set):
+    def vectorize(cls, path_points:set) -> set:
         """
         Takes a list of points chosen by pathfinding, and returns the smallest list of points that when connected, draw the same line
         """
@@ -121,7 +131,7 @@ class Pathfinding:
         return output
 
     @classmethod
-    def astar_heuristic(cls, x:tuple[int, int], y:tuple[int, int]):
+    def astar_heuristic(cls, x:tuple[int, int], y:tuple[int, int]) -> cython.float:
         return math.sqrt(((y[1]-x[1])**2) + ((y[0]-x[0])**2))
     
     @classmethod
@@ -212,7 +222,7 @@ class Pathfinding:
         return False
 
     @classmethod
-    def astar_linear_heuristic(cls, current, goal, prev):
+    def astar_linear_heuristic(cls, current, goal, prev) -> cython.double:
         # Euclidean distance as base heuristic
         base_heuristic = ((goal[0] - current[0]) ** 2 + (goal[1] - current[1]) ** 2) ** 0.5
         

@@ -137,6 +137,10 @@ class ConstructionCanvas(UIElement):
             self.gotoF = None
             self.gotoT = 0
     
+    def is_on_screen(self, rect) -> bool:
+        return 0 < rect[0] + rect[2] and rect[0] < self.width and 0 < rect[1] + rect[3] and rect[1] < self.height
+
+    
     def collides(self, mouse, rect) -> bool:
         mx, my = mouse
         x, y, w, h = rect

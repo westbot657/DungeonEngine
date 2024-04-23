@@ -125,6 +125,9 @@ class Editor:
         
         return False
 
+    def is_on_screen(self, rect) -> bool:
+        return 0 < rect[0] + rect[2] and rect[0] < self.width and 0 < rect[1] + rect[3] and rect[1] < self.height
+
     def cancel_mouse_event(self):
         self.previous_mouse = self.mouse.copy()
 

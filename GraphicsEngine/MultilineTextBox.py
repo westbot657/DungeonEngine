@@ -24,6 +24,7 @@ class MultilineTextBox(UIElement):
         self.y = y
         self.min_width = min_width
         self.min_height = min_height
+        self.editor = None
         self._text_width = 0
         self._text_height = 0
         self.single_line = single_line
@@ -52,6 +53,7 @@ class MultilineTextBox(UIElement):
         # self._bg_box = Box()
         self.char_whitelist: list[str] = None
         self.char_blacklist: list[str] = None
+        self._width, self._height = self.font.render("_", True, (0, 0, 0)).get_size()
 
         self.set_content(content)
 
@@ -60,7 +62,6 @@ class MultilineTextBox(UIElement):
 
         self._history_triggers = " \n:.,/;'\"[]{}-=_+<>?|\\~`!@#$%^&*()"
 
-        self._width, self._height = self.font.render("_", True, (0, 0, 0)).get_size()
 
     def set_text_color(self, color):
         self.text_color = Color.color(color)
@@ -258,14 +259,15 @@ class MultilineTextBox(UIElement):
     def refresh_surfaces(self):
         self._refresh_surfaces()
         data = self.format_text("\n".join(self.get_lines()), self.text_color)
-
+        y = 0
         for line, surface in zip(data, self.surfaces):
             x = 1
             for col, segment in line:
-
-                s = self.font.render(segment, True, tuple(col))
-                surface.blit(s, (x, 0))
-                x += s.get_width()
+                if self.editor and self.editor.is_on_screen((self.x+x, self.y+y, len(segment)*self._width, self._height)):
+                    s = self.font.render(segment, True, tuple(col))
+                    surface.blit(s, (x, 0))
+                x += len(segment)*self._width
+            y += self._height
 
     def format_content(self, content):
         return content
@@ -290,7 +292,8 @@ class MultilineTextBox(UIElement):
         l = 0
         for s in self.surfaces:
             s:pygame.Surface
-            editor.screen.blit(s, (X+self.x, Y+self.y+h))
+            if editor.is_on_screen(s.get_rect()):
+                editor.screen.blit(s, (X+self.x, Y+self.y+h))
             # if l == self.cursor_location.line and self._cursor_visible:
             #     _h = self.font.render(self.get_lines()[self.cursor_location.line][0:self.cursor_location.col], True, (0, 0, 0)) # This is not shown on screen, only used to get width
             #     editor.screen.blit(self._cursor_surface, (X+self.x+_h.get_width(), Y+self.y+h))
@@ -328,6 +331,7 @@ class MultilineTextBox(UIElement):
         self._text_selection_start = self._text_selection_end = None
 
     def _event(self, editor, X, Y):
+        self.editor = editor
         w, h = max(self.min_width, self._text_width), max(self.min_height, self._text_height)
         _x, _y = editor.mouse_pos
         # print(X+self.x, Y+self.y, w, h, _x, _y)

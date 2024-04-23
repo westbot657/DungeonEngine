@@ -665,6 +665,10 @@ class Scrollable:
             self.mouse_pos[0] -= self.x + self.offsetX
             self.mouse_pos[1] -= self.y + self.offsetY
 
+        def is_on_screen(self, rect) -> bool:
+            return 0 < rect[0] + rect[2] and rect[0] < self.width and 0 < rect[1] + rect[3] and rect[1] < self.height
+
+
         def collides(self, mouse, rect) -> bool:
             mx, my = mouse
             x, y, w, h = rect
@@ -891,6 +895,10 @@ class Collapsable:
             self.mouse_pos = list(editor.mouse_pos)
             self.mouse_pos[0] -= self.x
             self.mouse_pos[1] -= self.y
+
+        def is_on_screen(self, rect) -> bool:
+            return 0 < rect[0] + rect[2] and rect[0] < self.width and 0 < rect[1] + rect[3] and rect[1] < self.height
+
 
         def collides(self, mouse, rect) -> bool:
             mx, my = mouse

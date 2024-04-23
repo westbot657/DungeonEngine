@@ -159,7 +159,7 @@ class Editor:
         elif platform.system() == "Darwin":
             macOSfocusWindow(self._caption)
         
-        # fps_display = Text(0, 0, 1, f"{fps}", text_size=10)
+        fps_display = Text(0, 0, 1, f"FPS: ", text_size=10)
 
         while self.running:
             self.clock.tick(120)
@@ -176,6 +176,7 @@ class Editor:
             self.typing.clear()
             self.scroll = 0
             self.scrollx = 0
+            
             # self._frame += 1
             # if self._frame >= 100:
             #     self._frame = 1
@@ -293,9 +294,9 @@ class Editor:
                 self.screen.blit(self._alt_border, (min(max(0, self._alt_pos[0]), self.width-self._alt_border.get_width())-2, min(max(0, self._alt_pos[1]), self.height-self._alt_border.get_height())-2))
                 self._alt._update(self, min(max(0, self._alt_pos[0]), self.width-self._alt_border.get_width()), min(max(0, self._alt_pos[1]), self.height-self._alt_border.get_height()))
 
-            # fps_display.set_text(f"{fps-_fps}")
-            # fps_display._event(self, 5, self.height-10)
-            # fps_display._update(self, 5, self.height-10)
+            fps_display.set_text(f"FPS: {self.clock.get_fps()}")
+            fps_display._event(self, 5, self.height-10)
+            fps_display._update(self, 5, self.height-10)
 
             # self.screen_shader.render()
             

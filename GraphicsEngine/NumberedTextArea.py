@@ -139,7 +139,7 @@ class NumberedTextArea(UIElement):
             
             ratio = self.scroll_bar_y / ((self.height-self.scroll_bar_height))
             self.collapsable.main_area.offsetY = self.collapsable.aside.offsetY = -((self.editable._text_height - self.editable._height)*ratio)
-        else:
+        elif (self.editable._text_height - self.editable._height) != 0:
             ratio = -self.collapsable.main_area.offsetY / (self.editable._text_height - self.editable._height) #
             self.scroll_bar_y = (self.height-self.scroll_bar_height) * ratio
         

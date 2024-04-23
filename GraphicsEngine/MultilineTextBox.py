@@ -292,7 +292,7 @@ class MultilineTextBox(UIElement):
         l = 0
         for s in self.surfaces:
             s:pygame.Surface
-            if editor.is_on_screen(s.get_rect()):
+            if editor.is_on_screen((X+self.x, Y+self.y, s.get_width(), s.get_height())):
                 editor.screen.blit(s, (X+self.x, Y+self.y+h))
             # if l == self.cursor_location.line and self._cursor_visible:
             #     _h = self.font.render(self.get_lines()[self.cursor_location.line][0:self.cursor_location.col], True, (0, 0, 0)) # This is not shown on screen, only used to get width

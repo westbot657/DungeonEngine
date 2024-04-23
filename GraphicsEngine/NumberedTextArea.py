@@ -74,6 +74,10 @@ class NumberedTextArea(UIElement):
         self.collapsable.aside.right_bound = 0
         self.collapsable.main_area.right_bound = -self.editable._text_width
 
+    def focus_cursor(self):
+        # move to have 3 line buffer above, or 1 line buffer below, 4 chars to left, 2 chars on right
+        ...
+
     def _update_layout(self):
         self.lines.min_height = self.editable.min_height = self.height
         self.collapsable.height = self.collapsable.main_area.height = self.collapsable.aside.height = self.height

@@ -225,7 +225,7 @@ class Editor:
             nt = time.time()
             for key, t in self.unicode.items():
                 if (nt - t) > 0.8:
-                    if int(((nt - t) * 1000) % 5) == 0:
+                    if int(((nt - t) * 1000) % 2) == 0:
                         self.typing.append(key)
 
             layers = [*self.layers.keys()]

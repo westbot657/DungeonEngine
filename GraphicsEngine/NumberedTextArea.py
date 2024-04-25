@@ -80,8 +80,14 @@ class NumberedTextArea(UIElement):
         ty = self.editable.cursor_location.line * self.editable._height
         ex = -self.collapsable.main_area.offsetX
         ey = -self.collapsable.main_area.offsetY
-        if ty > (-self.collapsable.main_area.offsetY)-(self.editable._height):
-            ey
+        if ty < ey+(self.editable._height*3):
+            ey = ty-self.editable._height*3
+        elif ty > ey - (self.editable._height * 3) + self.height:
+            ey = ty + (self.editable._height * 3) - self.height
+
+        
+        self.collapsable.main_area.offsetY = self.collapsable.aside.offsetY = -ey
+        self.collapsable.main_area.offsetX = self.collapsable.aside.offsetX = -ex
 
     def _update_layout(self):
         self.lines.min_height = self.editable.min_height = self.height
@@ -111,7 +117,6 @@ class NumberedTextArea(UIElement):
         self._update_layout()
         
         self.show_scrollbar = self.editable._text_height - self.editable._height >= 0
-        
 
         if self.show_scrollbar:
             self.scroll_hovered = False
@@ -153,11 +158,19 @@ class NumberedTextArea(UIElement):
             self.scroll_bar_y = (self.height-self.scroll_bar_height) * ratio
         
         self.collapsable._event(editor, X, Y)
+                
+        if editor.typing:
+            self.focus_cursor()
+            
+        self.collapsable.main_area.clamp()
+        self.collapsable.aside.clamp()
 
         if self.collapsable.main_area.hovered:
             self.collapsable.aside.offsetY = self.collapsable.main_area.offsetY
         if self.collapsable.aside.hovered:
             self.collapsable.main_area.offsetY = self.collapsable.aside.offsetY
+
+
 
         lines = len(self.collapsable.main_area.children[1].get_lines())
 

@@ -388,8 +388,9 @@ class MultilineTextBox(UIElement):
             self.refresh_highlight()
 
         if self.focused:
+            if editor.typing:
+                self._cursor_visible = True
             for key in editor.typing:
-                
                 # print(f"{key!r}")
                 if key == "$↑":
                     _old = self.cursor_location.copy()

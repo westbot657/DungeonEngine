@@ -666,7 +666,7 @@ class Scrollable:
             self.mouse_pos[1] -= self.y + self.offsetY
 
         def is_on_screen(self, rect) -> bool:
-            return 0 < rect[0] + rect[2] and rect[0] < self.width and 0 < rect[1] + rect[3] and rect[1] < self.height
+            return 0 < rect[0] + rect[2] and rect[0] + self.offsetX < self.width and 0 < rect[1] + rect[3] and rect[1] + self.offsetY < self.height
 
 
         def collides(self, mouse, rect) -> bool:

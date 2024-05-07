@@ -16,7 +16,21 @@ DEFAULT_PARTICLE_CONFIGS = {
         },
         "particle": {
             "sheet-source": "", # Path to sprite sheet
-            "sheet-segments": [1, 1] # how many frames across width, height
+            "sheet-size": [1, 1] # how many frames across width, height (frames are always ordered left to right, top down)
+        }
+    },
+    
+    "poof": {
+        "loop": False,
+        "duration": [1.5, 2],
+        "fade-in": {
+            "duration": 0
+        },
+        "fade-out": {
+            "duration": 0
+        },
+        "particle": {
+            "source": ""
         }
     }
 }

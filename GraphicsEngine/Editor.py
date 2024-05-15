@@ -7,6 +7,7 @@ from ContextTree import ContextTree
 from SnapNode import SnapNode
 from MultilineText import MultilineText
 from MultilineTextBox import MultilineTextBox
+from SoundSystem import SoundSystem
 from TextBox import TextBox
 from FunctionalElements import Button
 from Text import Text
@@ -48,6 +49,8 @@ class Editor:
         self._hovered = False
         self._hovering = None
         self._hovering_last = None
+        self.sound_system = SoundSystem()
+        self.sound_system.initialize()
         self.held = None
         self.holding = False
         self.hold_offset = (0, 0)
@@ -141,8 +144,6 @@ class Editor:
 
     def run(self):
         # print(f"making window of size: ({self.width}, {self.height})")
-        
-        
         self.screen = pygame.display.set_mode((self.width, self.height), pygame.RESIZABLE | pygame.NOFRAME)# | pygame.OPENGL | pygame.DOUBLEBUF) # pylint: disable=no-member
         # self.screen_shader = pygame_shaders.DefaultScreenShader(self.screen) # <- Here we supply our default display, it's this display which will be displayed onto the opengl context via the screen_shader
 

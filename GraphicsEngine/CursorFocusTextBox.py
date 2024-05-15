@@ -29,6 +29,7 @@ class CursorFocusTextBox(UIElement):
         self.offsetX = 0
         self.last_X = 0
         self.last_Y = 0
+        self.focused = False
     
     def on_enter(self, method):
         self.text_box.on_enter(method)
@@ -74,6 +75,7 @@ class CursorFocusTextBox(UIElement):
         self.override_values(X, Y)
         
         self.text_box._event(self._canvas, self.offsetX, 0)
+        self.focused = self.text_box.focused
 
         cursor_x = self.text_box.cursor_location.col * self.text_box._width
         

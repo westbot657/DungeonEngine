@@ -38,6 +38,7 @@ class ShelfPanel(UIElement):
         self.attr_panel = attr_panel
         self.effective_height = height
         self.canvas = canvas
+        self.editor = editor
         self.panel = AttributePanel(0, 0, width, height, False, TEXT_BG_COLOR)
         self.panel.texture_scale = 1
         self.panel.rebuild()
@@ -109,6 +110,8 @@ class ShelfPanel(UIElement):
         
     
     def drop_acceptor(self, _, __):
+        self.editor.sound_system.get_audio("AESA_drop", "editor").play()
+        
         self.placer = self._placer
         return True
     

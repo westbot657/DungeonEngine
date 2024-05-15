@@ -41,7 +41,7 @@ class Draggable(UIElement):
         "lock_horizontal", "lock_vertical"
     ]
     
-    def __init__(self, x, y, width, height, lock_horizontal=False, lock_vertical=False, children=[]):
+    def __init__(self, x, y, width, height, lock_horizontal=False, lock_vertical=False, children=None):
         self.x = x
         self.y = y
         self.width = width
@@ -50,7 +50,7 @@ class Draggable(UIElement):
         self.hovered = False
         self.hx = 0
         self.hy = 0
-        self.children = children
+        self.children = children or []
         self.lock_horizontal = lock_horizontal
         self.lock_vertical = lock_vertical
         self.ignore_child_hovering = False
@@ -60,10 +60,11 @@ class Draggable(UIElement):
         _x, _y = editor.mouse_pos
 
         for child in self.children[::-1]:
-            child._event(editor, X + self.x, Y + self.y)
+            child._event(editor, X+self.x, Y+self.y)
 
         #if max(editor.X, X + self.x) <= _x <= min(X + self.x + self.width, editor.Width) and max(editor.Y, Y + self.y) <= _y <= min(Y + self.y + self.height, editor.Height):
-        if editor.collides((_x, _y), (X+self.x, Y+self.y, self.width, self.height)):
+        # print(f"mouse: {f"({_x}, {_y})": <8} ({self.x}, {self.y}, {self.width}, {self.height})")
+        if editor.collides((_x, _y), (self.x, self.y, self.width, self.height)):
             if editor._hovering is None:
                 self.hovered = editor._hovered = True
                 editor._hovering = self
@@ -102,7 +103,7 @@ class Draggable(UIElement):
 
     def _update(self, editor, X, Y):
         for child in self.children:
-            child._update(editor, X + self.x, Y + self.y)
+            child._update(editor, X+self.x, Y+self.y)
 
 class Resizable(Draggable):
     

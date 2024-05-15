@@ -13,6 +13,7 @@ from VisualConfig import VisualConfig
 from Toasts import Toasts
 from LoadingBar import LoadingBar
 from Pathfinding import Pathfinding
+from SoundSystem import SoundSystem
 
 from AdvancedPanels.PanelPlacer import PanelPlacer
 
@@ -53,6 +54,10 @@ class AdvancedEditorSubApp(UIElement):
         self.editor = editor
         self.children = []
         self.popouts = {}
+        
+        editor.sound_system.load(f"{PATH}/audio_assets/pick_up.wav", "AESA_pick_up", "editor")
+        editor.sound_system.load(f"{PATH}/audio_assets/drop.wav", "AESA_drop", "editor")
+        
         
         self.toasts = Toasts(editor.width-355, editor.height-20, 350)
         
@@ -206,6 +211,7 @@ class AdvancedEditorSubApp(UIElement):
         panel.y = (100*(y//100))
         
         panel.set_glow(0.75)
+        editor.sound_system.get_audio("AESA_drop", "editor").play()
         
         self.visibility_groups[shelf.category].append(panel)
     

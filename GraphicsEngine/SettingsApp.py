@@ -2,21 +2,50 @@
 
 from UIElement import UIElement
 from Text import Text
-from CursorFocusTextBox import CursorFocusTextBox
+from MultilineTextBox import MultilineTextBox
 from ConstructionCanvas import ConstructionCanvas
 from Options import TEXT_BG_COLOR, TEXT_BG2_COLOR, SCROLL_MULTIPLIER
 from NumberedTextArea import NumberedTextArea
+from Slider import Slider
 
 import pygame
+import re
 
 class SettingsApp(UIElement):
+    
+    def load_config(self):
+        self.config: dict[str, dict[str, str|float|bool]] = {}
+        with open(f"./settings.toml", "r+", encoding="utf-8") as f:
+            category = ""
+            for line in f.readlines():
+                if re.match(r" *#", line): continue
+                if m := re.match(r" *\[(?P<category>[^\]]+)\]", line):
+                    category = m.groupdict()["category"]
+                    if category not in self.config:
+                        self.config.update({category: {}})
+                elif m := re.match(r" *(?P<attr>[^=]+) *= *(?P<val>.*)", line):
+                    d = m.groupdict()
+                    attr = d["attr"].strip()
+                    val = d["val"].strip()
+                    if m := re.match(r"(?P<v>\d+(?:\.\d+)?)%", val):
+                        val = float(m.groupdict()["v"])/100
+                    elif m := re.match(r"\d+(?:\.\d+)?", val):
+                        val = float(val)
+                    elif val == "False":
+                        val = False
+                    elif val == "True":
+                        val = True
+                    
+                    self.config[category].update({attr: val})
+                    
+    
     def __init__(self, code_editor, editor):
         self.code_editor = code_editor
         self.children = []
+        self.load_config()
         self._canvas = ConstructionCanvas._Canvas(editor, self)
         self.screen = pygame.Surface((editor.width-50, editor.height-40))
         self.center = self.screen.get_width()/2
-        
         
         self.x = 50
         self.y = 20
@@ -43,24 +72,41 @@ class SettingsApp(UIElement):
         
         self.general_settings_label = Text(20, y_offset, 1, "General Settings", text_size=30)
         self.children.append(self.general_settings_label)
-        y_offset += self.general_settings_label.height + 10
+        y_offset += self.general_settings_label.height + 20
         ### XXX General Settigns XXX ###
         
+        ### XXX ################ XXX ###
         y_offset += 300
         
         
         self.game_settings_label = Text(20, y_offset, 1, "Game Settings", text_size=30)
         self.children.append(self.game_settings_label)
-        y_offset += self.game_settings_label.height + 10
+        y_offset += self.game_settings_label.height + 20
         ### XXX Game Settings XXX ###
         
+        ### XXX ############# XXX ###
         y_offset += 300
         
         self.editor_settings_label = Text(20, y_offset, 1, "Editor Settings", text_size=30)
         self.children.append(self.editor_settings_label)
-        y_offset += self.editor_settings_label.height + 10
+        y_offset += self.editor_settings_label.height + 20
         ### XXX Editor Settings XXX ###
         
+        
+        editor_vol = self.config["Editor Settings"]["editor_volume"]
+        self.editor_volume_label = Text(20, y_offset, 1, "Editor Volume", text_size=20)
+        self.children.append(self.editor_volume_label)
+        self.editor_volume_slider = Slider(self.editor_volume_label.width+70, y_offset+10, 300, 0, editor_vol, 6)
+        self.children.append(self.editor_volume_slider)
+        self.editor_volume_text_box = MultilineTextBox(self.editor_volume_label.width+420, y_offset, 1, 20, str(int(editor_vol*100)), text_size=20, single_line=True)
+        self.editor_volume_text_box.on_enter(self.editor_volume_text_box_enter)
+        self.editor_volume_text_box.char_whitelist = [c for c in "1234567890"]
+        self.children.append(self.editor_volume_text_box)
+        
+        
+        
+        
+        ### XXX ############### XXX ###
         y_offset += 300
         
         
@@ -69,24 +115,30 @@ class SettingsApp(UIElement):
         self.mouse_pos = [0, 0]
         self.scroll = 0
 
+    def editor_volume_text_box_enter(self, textbox):
+        num = int(textbox.get_content())
+        num = min(max(0, num), 100)
+        textbox.set_content(str(num))
+        self.editor_volume_slider.set_percent(num/100)
+
     def position_objects(self, editor):
         y_offset = 20
         
         self.general_settings_label.y = y_offset
-        y_offset += self.general_settings_label.height + 10
+        y_offset += self.general_settings_label.height + 20
         ### XXX General Settigns XXX ###
         
         y_offset += 300
         
         
         self.game_settings_label.y = y_offset
-        y_offset += self.game_settings_label.height + 10
+        y_offset += self.game_settings_label.height + 20
         ### XXX Game Settings XXX ###
         
         y_offset += 300
         
         self.editor_settings_label.y = y_offset
-        y_offset += self.editor_settings_label.height + 10
+        y_offset += self.editor_settings_label.height + 20
         ### XXX Editor Settings XXX ###
         
         y_offset += 300
@@ -104,8 +156,8 @@ class SettingsApp(UIElement):
 
     def override_values(self, editor):
         self.mouse_pos = list(editor.mouse_pos)
-        self.mouse_pos[0] -= self.x - self.scroll
-        self.mouse_pos[1] -= self.y
+        self.mouse_pos[0] -= self.x
+        self.mouse_pos[1] -= self.y - self.scroll
         
     def _event(self, editor, X, Y):
         if editor._do_layout_update:
@@ -161,6 +213,8 @@ class SettingsApp(UIElement):
             ratio = self.scroll / (self.total_scroll) #
             self.scroll_bar_y = (self.height-self.scroll_bar_height) * ratio
         
+        if not self.editor_volume_text_box.focused:
+            self.editor_volume_text_box.set_content(str(int(self.editor_volume_slider.get_percent()*100)))
 
     def _update(self, editor, X, Y):
         self.screen.fill(TEXT_BG_COLOR)

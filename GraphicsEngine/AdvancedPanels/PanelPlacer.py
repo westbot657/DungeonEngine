@@ -29,6 +29,7 @@ class PanelPlacer(UIElement):
         if self.hovered:
             self.frame = 1
             if editor.left_mouse_down():
+                editor.sound_system.get_audio("AESA_pick_up", "editor").play()
                 self.frame = 2
                 editor.holding = True
                 editor.held = self

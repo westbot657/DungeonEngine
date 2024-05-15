@@ -3,7 +3,8 @@
 from UIElement import UIElement
 from AttributePanel import AttributePanel
 from ConstructionCanvas import ConstructionCanvas
-from Options import SCROLL_MULTIPLIER
+from Options import SCROLL_MULTIPLIER, PATH
+from SoundSystem import SoundSystem
 
 import pygame
 

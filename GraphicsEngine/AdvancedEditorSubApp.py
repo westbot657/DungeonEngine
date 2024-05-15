@@ -38,10 +38,12 @@ class VisibilityToggle:
             self.button._alt_text = self.alt_text2
             self.button._bg_color = self.button.bg_color = self.frames[0]
             self.button.hover_color = self.frames[1]
+            self.sub_app.editor.sound_system.get_audio("AESA_click2", "editor").play()
         else:
             self.button._alt_text = self.alt_text1
             self.button._bg_color = self.button.bg_color = self.frames[2]
             self.button.hover_color = self.frames[3]
+            self.sub_app.editor.sound_system.get_audio("AESA_click", "editor").play()
             
         self.sub_app.visibility_toggled[self.typ] = not self.sub_app.visibility_toggled[self.typ]
 
@@ -56,8 +58,11 @@ class AdvancedEditorSubApp(UIElement):
         self.popouts = {}
         
         editor.sound_system.load(f"{PATH}/audio_assets/pick_up.wav", "AESA_pick_up", "editor")
-        editor.sound_system.load(f"{PATH}/audio_assets/drop.wav", "AESA_drop", "editor")
-        
+        editor.sound_system.load(f"{PATH}/audio_assets/drop.wav",    "AESA_drop",    "editor")
+        editor.sound_system.load(f"{PATH}/audio_assets/thud.wav",    "AESA_thud",    "editor")
+        editor.sound_system.load(f"{PATH}/audio_assets/thud2.wav",   "AESA_thud2",   "editor")
+        editor.sound_system.load(f"{PATH}/audio_assets/click.wav",   "AESA_click",   "editor")
+        editor.sound_system.load(f"{PATH}/audio_assets/click2.wav",  "AESA_click2",  "editor")
         
         self.toasts = Toasts(editor.width-355, editor.height-20, 350)
         
@@ -211,7 +216,7 @@ class AdvancedEditorSubApp(UIElement):
         panel.y = (100*(y//100))
         
         panel.set_glow(0.75)
-        editor.sound_system.get_audio("AESA_drop", "editor").play()
+        editor.sound_system.get_audio("AESA_thud", "editor").play()
         
         self.visibility_groups[shelf.category].append(panel)
     

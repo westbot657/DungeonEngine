@@ -344,6 +344,7 @@ class CodeEditor(UIElement):
         if self.active_app != "settings":
             self.active_app = "settings"
             self.app_settings_selector.bg_color = self.app_settings_selector._bg_color = self.app_settings_selector.hover_color = self.app_settings_icons[2]
+            self.settings_app.open_menu()
         else:
             self.active_app = ""
 
@@ -366,7 +367,6 @@ class CodeEditor(UIElement):
         editor.set_window_location(0, 0)
         editor._do_layout_update = True
         self._update_layout(editor)
-        
 
     def toggle_fullscreen(self, editor):
         editor._do_layout_update = True

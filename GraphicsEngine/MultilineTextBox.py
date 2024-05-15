@@ -602,6 +602,7 @@ class MultilineTextBox(UIElement):
 
 
             # self.surface = self.font.render(self.get_content(), True, self.text_color)
-            self.refresh_surfaces()
+            if editor.typing:
+                self.refresh_surfaces()
         elif self.single_line:
             self.cursor_location.col = 0

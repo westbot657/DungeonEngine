@@ -1,7 +1,9 @@
 # pylint: disable=[W,R,C, no-member, invalid-unary-operand-type, import-error]
 
 from UIElement import UIElement
-from Options import TEXT_BG_COLOR, TEXT_BG2_COLOR
+from Options import TEXT_BG_COLOR, TEXT_BG2_COLOR, TEXT_COLOR
+from Slider import Slider
+from Text import Text
 
 from typing import Any
 import pygame
@@ -96,6 +98,11 @@ class ConstructionCanvas(UIElement):
         self.screen = pygame.Surface((width, height), pygame.SRCALPHA, 32)
         
         # =============================
+        
+        self.zoom_indicator = Slider(self.width - 110, 10, 100, 0, 0.75/(3-0.25), draggable=False)
+        self.zoom_display = Text(self.width - 180, 5, 1, f"100.00%", text_bg_color=None)
+        self.zoom_delay = 0
+        self.zoom_transition = 0
     
     def setOffset(self, x, y, deltaTime, end_func=None):
         if self.gotoF is not None:
@@ -140,7 +147,6 @@ class ConstructionCanvas(UIElement):
     def is_on_screen(self, rect) -> bool:
         return 0 < rect[0] + rect[2] and rect[0] < self.width and 0 < rect[1] + rect[3] and rect[1] < self.height
 
-    
     def collides(self, mouse, rect) -> bool:
         mx, my = mouse
         x, y, w, h = rect
@@ -166,9 +172,16 @@ class ConstructionCanvas(UIElement):
         self.mouse_pos[0] /= self.scale
         self.mouse_pos[1] /= self.scale
     
+    def _update_layout(self, editor):
+        self.zoom_indicator.x = self.width - 110
+        self.zoom_display.x = self.width - 180
+    
     def _event(self, editor, X, Y):
         mx, my = editor.mouse_pos
         self.override_values()
+        
+        if editor._do_layout_update:
+            self._update_layout(editor)
         
         if self.targetX is not None:
             self._handleMove()
@@ -190,7 +203,7 @@ class ConstructionCanvas(UIElement):
             if editor.scroll != 0 and editor._hovering is None:
                 _mx, _my = self.mouse_pos
                 _scale = self.scale
-                self.scale = min(max(0.5, self.scale + (editor.scroll * 0.125)), 3)
+                self.scale = min(max(0.25, self.scale + (editor.scroll * 0.125)), 3)
                 # diff = self.scale - _scale
                 
                 pix_diff_w = (self.width / _scale) - (self.width / self.scale)
@@ -204,6 +217,12 @@ class ConstructionCanvas(UIElement):
                 
                 self.screen = pygame.Surface((self.width/self.scale, self.height/self.scale), pygame.SRCALPHA, 32)
         
+                self.zoom_display.set_text(f"{self.scale*100:.2f}%")
+                self.zoom_indicator.set_percent((self.scale-0.25)/(3-0.25))
+                self.zoom_delay = self.zoom_transition = time.time()
+                self.zoom_indicator._event(editor, 0, 0)
+                self.zoom_display._event(editor, 0, 0)
+        
         if editor.middle_mouse_up():
             self.canvas_hovered = False
             self.panning = False
@@ -212,6 +231,12 @@ class ConstructionCanvas(UIElement):
             dx, dy = self.pan_origin
             self.offsetX = (dx - mx) / self.scale
             self.offsetY = (dy - my) / self.scale
+        
+        if self.zoom_transition:
+            if time.time() > self.zoom_delay+1:
+                self.zoom_delay = 0
+            if time.time() > self.zoom_transition+2:
+                self.zoom_transition = 0
 
     def rebuild(self):
         self.screen = pygame.Surface((self.width/self.scale, self.height/self.scale), pygame.SRCALPHA, 32)
@@ -232,12 +257,12 @@ class ConstructionCanvas(UIElement):
             if _ex+_ey+2 < 40:
                 for i in range(_x, _ex+1):
                     x = (i * self.grid_size) - dx
-                    # self.screen.fill(TEXT_BG2_COLOR, (x-1, -1, 3, _height))
-                    pygame.draw.line(self.screen, TEXT_BG2_COLOR, (x, -1), (x, _height), 3)
+                    self.screen.fill(TEXT_BG2_COLOR, (x-1, -1, 3, _height))
+                    # pygame.draw.line(self.screen, TEXT_BG2_COLOR, (x, -1), (x, _height), 3)
                 for i in range(_y, _ey+1):
                     y = (i * self.grid_size) - dy
-                    # self.screen.fill(TEXT_BG2_COLOR, (-1, y-1, _width, 3))
-                    pygame.draw.line(self.screen, TEXT_BG2_COLOR, (-1, y), (_width, y), 3)
+                    self.screen.fill(TEXT_BG2_COLOR, (-1, y-1, _width, 3))
+                    # pygame.draw.line(self.screen, TEXT_BG2_COLOR, (-1, y), (_width, y), 3)
         
         viewport_rect = pygame.Rect(self.offsetX, self.offsetY, (self.width/self.scale), (self.height/self.scale))
 
@@ -250,4 +275,16 @@ class ConstructionCanvas(UIElement):
         
         sx, sy = self.screen.get_size()
         editor.screen.blit(pygame.transform.scale(self.screen, (sx*self.scale, sy*self.scale)), (X+self.x, Y+self.y))
+        
+        if self.zoom_transition:
+            if time.time() < self.zoom_delay+1:
+                # print("visible")
+                self.zoom_display._update(editor, X+self.x, Y+self.y)
+                self.zoom_indicator._update(editor, X+self.x, Y+self.y)
+            else:
+                percent = time.time() - self.zoom_transition-1
+                # print(f"sliding {percent}")
+                self.zoom_display._update(editor, X+self.x, Y+self.y - (100 * percent))
+                self.zoom_indicator._update(editor, X+self.x, Y+self.y - (100 * percent))
+                
 

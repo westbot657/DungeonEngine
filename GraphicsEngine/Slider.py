@@ -10,7 +10,7 @@ import pygame
 
 class Slider(UIElement):
     
-    def __init__(self, x:int, y:int, length:int, orientation:int, start_point:float, thickness=3, bg_color=TEXT_BG2_COLOR, fg_color=TEXT_BG3_COLOR, drag_color=TEXT_COLOR):
+    def __init__(self, x:int, y:int, length:int, orientation:int, start_point:float, thickness=3, bg_color=TEXT_BG2_COLOR, fg_color=TEXT_BG3_COLOR, drag_color=TEXT_COLOR, draggable=True):
         self.x = x
         self.y = y
         self.length = length
@@ -20,6 +20,7 @@ class Slider(UIElement):
         self.thickness = thickness
         self.pos = start_point
         self.drag_color = drag_color
+        self.draggable = draggable
         
         if self.orientation == 0: # horizontal
             s = pygame.Surface((6, thickness+4))
@@ -36,7 +37,7 @@ class Slider(UIElement):
             self.fg = pygame.Surface((thickness, 1))
             self.drag = Draggable(self.x-2, self.y+(length*start_point)-3, thickness+4, 6, True, False, [self._drag_surface])
         
-        self.drag.ignore_child_hovering = True
+        # self.drag.ignore_child_hovering = True
         self.bg.fill(self.bg_color)
         self.fg.fill(self.fg_color)
     
@@ -48,7 +49,8 @@ class Slider(UIElement):
         self.drag.x = self.x-3 + (self.length*self.pos)
     
     def _event(self, editor, X, Y):
-        self.drag._event(editor, X, Y)
+        if self.draggable:
+            self.drag._event(editor, X, Y)
         if self.orientation == 0:
             self.drag.x = min(max(self.x, self.drag.x+3), self.x+self.length)-3
             self.pos = ((self.drag.x+3)-self.x) / (self.length)

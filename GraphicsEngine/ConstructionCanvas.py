@@ -95,7 +95,7 @@ class ConstructionCanvas(UIElement):
     
         # == scrollable canvas stuff ==
         self.mouse_pos = [0, 0]
-        self.screen = pygame.Surface((width, height), pygame.SRCALPHA, 32)
+        self.screen = pygame.Surface((width, height))#, pygame.SRCALPHA, 32)
         
         # =============================
         
@@ -215,7 +215,7 @@ class ConstructionCanvas(UIElement):
                 side_ratio_y = ((my - self.y)) / self.height
                 self.offsetY += pix_diff_h * side_ratio_y
                 
-                self.screen = pygame.Surface((self.width/self.scale, self.height/self.scale), pygame.SRCALPHA, 32)
+                self.screen = pygame.Surface((self.width/self.scale, self.height/self.scale))#, pygame.SRCALPHA, 32)
         
                 self.zoom_display.set_text(f"{self.scale*100:.2f}%")
                 self.zoom_indicator.set_percent((self.scale-0.25)/(3-0.25))

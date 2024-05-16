@@ -65,10 +65,12 @@ class ShelfPanel(UIElement):
             self.visibility_button._bg_color = self.visibility_button.bg_color = self.visibility_frames[0]
             self.visibility_button.hover_color = self.visibility_button.click_color = self.visibility_frames[1]
             self.label_text_box.set_text_color(TEXT_BG3_COLOR)
+            editor.sound_system.get_audio("AESA_bloop1", "editor").play()
         else:
             self.visibility_button._bg_color = self.visibility_button.bg_color = self.visibility_frames[2]
             self.visibility_button.hover_color = self.visibility_button.click_color = self.visibility_frames[3]
             self.label_text_box.set_text_color(TEXT_COLOR)
+            editor.sound_system.get_audio("AESA_bloop2", "editor").play()
         self.label_text_box.set_content(self.label)
         self.attr_panel.visible = self.attr_panel_visible = not self.attr_panel_visible
     
@@ -76,6 +78,9 @@ class ShelfPanel(UIElement):
         self.focus_button._bg_color = self.focus_button.bg_color = self.focus_button.hover_color = self.refocus_frames[1]
         
         def make_glow():
+            # editor.sound_system.get_audio("AESA_thud2", "editor").stop()
+            editor.sound_system.get_audio("AESA_vibrate", "editor").play()
+            
             self.attr_panel.glow_time = time.time()+0.75
             self.attr_panel.glowing = True
             self.focus_button._bg_color = self.focus_button.bg_color = self.refocus_frames[0]
@@ -83,7 +88,9 @@ class ShelfPanel(UIElement):
             
         targetX = self.attr_panel.x - (((self.canvas.width / self.canvas.scale)-(self.attr_panel.width * self.canvas.scale))/2)
         targetY = self.attr_panel.y - (((self.canvas.height / self.canvas.scale)-(self.attr_panel.height * self.canvas.scale))/2)
-    
+
+        if not (self.canvas.offsetX == targetX and self.canvas.offsetY == targetY):
+            editor.sound_system.get_audio("AESA_thud2", "editor").play()
         self.canvas.setOffset(targetX, targetY, 1, make_glow)
     
     def _update(self, editor, X, Y):

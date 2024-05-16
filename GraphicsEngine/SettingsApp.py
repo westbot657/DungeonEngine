@@ -12,8 +12,19 @@ from Toasts import Toasts
 
 import pygame
 import re
+from mergedeep import merge
 
 class SettingsApp(UIElement):
+    
+    DEFAULT_CONFIG = {
+        "General Settings": {},
+        "Game Settings": {
+            "game_volume": 1
+        },
+        "Editor Settings": {
+            "editor_volume": 0.35
+        }
+    }
     
     def load_config(self):
         self.config: dict[str, dict[str, str|float|bool]] = {}
@@ -68,7 +79,10 @@ class SettingsApp(UIElement):
         ### XXX Editor Settings XXX ###
         self.config["Editor Settings"]["editor_volume"] = self.editor_volume_slider.get_percent()
 
-    
+    def reset_config(self, *_, **__):
+        self.config = merge({}, self.DEFAULT_CONFIG)
+        self.save_config()
+        self.load_component_values()
 
     def __init__(self, code_editor, editor):
         self.code_editor = code_editor
@@ -105,12 +119,13 @@ class SettingsApp(UIElement):
         
         ### XXX Apply & Save / Reset / Reset to Defaults XXX ###
         
-        self.full_reset_button = BorderedButton(editor.width-276, self.y+10, 200, 30, "Reset to Defaults")
+        self.full_reset_button = BorderedButton(0, self.y+10, 215, 23, " Reset to Defaults", text_size=19)
+        self.full_reset_button.on_left_click = self.reset_config
 
-        self.reset_button = BorderedButton(self.full_reset_button.x - 110, self.y+10, 100, 30, "Reset")
+        self.reset_button = BorderedButton(0, self.y+10, 80, 23, " Reset", text_size=19)
         self.reset_button.on_left_click = self.load_component_values
 
-        self.apply_changes_button = BorderedButton(self.reset_button.x - 160, self.y+10, 150, 30, "Apply & Save")
+        self.apply_changes_button = BorderedButton(0, self.y+10, 155, 23, " Apply & Save", text_size=19)
         self.apply_changes_button.on_left_click = self.apply_settings
         
 
@@ -186,9 +201,9 @@ class SettingsApp(UIElement):
     def position_objects(self, editor):
         y_offset = 20
         
-        self.full_reset_button.x = editor.width - 276
-        self.reset_button.x = self.full_reset_button.x - 110
-        self.apply_changes_button.x = self.reset_button.x - 160
+        self.full_reset_button.x = editor.width - 235
+        self.reset_button.x = self.full_reset_button.x - 90
+        self.apply_changes_button.x = self.reset_button.x - 165
         
         self.toasts.x = editor.width-355
         self.toasts.y = editor.height-20

@@ -63,6 +63,10 @@ class AdvancedEditorSubApp(UIElement):
         editor.sound_system.load(f"{PATH}/audio_assets/thud2.wav",   "AESA_thud2",   "editor")
         editor.sound_system.load(f"{PATH}/audio_assets/click.wav",   "AESA_click",   "editor")
         editor.sound_system.load(f"{PATH}/audio_assets/click2.wav",  "AESA_click2",  "editor")
+        editor.sound_system.load(f"{PATH}/audio_assets/bloop1.wav",  "AESA_bloop1",  "editor")
+        editor.sound_system.load(f"{PATH}/audio_assets/bloop2.wav",  "AESA_bloop2",  "editor")
+        editor.sound_system.load(f"{PATH}/audio_assets/vibrate.wav", "AESA_vibrate", "editor")
+        editor.sound_system.load(f"{PATH}/audio_assets/beep.wav",    "AESA_beep",    "editor")
         
         self.toasts = Toasts(editor.width-355, editor.height-20, 350)
         
@@ -164,6 +168,7 @@ class AdvancedEditorSubApp(UIElement):
     
     def click_load_dungeon(self, *_, **__):
         if not self.getting_directory:
+            self.editor.sound_system.get_audio("AESA_beep", "editor").play()
             t = Thread(target=self.get_directory_task_thread)
             t.daemon = True
             t.start()

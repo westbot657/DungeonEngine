@@ -89,7 +89,7 @@ class AttributePanel(UIElement):
     
     
     
-    def __init__(self, x:int, y:int, width:int, height:int, bordered:bool, bg_color=TEXT_BG2_COLOR):
+    def __init__(self, x:int, y:int, width:int, height:int, bordered:bool, bg_color=TEXT_BG2_COLOR, data:dict=None):
         self.x = x
         self.y = y
         self.width = self._width = width
@@ -101,7 +101,56 @@ class AttributePanel(UIElement):
         self.glow_time = 0
         self.bg_color = bg_color
         self.visible = True
+        self.data = data or {}
         self.rebuild()
+        self.build_data()
+
+    def build_data(self):
+        # Use data to build children.
+        if "type" in self.data:
+            match self.data["type"]:
+                case "weapon-base":
+                    ...
+                case "weapon-instance":
+                    ...
+                case "armor-base":
+                    ...
+                case "armor-instance":
+                    ...
+                case "ammo-base":
+                    ...
+                case "ammo-instance":
+                    ...
+                case "tool-base":
+                    ...
+                case "tool-instance":
+                    ...
+                case "item-base":
+                    ...
+                case "item-instance":
+                    ...
+                case "attack-base":
+                    ...
+                case "attack-instance":
+                    ...
+                case "combat-base":
+                    ...
+                case "combat-instance":
+                    ...
+                case "enemy-base":
+                    ...
+                case "enemy-instance":
+                    ...
+                case "status-effect-base":
+                    ...
+                case "status_effect-instance":
+                    ...
+                case "room":
+                    ...
+                case "script":
+                    ...
+                case _:
+                    raise TypeError("Unknown object type!")
     
     def rebuild(self):
         self.surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
@@ -219,8 +268,6 @@ class AttributePanel(UIElement):
             )
         
         
-        # self.surface = pygame.transform.scale(self.surface, (self.width*self.texture_scale, self.height*self.texture_scale))
-        # self.bg = pygame.transform.scale(self.bg, (self.width*self.texture_scale, self.height*self.texture_scale))
 
     def set_glow(self, duration:int):
         self.glow_time = time.time()+duration

@@ -26,8 +26,12 @@ class VisualConfig:
         # issues = []
         
         if not os.path.exists(f"{root}/{dungeon_id}.json"):
-            return "Folder does not resemble expected dungeon structure"
-        to_load.append(f"{root}/{dungeon_id}.json")
+            return "Folder does not resemble expected file structure"
+        # to_load.append(f"{root}/{dungeon_id}.json")
+        
+        to_load += glob.glob("**/*.ds", root_dir=root, recursive=True) + \
+                   glob.glob("**/*.dungeon_script", root_dir=root, recursive=True) + \
+                   glob.glob("**/*.json", root_dir=root, recursive=True)
         
         return to_load
     

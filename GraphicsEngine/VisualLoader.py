@@ -22,7 +22,8 @@ class VisualLoader:
             return VisualLoader._refernce_map[self.ref_id]
     
     class VisualObject:
-        def __init__(self, uid:str, data:dict):
+        def __init__(self, dungeon:str, uid:str, data:dict):
+            self.dungeon = dungeon
             self.uid = uid
             self.data = data
         
@@ -42,12 +43,12 @@ class VisualLoader:
         returns the list of files returned from glob.glob  \n
         if there are errors with the file structure, returns a string instead
         """
-        to_load = []
+        to_load: list[str] = []
         
         # issues = []
         
         if not os.path.exists(f"{root}/{dungeon_id}.json"):
-            return "Folder does not resemble expected file structure"
+            return f"Folder does not contain a '{dungeon_id}.json' file."
         # to_load.append(f"{root}/{dungeon_id}.json")
         
         to_load += glob.glob("**/*.ds", root_dir=root, recursive=True) + \
@@ -57,7 +58,7 @@ class VisualLoader:
         if f"{root}/vcfg.json" in to_load:
             to_load.remove(f"{root}/vcfg.json")
         
-        return to_load
+        return [t.replace("\\", "/") for t in to_load]
     
     @staticmethod
     def blank(*_, **__): pass
@@ -113,6 +114,35 @@ class VisualLoader:
             cls.error(result, loading_bar, load_toast, toasts)
         else:
             loading_bar.set_max_progress(len(result))
+            
+            for file_name in result:
+                if file_name.endswith(".json"): # weapon/tool/armor/etc
+                    # analyze files, look for external references
+                    if file_name.startswith("resources/weapons/"):
+                        ...
+                    elif file_name.startswith("resources/ammo/"):
+                        ...
+                    elif file_name.startswith("resources/armor/"):
+                        ...
+                    elif file_name.startswith("resources/tools/"):
+                        ...
+                    elif file_name.startswith("resources/items/"):
+                        ...
+                    elif file_name.startswith("resources/enemies/"):
+                        ...
+                    elif file_name.startswith("resources/attacks/"):
+                        ...
+                    elif file_name.startswith("resources/status_effects/"):
+                        ...
+                    elif file_name.startswith("resources/sounds/"):
+                        ...
+                    elif file_name.startswith("resources/loot_tables/"):
+                        ...
+                    elif file_name.startswith("resources/interactable/"):
+                        ...
+                elif file_name.endswith((".ds", ".dungeon_script")): # script
+                    ... # compile the scripts and analyze the tokens for references
+                
             
             
             

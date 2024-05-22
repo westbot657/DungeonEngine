@@ -39,7 +39,7 @@ class ShelfPanel(UIElement):
         self.effective_height = height
         self.canvas = canvas
         self.editor = editor
-        self.panel = AttributePanel(0, 0, width, height, False, TEXT_BG_COLOR)
+        self.panel = AttributePanel(None, 0, 0, width, height, False, TEXT_BG_COLOR)
         self.panel.texture_scale = 1
         self.panel.rebuild()
         self.label_text_box = CursorFocusTextBox(12, 9, 150, TEXT_SIZE+4, editor, "enter label...", content=label)

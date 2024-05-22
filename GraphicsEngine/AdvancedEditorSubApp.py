@@ -1,4 +1,4 @@
-# pylint: disable=[W,R,C, import-error]
+# pylint: disable=[W,R,C, import-error, no-member]
 
 from UIElement import UIElement
 from RenderPrimitives import Image
@@ -20,7 +20,7 @@ from AdvancedPanels.PanelPlacer import PanelPlacer
 from threading import Thread
 import tkinter.filedialog
 import tkinter
-
+import pygame
 
 class VisibilityToggle:
     def __init__(self, sub_app, typ, button, alt_text1, alt_text2, frames):
@@ -72,6 +72,18 @@ class AdvancedEditorSubApp(UIElement):
         
         self.construction_canvas = ConstructionCanvas(self, editor, 102, 22, editor.width-452, editor.height-111)
         self.children.append(self.construction_canvas)
+        
+        self.canvas_action_hint_mask = pygame.Surface((editor.width-452, editor.height-111), pygame.SRCALPHA, 32)
+        self.canvas_action_hint_mask.fill((0, 0, 0))
+        self.canvas_action_hint_mask.set_alpha(10)
+        self.canvas_action_hint_fade = 0
+        self.canvas_action_hint = Image(f"{PATH}/advanced_editor/canvas_action_hint.png", 0, 0, 55, 55)
+        
+        self.shelf_action_hint_mask = pygame.Surface((350, editor.height-81), pygame.SRCALPHA, 32)
+        self.shelf_action_hint_mask.fill((0, 0, 0))
+        self.shelf_action_hint_mask.set_alpha(10)
+        self.shelf_action_hint_fade = 0
+        self.shelf_action_hint = Image(f"{PATH}/advanced_editor/shelf_action_hint.png", 0, 0, 55, 55)
         
         self.visibility_types = [
             None,
@@ -197,18 +209,16 @@ class AdvancedEditorSubApp(UIElement):
         shelf_panel.placer = shelf_panel._placer = placer
     
     def create_panel(self, category, rect:tuple[int, int, int, int], label, bordered=False, tags=None, shelf_panel_height=35, panel_data:dict=None) -> AttributePanel:
-        attr_panel = AttributePanel(*rect, bordered=bordered, data=panel_data)
+        attr_panel = AttributePanel(self, *rect, bordered=bordered, data=panel_data)
         self.create_shelf_panel(category, attr_panel, label, tags, shelf_panel_height)
         return attr_panel
     
     def create_shelf_panel(self, category, attribute_panel, label, tags=None, height=35):
         shelf_panel = ShelfPanel(340, height, label, category, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas, tags)
+        attribute_panel.shelf_panel = shelf_panel
         self.object_tree.tree.append(shelf_panel)
     
-    def _update(self, editor, X, Y):
-        for child in self.children:
-            child._update(editor, X, Y)
-        self.toasts._update(editor, X, Y)
+    
     
     def panel_placer_acceptor(self, panel_placer, editor):
         shelf = panel_placer.parent_shelf
@@ -225,6 +235,41 @@ class AdvancedEditorSubApp(UIElement):
         
         self.visibility_groups[shelf.category].append(panel)
     
+    def attribute_panel_acceptor(self, attr_panel, editor):
+        mx, my = self.construction_canvas.get_relative_mouse(*editor.mouse_pos)
+        
+        attr_panel.x = (100*((mx - (editor.hold_offset[0])+50)//100))
+        attr_panel.y = (100*((my - (editor.hold_offset[1])+50)//100))
+        
+        self.visibility_groups[attr_panel.shelf_panel.category].append(attr_panel)
+        editor.sound_system.get_audio("AESA_thud", "editor").play()
+        
+    
+    def attribute_panel_acceptor_2(self, attr_panel, editor):
+        attr_panel.shelf_panel.placer = attr_panel.shelf_panel._placer
+        self.editor.sound_system.get_audio("AESA_drop", "editor").play()
+
+    def _update_layout(self, editor):
+        for button, _ in self.visibility_toggles.values():
+            button.y = editor.height-100
+        for blank in self.empty_visibility_toggle_spots:
+            blank.y = editor.height-100
+        self.end_fill.width = editor.width - 450
+        
+        self.construction_canvas.width = editor.width-452
+        self.construction_canvas.height = editor.height-111
+        
+        self.canvas_action_hint_mask = pygame.transform.scale(self.canvas_action_hint_mask, (max(1, editor.width-452), max(1, editor.height-111)))
+        self.shelf_action_hint_mask = pygame.transform.scale(self.shelf_action_hint_mask, (350, max(1, editor.height-81)))
+        
+        self.construction_canvas.rebuild()
+        self.search_box.x = editor.width-350
+        self.object_tree.x = editor.width-352
+        self.object_tree.height = editor.height-111
+        self.open_dungeon_button.y = editor.height-70
+        self.toasts.x = editor.width-355
+        self.toasts.y = editor.height-20
+
     def _event(self, editor, X, Y):
         
         if self.selected_directory:
@@ -238,24 +283,60 @@ class AdvancedEditorSubApp(UIElement):
         for child in self.children[::-1]:
             child._event(editor, X, Y)
         
-        if editor.drop_requested and isinstance(editor.held, PanelPlacer) and editor.collides(editor.mouse_pos, (self.construction_canvas.x, self.construction_canvas.y, self.construction_canvas.width, self.construction_canvas.height)):
-            editor.accept_drop(1, self.panel_placer_acceptor)
+        if editor.holding:
+            if isinstance(editor.held, (PanelPlacer, AttributePanel)):
+                if editor.collides(editor.mouse_pos, (self.construction_canvas.x, self.construction_canvas.y, self.construction_canvas.width, self.construction_canvas.height)):
+                    if self.shelf_action_hint_fade < 80:
+                        self.shelf_action_hint_fade = min(max(self.shelf_action_hint_fade+20, 10), 80)
+                        self.shelf_action_hint_mask.set_alpha(self.shelf_action_hint_fade)
+                    else:
+                        self.shelf_action_hint_fade = 90
+                    if self.canvas_action_hint_fade > 10:
+                        self.canvas_action_hint_fade = min(max(self.canvas_action_hint_fade-20, 10), 80)
+                        self.canvas_action_hint_mask.set_alpha(self.canvas_action_hint_fade)
+                    else:
+                        self.canvas_action_hint_fade = 0
+                else:
+                    if self.shelf_action_hint_fade > 10:
+                        self.shelf_action_hint_fade = min(max(self.shelf_action_hint_fade-20, 10), 80)
+                        self.shelf_action_hint_mask.set_alpha(self.shelf_action_hint_fade)
+                    else:
+                        self.shelf_action_hint_fade = 0
+                    if self.canvas_action_hint_fade < 80:
+                        self.canvas_action_hint_fade = min(max(self.canvas_action_hint_fade+20, 10), 80)
+                        self.canvas_action_hint_mask.set_alpha(self.canvas_action_hint_fade)
+                    else:
+                        self.canvas_action_hint_fade = 90
+        else:
+            self.canvas_action_hint_fade = 0
+            self.shelf_action_hint_fade = 0
+        
+        if editor.drop_requested:
+            
+            # vv if colliding with the construction canvas vv
+            canvas_collision = editor.collides(editor.mouse_pos, (self.construction_canvas.x, self.construction_canvas.y, self.construction_canvas.width, self.construction_canvas.height))
+            
+            if isinstance(editor.held, PanelPlacer) and canvas_collision:
+                editor.accept_drop(1, self.panel_placer_acceptor)
+            elif isinstance(editor.held, AttributePanel):
+                if canvas_collision:
+                    editor.accept_drop(1, self.attribute_panel_acceptor)
+                else:
+                    editor.accept_drop(0, self.attribute_panel_acceptor_2)
         
         self.toasts._event(editor, X, Y)
+    
+    def _update(self, editor, X, Y):
+        for child in self.children:
+            child._update(editor, X, Y)
             
-    def _update_layout(self, editor):
-        for button, _ in self.visibility_toggles.values():
-            button.y = editor.height-100
-        for blank in self.empty_visibility_toggle_spots:
-            blank.y = editor.height-100
-        self.end_fill.width = editor.width - 450
+        if self.canvas_action_hint_fade:
+            editor.screen.blit(self.canvas_action_hint_mask, (102, 22))
+            self.canvas_action_hint._update(editor, 102+(self.construction_canvas.width/2)-(27.5), 22+(self.construction_canvas.height/2)-(27.5))
         
-        self.construction_canvas.width = editor.width-452
-        self.construction_canvas.height = editor.height-111
-        self.construction_canvas.rebuild()
-        self.search_box.x = editor.width-350
-        self.object_tree.x = editor.width-352
-        self.object_tree.height = editor.height-111
-        self.open_dungeon_button.y = editor.height-70
-        self.toasts.x = editor.width-355
-        self.toasts.y = editor.height-20
+        if self.shelf_action_hint_fade:
+            editor.screen.blit(self.shelf_action_hint_mask, (self.object_tree.x, self.search_box.y-5))
+            self.shelf_action_hint._update(editor, self.object_tree.x+(self.object_tree.width/2)-(27.5), self.search_box.y+((self.search_box.height+self.object_tree.height)/2)-(27.5))
+            
+        self.toasts._update(editor, X, Y)
+

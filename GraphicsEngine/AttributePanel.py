@@ -86,10 +86,9 @@ class AttributePanel(UIElement):
             "glow": Image.from_pygameSurface(gs, (16*m, 16*m, 8*m, 8*m)).scale(m/texture_scale)
         }
     }
-    
-    
-    
-    def __init__(self, x:int, y:int, width:int, height:int, bordered:bool, bg_color=TEXT_BG2_COLOR, data:dict=None):
+
+    def __init__(self, parent, x:int, y:int, width:int, height:int, bordered:bool, bg_color=TEXT_BG2_COLOR, data:dict=None):
+        self.parent = parent
         self.x = x
         self.y = y
         self.width = self._width = width
@@ -102,6 +101,9 @@ class AttributePanel(UIElement):
         self.bg_color = bg_color
         self.visible = True
         self.data = data or {}
+        self.hovered = False
+        self.border_hovered = False
+        self.shelf_panel = None
         self.rebuild()
         self.build_data()
 
@@ -266,8 +268,6 @@ class AttributePanel(UIElement):
             self.surface.blit(
                 pygame.transform.scale(self.segments["bottom_right"]["normal"].surface, (6*self.texture_scale, 6*self.texture_scale)), (self.width-(6*self.texture_scale), self.height-(6*self.texture_scale))
             )
-        
-        
 
     def set_glow(self, duration:int):
         self.glow_time = time.time()+duration
@@ -291,9 +291,30 @@ class AttributePanel(UIElement):
                     editor._hovering = self
             else:
                 self.hovered = False
+                self.border_hovered = False
+                
+            if self.hovered:
+                if not editor.collides(editor.mouse_pos, (X+self.x+5, Y+self.y+5, self.width-10, self.height-10)):
+                    self.border_hovered = True
+                else:
+                    self.border_hovered = False
+            else:
+                self.border_hovered = False
+            
+            if self.border_hovered and self.parent:
+                if editor.left_mouse_down():
+                    self.parent.visibility_groups[self.shelf_panel.category].remove(self)
+                    editor.sound_system.get_audio("AESA_pick_up", "editor").play()
+                    editor.holding = True
+                    editor.held = self
+                    editor.hold_offset = (editor.mouse_pos[0]-self.x, editor.mouse_pos[1]-self.y)
+                    self.x = 0
+                    self.y = 0
+
         else:
             self.hovered = False
-        
+            self.border_hovered = False
+
     def _update(self, editor, X, Y):
         if self.visible:
             editor.screen.blit(self.bg, (X+self.x, Y+self.y))

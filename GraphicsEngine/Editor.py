@@ -319,6 +319,7 @@ class Editor:
                 self.held = None
                 self.drop_acceptors.clear()
                 self.drop_requested = False
+                self.holding = False
 
             pygame.display.flip()
 

@@ -9,7 +9,7 @@ from FunctionalElements import Button, BorderedButton
 from AdvancedPanels.PanelTree import PanelTree
 from AdvancedPanels.ShelfPanel import ShelfPanel
 from CursorFocusTextBox import CursorFocusTextBox
-from VisualConfig import VisualConfig
+from GraphicsEngine.VisualLoader import VisualLoader
 from Toasts import Toasts
 from LoadingBar import LoadingBar
 from Pathfinding import Pathfinding
@@ -193,7 +193,7 @@ class AdvancedEditorSubApp(UIElement):
         toast.children.append(loading_bar)
         toast.refresh()
         toast.keep_showing = True
-        VisualConfig.load(self.to_open, loading_bar, toast, self.toasts)
+        VisualLoader.load(self.to_open, loading_bar, toast, self.toasts)
         
         
     

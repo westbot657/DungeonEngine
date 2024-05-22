@@ -12,9 +12,30 @@ import json
 import glob
 import os
 
-class VisualConfig:
+class VisualLoader:
+    _refernce_map = {}
+    class ObjectReference:
+        def __init__(self, ref_id:str):
+            self.ref_id = ref_id
+        
+        def get(self):
+            return VisualLoader._refernce_map[self.ref_id]
     
+    class VisualObject:
+        def __init__(self, uid:str, data:dict):
+            self.uid = uid
+            self.data = data
+        
+        def ref(self):
+            return VisualLoader.ObjectReference(self.uid)
     
+        def get(self, data_name:str):
+            if data_name in self.data:
+                obj = self.data[data_name]
+                if isinstance(obj, VisualLoader.ObjectReference):
+                    return obj.get()
+                return obj
+        
     @classmethod
     def analyze_project_structure(cls, root:str, dungeon_id:str) -> list[str]|str:
         """
@@ -32,6 +53,9 @@ class VisualConfig:
         to_load += glob.glob("**/*.ds", root_dir=root, recursive=True) + \
                    glob.glob("**/*.dungeon_script", root_dir=root, recursive=True) + \
                    glob.glob("**/*.json", root_dir=root, recursive=True)
+        
+        if f"{root}/vcfg.json" in to_load:
+            to_load.remove(f"{root}/vcfg.json")
         
         return to_load
     
@@ -85,9 +109,14 @@ class VisualConfig:
         
         result = cls.analyze_project_structure(root, dungeon_id)
         
-        if isinstance(result, list):
-            ...
-        else:
+        if not isinstance(result, list):
             cls.error(result, loading_bar, load_toast, toasts)
+        else:
+            loading_bar.set_max_progress(len(result))
+            
+            
+            
+            
+            
             
 

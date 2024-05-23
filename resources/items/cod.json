@@ -1,4 +1,9 @@
 {
     "parent": "engine:items/fish",
-    "name": "Cod"
+    "name": "Cod",
+    "keywords": [
+        "food",
+        "meat",
+        "fish"
+    ]
 }

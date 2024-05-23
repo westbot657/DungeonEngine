@@ -7,5 +7,8 @@
         "values": [1, 2, 3, 4, 5]
     },
     "range": 3,
-    "max_durability": 80
+    "max_durability": 80,
+    "keywords": [
+        "melee"
+    ]
 }

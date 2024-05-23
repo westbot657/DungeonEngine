@@ -1,11 +1,14 @@
 {
     "parent": "engine:ammo/arrow",
     "name": "Lightning Arrow",
-    "description": "An electrically charged arrow. The head is infused with Krianor",
+    "description": "An electrically charged arrow.",
     "bonus_damage": {
         "function": "engine:random/range",
         "min": 4,
         "max": 6
     },
-    "max_count": 25
+    "max_count": 25,
+    "keywords": [
+        "magic"
+    ]
 }

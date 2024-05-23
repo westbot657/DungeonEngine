@@ -3,5 +3,8 @@
     "max_health": 8,
     "attacks": [
         "engine:attacks/bite"
+    ],
+    "keywords": [
+        "undead"
     ]
 }

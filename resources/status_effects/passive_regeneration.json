@@ -23,6 +23,9 @@
             "function": "engine:player/heal",
             "amount": 1
         }
-    }
+    },
+    "keywords": [
+        "buff"
+    ]
     
 }

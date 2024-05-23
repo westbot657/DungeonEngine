@@ -7,5 +7,8 @@
     },
     "range": 20,
     "max_durability": 300,
-    "ammo_type": "engine:ammo/arrow"
+    "ammo_type": "engine:ammo/arrow",
+    "keywords": [
+        "ranged"
+    ]
 }

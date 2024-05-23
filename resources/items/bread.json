@@ -1,4 +1,8 @@
 {
     "parent": "engine:items/food",
-    "name": "Bread"
+    "name": "Bread",
+    "keywords": [
+        "food",
+        "grain"
+    ]
 }

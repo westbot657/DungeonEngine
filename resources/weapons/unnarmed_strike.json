@@ -3,5 +3,8 @@
     "damage": 1,
     "range": 1,
     "max_durability": -1,
-    "hidden": true
+    "hidden": true,
+    "keywords": [
+        "melee"
+    ]
 }

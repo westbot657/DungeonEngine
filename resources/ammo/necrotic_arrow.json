@@ -1,11 +1,14 @@
 {
     "parent": "engine:ammo/arrow",
     "name": "Necrotic Arrow",
-    "description": "Decreased damage against undead. The head is infused with Droitium",
+    "description": "Decreased damage against undead.",
     "bonus_damage": {
         "function": "engine:random/range",
         "min": 3,
         "max": 6
     },
-    "max_count": 15
+    "max_count": 15,
+    "keywords": [
+        "magic"
+    ]
 }

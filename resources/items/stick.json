@@ -1,4 +1,7 @@
 {
     "name": "Stick",
-    "max_count": 40
+    "max_count": 40,
+    "keywords": [
+        "material"
+    ]
 }

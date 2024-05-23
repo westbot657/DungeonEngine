@@ -22,10 +22,13 @@ class VisualLoader:
             return VisualLoader._refernce_map[self.ref_id]
     
     class VisualObject:
-        def __init__(self, dungeon:str, uid:str, data:dict):
+        def __init__(self, source:str, dungeon:str, uid:str, data:dict):
+            self.source = source
             self.dungeon = dungeon
             self.uid = uid
             self.data = data
+            
+            VisualLoader._refernce_map.update({self.uid: self})
         
         def ref(self):
             return VisualLoader.ObjectReference(self.uid)
@@ -117,9 +120,18 @@ class VisualLoader:
             
             for file_name in result:
                 if file_name.endswith(".json"): # weapon/tool/armor/etc
+                    with open(file_name, "r+", encoding="utf-8") as f:
+                        data = json.load(f)
                     # analyze files, look for external references
                     if file_name.startswith("resources/weapons/"):
-                        ...
+                        
+                        
+                        vdata = {
+                            
+                        }
+                        
+                        weapon = VisualLoader.VisualObject(file_name, dungeon_id, f"{dungeon_id}:{file_name.replace("resources/", "")}", vdata)
+                        
                     elif file_name.startswith("resources/ammo/"):
                         ...
                     elif file_name.startswith("resources/armor/"):

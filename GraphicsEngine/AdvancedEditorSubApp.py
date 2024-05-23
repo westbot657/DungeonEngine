@@ -9,7 +9,7 @@ from FunctionalElements import Button, BorderedButton
 from AdvancedPanels.PanelTree import PanelTree
 from AdvancedPanels.ShelfPanel import ShelfPanel
 from CursorFocusTextBox import CursorFocusTextBox
-from GraphicsEngine.VisualLoader import VisualLoader
+from VisualLoader import VisualLoader
 from Toasts import Toasts
 from LoadingBar import LoadingBar
 from Pathfinding import Pathfinding

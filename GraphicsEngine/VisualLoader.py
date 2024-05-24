@@ -127,7 +127,8 @@ class VisualLoader:
                         
                         
                         vdata = {
-                            
+                            "parent": None,
+                            "name": data["name"]
                         }
                         
                         weapon = VisualLoader.VisualObject(file_name, dungeon_id, f"{dungeon_id}:{file_name.replace("resources/", "")}", vdata)

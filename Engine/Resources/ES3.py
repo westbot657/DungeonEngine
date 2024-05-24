@@ -339,6 +339,10 @@ match random.choice([1, 2, 3, 4]) {
 """
 
 
+class Node:
+    def compile(self):
+        return {}
+
 class EngineScript:
     _scripts = {}
     
@@ -353,7 +357,7 @@ class EngineScript:
         r"\<[^<> ]+\>": "OBJECT",
         r"(<=|>=|<|>|==|!=)": "COMP",
         r"(\.\.|::)": "CONCAT",
-        r"\b(if|elif|else|while|for|in|and|not|or|true|false|none|match|case)\b": "KEYWORD",
+        r"\b(if|elif|else|while|for|in|and|not|or|true|false|none|match|case|class|def)\b": "KEYWORD",
         r"[a-zA-Z_][a-zA-Z0-9_]*": "WORD",
         r"(\d+(\.\d+)?|\.\d+)": "NUMBER",
         r"\*\*": "POW",
@@ -552,8 +556,7 @@ class EngineScript:
         self.do_analysis = do_analysis
         self._tokens = []
         self.variable_table = {}
-        
-        
+
     def compile(self):
         self.macro_functions.clear()
         self.macros.clear()
@@ -569,9 +572,9 @@ class EngineScript:
 
         tokens = [t for t in tokens if t.type not in ["ignore", "context_hint"]]
 
-        print(tokens)
+        # print(tokens)
 
-        # self.build(tokens)
+        self.build(tokens)
     
     def cleanup(self, ast):
         # print(f"CLEANUP: {ast}")
@@ -600,14 +603,15 @@ class EngineScript:
         t = bool(tokens)
         if tokens:
             try:
-                self.compiled_script = self.cleanup(self.statements(tokens))
+                ast = self.statements(tokens)
+                self.compiled_script = self.cleanup(ast.compile())
             except EOF:
                 self.compiled_script = {}
         if t and self.compiled_script == {}:
             print(f"Warning:\n    File '{self.script_file}' contained code that compiled to nothing.")
 
-    def statements(self, tokens:list[Token], ignore_macros:bool=False):
-        ...
+    def statements(self, tokens:list[Token], ignore_macros:bool=False) -> Node:
+        return Node()
 
 """
 statements : statement*
@@ -615,6 +619,8 @@ statements : statement*
 statement : BREAK
           | RETURN expression?
           | PASS
+          | function_def
+          | class_def
           | if_statement
           | match_case
           | while_loop
@@ -645,8 +651,41 @@ macro : MACRO '(' macro_args ')' '=' macro_scope
       | MACRO '=' expression
       | MACRO
 
-arith : 
+macro_args : (MACRO ','?)+
 
+macro_scope : '{' macro_statements '}'
+
+arith : mul (('+'|'-') mul)*
+
+mul : pow (('*'|'/'|'%') pow)*
+
+pow : concat ('^' concat)*
+
+concat : var (CONCAT var)? (CONCATSEP var)?
+
+atom : var '=' expression
+     | var
+     | '-' atom
+     | '(' expression ')'
+     | (NUMBER|BOOL|STRING|OBJECT|table|WORD|scope|macro|function_call)
+
+var : WORD (('.' WORD)* ('[' expression ']')*)
+
+table : '[' comma_expressions ']'
+      | '{' table_contents '}'
+
+function_call : var parameters scope?
+              | 'new' ':' OBJECT scope
+
+table_contents : (expression ':' expression ','?)*
+
+parameters : '(' param_elements* ')'
+
+param_elements : (expression ',')* (WORD '=' expression ','?)*
+
+function_def : 'def' WORD '(' ( (WORD ','?)* (WORD '=' expression ','?)* )? ')' scope
+
+class_def : 'class' OBJECT scope
 
 """
 

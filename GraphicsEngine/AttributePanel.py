@@ -87,7 +87,7 @@ class AttributePanel(UIElement):
         }
     }
 
-    def __init__(self, parent, x:int, y:int, width:int, height:int, bordered:bool, bg_color=TEXT_BG2_COLOR, data:dict=None):
+    def __init__(self, parent, x:int, y:int, width:int, height:int, bordered:bool, bg_color=TEXT_BG2_COLOR, data=None):
         self.parent = parent
         self.x = x
         self.y = y
@@ -100,7 +100,7 @@ class AttributePanel(UIElement):
         self.glow_time = 0
         self.bg_color = bg_color
         self.visible = True
-        self.data = data or {}
+        self.data = data
         self.hovered = False
         self.border_hovered = False
         self.shelf_panel = None
@@ -111,9 +111,9 @@ class AttributePanel(UIElement):
         # Use data to build children.
         if "type" in self.data:
             match self.data["type"]:
-                case "weapon-base":
+                case "weapons-base":
                     ...
-                case "weapon-instance":
+                case "weapons-instance":
                     ...
                 case "armor-base":
                     ...
@@ -123,29 +123,29 @@ class AttributePanel(UIElement):
                     ...
                 case "ammo-instance":
                     ...
-                case "tool-base":
+                case "tools-base":
                     ...
-                case "tool-instance":
+                case "tools-instance":
                     ...
-                case "item-base":
+                case "items-base":
                     ...
-                case "item-instance":
+                case "items-instance":
                     ...
-                case "attack-base":
+                case "attacks-base":
                     ...
-                case "attack-instance":
+                case "attacks-instance":
                     ...
-                case "combat-base":
+                case "combats-base":
                     ...
-                case "combat-instance":
+                case "combats-instance":
                     ...
-                case "enemy-base":
+                case "enemies-base":
                     ...
-                case "enemy-instance":
+                case "enemies-instance":
                     ...
-                case "status-effect-base":
+                case "status_effects-base":
                     ...
-                case "status_effect-instance":
+                case "status_effects-instance":
                     ...
                 case "room":
                     ...

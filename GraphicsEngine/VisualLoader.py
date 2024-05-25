@@ -203,7 +203,7 @@ class VisualLoader:
             result = [f"resources/{f}".replace("\\", "/") for f in (glob.glob("**/*.json", root_dir="./resources", recursive=True) +\
                      glob.glob("**/*.ds", root_dir="./resources", recursive=True) + \
                      glob.glob("**/*.dundeon_script", root_dir="./resources", recursive=True))]
-            print(f"engine load: {result}")
+            # print(f"engine load: {result}")
         else:
             result = cls.analyze_project_structure(root, dungeon_id)
         
@@ -409,8 +409,8 @@ class VisualLoader:
 
         toasts.toast(f"Panels loaded!" + (f"\n{len(missing)} object{'s have' if len(missing) > 1 else " has"} broken or unloaded references." if missing else ""))
 
-        print(missing)
-        print(cls._refernce_map)
+        # print(missing)
+        # print(cls._refernce_map)
 
         if not loading_engine:
             with open(f"{root}/vcfg.json", "w+", encoding="utf-8") as f:

@@ -165,11 +165,11 @@ class AdvancedEditorSubApp(UIElement):
         self.getting_directory = False
         self.dir_getter = None
         
-        self.create_stashed_panel("weapon", (200, 400), "Longsword", True, ["weapon", "melee"])
-        self.create_stashed_panel("weapon", (300, 400), "Shortsword", True, ["weapon", "melee"])
-        self.create_stashed_panel("weapon", (300, 400), "Broadsword", True, ["weapon", "melee"])
-        self.create_stashed_panel("weapon", (300, 400), "Bow", True, ["weapon", "ranged"])
-        self.create_stashed_panel("weapon", (300, 400), "Crossbow", True, ["weapon", "ranged"])
+        # self.create_stashed_panel("weapon", (200, 400), "Longsword", True, ["weapon", "melee"])
+        # self.create_stashed_panel("weapon", (300, 400), "Shortsword", True, ["weapon", "melee"])
+        # self.create_stashed_panel("weapon", (300, 400), "Broadsword", True, ["weapon", "melee"])
+        # self.create_stashed_panel("weapon", (300, 400), "Bow", True, ["weapon", "ranged"])
+        # self.create_stashed_panel("weapon", (300, 400), "Crossbow", True, ["weapon", "ranged"])
     
     def get_directory_task_thread(self):
         self.getting_directory = True
@@ -180,7 +180,7 @@ class AdvancedEditorSubApp(UIElement):
     
     def click_load_dungeon(self, *_, **__):
         if not self.getting_directory:
-            self.editor.sound_system.get_audio("AESA_beep", "editor").play()
+            self.editor.sound_system.get_audio("AESA_click", "editor").play()
             t = Thread(target=self.get_directory_task_thread)
             t.daemon = True
             t.start()

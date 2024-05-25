@@ -108,12 +108,15 @@ class AttributePanel(UIElement):
         self.build_data()
 
     def build_data(self):
+        
+        if not self.data: return
+        
         # Use data to build children.
         if "type" in self.data:
             match self.data["type"]:
-                case "weapons-base":
+                case "weapon-base":
                     ...
-                case "weapons-instance":
+                case "weapon-instance":
                     ...
                 case "armor-base":
                     ...
@@ -123,36 +126,36 @@ class AttributePanel(UIElement):
                     ...
                 case "ammo-instance":
                     ...
-                case "tools-base":
+                case "tool-base":
                     ...
-                case "tools-instance":
+                case "tool-instance":
                     ...
-                case "items-base":
+                case "item-base":
                     ...
-                case "items-instance":
+                case "item-instance":
                     ...
-                case "attacks-base":
+                case "attack-base":
                     ...
-                case "attacks-instance":
+                case "attack-instance":
                     ...
-                case "combats-base":
+                case "combat-base":
                     ...
-                case "combats-instance":
+                case "combat-instance":
                     ...
-                case "enemies-base":
+                case "enemy-base":
                     ...
-                case "enemies-instance":
+                case "enemy-instance":
                     ...
-                case "status_effects-base":
+                case "status_effect-base":
                     ...
-                case "status_effects-instance":
+                case "status_effect-instance":
                     ...
                 case "room":
                     ...
                 case "script":
                     ...
                 case _:
-                    raise TypeError("Unknown object type!")
+                    raise TypeError(f"Unknown object type! '{self.data["type"]}'")
     
     def rebuild(self):
         self.surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)

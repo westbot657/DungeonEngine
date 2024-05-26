@@ -100,9 +100,14 @@ class ConstructionCanvas(UIElement):
         # =============================
         
         self.zoom_indicator = Slider(self.width - 110, 10, 100, 0, 0.75/(3-0.25), draggable=False)
-        self.zoom_display = Text(self.width - 180, 5, 1, f"100.00%", text_bg_color=None)
+        self.zoom_display = Text(self.width - 180, 5, 1, "100.00%", text_bg_color=None)
         self.zoom_delay = 0
         self.zoom_transition = 0
+        
+        self.coordinate_x_display = Text(self.zoom_display.x - 200, 5, 100, "X: 0", text_bg_color=None)
+        self.coordinate_y_display = Text(self.zoom_display.x - 100, 5, 100, "Y: 0", text_bg_color=None)
+        self.coord_delay = 0
+        self.coord_transition = 0
     
     def setOffset(self, x, y, deltaTime, end_func=None):
         if self.gotoF is not None:
@@ -173,6 +178,8 @@ class ConstructionCanvas(UIElement):
     def _update_layout(self, editor):
         self.zoom_indicator.x = self.width - 110
         self.zoom_display.x = self.width - 180
+        self.coordinate_x_display.x = self.width-380
+        self.coordinate_y_display.x = self.width-280
     
     def _event(self, editor, X, Y):
         mx, my = editor.mouse_pos
@@ -230,11 +237,24 @@ class ConstructionCanvas(UIElement):
             self.offsetX = (dx - mx) / self.scale
             self.offsetY = (dy - my) / self.scale
         
+        if self.panning or self.targetX is not None:
+            self.coord_delay = self.coord_transition = time.time()
+            self.coordinate_x_display.set_text(f"X: {int(self.offsetX)}")
+            self.coordinate_y_display.set_text(f"Y: {int(self.offsetY)}")
+            self.coordinate_x_display._event(editor, 0, 0)
+            self.coordinate_y_display._event(editor, 0, 0)
+        
         if self.zoom_transition:
             if time.time() > self.zoom_delay+1:
                 self.zoom_delay = 0
             if time.time() > self.zoom_transition+2:
                 self.zoom_transition = 0
+        
+        if self.coord_transition:
+            if time.time() > self.coord_delay+1:
+                self.coord_delay = 0
+            if time.time() > self.coord_transition+2:
+                self.coord_transition = 0
 
     def rebuild(self):
         self.screen = pygame.Surface((self.width/self.scale, self.height/self.scale), pygame.SRCALPHA, 32)
@@ -284,5 +304,15 @@ class ConstructionCanvas(UIElement):
                 # print(f"sliding {percent}")
                 self.zoom_display._update(editor, X+self.x, Y+self.y - (100 * percent))
                 self.zoom_indicator._update(editor, X+self.x, Y+self.y - (100 * percent))
+        
+        if self.coord_transition:
+            if time.time() < self.coord_delay+1:
+                self.coordinate_x_display._update(editor, X+self.x, Y+self.y)
+                self.coordinate_y_display._update(editor, X+self.x, Y+self.y)
+            else:
+                percent = time.time() - self.coord_transition-1
+                self.coordinate_x_display._update(editor, X+self.x, Y+self.y - (100 * percent))
+                self.coordinate_y_display._update(editor, X+self.x, Y+self.y - (100 * percent))
+        
                 
 

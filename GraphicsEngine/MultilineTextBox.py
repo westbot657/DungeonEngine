@@ -336,7 +336,7 @@ class MultilineTextBox(UIElement):
         _x, _y = editor.mouse_pos
         # print(X+self.x, Y+self.y, w, h, _x, _y)
         #if max(editor.X, X + self.x) <= _x <= min(X + self.x + w, editor.Width) and max(editor.Y, Y + self.y) <= _y <= min(Y + self.y + h, editor.Height):
-        if editor.collides((_x, _y), (X+self.x, Y+self.y, w, h)):
+        if editor.collides((_x, _y), (self.x, self.y, w, h)):
             if editor._hovering is None:
                 self.hovered = editor._hovered = True
                 editor._hovering = self

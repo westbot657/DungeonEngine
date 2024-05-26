@@ -289,7 +289,7 @@ class AttributePanel(UIElement):
         if self.visible:
         
             for child in self.children[::-1]:
-                child._event(editor, X+self.x, Y+self.y)
+                child._event(editor, self.x, self.y)
 
             if self.glowing:
                 if self.glow_time == 0:
@@ -297,7 +297,7 @@ class AttributePanel(UIElement):
                 elif time.time() >= self.glow_time > 0:
                     self.glow_time = 0
 
-            if editor.collides(editor.mouse_pos, (X+self.x, Y+self.y, self.width, self.height)):
+            if editor.collides(editor.mouse_pos, (self.x, self.y, self.width, self.height)):
                 if editor._hovering is None:
                     self.hovered = editor._hovered = True
                     editor._hovering = self
@@ -306,7 +306,7 @@ class AttributePanel(UIElement):
                 self.border_hovered = False
                 
             if self.hovered:
-                if not editor.collides(editor.mouse_pos, (X+self.x+5, Y+self.y+5, self.width-10, self.height-10)):
+                if not editor.collides(editor.mouse_pos, (self.x+5, self.y+5, self.width-10, self.height-10)):
                     self.border_hovered = True
                 else:
                     self.border_hovered = False

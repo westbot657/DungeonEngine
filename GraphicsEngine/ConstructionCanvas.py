@@ -150,10 +150,8 @@ class ConstructionCanvas(UIElement):
     def collides(self, mouse, rect) -> bool:
         mx, my = mouse
         x, y, w, h = rect
-        #print("Scrollable: v")
-        if self.canvas._editor.collides(self.editor.mouse_pos, (self.x, self.y, self.width, self.height)):
-            #print(f"Scrollable: \033[38;2;20;200;20m{mouse} \033[38;2;200;200;20m{rect}\033[0m")
-            if x <= (mx-self.offsetX) < x + w and y <= (my-self.offsetY) < y + h:
+        if self.editor.collides(self.editor.mouse_pos, (self.x, self.y, self.width, self.height)):
+            if x <= (mx) < x + w and y <= (my) < y + h:
                 return True
 
         return False

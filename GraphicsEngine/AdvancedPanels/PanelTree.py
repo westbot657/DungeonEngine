@@ -50,8 +50,7 @@ class PanelTree(UIElement):
         
     def _update_layout(self, editor):
         self.screen = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
-        
-    
+
     def _event(self, editor, X, Y):
         self._y = 0
         mx, my = editor.mouse_pos
@@ -74,8 +73,7 @@ class PanelTree(UIElement):
                 last = obj
             
         self.content_height = self._y-((last.effective_height)+5 if last else 0)
-        
-    
+
     def _update(self, editor, X, Y):
         y = 0
         

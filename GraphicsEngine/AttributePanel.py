@@ -118,8 +118,8 @@ class AttributePanel(UIElement):
             match self.data["type"]:
                 case "weapon-base":
                     
-                    # id_textbox = CursorFocusTextBox(11, 6, 200, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
-                    id_textbox = MultilineTextBox(11, 6, 200, 19, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR, single_line=True)
+                    id_textbox = CursorFocusTextBox(11, 6, 280, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
+                    # id_textbox = MultilineTextBox(11, 6, 200, 19, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR, single_line=True)
                     
                     self.children = [
                         id_textbox

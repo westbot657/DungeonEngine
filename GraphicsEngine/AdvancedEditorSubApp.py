@@ -202,19 +202,19 @@ class AdvancedEditorSubApp(UIElement):
         t.daemon = True
         t.start()
     
-    def create_stashed_panel(self, category, size:tuple[int, int], label:str, bordered=False, tags=None, shelf_panel_height=35, panel_data=None):
-        panel = self.create_panel(category, (0, 0, size[0], size[1]), label, bordered, tags, shelf_panel_height, panel_data)
+    def create_stashed_panel(self, category, size:tuple[int, int], label:str, id:str, bordered=False, tags=None, shelf_panel_height=35, panel_data=None):
+        panel = self.create_panel(category, (0, 0, size[0], size[1]), label, id, bordered, tags, shelf_panel_height, panel_data)
         shelf_panel = self.object_tree.tree[-1]
         placer = PanelPlacer(shelf_panel)
         shelf_panel.placer = shelf_panel._placer = placer
     
-    def create_panel(self, category, rect:tuple[int, int, int, int], label, bordered=False, tags=None, shelf_panel_height=35, panel_data=None) -> AttributePanel:
-        attr_panel = AttributePanel(self, *rect, bordered=bordered, data=panel_data)
-        self.create_shelf_panel(category, attr_panel, label, tags, shelf_panel_height)
+    def create_panel(self, category, rect:tuple[int, int, int, int], label, id, bordered=False, tags=None, shelf_panel_height=35, panel_data=None) -> AttributePanel:
+        attr_panel = AttributePanel(self.construction_canvas.canvas, self, *rect, bordered=bordered, data=panel_data)
+        self.create_shelf_panel(category, attr_panel, label, id, tags, shelf_panel_height)
         return attr_panel
     
-    def create_shelf_panel(self, category, attribute_panel, label, tags=None, height=35):
-        shelf_panel = ShelfPanel(340, height, label, category, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas, tags)
+    def create_shelf_panel(self, category, attribute_panel, label, id, tags=None, height=35):
+        shelf_panel = ShelfPanel(340, height, label, id, category, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas, tags)
         attribute_panel.shelf_panel = shelf_panel
         self.object_tree.tree.append(shelf_panel)
     

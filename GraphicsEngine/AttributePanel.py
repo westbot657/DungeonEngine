@@ -3,6 +3,8 @@
 from UIElement import UIElement
 from Options import PATH, TEXT_BG2_COLOR
 from RenderPrimitives import Image
+from CursorFocusTextBox import CursorFocusTextBox
+from MultilineTextBox import MultilineTextBox
 
 import pygame
 import time
@@ -87,7 +89,7 @@ class AttributePanel(UIElement):
         }
     }
 
-    def __init__(self, parent, x:int, y:int, width:int, height:int, bordered:bool, bg_color=TEXT_BG2_COLOR, data=None):
+    def __init__(self, editor, parent, x:int, y:int, width:int, height:int, bordered:bool, bg_color=TEXT_BG2_COLOR, data=None):
         self.parent = parent
         self.x = x
         self.y = y
@@ -105,9 +107,9 @@ class AttributePanel(UIElement):
         self.border_hovered = False
         self.shelf_panel = None
         self.rebuild()
-        self.build_data()
+        self.build_data(editor)
 
-    def build_data(self):
+    def build_data(self, editor):
         
         if not self.data: return
         
@@ -115,7 +117,14 @@ class AttributePanel(UIElement):
         if "type" in self.data:
             match self.data["type"]:
                 case "weapon-base":
-                    ...
+                    
+                    # id_textbox = CursorFocusTextBox(11, 6, 200, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
+                    id_textbox = MultilineTextBox(11, 6, 200, 19, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR, single_line=True)
+                    
+                    self.children = [
+                        id_textbox
+                    ]
+                    
                 case "weapon-instance":
                     ...
                 case "armor-base":

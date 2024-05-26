@@ -402,10 +402,10 @@ class VisualLoader:
             category = cls._category_map.get(cat, cat)
             panel_data = {"ref": ref, "type": f"{category}-base"}
             if config[id] == "stashed":
-                aesa.create_stashed_panel(category, (300, 400), ref.get("name", id), True, ref.get("keywords"), panel_data=panel_data)
+                aesa.create_stashed_panel(category, (300, 400), ref.get("name", id), id, True, ref.get("keywords", []) + [dungeon_id], panel_data=panel_data)
             
             else:
-                aesa.create_panel(category, (config[id][0], config[id][1], 300, 400), ref.get("name", id), True, ref.get("keywords"), panel_data=panel_data)
+                aesa.create_panel(category, (config[id][0], config[id][1], 300, 400), ref.get("name", id), id, True, ref.get("keywords", []) + [dungeon_id], panel_data=panel_data)
 
         toasts.toast(f"Panels loaded!" + (f"\n{len(missing)} object{'s have' if len(missing) > 1 else " has"} broken or unloaded references." if missing else ""))
 

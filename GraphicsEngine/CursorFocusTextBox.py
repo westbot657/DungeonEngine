@@ -72,6 +72,7 @@ class CursorFocusTextBox(UIElement):
         self.last_Y = Y
     
     def _event(self, editor, X, Y):
+        self.editor = editor
         self.override_values(X, Y)
         
         self.text_box._event(self._canvas, self.offsetX, 0)
@@ -94,8 +95,7 @@ class CursorFocusTextBox(UIElement):
             if cursor_x > rightX - (self.text_box._width*2):
                 dx = (rightX - (self.text_box._width*2)) - cursor_x
                 self.offsetX = min(self.offsetX + dx, self.text_box._text_width)
-            
-    
+
     def _update(self, editor, X, Y):
         self.screen.fill((0, 0, 0, 0))
         self.text_box._update(self._canvas, self.offsetX, 0)

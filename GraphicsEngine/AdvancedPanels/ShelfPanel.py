@@ -6,6 +6,7 @@ from AttributePanel import AttributePanel
 from MultilineTextBox import MultilineTextBox
 from Options import PATH, TEXT_COLOR, TEXT_BG_COLOR, TEXT_BG3_COLOR, TEXT_SIZE
 from CursorFocusTextBox import CursorFocusTextBox
+from Text import Text
 
 import time
 
@@ -27,7 +28,7 @@ class ShelfPanel(UIElement):
         Image(f"{PATH}/advanced_editor/panel_ellipsis_menu_hovered.png", 0, 0, 33, 33),
     )
     
-    def __init__(self, width, height, label, category, attr_panel, canvas, editor, tags:list|None=None):
+    def __init__(self, width, height, label, id, category, attr_panel, canvas, editor, tags:list|None=None):
         self.x = 0
         self.y = 0
         self.width = width
@@ -39,11 +40,18 @@ class ShelfPanel(UIElement):
         self.effective_height = height
         self.canvas = canvas
         self.editor = editor
-        self.panel = AttributePanel(None, 0, 0, width, height, False, TEXT_BG_COLOR)
+        self.panel = AttributePanel(editor, None, 0, 0, width, height, False, TEXT_BG_COLOR)
         self.panel.texture_scale = 1
         self.panel.rebuild()
-        self.label_text_box = CursorFocusTextBox(12, 9, 150, TEXT_SIZE+4, editor, "enter label...", content=label)
+        self.label_text_box = CursorFocusTextBox(12, 4, 150, TEXT_SIZE+4, editor, "enter label...", content=label)
+        
+        self.label_offset = [12, 15]
         # self.label_text_box.collides = self.collide_override
+        
+        self.id_offset = [12, 2]
+        
+        self.id_display = Text(0, 0, 1, id, TEXT_BG3_COLOR, None, 11)
+        
         self.label_text_box.on_enter(self.set_label)
         self.visibility_button = Button(self.width-68, (height-33)/2, 33, 33, "", self.visibility_frames[2], hover_color=self.visibility_frames[3], click_color=self.visibility_frames[3])
         self.visibility_button.on_left_click = self.visibility_toggle
@@ -97,8 +105,14 @@ class ShelfPanel(UIElement):
         
         # update
         self.panel._update(editor, X, Y)
-        self.label_text_box.x = self.x+12
-        self.label_text_box.y = self.y+9
+        self.label_text_box.x = self.x+self.label_offset[0]
+        self.label_text_box.y = self.y+self.label_offset[1]
+        
+        self.id_display.x = self.x+self.id_offset[0]
+        self.id_display.y = self.y+self.id_offset[1]
+        
+        self.id_display._update(editor, 0, 0)
+        
         self.label_text_box._update(editor, 0, 0)
         if self.placer is not None:
             self.placer._update(editor, X+self.placer_offset[0], Y+self.placer_offset[1])

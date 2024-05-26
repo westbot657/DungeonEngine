@@ -1,7 +1,7 @@
 # pylint: disable=[W,R,C, no-member, import-error]
 
 from UIElement import UIElement
-from Options import PATH, TEXT_BG2_COLOR
+from Options import PATH, TEXT_BG2_COLOR, TEXT_BG3_COLOR
 from RenderPrimitives import Image
 from CursorFocusTextBox import CursorFocusTextBox
 from MultilineTextBox import MultilineTextBox
@@ -109,6 +109,22 @@ class AttributePanel(UIElement):
         self.rebuild()
         self.build_data(editor)
 
+    def build_common(self, editor):
+        
+        id_textbox = CursorFocusTextBox(10, 6, 280, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
+        name_textbox = CursorFocusTextBox(10, 30, 280, 25, editor, shadow_text="name...", text_size=20, content=self.data["ref"].get("name"), text_bg_color=TEXT_BG2_COLOR)
+        
+        if self.data["ref"].locked:
+            id_textbox.text_box.allow_typing = False
+            name_textbox.text_box.allow_typing = False
+            id_textbox.set_text_color(TEXT_BG3_COLOR)
+            name_textbox.set_text_color(TEXT_BG3_COLOR)
+        
+        self.children = [
+            id_textbox,
+            name_textbox
+        ]
+
     def build_data(self, editor):
         
         if not self.data: return
@@ -117,30 +133,24 @@ class AttributePanel(UIElement):
         if "type" in self.data:
             match self.data["type"]:
                 case "weapon-base":
-                    
-                    id_textbox = CursorFocusTextBox(11, 6, 280, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
-                    # id_textbox = MultilineTextBox(11, 6, 200, 19, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR, single_line=True)
-                    
-                    self.children = [
-                        id_textbox
-                    ]
+                    self.build_common(editor)
                     
                 case "weapon-instance":
                     ...
                 case "armor-base":
-                    ...
+                    self.build_common(editor)
                 case "armor-instance":
                     ...
                 case "ammo-base":
-                    ...
+                    self.build_common(editor)
                 case "ammo-instance":
                     ...
                 case "tool-base":
-                    ...
+                    self.build_common(editor)
                 case "tool-instance":
                     ...
                 case "item-base":
-                    ...
+                    self.build_common(editor)
                 case "item-instance":
                     ...
                 case "attack-base":

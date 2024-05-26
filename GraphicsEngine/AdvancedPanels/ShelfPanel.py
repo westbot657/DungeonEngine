@@ -28,7 +28,7 @@ class ShelfPanel(UIElement):
         Image(f"{PATH}/advanced_editor/panel_ellipsis_menu_hovered.png", 0, 0, 33, 33),
     )
     
-    def __init__(self, width, height, label, id, category, attr_panel, canvas, editor, tags:list|None=None):
+    def __init__(self, width, height, label, id, category, attr_panel, canvas, editor, tags:list|None=None, locked=False):
         self.x = 0
         self.y = 0
         self.width = width
@@ -44,6 +44,9 @@ class ShelfPanel(UIElement):
         self.panel.texture_scale = 1
         self.panel.rebuild()
         self.label_text_box = CursorFocusTextBox(12, 4, 150, TEXT_SIZE+4, editor, "enter label...", content=label)
+        if locked:
+            self.label_text_box.text_box.allow_typing = False
+            self.label_text_box.set_text_color(TEXT_BG3_COLOR)
         
         self.label_offset = [12, 15]
         # self.label_text_box.collides = self.collide_override

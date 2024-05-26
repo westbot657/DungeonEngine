@@ -62,10 +62,11 @@ class MultilineTextBox(UIElement):
 
         self._history_triggers = " \n:.,/;'\"[]{}-=_+<>?|\\~`!@#$%^&*()"
 
+        self.allow_typing = True
 
     def set_text_color(self, color):
         self.text_color = Color.color(color)
-        self._refresh_surfaces()
+        self.refresh_surfaces()
 
     def save_history(self):
         content = self.get_content()
@@ -460,6 +461,15 @@ class MultilineTextBox(UIElement):
                     elif self._text_selection_start and self._text_selection_end:
                         self.cursor_location = min(self._text_selection_start, self._text_selection_end)
                         self._text_selection_start = self._text_selection_end = None
+                elif key == "\x03": # CTRL+C
+                    if (self._text_selection_start is not None) and (self._text_selection_end is not None):
+                        pyperclip.copy(self.get_selection())
+                elif key == "\x01": # CTRL+A
+                    self._text_selection_start = Cursor(0, 0)
+                    self._text_selection_end = Cursor(len(self._lines)-1, len(self._lines[-1]))
+                    self.refresh_highlight()
+                elif not self.allow_typing:
+                    continue
                 elif key in "\n\r":
                     if self.single_line:
                         self._on_enter(self)
@@ -499,7 +509,6 @@ class MultilineTextBox(UIElement):
                             self._lines[self.cursor_location.line-1] += self._lines.pop(self.cursor_location.line)
                             self.cursor_location.line -= 1
                             self.save_history()
-                    
                 elif key == "\x7f": # delete
                     if self.get_selection():
                         self.set_selection("")
@@ -529,9 +538,6 @@ class MultilineTextBox(UIElement):
                         pyperclip.copy(self.get_selection())
                         self.set_selection("")
                         self.save_history()
-                elif key == "\x03": # CTRL+C
-                    if (self._text_selection_start is not None) and (self._text_selection_end is not None):
-                        pyperclip.copy(self.get_selection())
                 elif key == "\x16": # CTRL+V
                     if self.get_selection():
                         self.set_selection("")
@@ -561,10 +567,6 @@ class MultilineTextBox(UIElement):
                     self.refresh_lines()
                     self.cursor_location.col += len(l[-1])
                     self.save_history()
-                elif key == "\x01": # CTRL+A
-                    self._text_selection_start = Cursor(0, 0)
-                    self._text_selection_end = Cursor(len(self._lines)-1, len(self._lines[-1]))
-                    self.refresh_highlight()
                 elif key == "\x13": # CTRL+S
                     content = self.get_content()
                     cursor = self.cursor_location.copy()

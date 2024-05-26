@@ -210,11 +210,11 @@ class AdvancedEditorSubApp(UIElement):
     
     def create_panel(self, category, rect:tuple[int, int, int, int], label, id, bordered=False, tags=None, shelf_panel_height=35, panel_data=None) -> AttributePanel:
         attr_panel = AttributePanel(self.construction_canvas.canvas, self, *rect, bordered=bordered, data=panel_data)
-        self.create_shelf_panel(category, attr_panel, label, id, tags, shelf_panel_height)
+        self.create_shelf_panel(category, attr_panel, label, id, tags, shelf_panel_height, panel_data)
         return attr_panel
     
-    def create_shelf_panel(self, category, attribute_panel, label, id, tags=None, height=35):
-        shelf_panel = ShelfPanel(340, height, label, id, category, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas, tags)
+    def create_shelf_panel(self, category, attribute_panel, label, id, tags=None, height=35, panel_data=None):
+        shelf_panel = ShelfPanel(340, height, label, id, category, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas, tags, panel_data["ref"].locked)
         attribute_panel.shelf_panel = shelf_panel
         self.object_tree.tree.append(shelf_panel)
     

@@ -228,27 +228,75 @@ class AdvancedEditorSubApp(UIElement):
         x = (mx-(panel.width/2)) + 50
         y = (my-(panel.height/2)) + 50
         
-        panel.x = (100*(x//100))
-        panel.y = (100*(y//100))
+        x = (100*(x//100))
+        y = (100*(y//100))
+        
+        panel.x = panel._x = x
+        panel.y = panel._y = y
         
         panel.set_glow(0.75)
         editor.sound_system.get_audio("AESA_thud", "editor").play()
         
         self.visibility_groups[shelf.category].append(panel)
+        
+        def redo():
+            panel.x = panel._x = x
+            panel.y = panel._y = y
+            panel.set_glow(0.75)
+            self.visibility_groups[shelf.category].append(panel)
+            shelf.placer = None
+        
+        def undo():
+            self.visibility_groups[shelf.category].remove(panel)
+            shelf.placer = shelf._placer
+        
+        editor.add_history(redo, undo, "Placed Attribute Panel")
     
     def attribute_panel_acceptor(self, attr_panel, editor):
         mx, my = self.construction_canvas.get_relative_mouse(*editor.mouse_pos)
         
-        attr_panel.x = (100*((mx - (editor.hold_offset[0])+50)//100))
-        attr_panel.y = (100*((my - (editor.hold_offset[1])+50)//100))
+        x = (100*((mx - (editor.hold_offset[0])+50)//100))
+        y = (100*((my - (editor.hold_offset[1])+50)//100))
+        
+        _x = attr_panel._x
+        _y = attr_panel._y
+        
+        attr_panel.x = attr_panel._x = x
+        attr_panel.y = attr_panel._y = y
         
         self.visibility_groups[attr_panel.shelf_panel.category].append(attr_panel)
         editor.sound_system.get_audio("AESA_thud", "editor").play()
         
+        def redo():
+            attr_panel.x = attr_panel._x = x
+            attr_panel.y = attr_panel._y = y
+        
+        def undo():
+            attr_panel.x = attr_panel._x = _x
+            attr_panel.y = attr_panel._y = _y
+        
+        editor.add_history(redo, undo, "Moved Attribute Panel")
+        
     
     def attribute_panel_acceptor_2(self, attr_panel, editor):
+        x = attr_panel._x
+        y = attr_panel._y
+        
         attr_panel.shelf_panel.placer = attr_panel.shelf_panel._placer
         self.editor.sound_system.get_audio("AESA_drop", "editor").play()
+        
+        
+        def redo():
+            self.visibility_groups[attr_panel.shelf_panel.category].remove(attr_panel)
+            attr_panel.shelf_panel.placer = attr_panel.shelf_panel._placer
+            
+        def undo():
+            attr_panel.x = attr_panel._x = x
+            attr_panel.y = attr_panel._y = y
+            attr_panel.shelf_panel.placer = None
+            self.visibility_groups[attr_panel.shelf_panel.category].append(attr_panel)
+        
+        editor.add_history(redo, undo, "Stashed Attribute Panel")
 
     def attr_cell_acceptor(self, cell, editor):
         slot = cell.slot

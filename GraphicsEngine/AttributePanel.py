@@ -93,8 +93,8 @@ class AttributePanel(UIElement):
 
     def __init__(self, editor, parent, x:int, y:int, width:int, height:int, bordered:bool, bg_color=TEXT_BG2_COLOR, data=None):
         self.parent = parent
-        self.x = x
-        self.y = y
+        self.x = self._x = x
+        self.y = self._y = y
         self.width = self._width = width
         self.height = self._height = height
         self.children = []
@@ -350,6 +350,8 @@ class AttributePanel(UIElement):
                     editor.holding = True
                     editor.held = self
                     editor.hold_offset = (editor.mouse_pos[0]-self.x, editor.mouse_pos[1]-self.y)
+                    # self._x = self.x
+                    # self._y = self.y
                     self.x = 0
                     self.y = 0
 

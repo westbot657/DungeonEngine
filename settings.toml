@@ -4,4 +4,5 @@
 game_volume = 100%
 
 [Editor Settings]
+editor_history_limit = 200
 editor_volume = 35%

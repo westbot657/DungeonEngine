@@ -22,6 +22,7 @@ class SettingsApp(UIElement):
             "game_volume": 1
         },
         "Editor Settings": {
+            "editor_history_limit": 200,
             "editor_volume": 0.35
         }
     }
@@ -70,6 +71,9 @@ class SettingsApp(UIElement):
         
         ### XXX Editor Settings XXX ###
         
+        self.editor.history_limit = int(self.config["Editor Settings"]["editor_history_limit"])
+        self.editor_history_limit_textbox.set_content(str(self.editor.history_limit))
+        
         editor_vol = self.config["Editor Settings"]["editor_volume"]
         self.editor_volume_slider.set_percent(editor_vol)
         self.editor_volume_text_box.set_content(str(int(editor_vol*100)))
@@ -77,6 +81,7 @@ class SettingsApp(UIElement):
     def save_component_values(self):
         
         ### XXX Editor Settings XXX ###
+        self.config["Editor Settings"]["editor_history_limit"] = int(float(self.editor_history_limit_textbox.get_content()))
         self.config["Editor Settings"]["editor_volume"] = self.editor_volume_slider.get_percent()
 
     def reset_config(self, *_, **__):
@@ -156,6 +161,14 @@ class SettingsApp(UIElement):
         y_offset += self.editor_settings_label.height + 20
         ### XXX Editor Settings XXX ###
         
+        self.editor.history_limit = self.config["Editor Settings"]["editor_history_limit"]
+        self.editor_history_limit_label = Text(20, y_offset, 1, "Undo/Redo History Limit", text_size=20)
+        self.children.append(self.editor_history_limit_label)
+        self.editor_history_limit_textbox = MultilineTextBox(self.editor_history_limit_label.width + 70, y_offset, 100, 20, content=str(self.editor.history_limit), text_size=20, single_line=True)
+        self.editor_history_limit_textbox.char_whitelist = [c for c in "1234567890"]
+        
+        self.children.append(self.editor_history_limit_textbox)
+        y_offset += 35
         
         editor_vol = self.config["Editor Settings"]["editor_volume"]
         self.editor_volume_label = Text(20, y_offset, 1, "Editor Volume", text_size=20)
@@ -166,7 +179,7 @@ class SettingsApp(UIElement):
         self.editor_volume_text_box.on_enter(self.editor_volume_text_box_enter)
         self.editor_volume_text_box.char_whitelist = [c for c in "1234567890"]
         self.children.append(self.editor_volume_text_box)
-        y_offset += 20
+        y_offset += 35
         
         
         
@@ -199,7 +212,7 @@ class SettingsApp(UIElement):
         self.editor_volume_slider.set_percent(num/100)
 
     def position_objects(self, editor):
-        y_offset = 20
+        # y_offset = 20
         
         self.full_reset_button.x = editor.width - 235
         self.reset_button.x = self.full_reset_button.x - 90
@@ -208,27 +221,29 @@ class SettingsApp(UIElement):
         self.toasts.x = editor.width-355
         self.toasts.y = editor.height-20
         
-        self.general_settings_label.y = y_offset
-        y_offset += self.general_settings_label.height + 20
-        ### XXX General Settigns XXX ###
+        # self.general_settings_label.y = y_offset
+        # y_offset += self.general_settings_label.height + 20
+        # ### XXX General Settigns XXX ###
         
-        y_offset += 300
-        
-        
-        self.game_settings_label.y = y_offset
-        y_offset += self.game_settings_label.height + 20
-        ### XXX Game Settings XXX ###
-        
-        y_offset += 300
-        
-        self.editor_settings_label.y = y_offset
-        y_offset += self.editor_settings_label.height + 20
-        ### XXX Editor Settings XXX ###
-        
-        y_offset += 300
+        # y_offset += 300
         
         
-        self.total_scroll = max(0, min(y_offset, self.height)-self.height/2)
+        # self.game_settings_label.y = y_offset
+        # y_offset += self.game_settings_label.height + 20
+        # ### XXX Game Settings XXX ###
+        
+        # y_offset += 300
+        
+        # self.editor_settings_label.y = y_offset
+        # y_offset += self.editor_settings_label.height + 20
+        # ### XXX Editor Settings XXX ###
+        
+        # y_offset += 50
+        
+        # y_offset += 300
+        
+        
+        # self.total_scroll = max(0, min(y_offset, self.height)-self.height/2)
         self.width = editor.width
         self.height = editor.height
 

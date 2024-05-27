@@ -75,6 +75,32 @@ class Editor:
         self.keys = []
         self.typing = []
         self._do_layout_update = True
+        
+        self.history = []
+        self.future = []
+        self.history_limit = 200
+    
+    def add_history(self, action_made, inverse_action, description:str):
+        self.history.append((action_made, inverse_action, description))
+        self.future.clear()
+        
+        while len(self.history) > self.history_limit:
+            self.history.pop(0)
+    
+    def set_history_limit(self, limit):
+        self.history_limit = limit
+    
+    def undo(self):
+        if self.history:
+            event = self.history.pop(-1)
+            event[1]()
+            self.future.append(event)
+    
+    def redo(self):
+        if self.future:
+            event = self.future.pop(-1)
+            event[0]()
+            self.history.append(event)
 
     def accept_drop(self, priority, drop_handler):
         self.drop_acceptors.update({priority: drop_handler})

@@ -73,6 +73,8 @@ class PanelTree(UIElement):
                 last = obj
             
         self.content_height = self._y-((last.effective_height)+5 if last else 0)
+        
+        self.offsetY = min(max(-self.content_height, self.offsetY), 0)
 
     def _update(self, editor, X, Y):
         y = 0

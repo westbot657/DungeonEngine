@@ -5,6 +5,7 @@ from Toasts import Toasts
 from FunctionalElements import Button
 from RenderPrimitives import Image
 from Options import PATH
+from AdvancedPanels.PanelPlacer import PanelPlacer
 
 from typing import Any
 
@@ -405,7 +406,13 @@ class VisualLoader:
                 aesa.create_stashed_panel(category, (300, 400), ref.get("name", id), id, True, ref.get("keywords", []) + [dungeon_id], panel_data=panel_data)
             
             else:
-                aesa.create_panel(category, (config[id][0], config[id][1], 300, 400), ref.get("name", id), id, True, ref.get("keywords", []) + [dungeon_id], panel_data=panel_data)
+                panel = aesa.create_panel(category, (config[id][0], config[id][1], 300, 400), ref.get("name", id), id, True, ref.get("keywords", []) + [dungeon_id], panel_data=panel_data)
+
+                aesa.visibility_groups[panel.shelf_panel.category].append(panel)
+                
+                shelf_panel = aesa.object_tree.tree[-1]
+                placer = PanelPlacer(shelf_panel)
+                shelf_panel._placer = placer
 
         toasts.toast(f"Panels loaded!" + (f"\n{len(missing)} object{'s have' if len(missing) > 1 else " has"} broken or unloaded references." if missing else ""))
 

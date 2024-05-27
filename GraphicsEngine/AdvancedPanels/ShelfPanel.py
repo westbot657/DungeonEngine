@@ -170,4 +170,6 @@ class ShelfPanel(UIElement):
             
         self.panel._event(editor, self.x, self.y)
         
-
+    def get_collider(self, x, y):
+        t = self.panel.get_collider()
+        return (x, y, t[2], t[3])

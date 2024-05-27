@@ -190,11 +190,15 @@ class ConstructionCanvas(UIElement):
         
         if self.targetX is not None:
             self._handleMove()
+            
+            
+        viewport_rect = pygame.Rect(self.offsetX, self.offsetY, (self.width/self.scale), (self.height/self.scale))
         
         for group, visible in [i for i in self.advanced_editor.visibility_toggled.items()][::-1]:
             if visible:
                 for child in self.advanced_editor.visibility_groups[group][::-1]:
-                    child._event(self.canvas, -self.offsetX, -self.offsetY)
+                    if viewport_rect.colliderect(child.get_collider()):
+                        child._event(self.canvas, -self.offsetX, -self.offsetY)
         
         if editor.collides((mx, my), (self.x, self.y, self.width, self.height)):
             self.canvas_hovered = True
@@ -292,7 +296,7 @@ class ConstructionCanvas(UIElement):
         
         
         sx, sy = self.screen.get_size()
-        editor.screen.blit(pygame.transform.scale(self.screen, (sx*self.scale, sy*self.scale)), (X+self.x, Y+self.y))
+        editor.screen.blit(pygame.transform.smoothscale(self.screen, (sx*self.scale, sy*self.scale)), (X+self.x, Y+self.y))
         
         if self.zoom_transition:
             if time.time() < self.zoom_delay+1:

@@ -4,8 +4,11 @@ from LoadingBar import LoadingBar
 from Toasts import Toasts
 from FunctionalElements import Button
 from RenderPrimitives import Image
-from Options import PATH
+from Options import PATH, TEXT_COLOR, TEXT_BG_COLOR, TEXT_BG2_COLOR, TEXT_BG3_COLOR
 from AdvancedPanels.PanelPlacer import PanelPlacer
+from CursorFocusTextBox import CursorFocusTextBox
+
+from UIElement import UIElement
 
 from typing import Any
 
@@ -15,6 +18,108 @@ import json
 import glob
 import os
 import re
+
+class AttributeCell(UIElement):
+    def __init__(self, editor, value:Any, data_type:str, modifieable:bool=True):
+        self.editor = editor
+        self.value = value
+        
+        self.slot = None
+        
+        self.width = 150
+        self.height = 50
+        self.data_type = data_type
+        self.children = []
+        self.modifieable = modifieable
+        
+        self.configure_value()
+        
+    def configure_value(self):
+        match self.data_type:
+            case "str":
+                ...
+            case "int":
+                ...
+            case "float":
+                ...
+            case "percent":
+                ...
+            case "dict":
+                ...
+            case "list":
+                ...
+            case "ref":
+                self.display = CursorFocusTextBox(3, 2, 170, 18, self.editor, content=self.value.ref_id, text_bg_color=None)
+                self.display.text_box.allow_typing = False
+                self.display.set_text_color(TEXT_BG3_COLOR)
+                self.children.append(self.display)
+                self.width = 180
+                self.height = 24
+        
+    def _event(self, editor, X, Y):
+        
+        for child in self.children[::-1]:
+            child._event(editor, X, Y)
+    
+    def _update(self, editor, X, Y):
+        
+        for child in self.children:
+            child._update(editor, X, Y)
+
+class CellSlot(UIElement):
+    
+    lock_icon = Image(f"{PATH}/advanced_editor/lock.png", 0, 0, 20, 20)
+    
+    def __init__(self, x:int, y:int, width:int, height:int, data_types:list, cell=None, locked=False):
+        self.x = x
+        self.y = y
+        self.width = self._width = width
+        self.height = self._height = height
+        self.data_types = data_types
+        self.cell = cell
+        self.locked = locked
+        self.hovered = False
+    
+    def _event(self, editor, X, Y):
+        
+        if self.cell:
+            self.cell._event(editor, X+self.x, Y+self.y)
+            self.width = self.cell.width
+            self.height = self.cell.height
+        else:
+            self.width = self._width
+            self.height = self._height
+        
+        editor.check_hover(editor, (X+self.x, Y+self.y, self.width, self.height), self)
+    
+    def _update(self, editor, X, Y):
+        dw = min(X+self.x-1, 0)
+        dh = min(Y+self.y-1, 0)
+        dw2 = min(X+self.x, 0)
+        dh2 = min(Y+self.y, 0)
+        if self.locked:
+            editor.screen.fill(TEXT_BG3_COLOR, (X+self.x-1-dw, Y+self.y-1-dh, self.width+dw+2, self.height+dh+2))
+            
+            
+        
+        elif self.hovered:
+            editor.screen.fill((0, 120, 212), (X+self.x-1-dw, Y+self.y-1-dh, self.width+dw+2, self.height+dh+2))
+            
+        else:
+            editor.screen.fill(TEXT_COLOR, (X+self.x-1-dw, Y+self.y-1-dh, self.width+dw+2, self.height+dh+2))
+        
+        if self.cell:
+            editor.screen.fill(TEXT_BG2_COLOR, (X+self.x-dw2, Y+self.y-dh2, self.width+dw2, self.height+dh2))
+        else:
+            editor.screen.fill(TEXT_BG_COLOR, (X+self.x-dw2, Y+self.y-dh2, self.width+dw2, self.height+dh2))
+        
+        if self.locked:
+            self.lock_icon._update(editor, (X+self.x+self.width+2) if self.cell else (X+self.x+(self.width/2)-10), (Y+self.y+(self.height/2))-10)
+        
+        if self.cell:
+            self.cell._update(editor, X+self.x, Y+self.y)
+        
+        
 
 class VisualLoader:
     
@@ -89,8 +194,13 @@ class VisualLoader:
             if data_name in self.data:
                 obj = self.data[data_name]
                 if isinstance(obj, VisualLoader.ObjectReference):
-                    return obj.get()
+                    return obj.get_ref()
                 return obj
+            return default
+
+        def get_raw(self, data_name:str, default=None):
+            if data_name in self.data:
+                return self.data[data_name]
             return default
         
         def set(self, data_name:str, value:Any):
@@ -113,13 +223,13 @@ class VisualLoader:
             return cls._instance
     
         def split(self, *args, **kwargs):
-            return "[unnamed]".split(*args, **kwargs)
+            return "[unspecified]".split(*args, **kwargs)
 
         def __str__(self):
-            return "[unnamed]"
+            return "[unspecified]"
         
         def lower(self):
-            return "[unnamed]"
+            return "[unspecified]"
     
     _refernce_map: dict[str, dict[str, VisualObject]] = {}
         

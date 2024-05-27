@@ -87,7 +87,7 @@ class AdvancedEditorSubApp(UIElement):
         
         self.visibility_types = [
             None,
-            "weapon", "ammo", "armor", "item", None,
+            "weapon", "ammo", "armor", "item", "tool", None,
             "road", "room", None,
             "enemies", "combat", None,
             "script",

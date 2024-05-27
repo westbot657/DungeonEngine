@@ -25,7 +25,7 @@ class CursorFocusTextBox(UIElement):
         self.mouse_pos = [0, 0]
         self.screen = pygame.Surface((width, height), pygame.SRCALPHA, 32)
         self._canvas = ConstructionCanvas._Canvas(editor, self)
-        self.shadow_text_obj = Text(4, 0, 1, self.shadow_text, text_color=TEXT_BG3_COLOR)
+        self.shadow_text_obj = Text(4, 0, 1, self.shadow_text, text_color=TEXT_BG3_COLOR, text_size=self.text_box.text_size, text_bg_color=self.text_box.text_bg_color)
         self.offsetX = 0
         self.last_X = 0
         self.last_Y = 0

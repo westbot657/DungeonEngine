@@ -64,10 +64,13 @@ class PanelTree(UIElement):
         
         self._search = self.get_search().lower()
         
+        viewport_rect = pygame.Rect(0, -self.offsetY, self.width, self.height)
+        
         last = None
         for obj in self.tree:
             if (self._search in obj.label.lower()) or any(tag.startswith(self._search) for tag in obj.tags):
-                obj._event(self._canvas, 5, self._y + self.offsetY)
+                if viewport_rect.colliderect(obj.get_collider(0, self._y)):
+                    obj._event(self._canvas, 5, self._y + self.offsetY)
                 # self.mouse_pos[1] -= obj.effective_height+5
                 self._y += obj.effective_height + 5
                 last = obj
@@ -81,11 +84,14 @@ class PanelTree(UIElement):
         
         self.screen.fill((0, 0, 0, 0))
         
+        viewport_rect = pygame.Rect(0, -self.offsetY, self.width, self.height)
+        
+        
         for obj in self.tree:
             if (self._search in obj.label.lower()) or any(tag.startswith(self._search) for tag in obj.tags):
                 # self.mouse_pos[1] += obj.effective_height+5
-                
-                obj._update(self._canvas, 5, y+self.offsetY)
+                if viewport_rect.colliderect(obj.get_collider(0, y)):
+                    obj._update(self._canvas, 5, y+self.offsetY)
                 y += obj.effective_height + 5
         editor.screen.blit(self.screen, (self.x, self.y))
     

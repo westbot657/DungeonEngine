@@ -5,6 +5,8 @@ from Options import PATH, TEXT_BG2_COLOR, TEXT_BG3_COLOR
 from RenderPrimitives import Image
 from CursorFocusTextBox import CursorFocusTextBox
 from MultilineTextBox import MultilineTextBox
+from Text import Text
+from VisualLoader import VisualLoader, AttributeCell, CellSlot
 
 import pygame
 import time
@@ -111,18 +113,34 @@ class AttributePanel(UIElement):
 
     def build_common(self, editor):
         
-        id_textbox = CursorFocusTextBox(10, 6, 280, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
-        name_textbox = CursorFocusTextBox(10, 30, 280, 25, editor, shadow_text="name...", text_size=20, content=self.data["ref"].get("name"), text_bg_color=TEXT_BG2_COLOR)
+        locked = self.data["ref"].locked
         
-        if self.data["ref"].locked:
+        id_textbox = CursorFocusTextBox(10, 6, 280, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
+        n = self.data["ref"].get("name")
+        name_textbox = CursorFocusTextBox(10, 30, 280, 25, editor, shadow_text="[unnamed]" if locked else "name...", text_size=20, content=(n if isinstance(n, str) else ""), text_bg_color=TEXT_BG2_COLOR)
+        
+        parent_label = Text(15, 63, 1, "parent: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+        
+        parent = self.data["ref"].get_raw("parent", None)
+        if isinstance(parent, VisualLoader.ObjectReference):
+            parent_cell = AttributeCell(editor, parent, "ref", False)
+        else:
+            parent_cell = None
+        
+        parent_data_cell = CellSlot(15+parent_label.width, 60, 180, 24, ["ref"], parent_cell, locked)
+        
+        if locked:
             id_textbox.text_box.allow_typing = False
             name_textbox.text_box.allow_typing = False
+            
             id_textbox.set_text_color(TEXT_BG3_COLOR)
             name_textbox.set_text_color(TEXT_BG3_COLOR)
         
         self.children = [
             id_textbox,
-            name_textbox
+            name_textbox,
+            parent_label,
+            parent_data_cell
         ]
 
     def build_data(self, editor):
@@ -134,6 +152,8 @@ class AttributePanel(UIElement):
             match self.data["type"]:
                 case "weapon-base":
                     self.build_common(editor)
+                    
+                    
                     
                 case "weapon-instance":
                     ...

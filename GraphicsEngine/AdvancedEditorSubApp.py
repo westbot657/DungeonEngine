@@ -299,6 +299,8 @@ class AdvancedEditorSubApp(UIElement):
         editor.add_history(redo, undo, "Stashed Attribute Panel")
 
     def attr_cell_acceptor(self, cell, editor):
+        if cell.new_ref: return
+        
         slot = cell.slot
         def redo():
             # print(f"set None as cell of slot '{slot}'")

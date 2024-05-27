@@ -127,7 +127,9 @@ class AttributePanel(UIElement):
         else:
             parent_cell = None
         
-        parent_data_cell = CellSlot(15+parent_label.width, 60, 180, 24, ["ref"], parent_cell, locked)
+        parent_data_cell = CellSlot(15+parent_label.width, 60, 180, 24, ["ref"], parent_cell, locked, ignored_values=[self.data["ref"].uid])
+        
+        reference_generator = CellSlot(15, 365, 132, 20, None, self.data["ref"].uid, False, True)
         
         if locked:
             id_textbox.text_box.allow_typing = False
@@ -140,7 +142,9 @@ class AttributePanel(UIElement):
             id_textbox,
             name_textbox,
             parent_label,
-            parent_data_cell
+            parent_data_cell,
+            
+            reference_generator
         ]
 
     def build_data(self, editor):

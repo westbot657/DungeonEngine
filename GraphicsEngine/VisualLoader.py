@@ -7,6 +7,7 @@ from RenderPrimitives import Image
 from Options import PATH, TEXT_COLOR, TEXT_BG_COLOR, TEXT_BG2_COLOR, TEXT_BG3_COLOR
 from AdvancedPanels.PanelPlacer import PanelPlacer
 from CursorFocusTextBox import CursorFocusTextBox
+from Text import Text
 
 from UIElement import UIElement
 
@@ -20,7 +21,7 @@ import os
 import re
 
 class AttributeCell(UIElement):
-    def __init__(self, editor, value:Any, data_type:str, modifieable:bool=True):
+    def __init__(self, editor, value:Any, data_type:str, modifieable:bool=True, new_ref=False):
         self.editor = editor
         self.value = value
         
@@ -31,8 +32,16 @@ class AttributeCell(UIElement):
         self.data_type = data_type
         self.children = []
         self.modifieable = modifieable
+        self.new_ref = new_ref
         
         self.configure_value()
+        
+    def get_value(self):
+        match self.data_type:
+            case "ref":
+                return self.value.ref_id
+            case _:
+                return self.value
         
     def configure_value(self):
         match self.data_type:
@@ -49,11 +58,11 @@ class AttributeCell(UIElement):
             case "list":
                 ...
             case "ref":
-                self.display = CursorFocusTextBox(3, 2, 170, 18, self.editor, content=self.value.ref_id, text_bg_color=None)
+                self.display = CursorFocusTextBox(10, 3, 180, 18, self.editor, content=self.value.ref_id, text_bg_color=None)
                 self.display.text_box.allow_typing = False
                 self.display.set_text_color(TEXT_BG3_COLOR)
                 self.children.append(self.display)
-                self.width = 180
+                self.width = 200
                 self.height = 24
         
     def _event(self, editor, X, Y):
@@ -75,7 +84,7 @@ class CellSlot(UIElement):
     
     lock_icon = Image(f"{PATH}/advanced_editor/lock.png", 0, 0, 20, 20)
     
-    def __init__(self, x:int, y:int, width:int, height:int, data_types:list, cell=None, locked=False):
+    def __init__(self, x:int, y:int, width:int, height:int, data_types:list, cell=None, locked=False, generator=False, ignored_values=None):
         self.x = x
         self.y = y
         self.width = self._width = width
@@ -85,25 +94,38 @@ class CellSlot(UIElement):
         self.locked = locked
         self.hovered = False
         self.empty_mouse = True
+        self.generator = generator
+        self.ignored_values = ignored_values or []
         
-        if self.cell:
+        if self.cell and not generator:
             self.cell.slot = self
+            
+        if self.generator:
+            self.label = Text(2, 2, 1, "Create Reference", text_bg_color=None)
     
     def _event(self, editor, X, Y):
         
-        if self.cell:
-            self.cell._event(editor, X+self.x, Y+self.y)
-            self.width = self.cell.width
-            self.height = self.cell.height
-        else:
-            self.width = self._width
-            self.height = self._height
+        if not self.generator:
+            if self.cell:
+                self.cell._event(editor, X+self.x, Y+self.y)
+                self.width = self.cell.width
+                self.height = self.cell.height
+            else:
+                self.width = self._width
+                self.height = self._height
         
         self.hovered = False
         editor.check_hover(editor, (X+self.x, Y+self.y, self.width, self.height), self)
         
         if self.hovered:
-            if self.cell:
+            if self.generator:
+                if editor.left_mouse_down():
+                    ref = VisualLoader.ObjectReference(self.cell)
+                    cell = AttributeCell(editor, ref, "ref", False, True)
+                    editor.holding = True
+                    editor.held = cell
+                    editor.hold_offset = (editor.mouse_pos[0]-(X+self.x), editor.mouse_pos[1]-(Y+self.y))
+            elif self.cell and not self.locked:
                 if editor.left_mouse_down():
                     editor.holding = True
                     editor.held = self.cell
@@ -112,7 +134,7 @@ class CellSlot(UIElement):
                     self.cell = None
             elif editor.holding or editor.drop_requested:
                 if isinstance(editor.held, AttributeCell):
-                    if editor.held.data_type in self.data_types:
+                    if editor.held.data_type in self.data_types and editor.held.get_value() not in self.ignored_values:
                         self.empty_mouse = True
                         
                         if editor.drop_requested:
@@ -125,20 +147,39 @@ class CellSlot(UIElement):
     
     def drop_acceptor(self, cell, editor):
         
-        old_slot = cell.slot
-        
-        self.cell = cell
-        cell.slot = self
-        
-        def undo():
-            old_slot.cell = cell
-            self.cell = None
-        
-        def redo():
-            old_slot.cell = None
+        if cell.new_ref:
+            
             self.cell = cell
+            cell.slot = self
+            cell.new_ref = False
+            
+            def undo():
+                self.cell = None
+                cell.slot = None
+                cell.new_ref = True
+                
+            def redo():
+                self.cell = cell
+                cell.slot = self
+                cell.new_ref = False
+            
+            editor.add_history(redo, undo, "Added Attribute")
+        else:
         
-        editor.add_history(redo, undo, "Moved Attribute")
+            old_slot = cell.slot
+            
+            self.cell = cell
+            cell.slot = self
+            
+            def undo():
+                old_slot.cell = cell
+                self.cell = None
+            
+            def redo():
+                old_slot.cell = None
+                self.cell = cell
+        
+            editor.add_history(redo, undo, "Moved Attribute")
 
     def _update(self, editor, X, Y):
         dw = min(X+self.x-1, 0)
@@ -155,14 +196,16 @@ class CellSlot(UIElement):
             editor.screen.fill(TEXT_COLOR, (X+self.x-1-dw, Y+self.y-1-dh, self.width+dw+2, self.height+dh+2))
         
         if not self.cell:
-        #     editor.screen.fill(TEXT_BG2_COLOR, (X+self.x-dw2, Y+self.y-dh2, self.width+dw2, self.height+dh2))
-        # else:
             editor.screen.fill(TEXT_BG_COLOR, (X+self.x-dw2, Y+self.y-dh2, self.width+dw2, self.height+dh2))
+        elif self.generator:
+            editor.screen.fill(TEXT_BG2_COLOR, (X+self.x-dw2, Y+self.y-dh2, self.width+dw2, self.height+dh2))
         
         if self.locked:
             self.lock_icon._update(editor, (X+self.x+self.width+2) if self.cell else (X+self.x+(self.width/2)-10), (Y+self.y+(self.height/2))-10)
         
-        if self.cell:
+        if self.generator:
+            self.label._update(editor, X+self.x, Y+self.y)
+        elif self.cell:
             self.cell._update(editor, X+self.x, Y+self.y)
         
         

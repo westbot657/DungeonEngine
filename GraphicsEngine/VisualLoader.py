@@ -63,6 +63,11 @@ class AttributeCell(UIElement):
     
     def _update(self, editor, X, Y):
         
+        dw2 = min(X, 0)
+        dh2 = min(Y, 0)
+        
+        editor.screen.fill(TEXT_BG2_COLOR, (X-dw2, Y-dh2, self.width+dw2, self.height+dh2))
+        
         for child in self.children:
             child._update(editor, X, Y)
 
@@ -79,6 +84,10 @@ class CellSlot(UIElement):
         self.cell = cell
         self.locked = locked
         self.hovered = False
+        self.empty_mouse = True
+        
+        if self.cell:
+            self.cell.slot = self
     
     def _event(self, editor, X, Y):
         
@@ -90,8 +99,47 @@ class CellSlot(UIElement):
             self.width = self._width
             self.height = self._height
         
+        self.hovered = False
         editor.check_hover(editor, (X+self.x, Y+self.y, self.width, self.height), self)
+        
+        if self.hovered:
+            if self.cell:
+                if editor.left_mouse_down():
+                    editor.holding = True
+                    editor.held = self.cell
+                    editor.hold_offset = (editor.mouse_pos[0]-(X+self.x), editor.mouse_pos[1]-(Y+self.y))
+                    # self.cell.slot = None
+                    self.cell = None
+            elif editor.holding or editor.drop_requested:
+                if isinstance(editor.held, AttributeCell):
+                    if editor.held.data_type in self.data_types:
+                        self.empty_mouse = True
+                        
+                        if editor.drop_requested:
+                            editor.accept_drop(1, self.drop_acceptor)
+                        
+                else:
+                    self.empty_mouse = False
+            else:
+                self.empty_mouse = True
     
+    def drop_acceptor(self, cell, editor):
+        
+        old_slot = cell.slot
+        
+        self.cell = cell
+        cell.slot = self
+        
+        def undo():
+            old_slot.cell = cell
+            self.cell = None
+        
+        def redo():
+            old_slot.cell = None
+            self.cell = cell
+        
+        editor.add_history(redo, undo, "Moved Attribute")
+
     def _update(self, editor, X, Y):
         dw = min(X+self.x-1, 0)
         dh = min(Y+self.y-1, 0)
@@ -100,17 +148,15 @@ class CellSlot(UIElement):
         if self.locked:
             editor.screen.fill(TEXT_BG3_COLOR, (X+self.x-1-dw, Y+self.y-1-dh, self.width+dw+2, self.height+dh+2))
             
-            
-        
-        elif self.hovered:
+        elif self.hovered and self.empty_mouse:
             editor.screen.fill((0, 120, 212), (X+self.x-1-dw, Y+self.y-1-dh, self.width+dw+2, self.height+dh+2))
             
         else:
             editor.screen.fill(TEXT_COLOR, (X+self.x-1-dw, Y+self.y-1-dh, self.width+dw+2, self.height+dh+2))
         
-        if self.cell:
-            editor.screen.fill(TEXT_BG2_COLOR, (X+self.x-dw2, Y+self.y-dh2, self.width+dw2, self.height+dh2))
-        else:
+        if not self.cell:
+        #     editor.screen.fill(TEXT_BG2_COLOR, (X+self.x-dw2, Y+self.y-dh2, self.width+dw2, self.height+dh2))
+        # else:
             editor.screen.fill(TEXT_BG_COLOR, (X+self.x-dw2, Y+self.y-dh2, self.width+dw2, self.height+dh2))
         
         if self.locked:

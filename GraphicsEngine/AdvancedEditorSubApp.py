@@ -9,11 +9,12 @@ from FunctionalElements import Button, BorderedButton
 from AdvancedPanels.PanelTree import PanelTree
 from AdvancedPanels.ShelfPanel import ShelfPanel
 from CursorFocusTextBox import CursorFocusTextBox
-from VisualLoader import VisualLoader
+from VisualLoader import VisualLoader, CellSlot, AttributeCell
 from Toasts import Toasts
 from LoadingBar import LoadingBar
 from Pathfinding import Pathfinding
 from SoundSystem import SoundSystem
+from MultilineTextBox import MultilineTextBox
 
 from AdvancedPanels.PanelPlacer import PanelPlacer
 
@@ -249,6 +250,20 @@ class AdvancedEditorSubApp(UIElement):
         attr_panel.shelf_panel.placer = attr_panel.shelf_panel._placer
         self.editor.sound_system.get_audio("AESA_drop", "editor").play()
 
+    def attr_cell_acceptor(self, cell, editor):
+        slot = cell.slot
+        def redo():
+            # print(f"set None as cell of slot '{slot}'")
+            slot.cell = None
+            cell.slot = None
+        
+        def undo():
+            # print(f"set '{cell}' as cell of slot '{slot}'")
+            slot.cell = cell
+            cell.slot = slot
+        
+        editor.add_history(redo, undo, "Removed attribute")
+
     def _update_layout(self, editor):
         for button, _ in self.visibility_toggles.values():
             button.y = editor.height-100
@@ -282,6 +297,16 @@ class AdvancedEditorSubApp(UIElement):
         
         for child in self.children[::-1]:
             child._event(editor, X, Y)
+            
+        if MultilineTextBox._focused is None:
+            for key in editor.typing:
+                if key == "\x1a":
+                    if pygame.K_LSHIFT in editor.keys:
+                        # print("redo!")
+                        editor.redo()
+                    else:
+                        # print("undo!")
+                        editor.undo()
         
         if editor.holding:
             if isinstance(editor.held, (PanelPlacer, AttributePanel)):
@@ -323,6 +348,8 @@ class AdvancedEditorSubApp(UIElement):
                     editor.accept_drop(1, self.attribute_panel_acceptor)
                 else:
                     editor.accept_drop(0, self.attribute_panel_acceptor_2)
+            elif isinstance(editor.held, AttributeCell):
+                editor.accept_drop(0, self.attr_cell_acceptor)
         
         self.toasts._event(editor, X, Y)
     

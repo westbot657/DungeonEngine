@@ -214,50 +214,50 @@ class CodeEditor(UIElement):
             self.delete_file_confirm_input_box,
             self.delete_file_err
         )
-        self.top_bar_file = ContextTree.new(
-            25, 0, 40, 20, "File", [
-                {
-                    "New File...": self.top_bar_file_new_file,
-                    "Delete File...": self.top_bar_file_delete_file
-                },
-                # ContextTree.Line(),
-                # {
-                #     "Open File...": self.top_bar_file_open_file,
-                #     "Open Folder...": self.top_bar_file_open_folder
-                # },
-                # ContextTree.Line(),
-                # {
-                #     "Save": self.top_bar_file_save,
-                #     "Save All": self.top_bar_file_save_all
-                # },
-                # ContextTree.Line(),
-                # {
-                #     "Exit": self.top_bar_file_exit
-                # }
-            ], 115, *self.ctx_tree_opts,
-            group="main-ctx"
-        )
-        self.top_bar_file._uoffx = -self.top_bar_file.width
-        self.top_bar_file._uoffy = self.top_bar_file.height
-        self.children.append(self.top_bar_file)
-        self.top_bar_edit = ContextTree.new(
-            70, 0, 40, 20, "Edit", [
-                {
-                    "Undo": self.top_bar_edit_undo,
-                    "Redo": self.top_bar_edit_redo
-                },
-                ContextTree.Line(),
-                {
-                    "Cut": self.top_bar_edit_cut,
-                    "Copy": self.top_bar_edit_copy,
-                    "Paste": self.top_bar_edit_paste
-                }
-            ], 60, *self.ctx_tree_opts,
-            group="main-ctx"
-        )
-        self.top_bar_edit._uoffx = -self.top_bar_edit.width
-        self.top_bar_edit._uoffy = self.top_bar_edit.height
-        self.children.append(self.top_bar_edit)
+        # self.top_bar_file = ContextTree.new(
+        #     25, 0, 40, 20, "File", [
+        #         {
+        #             "New File...": self.top_bar_file_new_file,
+        #             "Delete File...": self.top_bar_file_delete_file
+        #         },
+        #         # ContextTree.Line(),
+        #         # {
+        #         #     "Open File...": self.top_bar_file_open_file,
+        #         #     "Open Folder...": self.top_bar_file_open_folder
+        #         # },
+        #         # ContextTree.Line(),
+        #         # {
+        #         #     "Save": self.top_bar_file_save,
+        #         #     "Save All": self.top_bar_file_save_all
+        #         # },
+        #         # ContextTree.Line(),
+        #         # {
+        #         #     "Exit": self.top_bar_file_exit
+        #         # }
+        #     ], 115, *self.ctx_tree_opts,
+        #     group="main-ctx"
+        # )
+        # self.top_bar_file._uoffx = -self.top_bar_file.width
+        # self.top_bar_file._uoffy = self.top_bar_file.height
+        # self.children.append(self.top_bar_file)
+        # self.top_bar_edit = ContextTree.new(
+        #     70, 0, 40, 20, "Edit", [
+        #         {
+        #             "Undo": self.top_bar_edit_undo,
+        #             "Redo": self.top_bar_edit_redo
+        #         },
+        #         ContextTree.Line(),
+        #         {
+        #             "Cut": self.top_bar_edit_cut,
+        #             "Copy": self.top_bar_edit_copy,
+        #             "Paste": self.top_bar_edit_paste
+        #         }
+        #     ], 60, *self.ctx_tree_opts,
+        #     group="main-ctx"
+        # )
+        # self.top_bar_edit._uoffx = -self.top_bar_edit.width
+        # self.top_bar_edit._uoffy = self.top_bar_edit.height
+        # self.children.append(self.top_bar_edit)
         # ctx_file_onclick = self.top_bar_file.on_left_click
         # def ctx_file(*_, **__):
         #     self.top_bar_edit.children[0].set_visibility(False)
@@ -469,49 +469,49 @@ class CodeEditor(UIElement):
             else:
                 self.delete_file_err.set_colored_content("Please enter name of file to delete")
                 
-    def top_bar_file_new_file(self, *_, **__):
-        self.top_bar_file.children[0].toggle_visibility()
-        self.new_file_popup.popup()
+    # def top_bar_file_new_file(self, *_, **__):
+    #     self.top_bar_file.children[0].toggle_visibility()
+    #     self.new_file_popup.popup()
 
-    def top_bar_file_delete_file(self, *_, **__):
-        self.top_bar_file.children[0].toggle_visibility()
-        self.delete_file_popup.popup()
+    # def top_bar_file_delete_file(self, *_, **__):
+    #     self.top_bar_file.children[0].toggle_visibility()
+    #     self.delete_file_popup.popup()
         
-    def top_bar_file_open_file(self, *_, **__):
-        ...
+    # def top_bar_file_open_file(self, *_, **__):
+    #     ...
 
-    def top_bar_file_open_folder(self, *_, **__):
-        ...
+    # def top_bar_file_open_folder(self, *_, **__):
+    #     ...
 
-    def top_bar_file_save(self, *_, **__):
-        ...
+    # def top_bar_file_save(self, *_, **__):
+    #     ...
 
-    def top_bar_file_save_all(self, *_, **__):
-        ...
+    # def top_bar_file_save_all(self, *_, **__):
+    #     ...
 
-    def top_bar_file_exit(self, *_, **__):
-        ...
+    # def top_bar_file_exit(self, *_, **__):
+    #     ...
 
-    def top_bar_edit_undo(self, *_, **__):
-        ...
+    # def top_bar_edit_undo(self, *_, **__):
+    #     ...
 
-    def top_bar_edit_redo(self, *_, **__):
-        ...
+    # def top_bar_edit_redo(self, *_, **__):
+    #     ...
 
-    def top_bar_edit_cut(self, *_, **__):
-        ...
+    # def top_bar_edit_cut(self, *_, **__):
+    #     ...
 
-    def top_bar_edit_copy(self, *_, **__):
-        ...
+    # def top_bar_edit_copy(self, *_, **__):
+    #     ...
 
-    def top_bar_edit_paste(self, *_, **__):
-        ...
+    # def top_bar_edit_paste(self, *_, **__):
+    #     ...
 
-    def top_bar_edit_find(self, *_, **__):
-        ...
+    # def top_bar_edit_find(self, *_, **__):
+    #     ...
 
-    def top_bar_edit_replace(self, *_, **__):
-        ...
+    # def top_bar_edit_replace(self, *_, **__):
+    #     ...
 
     def _update(self, editor, X, Y):
 

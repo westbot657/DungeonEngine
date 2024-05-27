@@ -110,6 +110,15 @@ class AttributePanel(UIElement):
         self.shelf_panel = None
         self.rebuild()
         self.build_data(editor)
+        self.referencers = []
+
+    def get_reference_tree(self):
+        out = [self.parent_ref.uid]
+        
+        for ref in self.referencers:
+            out += ref.get_reference_tree()
+
+        return out
 
     def build_common(self, editor):
         
@@ -127,9 +136,9 @@ class AttributePanel(UIElement):
         else:
             parent_cell = None
         
-        parent_data_cell = CellSlot(15+parent_label.width, 60, 180, 24, ["ref"], parent_cell, locked, ignored_values=[self.data["ref"].uid])
+        parent_data_cell = CellSlot(self, 15+parent_label.width, 60, 180, 24, ["ref"], parent_cell, locked, ignored_values=[self.data["ref"].uid])
         
-        reference_generator = CellSlot(15, 365, 132, 20, None, self.data["ref"].uid, False, True)
+        reference_generator = CellSlot(self, 15, 365, 132, 20, None, self.data["ref"].uid, False, True)
         
         if locked:
             id_textbox.text_box.allow_typing = False
@@ -150,6 +159,8 @@ class AttributePanel(UIElement):
     def build_data(self, editor):
         
         if not self.data: return
+        
+        self.parent_ref = self.data["ref"]
         
         # Use data to build children.
         if "type" in self.data:

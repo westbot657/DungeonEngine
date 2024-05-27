@@ -21,7 +21,7 @@ import os
 import re
 
 class AttributeCell(UIElement):
-    def __init__(self, editor, value:Any, data_type:str, modifieable:bool=True, new_ref=False):
+    def __init__(self, editor, value:Any, data_type:str, modifieable:bool=True, new_ref=False, back_link=None):
         self.editor = editor
         self.value = value
         
@@ -33,7 +33,7 @@ class AttributeCell(UIElement):
         self.children = []
         self.modifieable = modifieable
         self.new_ref = new_ref
-        
+        self.back_link = back_link
         self.configure_value()
         
     def get_value(self):
@@ -84,7 +84,8 @@ class CellSlot(UIElement):
     
     lock_icon = Image(f"{PATH}/advanced_editor/lock.png", 0, 0, 20, 20)
     
-    def __init__(self, x:int, y:int, width:int, height:int, data_types:list, cell=None, locked=False, generator=False, ignored_values=None):
+    def __init__(self, parent, x:int, y:int, width:int, height:int, data_types:list, cell=None, locked=False, generator=False, ignored_values=None):
+        self.parent = parent
         self.x = x
         self.y = y
         self.width = self._width = width
@@ -102,6 +103,13 @@ class CellSlot(UIElement):
             
         if self.generator:
             self.label = Text(2, 2, 1, "Create Reference", text_bg_color=None)
+    
+    def get_ignored_values(self):
+        out = self.ignored_values.copy()
+        
+        out += self.parent.get_reference_tree()
+        
+        return out
     
     def _event(self, editor, X, Y):
         
@@ -121,7 +129,7 @@ class CellSlot(UIElement):
             if self.generator:
                 if editor.left_mouse_down():
                     ref = VisualLoader.ObjectReference(self.cell)
-                    cell = AttributeCell(editor, ref, "ref", False, True)
+                    cell = AttributeCell(editor, ref, "ref", False, True, back_link=self.parent)
                     editor.holding = True
                     editor.held = cell
                     editor.hold_offset = (editor.mouse_pos[0]-(X+self.x), editor.mouse_pos[1]-(Y+self.y))
@@ -130,11 +138,12 @@ class CellSlot(UIElement):
                     editor.holding = True
                     editor.held = self.cell
                     editor.hold_offset = (editor.mouse_pos[0]-(X+self.x), editor.mouse_pos[1]-(Y+self.y))
+                    self.cell.back_link.referencers.remove(self.parent)
                     # self.cell.slot = None
                     self.cell = None
             elif editor.holding or editor.drop_requested:
                 if isinstance(editor.held, AttributeCell):
-                    if editor.held.data_type in self.data_types and editor.held.get_value() not in self.ignored_values:
+                    if editor.held.data_type in self.data_types and editor.held.get_value() not in self.get_ignored_values():
                         self.empty_mouse = True
                         
                         if editor.drop_requested:
@@ -153,15 +162,25 @@ class CellSlot(UIElement):
             cell.slot = self
             cell.new_ref = False
             
+            if cell.back_link and self.parent:
+                cell.back_link.referencers.append(self.parent)
+                
+            
             def undo():
                 self.cell = None
                 cell.slot = None
                 cell.new_ref = True
                 
+                if cell.back_link and self.parent:
+                    cell.back_link.referencers.remove(self.parent)
+                
             def redo():
                 self.cell = cell
                 cell.slot = self
                 cell.new_ref = False
+                
+                if cell.back_link and self.parent:
+                    cell.back_link.referencers.append(self.parent)
             
             editor.add_history(redo, undo, "Added Attribute")
         else:

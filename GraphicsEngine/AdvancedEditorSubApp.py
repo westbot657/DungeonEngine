@@ -301,14 +301,18 @@ class AdvancedEditorSubApp(UIElement):
     def attr_cell_acceptor(self, cell, editor):
         if cell.new_ref: return
         
+        
         slot = cell.slot
+        cell.back_link.referencers.remove(slot.parent)
         def redo():
             # print(f"set None as cell of slot '{slot}'")
+            cell.back_link.referencers.remove(slot.parent)
             slot.cell = None
             cell.slot = None
         
         def undo():
             # print(f"set '{cell}' as cell of slot '{slot}'")
+            cell.back_link.referencers.append(slot.parent)
             slot.cell = cell
             cell.slot = slot
         

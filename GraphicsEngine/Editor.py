@@ -310,6 +310,10 @@ class Editor:
                 self._alt = None
                 if not self._hovering_ctx_tree:
                     ContextTree.closeAll()
+                
+                if not isinstance(self._hovering, (TextBox, MultilineTextBox)):
+                    if MultilineTextBox._focused:
+                        MultilineTextBox._focused.unfocus()
 
             for l in layers:
                 for i in self.layers[l]:

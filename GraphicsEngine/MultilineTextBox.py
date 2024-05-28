@@ -328,6 +328,12 @@ class MultilineTextBox(UIElement):
         
         cls._focused = box
 
+    def unfocus(self):
+        if MultilineTextBox._focused is self:
+            MultilineTextBox._focused = None
+        self.focused = False
+        self._cursor_visible = False
+
     def clear_selection(self):
         self._text_selection_start = self._text_selection_end = None
 

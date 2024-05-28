@@ -309,8 +309,7 @@ class CodeEditor(UIElement):
         self.app_editor_selector.hover_color = self._app_editor_icon_hovered
         self.app_settings_selector.bg_color = self.app_settings_selector._bg_color = self.app_settings_icons[0]
         self.app_settings_selector.hover_color = self.app_settings_icons[1]
-        
-        
+
     def select_game_app(self, editor):
         self.reset_app_selectors()
 

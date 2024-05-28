@@ -46,6 +46,9 @@ class CursorFocusTextBox(UIElement):
     def clear_selection(self):
         self.text_box.clear_selection()
     
+    def unfocus(self):
+        self.text_box.unfocus()
+    
     def collides(self, mouse, rect) -> bool:
         mx, my = mouse
         x, y, w, h = rect

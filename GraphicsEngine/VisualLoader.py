@@ -36,6 +36,13 @@ class AttributeCell(UIElement):
         self.back_link = back_link
         self.configure_value()
         
+    def unfocus(self):
+        match self.data_type:
+            case "ref":
+                self.display.unfocus()
+            case _:
+                pass
+        
     def get_value(self):
         match self.data_type:
             case "ref":
@@ -139,6 +146,7 @@ class CellSlot(UIElement):
                     editor.held = self.cell
                     editor.hold_offset = (editor.mouse_pos[0]-(X+self.x), editor.mouse_pos[1]-(Y+self.y))
                     self.cell.back_link.referencers.remove(self.parent)
+                    self.cell.unfocus()
                     # self.cell.slot = None
                     self.cell = None
             elif editor.holding or editor.drop_requested:
@@ -148,7 +156,8 @@ class CellSlot(UIElement):
                         
                         if editor.drop_requested:
                             editor.accept_drop(1, self.drop_acceptor)
-                        
+                    else:
+                        self.empty_mouse = False
                 else:
                     self.empty_mouse = False
             else:

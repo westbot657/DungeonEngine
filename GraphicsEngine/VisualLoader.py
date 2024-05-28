@@ -42,7 +42,7 @@ class AttributeCell(UIElement):
                 self.display.unfocus()
             case _:
                 pass
-        
+    
     def get_value(self):
         match self.data_type:
             case "ref":
@@ -199,13 +199,22 @@ class CellSlot(UIElement):
             self.cell = cell
             cell.slot = self
             
+            if cell.back_link and self.parent:
+                cell.back_link.referencers.append(self.parent)
+            
             def undo():
                 old_slot.cell = cell
                 self.cell = None
+                
+                if cell.back_link and self.parent:
+                    cell.back_link.referencers.remove(self.parent)
             
             def redo():
                 old_slot.cell = None
                 self.cell = cell
+                
+                if cell.back_link and self.parent:
+                    cell.back_link.referencers.append(self.parent)
         
             editor.add_history(redo, undo, "Moved Attribute")
 

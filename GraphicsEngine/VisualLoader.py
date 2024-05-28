@@ -21,6 +21,9 @@ import os
 import re
 
 class AttributeCell(UIElement):
+    
+    _data_types = set()
+    
     def __init__(self, editor, value:Any, data_type:str, modifieable:bool=True, new_ref=False, back_link=None):
         self.editor = editor
         self.value = value
@@ -28,7 +31,7 @@ class AttributeCell(UIElement):
         self.slot = None
         
         self.width = 150
-        self.height = 50
+        self.height = 24
         self.data_type = data_type
         self.children = []
         self.modifieable = modifieable
@@ -36,40 +39,78 @@ class AttributeCell(UIElement):
         self.back_link = back_link
         self.configure_value()
         
+        AttributeCell._data_types.update(data_type)
+        
     def unfocus(self):
-        match self.data_type:
-            case "ref":
+        match self.data_type.rsplit("-", 1)[-1]:
+            case "ref"|"str"|"int"|"float"|"percent":
                 self.display.unfocus()
             case _:
                 pass
     
     def get_value(self):
-        match self.data_type:
+        match self.data_type.rsplit("-", 1)[-1]:
             case "ref":
                 return self.value.ref_id
             case _:
                 return self.value
-        
+    
+    def setup_function(self, return_type):
+        ico = Text(2, 3, 1, "f(x) { ... }", text_bg_color=None)
+        self.children.append(ico)
+        self.width = 180
+        self.height = 24
+    
     def configure_value(self):
-        match self.data_type:
+        match self.data_type.rsplit("-", 1)[-1]:
             case "str":
-                ...
+                self.display = CursorFocusTextBox(10, 3, 160, 18, self.editor, content=str(self.value), text_bg_color=None)
+                self.display.text_box.allow_typing = self.modifieable
+                self.children.append(self.display)
+                self.width = 180
+                self.height = 24
             case "int":
-                ...
+                if isinstance(self.value, (int, float)):
+                    self.display = CursorFocusTextBox(10, 3, 160, 18, self.editor, content=str(int(self.value)), text_bg_color=None)
+                    self.display.text_box.char_whitelist = [n for n in "0123456789"]
+                    self.display.text_box.allow_typing = self.modifieable
+                    self.children.append(self.display)
+                    self.width = 180
+                    self.height = 24
+                elif isinstance(self.value, dict):
+                    self.setup_function("int")
             case "float":
-                ...
+                if isinstance(self.value, (int, float)):
+                    self.display = CursorFocusTextBox(10, 3, 160, 18, self.editor, content=str(float(self.value)), text_bg_color=None)
+                    self.display.text_box.char_whitelist = [n for n in "0123456789."]
+                    self.display.text_box.allow_typing = self.modifieable
+                    self.children.append(self.display)
+                    self.width = 180
+                    self.height = 24
+                elif isinstance(self.value, dict):
+                    self.setup_function("float")
             case "percent":
-                ...
+                if isinstance(self.value, (int, float)):
+                    self.display = CursorFocusTextBox(10, 3, 150, 18, self.editor, content=str(int(self.value)), text_bg_color=None)
+                    self.display.text_box.char_whitelist = [n for n in "0123456789."]
+                    self.display.text_box.allow_typing = self.modifieable
+                    self.children.append(self.display)
+                    self.width = 180
+                    self.height = 24
+                    self.percent_sign = Text(160, 3, 1, "%", text_bg_color=None)
+                    self.children.append(self.percent_sign)
+                elif isinstance(self.value, dict):
+                    self.setup_function("percent")
             case "dict":
                 ...
             case "list":
                 ...
             case "ref":
-                self.display = CursorFocusTextBox(10, 3, 180, 18, self.editor, content=self.value.ref_id, text_bg_color=None)
+                self.display = CursorFocusTextBox(10, 3, 160, 18, self.editor, content=self.value.ref_id, text_bg_color=None)
                 self.display.text_box.allow_typing = False
                 self.display.set_text_color(TEXT_BG3_COLOR)
                 self.children.append(self.display)
-                self.width = 200
+                self.width = 180
                 self.height = 24
         
     def _event(self, editor, X, Y):
@@ -105,6 +146,9 @@ class CellSlot(UIElement):
         self.generator = generator
         self.ignored_values = ignored_values or []
         
+        if isinstance(data_types, list):
+            AttributeCell._data_types.update(*data_types)
+        
         if self.cell and not generator:
             self.cell.slot = self
             
@@ -136,7 +180,7 @@ class CellSlot(UIElement):
             if self.generator:
                 if editor.left_mouse_down():
                     ref = VisualLoader.ObjectReference(self.cell)
-                    cell = AttributeCell(editor, ref, "ref", False, True, back_link=self.parent)
+                    cell = AttributeCell(editor, ref, (self.data_types or "ref"), False, True, back_link=self.parent)
                     editor.holding = True
                     editor.held = cell
                     editor.hold_offset = (editor.mouse_pos[0]-(X+self.x), editor.mouse_pos[1]-(Y+self.y))
@@ -145,12 +189,13 @@ class CellSlot(UIElement):
                     editor.holding = True
                     editor.held = self.cell
                     editor.hold_offset = (editor.mouse_pos[0]-(X+self.x), editor.mouse_pos[1]-(Y+self.y))
-                    self.cell.back_link.referencers.remove(self.parent)
+                    if self.cell.back_link and self.parent:
+                        self.cell.back_link.referencers.remove(self.parent)
                     self.cell.unfocus()
                     # self.cell.slot = None
                     self.cell = None
             elif editor.holding or editor.drop_requested:
-                if isinstance(editor.held, AttributeCell):
+                if isinstance(editor.held, AttributeCell) and not self.locked:
                     if editor.held.data_type in self.data_types and editor.held.get_value() not in self.get_ignored_values():
                         self.empty_mouse = True
                         
@@ -358,7 +403,7 @@ class VisualLoader:
             return "[unspecified]"
     
     _refernce_map: dict[str, dict[str, VisualObject]] = {}
-        
+    
     @classmethod
     def analyze_project_structure(cls, root:str, dungeon_id:str) -> list[str]|str:
         """
@@ -415,7 +460,9 @@ class VisualLoader:
         "items": "item",
         "attacks": "attack",
         "combats": "combat",
-        "status_effects": "status_effect"
+        "status_effects": "status_effect",
+        "rooms": "room",
+        "scripts": "script"
     }
     
     @classmethod
@@ -455,161 +502,188 @@ class VisualLoader:
             cls.build_visuals(root, loading_bar, load_toast, toasts, result, dungeon_id, aesa, loading_engine)
 
     @classmethod
-    def build_visuals(cls, root, loading_bar, load_toast, toasts, result, dungeon_id, aesa, loading_engine:bool):
+    def build_visuals(cls, root:str, loading_bar:LoadingBar, load_toast:Toasts.Toast, toasts:Toasts, result:list[str], dungeon_id:str, aesa, loading_engine:bool):
         loaded = 0
         for file_name in result:
-            fn = file_name.replace("resources/", "").replace(".json", "")
-            if file_name.endswith(".json"): # weapon/tool/armor/etc
-                # print(file_name)
-                with open(f"{root}/{file_name}", "r+", encoding="utf-8") as f:
-                    data: dict[str, Any] = json.load(f)
-                # analyze files, look for external references
-                if file_name.startswith("resources/weapons/"):
-                    if "parent" in data:
-                        parent = VisualLoader.ObjectReference(data["parent"])
-                        vdata = {
-                            "template": data.get("template", False),
-                            "parent": parent,
-                            "name": data.get("name", VisualLoader.MissingValue()),
-                            "damage": VisualLoader.InheretenceLink(parent, "damage", data),
-                            "range": VisualLoader.InheretenceLink(parent, "range", data),
-                            "max_durability": VisualLoader.InheretenceLink(parent, "max_durability", data),
-                            "durability": VisualLoader.InheretenceLink(parent, "durability", data)
-                        }
-                    else:
-                        vdata = {
-                            "template": data.get("template", False),
-                            "parent": VisualLoader.MissingValue(),
-                            "name": data.get("name", VisualLoader.MissingValue()),
-                            "damage": data.get("damage", VisualLoader.MissingValue()),
-                            "range": data.get("range", VisualLoader.MissingValue()),
-                            "max_durability": data.get("max_durability", VisualLoader.MissingValue()),
-                            "durability": data.get("durability", VisualLoader.MissingValue())
-                        }
+            if file_name.startswith("resources/"):
+                if file_name.endswith(".json"): # weapon/tool/armor/etc
+                    fn = file_name.replace("resources/", "", 1).replace(".json", "")
+                    # print(file_name)
+                    with open(f"{root}/{file_name}", "r+", encoding="utf-8") as f:
+                        data: dict[str, Any] = json.load(f)
+                    # analyze files, look for external references
+                    if file_name.startswith("resources/weapons/"):
+                        if "parent" in data:
+                            parent = VisualLoader.ObjectReference(data["parent"])
+                            vdata = {
+                                "template": data.get("template", False),
+                                "parent": parent,
+                                "name": data.get("name", VisualLoader.MissingValue()),
+                                "damage": VisualLoader.InheretenceLink(parent, "damage", data),
+                                "range": VisualLoader.InheretenceLink(parent, "range", data),
+                                "max_durability": VisualLoader.InheretenceLink(parent, "max_durability", data),
+                                "durability": VisualLoader.InheretenceLink(parent, "durability", data)
+                            }
+                        else:
+                            vdata = {
+                                "template": data.get("template", False),
+                                "parent": VisualLoader.MissingValue(),
+                                "name": data.get("name", VisualLoader.MissingValue()),
+                                "damage": data.get("damage", VisualLoader.MissingValue()),
+                                "range": data.get("range", VisualLoader.MissingValue()),
+                                "max_durability": data.get("max_durability", VisualLoader.MissingValue()),
+                                "durability": data.get("durability", VisualLoader.MissingValue())
+                            }
 
-                    VisualLoader.VisualObject(file_name, dungeon_id, f"{dungeon_id}:{fn}", vdata, loading_engine)
+                        VisualLoader.VisualObject(file_name, dungeon_id, f"{dungeon_id}:{fn}", vdata, loading_engine)
 
-                elif file_name.startswith("resources/ammo/"):
-                    if "parent" in data:
-                        parent = VisualLoader.ObjectReference(data["parent"])
-                        vdata = {
-                            "template": data.get("template", False),
-                            "parent": parent,
-                            "name": data.get("name", VisualLoader.MissingValue()),
-                            "description": VisualLoader.InheretenceLink(parent, "description", data),
-                            "bonus_damage": VisualLoader.InheretenceLink(parent, "bonus_damage", data),
-                            "max_count": VisualLoader.InheretenceLink(parent, "max_count", data),
-                            "count": VisualLoader.InheretenceLink(parent, "count", data)
-                        }
-                    else:
-                        vdata = {
-                            "template": data.get("template", False),
-                            "parent": VisualLoader.MissingValue(),
-                            "name": data.get("name", VisualLoader.MissingValue()),
-                            "description": data.get("description", VisualLoader.MissingValue()),
-                            "bonus_damage": data.get("bonus_damage", VisualLoader.MissingValue()),
-                            "max_count": data.get("max_count", VisualLoader.MissingValue()),
-                            "count": data.get("count", VisualLoader.MissingValue()),
-                        }
+                    elif file_name.startswith("resources/ammo/"):
+                        if "parent" in data:
+                            parent = VisualLoader.ObjectReference(data["parent"])
+                            vdata = {
+                                "template": data.get("template", False),
+                                "parent": parent,
+                                "name": data.get("name", VisualLoader.MissingValue()),
+                                "description": VisualLoader.InheretenceLink(parent, "description", data),
+                                "bonus_damage": VisualLoader.InheretenceLink(parent, "bonus_damage", data),
+                                "max_count": VisualLoader.InheretenceLink(parent, "max_count", data),
+                                "count": VisualLoader.InheretenceLink(parent, "count", data)
+                            }
+                        else:
+                            vdata = {
+                                "template": data.get("template", False),
+                                "parent": VisualLoader.MissingValue(),
+                                "name": data.get("name", VisualLoader.MissingValue()),
+                                "description": data.get("description", VisualLoader.MissingValue()),
+                                "bonus_damage": data.get("bonus_damage", VisualLoader.MissingValue()),
+                                "max_count": data.get("max_count", VisualLoader.MissingValue()),
+                                "count": data.get("count", VisualLoader.MissingValue()),
+                            }
 
-                    VisualLoader.VisualObject(file_name, dungeon_id, f"{dungeon_id}:{fn}", vdata, loading_engine)
+                        VisualLoader.VisualObject(file_name, dungeon_id, f"{dungeon_id}:{fn}", vdata, loading_engine)
 
-                elif file_name.startswith("resources/armor/"):
-                    if "parent" in data:
-                        parent = VisualLoader.ObjectReference(data["parent"])
-                        vdata = {
-                            "template": data.get("template", False),
-                            "parent": parent,
-                            "name": data.get("name", VisualLoader.MissingValue()),
-                            "description": VisualLoader.InheretenceLink(parent, "description", data),
-                            "damage_reduction": VisualLoader.InheretenceLink(parent, "damage_reduction", data),
-                            "max_durability": VisualLoader.InheretenceLink(parent, "max_cdurability", data),
-                            "durability": VisualLoader.InheretenceLink(parent, "durability", data),
-                            "events": VisualLoader.InheretenceLink(parent, "events", data)
-                        }
-                    else:
-                        vdata = {
-                            "template": data.get("template", False),
-                            "parent": VisualLoader.MissingValue(),
-                            "name": data.get("name", VisualLoader.MissingValue()),
-                            "description": data.get("description", VisualLoader.MissingValue()),
-                            "damage_reduction": data.get("damage_reduction", VisualLoader.MissingValue()),
-                            "max_durability": data.get("max_cdurability", VisualLoader.MissingValue()),
-                            "durability": data.get("durability", VisualLoader.MissingValue()),
-                            "events": data.get("events", VisualLoader.MissingValue())
-                        }
+                    elif file_name.startswith("resources/armor/"):
+                        if "parent" in data:
+                            parent = VisualLoader.ObjectReference(data["parent"])
+                            vdata = {
+                                "template": data.get("template", False),
+                                "parent": parent,
+                                "name": data.get("name", VisualLoader.MissingValue()),
+                                "description": VisualLoader.InheretenceLink(parent, "description", data),
+                                "damage_reduction": VisualLoader.InheretenceLink(parent, "damage_reduction", data),
+                                "max_durability": VisualLoader.InheretenceLink(parent, "max_cdurability", data),
+                                "durability": VisualLoader.InheretenceLink(parent, "durability", data),
+                                "events": VisualLoader.InheretenceLink(parent, "events", data)
+                            }
+                        else:
+                            vdata = {
+                                "template": data.get("template", False),
+                                "parent": VisualLoader.MissingValue(),
+                                "name": data.get("name", VisualLoader.MissingValue()),
+                                "description": data.get("description", VisualLoader.MissingValue()),
+                                "damage_reduction": data.get("damage_reduction", VisualLoader.MissingValue()),
+                                "max_durability": data.get("max_cdurability", VisualLoader.MissingValue()),
+                                "durability": data.get("durability", VisualLoader.MissingValue()),
+                                "events": data.get("events", VisualLoader.MissingValue())
+                            }
 
-                    VisualLoader.VisualObject(file_name, dungeon_id, f"{dungeon_id}:{fn}", vdata, loading_engine)
+                        VisualLoader.VisualObject(file_name, dungeon_id, f"{dungeon_id}:{fn}", vdata, loading_engine)
+                        
+                    elif file_name.startswith("resources/tools/"):
+                        if "parent" in data:
+                            parent = VisualLoader.ObjectReference(data["parent"])
+                            vdata = {
+                                "template": data.get("template", False),
+                                "parent": parent,
+                                "name": data.get("name", VisualLoader.MissingValue()),
+                                "description": VisualLoader.InheretenceLink(parent, "description", data),
+                                "data": VisualLoader.InheretenceLink(parent, "data", data),
+                                "max_durability": VisualLoader.InheretenceLink(parent, "max_cdurability", data),
+                                "durability": VisualLoader.InheretenceLink(parent, "durability", data),
+                                "events": VisualLoader.InheretenceLink(parent, "events", data)
+                            }
+                        else:
+                            vdata = {
+                                "template": data.get("template", False),
+                                "parent": VisualLoader.MissingValue(),
+                                "name": data.get("name", VisualLoader.MissingValue()),
+                                "description": data.get("description", VisualLoader.MissingValue()),
+                                "data": data.get("data", VisualLoader.MissingValue()),
+                                "max_durability": data.get("max_cdurability", VisualLoader.MissingValue()),
+                                "durability": data.get("durability", VisualLoader.MissingValue()),
+                                "events": data.get("events", VisualLoader.MissingValue())
+
+                            }
+
+                        VisualLoader.VisualObject(file_name, dungeon_id, f"{dungeon_id}:{fn}", vdata, loading_engine)
+                        
+                    elif file_name.startswith("resources/items/"):
+                        if "parent" in data:
+                            parent = VisualLoader.ObjectReference(data["parent"])
+                            vdata = {
+                                "template": data.get("template", False),
+                                "parent": parent,
+                                "name": data.get("name", VisualLoader.MissingValue()),
+                                "description": VisualLoader.InheretenceLink(parent, "description", data),
+                                "data": VisualLoader.InheretenceLink(parent, "data", data),
+                                "events": VisualLoader.InheretenceLink(parent, "events", data),
+                                "max_count": VisualLoader.InheretenceLink(parent, "max_count", data),
+                                "count": VisualLoader.InheretenceLink(parent, "count", data)
+                            }
+                        else:
+                            vdata = {
+                                "template": data.get("template", False),
+                                "parent": VisualLoader.MissingValue(),
+                                "name": data.get("name", VisualLoader.MissingValue()),
+                                "description": data.get("description", VisualLoader.MissingValue()),
+                                "data": data.get("data", VisualLoader.MissingValue()),
+                                "events": data.get("events", VisualLoader.MissingValue()),
+                                "max_count": data.get("max_count", VisualLoader.MissingValue()),
+                                "count": data.get("count", VisualLoader.MissingValue()),
+                            }
+
+                        VisualLoader.VisualObject(file_name, dungeon_id, f"{dungeon_id}:{fn}", vdata, loading_engine)
+                        
+                    elif file_name.startswith("resources/enemies/"):
+                        ...
+                    elif file_name.startswith("resources/attacks/"):
+                        ...
+                    elif file_name.startswith("resources/status_effects/"):
+                        ...
+                    elif file_name.startswith("resources/sounds/"):
+                        ...
+                    elif file_name.startswith("resources/loot_tables/"):
+                        ...
+                    elif file_name.startswith("resources/interactable/"):
+                        ...
+
+            elif file_name.startswith("rooms/"):
+                if file_name.endswith(".json"):
+                    fn = f"{dungeon_id}/{file_name.replace(".json", "")}"
                     
-                elif file_name.startswith("resources/tools/"):
-                    if "parent" in data:
-                        parent = VisualLoader.ObjectReference(data["parent"])
-                        vdata = {
-                            "template": data.get("template", False),
-                            "parent": parent,
-                            "name": data.get("name", VisualLoader.MissingValue()),
-                            "description": VisualLoader.InheretenceLink(parent, "description", data),
-                            "data": VisualLoader.InheretenceLink(parent, "data", data),
-                            "max_durability": VisualLoader.InheretenceLink(parent, "max_cdurability", data),
-                            "durability": VisualLoader.InheretenceLink(parent, "durability", data),
-                            "events": VisualLoader.InheretenceLink(parent, "events", data)
-                        }
-                    else:
-                        vdata = {
-                            "template": data.get("template", False),
-                            "parent": VisualLoader.MissingValue(),
-                            "name": data.get("name", VisualLoader.MissingValue()),
-                            "description": data.get("description", VisualLoader.MissingValue()),
-                            "data": data.get("data", VisualLoader.MissingValue()),
-                            "max_durability": data.get("max_cdurability", VisualLoader.MissingValue()),
-                            "durability": data.get("durability", VisualLoader.MissingValue()),
-                            "events": data.get("events", VisualLoader.MissingValue())
-
-                        }
-
-                    VisualLoader.VisualObject(file_name, dungeon_id, f"{dungeon_id}:{fn}", vdata, loading_engine)
+                    with open(f"{root}/{file_name}", "r+", encoding="utf-8") as f:
+                        data: dict[str, Any] = json.load(f)
                     
-                elif file_name.startswith("resources/items/"):
-                    if "parent" in data:
-                        parent = VisualLoader.ObjectReference(data["parent"])
-                        vdata = {
-                            "template": data.get("template", False),
-                            "parent": parent,
-                            "name": data.get("name", VisualLoader.MissingValue()),
-                            "description": VisualLoader.InheretenceLink(parent, "description", data),
-                            "data": VisualLoader.InheretenceLink(parent, "data", data),
-                            "events": VisualLoader.InheretenceLink(parent, "events", data),
-                            "max_count": VisualLoader.InheretenceLink(parent, "max_count", data),
-                            "count": VisualLoader.InheretenceLink(parent, "count", data)
-                        }
-                    else:
-                        vdata = {
-                            "template": data.get("template", False),
-                            "parent": VisualLoader.MissingValue(),
-                            "name": data.get("name", VisualLoader.MissingValue()),
-                            "description": data.get("description", VisualLoader.MissingValue()),
-                            "data": data.get("data", VisualLoader.MissingValue()),
-                            "events": data.get("events", VisualLoader.MissingValue()),
-                            "max_count": data.get("max_count", VisualLoader.MissingValue()),
-                            "count": data.get("count", VisualLoader.MissingValue()),
-                        }
-
-                    VisualLoader.VisualObject(file_name, dungeon_id, f"{dungeon_id}:{fn}", vdata, loading_engine)
+                    events: dict = data.get("events", {})
                     
-                elif file_name.startswith("resources/enemies/"):
-                    ...
-                elif file_name.startswith("resources/attacks/"):
-                    ...
-                elif file_name.startswith("resources/status_effects/"):
-                    ...
-                elif file_name.startswith("resources/sounds/"):
-                    ...
-                elif file_name.startswith("resources/loot_tables/"):
-                    ...
-                elif file_name.startswith("resources/interactable/"):
-                    ...
-            elif file_name.endswith((".ds", ".dungeon_script")): # script
-                ... # compile the scripts and analyze the tokens for references
+                    vdata = {
+                        "name": data.get("name", VisualLoader.MissingValue()),
+                        "on_enter": events.get("on_enter", VisualLoader.MissingValue()),
+                        "on_exit": events.get("on_exit", VisualLoader.MissingValue()),
+                        "on_input": events.get("on_input", VisualLoader.MissingValue()),
+                        "interactions": data.get("interactions", VisualLoader.MissingValue())
+                    }
+                    
+                    VisualLoader.VisualObject(file_name, dungeon_id, fn, vdata)
+                    
+            elif file_name.startswith("scripts/"):
+                if file_name.endswith((".ds", ".dungeon_script")):
+                    fn = f"{dungeon_id}/{file_name.replace(".dungeon_script", "").replace(".ds", "")}"
+                    
+                    VisualLoader.VisualObject(file_name, dungeon_id, fn, {"file": f"Dungeons/{dungeon_id}/{file_name}"}, loading_engine)
+                    
+            elif file_name.startswith("combats/"):
+                ... # special combat editor system is required first
 
             loaded += 1
             loading_bar.set_progress(loaded)
@@ -635,7 +709,8 @@ class VisualLoader:
             
             if id not in config:
                 config.update({id: "stashed"})
-            cat = re.match(f"(?:{dungeon_id}:)(?P<category>[^/]+)(?:/)", id).groupdict()["category"]
+            # print(f"id : {id}")
+            cat = re.match(f"(?:{dungeon_id}(?::|/))(?P<category>[^/]+)(?:/)", id).groupdict()["category"]
             category = cls._category_map.get(cat, cat)
             panel_data = {"ref": ref, "type": f"{category}-base"}
             if config[id] == "stashed":

@@ -108,8 +108,8 @@ class AttributePanel(UIElement):
         self.hovered = False
         self.border_hovered = False
         self.shelf_panel = None
-        self.rebuild()
         self.build_data(editor)
+        self.rebuild()
         self.referencers = []
 
     def get_reference_tree(self):
@@ -120,25 +120,26 @@ class AttributePanel(UIElement):
 
         return out
 
-    def build_common(self, editor):
+    def build_common(self, editor, ref_type):
         
         locked = self.data["ref"].locked
         
         id_textbox = CursorFocusTextBox(10, 6, 280, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
         n = self.data["ref"].get("name")
-        name_textbox = CursorFocusTextBox(10, 30, 280, 25, editor, shadow_text="[unnamed]" if locked else "name...", text_size=20, content=(n if isinstance(n, str) else ""), text_bg_color=TEXT_BG2_COLOR)
         
-        parent_label = Text(15, 63, 1, "parent: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+        parent_label = Text(15, 63, 1, "parent:  ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
         
         parent = self.data["ref"].get_raw("parent", None)
         if isinstance(parent, VisualLoader.ObjectReference):
-            parent_cell = AttributeCell(editor, parent, "ref", False)
+            parent_cell = AttributeCell(editor, parent, f"{ref_type}-ref", False)
         else:
             parent_cell = None
         
-        parent_data_cell = CellSlot(self, 15+parent_label.width, 60, 180, 24, ["ref"], parent_cell, locked, ignored_values=[self.data["ref"].uid])
+        parent_data_cell = CellSlot(self, 15+parent_label.width, 60, 180, 24, [f"{ref_type}-ref"], parent_cell, locked, ignored_values=[self.data["ref"].uid])
         
-        reference_generator = CellSlot(self, 15, 365, 132, 20, None, self.data["ref"].uid, False, True)
+        reference_generator = CellSlot(self, 15, 365, 132, 20, f"{ref_type}-ref", self.data["ref"].uid, False, True)
+        name_textbox = CursorFocusTextBox(10, 30, 280, 25, editor, shadow_text="[unnamed]" if locked else "name...", text_size=20, content=(n if isinstance(n, str) else ""), text_bg_color=TEXT_BG2_COLOR)
+        
         
         if locked:
             id_textbox.text_box.allow_typing = False
@@ -149,43 +150,170 @@ class AttributePanel(UIElement):
         
         self.children = [
             id_textbox,
-            name_textbox,
             parent_label,
             parent_data_cell,
-            
+            name_textbox,
             reference_generator
         ]
 
+    def attr_cell(self, label_text:str, value:str, y:int, y2:int, offset:int, width:int, classes:tuple[type], val_type:str, data_types:list[str], locked:bool, editor) -> tuple[Text, CellSlot]:
+        label = Text(15, y, 1, label_text, text_bg_color=None, text_color=TEXT_BG3_COLOR)
+        val = self.data["ref"].get(value)
+        if isinstance(val, classes):
+            cell = AttributeCell(editor, val, val_type, not locked)
+        else:
+            cell = None
+        slot = CellSlot(self, 15+label.width+offset, y2, width, 24, data_types, cell, locked)
+        
+        return label, slot
+
     def build_data(self, editor):
-        
         if not self.data: return
-        
         self.parent_ref = self.data["ref"]
-        
-        # Use data to build children.
         if "type" in self.data:
             match self.data["type"]:
                 case "weapon-base":
-                    self.build_common(editor)
+                    # self.height = 300
+                    self.build_common(editor, "weapon")
+                    
+                    # self.children[4].y -= 100
+                    
+                    locked = self.data["ref"].locked
+                    
+                    damage_label = Text(15, 93, 1, "Damage:  ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    dmg = self.data["ref"].get("damage")
+                    if isinstance(dmg, (int, float, dict)):
+                        damage_cell = AttributeCell(editor, dmg, "int", not locked)
+                    else:
+                        damage_cell = None
+                    damage_slot = CellSlot(self, 15+damage_label.width, 90, 180, 24, ["int", "float"], damage_cell, locked)
                     
                     
+                    range_label = Text(15, 123, 1, "Range:  ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    rng = self.data["ref"].get("range")
+                    if isinstance(rng, (int, float, dict)):
+                        range_cell = AttributeCell(editor, rng, "int", not locked)
+                    else:
+                        range_cell = None
+                    range_slot = CellSlot(self, 15+damage_label.width, 120, 180, 24, ["int", "float"], range_cell, locked)
+                    
+                    
+                    durability_label = Text(15, 153, 1, "Durability:", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    dura_label1 = Text(15, 183, 1, "Max:     ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    dura_label2 = Text(15, 213, 1, "Current: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    
+                    dura = self.data["ref"].get("durability")
+                    if isinstance(dura, (int, float, dict)):
+                        dura_cell = AttributeCell(editor, dura, "int", not locked)
+                    else:
+                        dura_cell = None
+                    
+                    dura_max = self.data["ref"].get("max_durability")
+                    if isinstance(dura_max, (int, float, dict)):
+                        dura_max_cell = AttributeCell(editor, dura_max, "int", not locked)
+                    else:
+                        dura_max_cell = None
+                    
+                    dura_max_slot = CellSlot(self, 15+dura_label2.width, 180, 180, 24, ["int", "float"], dura_max_cell, locked)
+                    dura_slot = CellSlot(self, 15+dura_label2.width, 210, 180, 24, ["int", "float"], dura_cell, locked)
+                    
+                    # TODO: events sub-menu
+                    
+                    self.children += [
+                        damage_label,
+                        damage_slot,
+                        range_label,
+                        range_slot,
+                        durability_label,
+                        dura_label1,
+                        dura_label2,
+                        dura_slot,
+                        dura_max_slot
+                    ]
                     
                 case "weapon-instance":
                     ...
                 case "armor-base":
-                    self.build_common(editor)
+                    # self.height = 500
+                    self.build_common(editor, "armor")
+                    
+                    # self.children[4].y += 100
+                    
+                    locked = self.data["ref"].locked
+                    
+                    desc_label, desc_slot = self.attr_cell(
+                        "Description: ", "description", 93, 120, 0, 180,
+                        (str), "str", ["str"], locked, editor
+                    )
+                    desc_slot.x = self.children[2].x
+                    
+                    dmg_label, dmg_slot = self.attr_cell(
+                        "Damage Reduction: ", "damage_reduction", 153, 180, 0, 180,
+                        (int, float, dict), "int", ["int", "float"], locked, editor
+                    )
+                    dmg_slot.x = desc_slot.x
+                    
+                    durability_label = Text(15, 213, 1, "Durability:", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    dura_label1 = Text(15, 243, 1, "Max:     ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    dura_label2 = Text(15, 273, 1, "Current: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    
+                    dura = self.data["ref"].get("durability")
+                    if isinstance(dura, (int, float, dict)):
+                        dura_cell = AttributeCell(editor, dura, "int", not locked)
+                    else:
+                        dura_cell = None
+                    
+                    dura_max = self.data["ref"].get("max_durability")
+                    if isinstance(dura_max, (int, float, dict)):
+                        dura_max_cell = AttributeCell(editor, dura_max, "int", not locked)
+                    else:
+                        dura_max_cell = None
+                    
+                    dura_max_slot = CellSlot(self, 15+dura_label2.width, 240, 180, 24, ["int", "float"], dura_max_cell, locked)
+                    dura_slot = CellSlot(self, 15+dura_label2.width, 270, 180, 24, ["int", "float"], dura_cell, locked)
+                    
+                    # TODO: events sub-menu
+                    
+                    self.children += [
+                        desc_label, desc_slot,
+                        dmg_label, dmg_slot,
+                        durability_label,
+                        dura_label1, dura_max_slot,
+                        dura_label2, dura_slot,
+                    ]
+                    
                 case "armor-instance":
                     ...
                 case "ammo-base":
-                    self.build_common(editor)
+                    self.build_common(editor, "ammo")
+                    
+                    locked = self.data["ref"].locked
+                    
+                    desc_label, desc_slot = self.attr_cell(
+                        "Description: ", "description", 93, 120, 0, 180,
+                        (str), "str", ["str"], locked, editor
+                    )
+                    desc_slot.x = self.children[2].x # 'parent' slot x-pos
+                    
+                    dmg_label, dmg_slot = self.attr_cell(
+                        "Bonus Damage: ", "bonus_damage", 153, 180, 0, 180,
+                        (int, float, dict), "int", ["int", "float"], locked, editor
+                    )
+                    dmg_slot.x = desc_slot.x
+                    
+                    self.children += [
+                        desc_label, desc_slot,
+                        dmg_label, dmg_slot
+                    ]
+                    
                 case "ammo-instance":
                     ...
                 case "tool-base":
-                    self.build_common(editor)
+                    self.build_common(editor, "tool")
                 case "tool-instance":
                     ...
                 case "item-base":
-                    self.build_common(editor)
+                    self.build_common(editor, "item")
                 case "item-instance":
                     ...
                 case "attack-base":
@@ -204,12 +332,81 @@ class AttributePanel(UIElement):
                     ...
                 case "status_effect-instance":
                     ...
-                case "room":
-                    ...
-                case "script":
-                    ...
+                case "room-base":
+                    locked = self.data["ref"].locked
+        
+                    id_textbox = CursorFocusTextBox(10, 6, 280, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
+                    n = self.data["ref"].get("name")
+                    
+                    reference_generator = CellSlot(self, 15, 365, 132, 20, "room-ref", self.data["ref"].uid, False, True)
+                    name_textbox = CursorFocusTextBox(10, 30, 280, 25, editor, shadow_text="[unnamed]" if locked else "name...", text_size=20, content=(n if isinstance(n, str) else ""), text_bg_color=TEXT_BG2_COLOR)
+                    
+                    on_enter_label = Text(15, 80,  1, "Enter Script: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    on_input_label = Text(15, 140, 1, "Input Script: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    on_exit_label  = Text(15, 200, 1, "Exit Script: ",  text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    
+                    on_enter = self.data["ref"].get("on_enter")
+                    if isinstance(on_enter, dict) and "#script" in on_enter:
+                        on_enter_cell = AttributeCell(editor, VisualLoader.ObjectReference(on_enter["#script"]), "script-ref", False)
+                    else:
+                        on_enter_cell = None
+                    
+                    on_enter_slot = CellSlot(self, 15, 100, 200, 24, ["script-ref"], on_enter_cell, locked)
+                    
+                    on_input = self.data["ref"].get("on_input")
+                    if isinstance(on_input, dict) and "#script" in on_input:
+                        on_input_cell = AttributeCell(editor, VisualLoader.ObjectReference(on_input["#script"]), "script-ref", False)
+                    else:
+                        on_input_cell = None
+                    
+                    on_input_slot = CellSlot(self, 15, 160, 200, 24, ["script-ref"], on_input_cell, locked)
+                    
+                    on_exit = self.data["ref"].get("on_exit")
+                    if isinstance(on_exit, dict) and "#script" in on_exit:
+                        on_exit_cell = AttributeCell(editor, VisualLoader.ObjectReference(on_exit["#script"]), "script-ref", False)
+                    else:
+                        on_exit_cell = None
+                    
+                    on_exit_slot = CellSlot(self, 15, 220, 200, 24, ["script-ref"], on_exit_cell, locked)
+                    
+                    if locked:
+                        id_textbox.text_box.allow_typing = False
+                        name_textbox.text_box.allow_typing = False
+                        
+                        id_textbox.set_text_color(TEXT_BG3_COLOR)
+                        name_textbox.set_text_color(TEXT_BG3_COLOR)
+                    
+                    # TODO: interactions sub-menu
+                    
+                    self.children = [
+                        id_textbox,
+                        on_enter_label,
+                        on_enter_slot,
+                        on_input_label,
+                        on_input_slot,
+                        on_exit_label,
+                        on_exit_slot,
+                        name_textbox,
+                        reference_generator
+                    ]
+                    
+                case "script-base":
+                    locked = self.data["ref"].locked
+                    id_textbox = CursorFocusTextBox(10, 6, 280, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
+                    
+                    if locked:
+                        id_textbox.text_box.allow_typing = False
+                        id_textbox.set_text_color(TEXT_BG3_COLOR)
+                    
+                    self.children = [
+                        id_textbox
+                    ]
+                    
                 case _:
                     raise TypeError(f"Unknown object type! '{self.data["type"]}'")
+    
+    def save(self, editor) -> dict:
+        ...
     
     def rebuild(self):
         self.surface = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)

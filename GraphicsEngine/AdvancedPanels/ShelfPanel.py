@@ -43,7 +43,7 @@ class ShelfPanel(UIElement):
         self.panel = AttributePanel(editor, None, 0, 0, width, height, False, TEXT_BG_COLOR)
         self.panel.texture_scale = 1
         self.panel.rebuild()
-        self.label_text_box = CursorFocusTextBox(12, 4, 150, TEXT_SIZE+4, editor, "enter label...", content=label)
+        self.label_text_box = CursorFocusTextBox(12, 4, 250, TEXT_SIZE+4, editor, "enter label...", content=label)
         if locked:
             self.label_text_box.text_box.allow_typing = False
             self.label_text_box.set_text_color(TEXT_BG3_COLOR)

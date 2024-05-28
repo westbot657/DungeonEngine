@@ -105,7 +105,7 @@ class AdvancedEditorSubApp(UIElement):
         self.search_box = CursorFocusTextBox(editor.width-350, 27, 348, 30, editor, "search...")
         self.children.append(self.search_box)
         
-        self.object_tree = PanelTree(editor.width-352, 57, 350, editor.height-111, editor)
+        self.object_tree = PanelTree(editor.width-352, 57, 350, editor.height-146, editor)
         self.children.append(self.object_tree)
         
         self.object_tree.get_search = self.search_box.get_content
@@ -304,13 +304,15 @@ class AdvancedEditorSubApp(UIElement):
         # cell.back_link.referencers.remove(slot.parent)
         def redo():
             # print(f"set None as cell of slot '{slot}'")
-            cell.back_link.referencers.remove(slot.parent)
+            if cell.back_link and slot.parent:
+                cell.back_link.referencers.remove(slot.parent)
             slot.cell = None
             cell.slot = None
         
         def undo():
             # print(f"set '{cell}' as cell of slot '{slot}'")
-            cell.back_link.referencers.append(slot.parent)
+            if cell.back_link and slot.parent:
+                cell.back_link.referencers.append(slot.parent)
             slot.cell = cell
             cell.slot = slot
         
@@ -327,12 +329,12 @@ class AdvancedEditorSubApp(UIElement):
         self.construction_canvas.height = editor.height-111
         
         self.canvas_action_hint_mask = pygame.transform.scale(self.canvas_action_hint_mask, (max(1, editor.width-452), max(1, editor.height-111)))
-        self.shelf_action_hint_mask = pygame.transform.scale(self.shelf_action_hint_mask, (350, max(1, editor.height-81)))
+        self.shelf_action_hint_mask = pygame.transform.scale(self.shelf_action_hint_mask, (350, max(1, editor.height-111)))
         
         self.construction_canvas.rebuild()
         self.search_box.x = editor.width-350
         self.object_tree.x = editor.width-352
-        self.object_tree.height = editor.height-111
+        self.object_tree.height = editor.height-146
         self.open_dungeon_button.y = editor.height-70
         self.toasts.x = editor.width-355
         self.toasts.y = editor.height-20

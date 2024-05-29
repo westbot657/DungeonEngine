@@ -8,6 +8,9 @@ from MultilineTextBox import MultilineTextBox
 from Text import Text
 from VisualLoader import VisualLoader, AttributeCell, CellSlot
 from AdvancedPanels.PanelTextBox import PanelTextBox
+from ContextTree import ContextTree
+
+from Editor import Editor
 
 import pygame
 import time
@@ -111,6 +114,7 @@ class AttributePanel(UIElement):
         self.hovered = False
         self.border_hovered = False
         self.shelf_panel = None
+        self.has_data = False
         self.build_data(editor)
         self.rebuild()
         self.referencers = []
@@ -170,10 +174,67 @@ class AttributePanel(UIElement):
         
         return label, slot
 
+    def stash(self, editor):
+        self.ctx_tree.close()
+        
+        _x = self.x
+        _y = self.y
+        
+        self.shelf_panel.placer = self.shelf_panel._placer
+        self.shelf_panel.aesa.visibility_groups[self.shelf_panel.category].remove(self)
+        
+        def redo():
+            self.shelf_panel.placer = self.shelf_panel._placer
+            self.shelf_panel.aesa.visibility_groups[self.shelf_panel.category].remove(self)
+        
+        def undo():
+            self.x = _x
+            self.y = _y
+            self.shelf_panel.aesa.visibility_groups[self.shelf_panel.category].append(self)
+            self.shelf_panel.placer = None
+        
+        editor.add_history(redo, undo, "Stashed panel")
+    
+    def show_shelf(self, editor):
+        self.ctx_tree.close()
+        
+        if self.shelf_panel.aesa.object_tree._search in self.shelf_panel.label.lower():
+            self.shelf_panel.aesa.object_tree.offsetY -= self.shelf_panel.y-5
+        else:
+            self.shelf_panel.aesa.toasts.toast("Current search query is\nhiding this shelf panel.")
+        
+
+    def hide(self, editor):
+        self.ctx_tree.close()
+        # the panel is visible if this function is reachable
+        self.shelf_panel.visibility_toggle(editor)
+        
+        def redo():
+            self.shelf_panel.visibility_toggle(editor)
+        
+        editor.add_history(redo, redo, "Toggled panel visibility")
+
+
     def build_data(self, editor):
         if not self.data: return
         self.parent_ref = self.data["ref"]
         if "type" in self.data:
+            
+            self.has_data = True
+            
+            self.ctx_tree = ContextTree([
+                {
+                    "  Stash": self.stash
+                },
+                {
+                    "  Show on Shelf": self.show_shelf
+                },
+                {
+                    "  Hide": self.hide
+                }
+            ], 200, 20, group="main-ctx", hover_color=TEXT_BG2_COLOR, click_color=TEXT_BG2_COLOR)
+            
+            
             match self.data["type"]:
                 case "weapon-base":
                     # self.height = 300
@@ -591,6 +652,11 @@ class AttributePanel(UIElement):
                 self.border_hovered = False
                 
             if self.hovered:
+                
+                if editor.right_mouse_down() and self.has_data:
+                    # print(f"open ctx menu?  {Editor._e_instance} mouse: {Editor._e_instance.mouse_pos}")
+                    self.ctx_tree.openAtMouse(Editor._e_instance)
+                
                 if not editor.collides(editor.mouse_pos, (self.x+5, self.y+5, self.width-10, self.height-10)):
                     self.border_hovered = True
                 else:

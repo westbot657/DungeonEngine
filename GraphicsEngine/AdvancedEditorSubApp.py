@@ -158,7 +158,8 @@ class AdvancedEditorSubApp(UIElement):
         self.empty_visibility_toggle_spots.append(img)
         
         
-        self.open_dungeon_button = BorderedButton(base_x+x_offset+10, base_y+30, -1, None, " Open Dungeon ")
+        self.open_dungeon_button = BorderedButton(157, editor.height-50, -1, None, "    Open Dungeon    ")
+        # self.open_dungeon_offset = (350+self.open_dungeon_button.width)/2
         self.open_dungeon_button.on_left_click = self.click_load_dungeon
         self.children.append(self.open_dungeon_button)
         self.to_open = ""
@@ -215,7 +216,7 @@ class AdvancedEditorSubApp(UIElement):
         return attr_panel
     
     def create_shelf_panel(self, category, attribute_panel, label, id, tags=None, height=35, panel_data=None):
-        shelf_panel = ShelfPanel(340, height, label, id, category, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas, tags, panel_data["ref"].locked)
+        shelf_panel = ShelfPanel(340, height, label, id, category, attribute_panel, self.construction_canvas.canvas, self.object_tree._canvas, tags, panel_data["ref"].locked, self)
         attribute_panel.shelf_panel = shelf_panel
         self.object_tree.tree.append(shelf_panel)
     
@@ -335,7 +336,8 @@ class AdvancedEditorSubApp(UIElement):
         self.search_box.x = editor.width-350
         self.object_tree.x = editor.width-352
         self.object_tree.height = editor.height-146
-        self.open_dungeon_button.y = editor.height-70
+        # self.open_dungeon_button.x = editor.width - self.open_dungeon_offset
+        self.open_dungeon_button.y = editor.height - 45
         self.toasts.x = editor.width-355
         self.toasts.y = editor.height-20
 

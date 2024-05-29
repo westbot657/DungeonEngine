@@ -69,6 +69,8 @@ class PanelTree(UIElement):
         last = None
         for obj in self.tree:
             if (self._search in obj.label.lower()) or any(tag.startswith(self._search) for tag in obj.tags):
+                obj.x = 5
+                obj.y = self._y + self.offsetY
                 if viewport_rect.colliderect(obj.get_collider(0, self._y)):
                     obj._event(self._canvas, 5, self._y + self.offsetY)
                 # self.mouse_pos[1] -= obj.effective_height+5

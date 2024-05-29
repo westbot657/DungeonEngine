@@ -31,9 +31,10 @@ class ShelfPanel(UIElement):
     
     reference_grab = Image(f"{PATH}/advanced_editor/reference_grab.png", 0, 0, 5, 35)
     
-    def __init__(self, width, height, label, id, category, attr_panel, canvas, editor, tags:list|None=None, locked=False):
+    def __init__(self, width, height, label, id, category, attr_panel, canvas, editor, tags:list|None=None, locked=False, aesa=None):
         self.x = 0
         self.y = 0
+        self.aesa = aesa
         self.width = width
         self.height = height
         self.label = label # Used for panel search filtering
@@ -111,7 +112,7 @@ class ShelfPanel(UIElement):
     def _update(self, editor, X, Y):
         
         # update
-        self.panel._update(editor, X, Y)
+        self.panel._update(editor, self.x, self.y)
         self.label_text_box.x = self.x+self.label_offset[0]
         self.label_text_box.y = self.y+self.label_offset[1]
         
@@ -125,18 +126,18 @@ class ShelfPanel(UIElement):
         
         self.label_text_box._update(editor, 0, 0)
         if self.placer is not None:
-            self.placer._update(editor, X+self.placer_offset[0], Y+self.placer_offset[1])
+            self.placer._update(editor, self.x+self.placer_offset[0], Y+self.placer_offset[1])
         else:
-            self.visibility_button._update(editor, X, Y)
-            self.focus_button._update(editor, X, Y)
+            self.visibility_button._update(editor, self.x, self.y)
+            self.focus_button._update(editor, self.x, self.y)
         
         self.effective_height = self.height
         for child in self.children:
             if hasattr(child, "effective_height"):
-                child._update(editor, X, Y+self.effective_height)
+                child._update(editor, self.x, self.y+self.effective_height)
                 self.effective_height += child.effective_height
             else:
-                child._update(editor, X, Y)
+                child._update(editor, self.x, self.y)
                 
         
     
@@ -147,8 +148,8 @@ class ShelfPanel(UIElement):
         return True
     
     def _event(self, editor, X, Y):
-        self.x = X
-        self.y = Y
+        # self.x = X
+        # self.y = Y
         # print(f"offsetY: {offsetY}")
         self.effective_height = self.height
         
@@ -162,7 +163,7 @@ class ShelfPanel(UIElement):
         
         for child in self.children: # Can not reverse-iterate, as positions are constructed iteratively
             if hasattr(child, "effective_height"):
-                child._event(editor, X, Y+self.effective_height)
+                child._event(editor, self.x, self.y+self.effective_height)
                 self.effective_height += child.effective_height
             else:
                 child._event(editor, self.x, self.y)

@@ -55,7 +55,7 @@ class ContextTree(UIElement):
         for obj in tree_fields:
             if isinstance(obj, ContextTree.Line):
                 self.tree.update({h: Box(0, h, self.width, 1, self.line_color)})
-                h += 1/2
+                h += 1
 
             elif isinstance(obj, dict):
                 for key, val in obj.items():
@@ -102,18 +102,18 @@ class ContextTree(UIElement):
 
     def openAtMouse(self, editor):
         if not (self.parent is ContextTree.MousePos or self.parent is None):
-            self.set_visibility(not self.visible)
+            self.set_visibility(True)
             return
         ContextTree.MousePos.x, ContextTree.MousePos.y = editor.mouse_pos
         self.parent = ContextTree.MousePos
-        self.set_visibility(not self.visible)
+        self.set_visibility(True)
+        editor._hovering_ctx_tree = True
 
     def __call__(self, *_, **__):
         self.toggle_visibility()
     
     def _update(self, editor, X, Y):
         if self.visible:
-            
             if self.tree:
                 dx = 0 if X + self.parent.width + self.width < editor.width else -[v for v in self.tree.values()][0].width
                 dw = min(0, X+self.parent.x+dx-1)

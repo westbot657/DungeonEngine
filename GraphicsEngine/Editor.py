@@ -25,7 +25,7 @@ pygame.init()
 
 class Editor:
     
-    _instance = None
+    _e_instance = None
 
     def __init__(self, engine, io_hook, width=1280, height=720) -> None:
         self.screen:pygame.Surface = None
@@ -82,7 +82,7 @@ class Editor:
         self.future = []
         self.history_limit = 200
         
-        Editor._instance = self
+        Editor._e_instance = self
     
     def add_history(self, action_made, inverse_action, description:str):
         self.history.append((action_made, inverse_action, description))
@@ -265,6 +265,8 @@ class Editor:
                 Popup._popup._update_layout(self)
                 Popup._popup._event(self, 0, 0)
 
+            lmd = self.left_mouse_down()
+            rmd = self.right_mouse_down()
             ContextTree.event(self, 0, 0)
 
             for l in layers[::-1]:
@@ -273,8 +275,6 @@ class Editor:
 
             SnapNode.reset()
 
-            lmd = self.left_mouse_down()
-            rmd = self.right_mouse_down()
             if self._hovering is not None:
                 # print(f"Hovering: {self._hovering}  alt: {getattr(self._hovering, "_alt_text", "")}")
                 if self._hovering != self._hovering_last:

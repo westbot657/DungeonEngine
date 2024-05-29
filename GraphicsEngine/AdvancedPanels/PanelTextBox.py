@@ -140,6 +140,7 @@ class PanelTextBox(UIElement):
             self.state = "404"
     
     def on_close_button_clicked(self, editor):
+        self.text_box.unfocus()
         
         if self.text_box.saved:
             self.state = "open-menu"
@@ -198,7 +199,7 @@ class PanelTextBox(UIElement):
                 if editor.scroll != 0 and self.text_box.hovered:
                     if pygame.K_LSHIFT in editor.keys: # pylint: disable=no-member
                         self.offsetX += editor.scroll * SCROLL_MULTIPLIER
-                        self.offsetX = -min(max(0, -self.offsetX), self.text_box._text_width + 40)
+                        self.offsetX = -min(max(0, -self.offsetX), self.text_box._text_width - 40)
                         
                     else:
                         self.offsetY += editor.scroll * SCROLL_MULTIPLIER

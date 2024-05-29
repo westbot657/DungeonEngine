@@ -174,7 +174,7 @@ class CellSlot(UIElement):
                             elif d == "list":
                                 value = []
                             elif d == "dict":
-                                value = []
+                                value = {}
                             else:
                                 raise ValueError(f"default value not implemented for type '{data_type}'")
                             cell = AttributeCell(editor, value, d, True)
@@ -194,6 +194,7 @@ class CellSlot(UIElement):
                 
                 # print(fields)
                 self.ctx_tree = ContextTree(fields, 200, 20, group="main-ctx", hover_color=TEXT_BG3_COLOR, click_color=TEXT_BG3_COLOR)
+                # self.ctx_tree.parent = self.add_button
 
     def get_ignored_values(self):
         out = self.ignored_values.copy()
@@ -204,7 +205,8 @@ class CellSlot(UIElement):
     
     def on_add_clicked(self, editor):
         # print("open context tree?")
-        self.ctx_tree.openAtMouse(editor._instance)
+        # self.ctx_tree.open()
+        self.ctx_tree.openAtMouse(editor._e_instance)
     
     def _event(self, editor, X, Y):
         
@@ -240,6 +242,8 @@ class CellSlot(UIElement):
                     self.cell.unfocus()
                     # self.cell.slot = None
                     self.cell = None
+                if editor.holding:
+                    self.empty_mouse = False
             elif editor.holding or editor.drop_requested:
                 if isinstance(editor.held, AttributeCell) and not self.locked:
                     if editor.held.data_type in self.data_types and editor.held.get_value() not in self.get_ignored_values():
@@ -337,8 +341,7 @@ class CellSlot(UIElement):
             self.cell._update(editor, X+self.x, Y+self.y)
         elif self.has_add and not self.locked:
             self.add_button._update(editor, X+self.x, Y+self.y)
-        
-        
+
 
 class VisualLoader:
     

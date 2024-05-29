@@ -7,6 +7,7 @@ from MultilineTextBox import MultilineTextBox
 from Options import PATH, TEXT_COLOR, TEXT_BG_COLOR, TEXT_BG3_COLOR, TEXT_SIZE
 from CursorFocusTextBox import CursorFocusTextBox
 from Text import Text
+from VisualLoader import VisualLoader, AttributeCell
 
 import time
 
@@ -28,12 +29,15 @@ class ShelfPanel(UIElement):
         Image(f"{PATH}/advanced_editor/panel_ellipsis_menu_hovered.png", 0, 0, 33, 33),
     )
     
+    reference_grab = Image(f"{PATH}/advanced_editor/reference_grab.png", 0, 0, 5, 35)
+    
     def __init__(self, width, height, label, id, category, attr_panel, canvas, editor, tags:list|None=None, locked=False):
         self.x = 0
         self.y = 0
         self.width = width
         self.height = height
         self.label = label # Used for panel search filtering
+        self.id = id
         self.category = category
         self.tags = tags or []
         self.attr_panel = attr_panel
@@ -116,6 +120,9 @@ class ShelfPanel(UIElement):
         
         self.id_display._update(editor, 0, 0)
         
+        if self.attr_panel.generator:
+            self.reference_grab._update(editor, self.x*2, self.y)
+        
         self.label_text_box._update(editor, 0, 0)
         if self.placer is not None:
             self.placer._update(editor, X+self.placer_offset[0], Y+self.placer_offset[1])
@@ -145,7 +152,13 @@ class ShelfPanel(UIElement):
         # print(f"offsetY: {offsetY}")
         self.effective_height = self.height
         
-        
+        if self.attr_panel.generator and editor.collides(editor.mouse_pos, (self.x, self.y, 5, self.height)):
+            if editor.left_mouse_down():
+                ref = VisualLoader.ObjectReference(self.id)
+                cell = AttributeCell(editor, ref, (self.attr_panel.generator.data_types or "ref"), False, True, back_link=self.attr_panel.generator.parent)
+                editor.holding = True
+                editor.held = cell
+                editor.hold_offset = (cell.width/2, cell.height/2)
         
         for child in self.children: # Can not reverse-iterate, as positions are constructed iteratively
             if hasattr(child, "effective_height"):

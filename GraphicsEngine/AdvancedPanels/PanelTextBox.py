@@ -31,17 +31,36 @@ class PanelTextBox(UIElement):
         self.file_path = file_path
         
         self.text_box = MultilineTextBox(5, 0, width-5, height, text_bg_color=TEXT_BG2_COLOR)
+        self.text_box.on_save(self.on_save)
         
         self.open_button = BorderedButton(0, 0, -1, 20, " Open File ")
         self.open_button.x = (self.width-self.open_button.width)/2
         self.open_button.y = (self.height-self.open_button.height)/2
         self.open_button.on_left_click = self.on_open_button_clicked
         
-        self.close_button = BorderedButton(150, 365, -1, 20, " Close ")
+        self.close_button = BorderedButton(200, 365, -1, 20, " Close ")
+        self.close_button.on_left_click = self.on_close_button_clicked
         
         self.error_msg = MultilineText(0, 0, 1, 1, "Couldn't load file!", text_bg_color=TEXT_BG2_COLOR)
         self.error_msg.x = (self.width-self.error_msg._text_width)/2
         self.error_msg.y = (self.height-self.error_msg._text_height)/2
+        
+        
+        self.confirm_msg = MultilineText(0, 80, 1, 1, "       You haven't saved!       \nWould you like to close anyways?")
+        self.confirm_msg.x = (self.width-self.confirm_msg._text_width)/2
+        
+        self.confirm_close_button = BorderedButton(0, 0, -1, 20, " Close ")
+        self.confirm_close_button.off_left_click = self.on_confirm_button_clicked
+        
+        self.cancel_close_button = BorderedButton(0, 0, -1, 20, " Cancel ")
+        self.cancel_close_button.on_left_click = self.on_cancel_button_clicked
+        
+        self.confirm_close_button.x = (self.width-self.confirm_close_button.width)/2
+        self.confirm_close_button.y = ((self.height-self.confirm_close_button.height)/2) - 15
+        
+        self.cancel_close_button.x = (self.width-self.cancel_close_button.width)/2
+        self.cancel_close_button.y = ((self.height-self.cancel_close_button.height)/2) + 15
+        
         
         self.state = "open-menu"
         
@@ -87,6 +106,16 @@ class PanelTextBox(UIElement):
         self.last_X = X
         self.last_Y = Y
     
+    def on_confirm_button_clicked(self, editor):
+        self.state = "open-menu"
+    
+    def on_cancel_button_clicked(self, editor):
+        self.state = "editor"
+    
+    def on_save(self, _, content, __, ___):
+        with open(self.file_path, "w+", encoding="utf-8") as f:
+            f.write(content)
+    
     def on_open_button_clicked(self, editor):
         
         if os.path.exists(self.file_path):
@@ -109,7 +138,13 @@ class PanelTextBox(UIElement):
         
         else:
             self.state = "404"
+    
+    def on_close_button_clicked(self, editor):
         
+        if self.text_box.saved:
+            self.state = "open-menu"
+        else:
+            self.state = "confirm-close"
     
     def _event(self, editor, X, Y):
         self.editor = editor
@@ -120,7 +155,13 @@ class PanelTextBox(UIElement):
                 self.open_button._event(editor, X+self.x, Y+self.y)
             case "404":
                 self.error_msg._event(editor, X+self.x, Y+self.y)
+            case "confirm-close":
+                self.confirm_msg._event(editor, X+self.x, Y+self.y)
+                self.confirm_close_button._event(editor, X+self.x, Y+self.y)
+                self.cancel_close_button._event(editor, X+self.x, Y+self.y)
             case _:
+                
+                self.close_button._event(editor, X, Y)
                 
                 self.scroll_visible = self.text_box._text_height - self.text_box._height >= 0
                 
@@ -171,8 +212,6 @@ class PanelTextBox(UIElement):
                 elif (self.text_box._text_height - self.text_box._height) != 0:
                     ratio = -self.offsetY / (self.text_box._text_height - self.text_box._height) #
                     self.scroll_y = (self.scroll_space-self.scroll_height) * ratio
-                
-                    
     
     def _update(self, editor, X, Y):
         match self.state:
@@ -180,6 +219,10 @@ class PanelTextBox(UIElement):
                 self.open_button._update(editor, X+self.x, Y+self.y)
             case "404":
                 self.error_msg._update(editor, X+self.x, Y+self.y)
+            case "confirm-close":
+                self.confirm_msg._update(editor, X+self.x, Y+self.y)
+                self.confirm_close_button._update(editor, X+self.x, Y+self.y)
+                self.cancel_close_button._update(editor, X+self.x, Y+self.y)
             case _:
                 self.screen.fill(TEXT_BG2_COLOR)
                 self.text_box._update(self._canvas, self.offsetX, self.offsetY)
@@ -192,5 +235,7 @@ class PanelTextBox(UIElement):
                     editor.screen.fill(self.scroll_bar_hover_color if (self.scroll_dragging or self.scroll_hovered) else self.scroll_bar_color, (X+self.scroll_x-dw, Y+self.y+self.scroll_y-dh, 5+dw, self.scroll_height+dh))
                 
                 editor.screen.blit(self.cutoff_bar, (X+self.x, Y+self.y+self.height-1))
+                
+                self.close_button._update(editor, X, Y)
 
 

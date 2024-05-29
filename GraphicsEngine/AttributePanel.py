@@ -1,7 +1,7 @@
 # pylint: disable=[W,R,C, no-member, import-error]
 
 from UIElement import UIElement
-from Options import PATH, TEXT_BG2_COLOR, TEXT_BG3_COLOR
+from Options import PATH, TEXT_BG2_COLOR, TEXT_BG3_COLOR, TEXT_COLOR
 from RenderPrimitives import Image
 from CursorFocusTextBox import CursorFocusTextBox
 from MultilineTextBox import MultilineTextBox
@@ -107,6 +107,7 @@ class AttributePanel(UIElement):
         self.bg_color = bg_color
         self.visible = True
         self.data = data
+        self.generator = None
         self.hovered = False
         self.border_hovered = False
         self.shelf_panel = None
@@ -139,7 +140,7 @@ class AttributePanel(UIElement):
         
         parent_data_cell = CellSlot(self, 15+parent_label.width, 60, 180, 24, [f"{ref_type}-ref"], parent_cell, locked, ignored_values=[self.data["ref"].uid])
         
-        reference_generator = CellSlot(self, 15, 365, 132, 20, f"{ref_type}-ref", self.data["ref"].uid, False, True)
+        self.generator = reference_generator = CellSlot(self, 15, 365, 132, 20, f"{ref_type}-ref", self.data["ref"].uid, False, True)
         name_textbox = CursorFocusTextBox(10, 30, 280, 25, editor, shadow_text="[unnamed]" if locked else "name...", text_size=20, content=(n if isinstance(n, str) else ""), text_bg_color=TEXT_BG2_COLOR)
         
         
@@ -362,7 +363,7 @@ class AttributePanel(UIElement):
                     id_textbox = CursorFocusTextBox(10, 6, 280, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
                     n = self.data["ref"].get("name")
                     
-                    reference_generator = CellSlot(self, 15, 365, 132, 20, "room-ref", self.data["ref"].uid, False, True)
+                    self.generator = reference_generator = CellSlot(self, 15, 365, 132, 20, "room-ref", self.data["ref"].uid, False, True)
                     name_textbox = CursorFocusTextBox(10, 30, 280, 25, editor, shadow_text="[unnamed]" if locked else "name...", text_size=20, content=(n if isinstance(n, str) else ""), text_bg_color=TEXT_BG2_COLOR)
                     
                     on_enter_label = Text(15, 80,  1, "Enter Script: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
@@ -420,12 +421,15 @@ class AttributePanel(UIElement):
                     
                     edit_box = PanelTextBox(5, 30, 285, 320, 320, self.data["ref"].get("file"), editor)
                     
+                    self.generator = reference_generator = CellSlot(self, 15, 365, 132, 20, f"script-ref", self.data["ref"].uid, False, True)
+                    
                     if locked:
                         id_textbox.text_box.allow_typing = False
                         id_textbox.set_text_color(TEXT_BG3_COLOR)
                     
                     self.children = [
-                        id_textbox
+                        id_textbox,
+                        reference_generator
                     ]
                     self.top_children = [
                         edit_box
@@ -559,6 +563,13 @@ class AttributePanel(UIElement):
     def _event(self, editor, X, Y):
         if self.visible:
             
+            if self.data and self.data["type"] == "script-base":
+                tb = self.top_children[0].text_box
+                if tb.saved and not tb._saved:
+                    self.children[0].set_text_color(TEXT_COLOR)
+                elif tb._saved and not tb.saved:
+                    self.children[0].set_text_color((226, 162, 74))
+            
             for child in self.top_children[::-1]:
                 child._event(editor, self.x, self.y)
         
@@ -598,9 +609,6 @@ class AttributePanel(UIElement):
                     # self._y = self.y
                     self.x = 0
                     self.y = 0
-            
-            
-
         else:
             self.hovered = False
             self.border_hovered = False

@@ -50,6 +50,9 @@ class MultilineTextBox(UIElement):
         self.highlights = []
         self._save = self._default_save_event
         self._on_enter = self._default_on_enter_event
+        
+        self._saved = True
+        self.saved = True
         # self._bg_box = Box()
         self.char_whitelist: list[str] = None
         self.char_blacklist: list[str] = None
@@ -395,8 +398,10 @@ class MultilineTextBox(UIElement):
             self.refresh_highlight()
 
         if self.focused:
+            self._saved = self.saved
             if editor.typing:
                 self._cursor_visible = True
+                self.saved = False
             for key in editor.typing:
                 # print(f"{key!r}")
                 if key == "$↑":
@@ -574,6 +579,7 @@ class MultilineTextBox(UIElement):
                     self.cursor_location.col += len(l[-1])
                     self.save_history()
                 elif key == "\x13": # CTRL+S
+                    self.saved = True
                     content = self.get_content()
                     cursor = self.cursor_location.copy()
                     selection = None

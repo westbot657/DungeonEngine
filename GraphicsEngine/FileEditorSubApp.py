@@ -20,7 +20,7 @@ class Opener:
         self.editor = editor
         self.ctx_tree = ContextTree([
             {
-                "Open in popout": self.open_popout
+                "  Open in popout": self.open_popout
             }
         ], 200, 20, TEXT_COLOR, TEXT_BG_COLOR, (70, 70, 70), TEXT_SIZE, (50, 50, 50), (50, 50, 50), group="main-ctx")
 

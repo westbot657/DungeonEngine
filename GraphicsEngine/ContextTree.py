@@ -38,6 +38,7 @@ class ContextTree(UIElement):
     def __init__(self, tree_fields, width, option_height, text_color=TEXT_COLOR, bg_color=TEXT_BG_COLOR, line_color=(70, 70, 70), text_size=TEXT_SIZE, hover_color=TEXT_BG_COLOR, click_color=TEXT_BG_COLOR, group=None):
         self.visible = False
         self.width = width
+        self.height = 0
         self.option_height = option_height
         self.text_color = text_color
         self.bg_color = bg_color
@@ -61,7 +62,7 @@ class ContextTree(UIElement):
                     if val is None:
                         continue
 
-                    b = Button(0, h, self.width, self.option_height, key, self.bg_color, self.text_color, self.text_size, self.hover_color, self.click_color)
+                    b = Button(0, 0, self.width, self.option_height, key, self.bg_color, self.text_color, self.text_size, self.hover_color, self.click_color)
                     b.on_left_click = val
                     if isinstance(val, UIElement):
                         b.children.append(val)
@@ -69,7 +70,9 @@ class ContextTree(UIElement):
                             val.parent = b
 
                     self.tree.update({h: b})
-                    h += self.option_height/2
+                    h += self.option_height
+                    
+        self.height = h
 
     def set_visibility(self, val:bool):
         self.visible = val
@@ -110,6 +113,14 @@ class ContextTree(UIElement):
     
     def _update(self, editor, X, Y):
         if self.visible:
+            
+            if self.tree:
+                dx = 0 if X + self.parent.width + self.width < editor.width else -[v for v in self.tree.values()][0].width
+                dw = min(0, X+self.parent.x+dx-1)
+                dh = min(0, Y+self.parent.height+self.parent.y-1)
+                
+                editor.screen.fill((0, 120, 212), (X+self.parent.x+dx-dw-1, Y+self.parent.height+self.parent.y-1, self.width+2+dw, self.height+2+dw))
+            
             for h, t in self.tree.items():
                 _x = 0 if X + self.parent.width + self.width < editor.width else -t.width
                 t._update(editor, X + _x+self.parent.x, Y + h+self.parent.height+self.parent.y)

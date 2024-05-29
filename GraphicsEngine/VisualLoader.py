@@ -190,10 +190,10 @@ class CellSlot(UIElement):
                                 cell.slot = self
                             editor.add_history(redo, undo, "Created new value")
                         return new_of_type
-                    fields.append({data_type: create(data_type)})
+                    fields.append({f"  {data_type}": create(data_type)})
                 
                 # print(fields)
-                self.ctx_tree = ContextTree(fields, 200, 20, group="main-ctx")
+                self.ctx_tree = ContextTree(fields, 200, 20, group="main-ctx", hover_color=TEXT_BG3_COLOR, click_color=TEXT_BG3_COLOR)
 
     def get_ignored_values(self):
         out = self.ignored_values.copy()

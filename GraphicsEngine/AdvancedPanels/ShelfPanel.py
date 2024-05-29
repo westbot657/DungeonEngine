@@ -4,7 +4,7 @@ from RenderPrimitives import Image
 from FunctionalElements import Button
 from AttributePanel import AttributePanel
 from MultilineTextBox import MultilineTextBox
-from Options import PATH, TEXT_COLOR, TEXT_BG_COLOR, TEXT_BG3_COLOR, TEXT_SIZE
+from Options import PATH, TEXT_COLOR, TEXT_BG_COLOR, TEXT_BG2_COLOR, TEXT_BG3_COLOR, TEXT_SIZE
 from CursorFocusTextBox import CursorFocusTextBox
 from Text import Text
 from VisualLoader import VisualLoader, AttributeCell
@@ -49,9 +49,10 @@ class ShelfPanel(UIElement):
         self.panel.texture_scale = 1
         self.panel.rebuild()
         self.label_text_box = CursorFocusTextBox(12, 4, 250, TEXT_SIZE+4, editor, "enter label...", content=label)
+        self.locked = locked
         if locked:
             self.label_text_box.text_box.allow_typing = False
-            self.label_text_box.set_text_color(TEXT_BG3_COLOR)
+            self.label_text_box.set_text_color((150, 150, 150))
         
         self.label_offset = [12, 15]
         # self.label_text_box.collides = self.collide_override
@@ -80,12 +81,18 @@ class ShelfPanel(UIElement):
         if self.attr_panel_visible:
             self.visibility_button._bg_color = self.visibility_button.bg_color = self.visibility_frames[0]
             self.visibility_button.hover_color = self.visibility_button.click_color = self.visibility_frames[1]
-            self.label_text_box.set_text_color(TEXT_BG3_COLOR)
+            if self.locked:
+                self.label_text_box.set_text_color((70, 70, 70))
+            else:
+                self.label_text_box.set_text_color(TEXT_BG3_COLOR)
             editor.sound_system.get_audio("AESA_bloop1", "editor").play()
         else:
             self.visibility_button._bg_color = self.visibility_button.bg_color = self.visibility_frames[2]
             self.visibility_button.hover_color = self.visibility_button.click_color = self.visibility_frames[3]
-            self.label_text_box.set_text_color(TEXT_COLOR)
+            if self.locked:
+                self.label_text_box.set_text_color((150, 150, 150))
+            else:
+                self.label_text_box.set_text_color(TEXT_COLOR)
             editor.sound_system.get_audio("AESA_bloop2", "editor").play()
         self.label_text_box.set_content(self.label)
         self.attr_panel.visible = self.attr_panel_visible = not self.attr_panel_visible

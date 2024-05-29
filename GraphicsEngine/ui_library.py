@@ -603,16 +603,16 @@ class CodeEditor(UIElement):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         if self.selected_drag in ["bottom_drag", "bottom_right_drag", "bottom_left_drag"]:
-            editor.height = max(425, rmy - rsy)
+            editor.height = max(600, rmy - rsy)
             self._update_layout(editor)
 
         if self.selected_drag in ["left_drag", "bottom_left_drag"]:
             editor.set_window_location(min (rmx, self.drag_offset[0]-100), self.drag_offset[1])
-            editor.width = max(800, self.drag_offset[0] - rmx)
+            editor.width = max(1200, self.drag_offset[0] - rmx)
             self._update_layout(editor)
 
         if self.selected_drag in ["right_drag", "bottom_right_drag"]:
-            editor.width = max(800, rmx - rsx)
+            editor.width = max(1200, rmx - rsx)
             self._update_layout(editor)
 
         if (not editor.mouse[0]) and editor.previous_mouse[0]:

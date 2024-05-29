@@ -45,7 +45,8 @@ class AttributeCell(UIElement):
     def unfocus(self):
         match self.data_type.rsplit("-", 1)[-1]:
             case "ref"|"str"|"int"|"float"|"percent":
-                self.display.unfocus()
+                if hasattr(self, "display"):
+                    self.display.unfocus()
             case _:
                 pass
     
@@ -57,7 +58,7 @@ class AttributeCell(UIElement):
                 return self.value
     
     def setup_function(self, return_type):
-        ico = Text(2, 3, 1, "f(x) { ... }", text_bg_color=None)
+        ico = Text(2, 3, 1, f"f(x) -> {return_type}", text_bg_color=None)
         self.children.append(ico)
         self.width = 180
         self.height = 24
@@ -65,11 +66,14 @@ class AttributeCell(UIElement):
     def configure_value(self):
         match self.data_type.rsplit("-", 1)[-1]:
             case "str":
-                self.display = CursorFocusTextBox(10, 3, 160, 18, self.editor, content=str(self.value), text_bg_color=None)
-                self.display.text_box.allow_typing = self.modifieable
-                self.children.append(self.display)
-                self.width = 180
-                self.height = 24
+                if isinstance(self.value, (str, int, float)):
+                    self.display = CursorFocusTextBox(10, 3, 160, 18, self.editor, content=str(self.value), text_bg_color=None)
+                    self.display.text_box.allow_typing = self.modifieable
+                    self.children.append(self.display)
+                    self.width = 180
+                    self.height = 24
+                elif isinstance(self.value, dict):
+                    self.setup_function("str")
             case "int":
                 if isinstance(self.value, (int, float)):
                     self.display = CursorFocusTextBox(10, 3, 160, 18, self.editor, content=str(int(self.value)), text_bg_color=None)
@@ -193,7 +197,7 @@ class CellSlot(UIElement):
                     fields.append({f"  {data_type}": create(data_type)})
                 
                 # print(fields)
-                self.ctx_tree = ContextTree(fields, 200, 20, group="main-ctx", hover_color=TEXT_BG3_COLOR, click_color=TEXT_BG3_COLOR)
+                self.ctx_tree = ContextTree(fields, 200, 20, group="main-ctx", hover_color=TEXT_BG2_COLOR, click_color=TEXT_BG2_COLOR)
                 # self.ctx_tree.parent = self.add_button
 
     def get_ignored_values(self):
@@ -207,6 +211,9 @@ class CellSlot(UIElement):
         # print("open context tree?")
         # self.ctx_tree.open()
         self.ctx_tree.openAtMouse(editor._e_instance)
+    
+    # def open_edit_ctx_tree(self):
+    #     ...
     
     def _event(self, editor, X, Y):
         
@@ -222,7 +229,7 @@ class CellSlot(UIElement):
                     self.add_button._event(editor, X+self.x, Y+self.y)
         
         self.hovered = False
-        editor.check_hover(editor, (X+self.x, Y+self.y, self.width, self.height), self)
+        editor._e_instance.check_hover(editor, (X+self.x, Y+self.y, self.width, self.height), self)
         
         if self.hovered:
             if self.generator:
@@ -242,6 +249,8 @@ class CellSlot(UIElement):
                     self.cell.unfocus()
                     # self.cell.slot = None
                     self.cell = None
+                # if editor.right_mouse_down():
+                #     self.open_edit_ctx_tree()
                 if editor.holding:
                     self.empty_mouse = False
             elif editor.holding or editor.drop_requested:

@@ -1,7 +1,7 @@
 # pylint: disable=[W,R,C, import-error]
 
 from ContextTree import ContextTree
-from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE
+from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE, TEXT_BG3_COLOR, TEXT_BG2_COLOR
 from FileEditor import FileEditor
 from Organizers import LayeredObjects
 from DirectoryTree import DirectoryTree
@@ -22,7 +22,7 @@ class Opener:
             {
                 "  Open in popout": self.open_popout
             }
-        ], 200, 20, TEXT_COLOR, TEXT_BG_COLOR, (70, 70, 70), TEXT_SIZE, (50, 50, 50), (50, 50, 50), group="main-ctx")
+        ], 200, 20, TEXT_COLOR, TEXT_BG_COLOR, (70, 70, 70), TEXT_SIZE, TEXT_BG2_COLOR, TEXT_BG2_COLOR, group="main-ctx")
 
     def __call__(s, *_, **__): # pylint: disable=no-self-argument
         self = s.sub_app

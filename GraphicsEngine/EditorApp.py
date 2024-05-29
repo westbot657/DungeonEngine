@@ -17,7 +17,7 @@ class EditorApp(UIElement):
         self.sub_apps = []
         self.sub_app_bar = Box(51, 21, 50, editor.height-42, (24, 24, 24))
         self.children.append(self.sub_app_bar)
-        self.sub_app_bar_line = Box(102, 21, 1, editor.height-42, (70, 70, 70))
+        self.sub_app_bar_line = Box(101, 21, 1, editor.height-42, (70, 70, 70))
         self.children.append(self.sub_app_bar_line)
         self.file_editor_icons = [
             Image(f"{PATH}/file_editor_sub_app.png", 0, 0, 50, 50),

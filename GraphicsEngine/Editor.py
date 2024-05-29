@@ -141,9 +141,9 @@ class Editor:
     def check_hover(self, editor, rect, obj):
         """editor needs to be passed in due to Editor Mimicing"""
         if editor.collides(editor.mouse_pos, rect):
-            if editor._hovering is None:
-                obj.hovered = editor._hovered = True
-                editor._hovering = obj
+            if self._e_instance._hovering is None:
+                obj.hovered = self._e_instance._hovered = True
+                self._e_instance._hovering = obj
         else:
             obj.hovered = False
         
@@ -265,7 +265,6 @@ class Editor:
                 Popup._popup._update_layout(self)
                 Popup._popup._event(self, 0, 0)
 
-            lmd = self.left_mouse_down()
             rmd = self.right_mouse_down()
             ContextTree.event(self, 0, 0)
 
@@ -304,10 +303,13 @@ class Editor:
                 else:
                     self.override_cursor = False
 
+            
+
+
             elif self.override_cursor:
                 self.override_cursor = False
                 pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-            
+            lmd = self.left_mouse_down()
             self._hovering_last = self._hovering
 
             if (rmd or lmd):

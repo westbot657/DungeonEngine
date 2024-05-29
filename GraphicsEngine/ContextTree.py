@@ -2,9 +2,10 @@
 
 from UIElement import UIElement
 from Util import PopoutElement
-from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE
+from Options import TEXT_COLOR, TEXT_BG_COLOR, TEXT_SIZE, TEXT_BG3_COLOR
 from FunctionalElements import Button
 from Geometry import Box
+from Text import Text
 
 @PopoutElement()
 class ContextTree(UIElement):
@@ -60,6 +61,9 @@ class ContextTree(UIElement):
             elif isinstance(obj, dict):
                 for key, val in obj.items():
                     if val is None:
+                        b = Button(0, 0, self.width, self.option_height, key, text_color=TEXT_BG3_COLOR, bg_color=self.bg_color, text_size=self.text_size, hover_color=self.bg_color, click_color=self.bg_color)
+                        self.tree.update({h: b})
+                        h += self.option_height
                         continue
 
                     b = Button(0, 0, self.width, self.option_height, key, self.bg_color, self.text_color, self.text_size, self.hover_color, self.click_color)
@@ -105,6 +109,12 @@ class ContextTree(UIElement):
             self.set_visibility(True)
             return
         ContextTree.MousePos.x, ContextTree.MousePos.y = editor.mouse_pos
+        
+        if ContextTree.MousePos.y < 20:
+            ContextTree.MousePos.y = 20
+        if ContextTree.MousePos.y + self.height > editor.height-5:
+            ContextTree.MousePos.y = editor.height - 5 - self.height
+        
         self.parent = ContextTree.MousePos
         self.set_visibility(True)
         editor._hovering_ctx_tree = True

@@ -643,10 +643,13 @@ class AttributePanel(UIElement):
                 elif time.time() >= self.glow_time > 0:
                     self.glow_time = 0
 
+
+            # self.hovered = False
+            # editor._e_instance.check_hover(editor, (X+self.x, Y+self.y, self.width, self.height), self)
             if editor.collides(editor.mouse_pos, (self.x, self.y, self.width, self.height)):
-                if editor._hovering is None:
-                    self.hovered = editor._hovered = True
-                    editor._hovering = self
+                if editor._e_instance._hovering is None:
+                    self.hovered = editor._e_instance._hovered = True
+                    editor._e_instance._hovering = self
             else:
                 self.hovered = False
                 self.border_hovered = False
@@ -668,9 +671,9 @@ class AttributePanel(UIElement):
                 if editor.left_mouse_down():
                     self.parent.visibility_groups[self.shelf_panel.category].remove(self)
                     editor.sound_system.get_audio("AESA_pick_up", "editor").play()
-                    editor.holding = True
-                    editor.held = self
-                    editor.hold_offset = (editor.mouse_pos[0]-self.x, editor.mouse_pos[1]-self.y)
+                    editor._e_instance.holding = True
+                    editor._e_instance.held = self
+                    editor._e_instance.hold_offset = (editor.mouse_pos[0]-self.x, editor.mouse_pos[1]-self.y)
                     # self._x = self.x
                     # self._y = self.y
                     self.x = 0

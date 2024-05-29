@@ -15,8 +15,8 @@ from LoadingBar import LoadingBar
 from Pathfinding import Pathfinding
 from SoundSystem import SoundSystem
 from MultilineTextBox import MultilineTextBox
-
 from AdvancedPanels.PanelPlacer import PanelPlacer
+from AdvancedPanels.CellEditor import CellEditor
 
 from threading import Thread
 import tkinter.filedialog
@@ -85,6 +85,7 @@ class AdvancedEditorSubApp(UIElement):
         self.shelf_action_hint_mask.set_alpha(10)
         self.shelf_action_hint_fade = 0
         self.shelf_action_hint = Image(f"{PATH}/advanced_editor/shelf_action_hint.png", 0, 0, 55, 55)
+        
         
         self.visibility_types = [
             None,
@@ -166,6 +167,9 @@ class AdvancedEditorSubApp(UIElement):
         self.selected_directory = False
         self.getting_directory = False
         self.dir_getter = None
+        
+        self.cell_editor = CellEditor(editor, self)
+        self.children.append(self.cell_editor)
         
         # self.create_stashed_panel("weapon", (200, 400), "Longsword", True, ["weapon", "melee"])
         # self.create_stashed_panel("weapon", (300, 400), "Shortsword", True, ["weapon", "melee"])

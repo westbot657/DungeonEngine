@@ -7,6 +7,7 @@ from CursorFocusTextBox import CursorFocusTextBox
 from MultilineTextBox import MultilineTextBox
 from Text import Text
 from VisualLoader import VisualLoader, AttributeCell, CellSlot
+from AdvancedPanels.PanelTextBox import PanelTextBox
 
 import pygame
 import time
@@ -98,6 +99,7 @@ class AttributePanel(UIElement):
         self.width = self._width = width
         self.height = self._height = height
         self.children = []
+        self.top_children = []
         self.bordered = bordered
         self.scroll_directions = 0b0000 # left, up, right, down
         self.glowing = False
@@ -200,7 +202,7 @@ class AttributePanel(UIElement):
                     
                     durability_label = Text(15, 153, 1, "Durability:", text_bg_color=None, text_color=TEXT_BG3_COLOR)
                     dura_label1 = Text(15, 183, 1, "Max:     ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
-                    dura_label2 = Text(15, 213, 1, "Current: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    dura_label2 = Text(15, 213, 1, "Default: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
                     
                     dura = self.data["ref"].get("durability")
                     if isinstance(dura, (int, float, dict)):
@@ -255,7 +257,7 @@ class AttributePanel(UIElement):
                     
                     durability_label = Text(15, 213, 1, "Durability:", text_bg_color=None, text_color=TEXT_BG3_COLOR)
                     dura_label1 = Text(15, 243, 1, "Max:     ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
-                    dura_label2 = Text(15, 273, 1, "Current: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    dura_label2 = Text(15, 273, 1, "Default: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
                     
                     dura = self.data["ref"].get("durability")
                     if isinstance(dura, (int, float, dict)):
@@ -301,9 +303,31 @@ class AttributePanel(UIElement):
                     )
                     dmg_slot.x = desc_slot.x
                     
+                    durability_label = Text(15, 213, 1, "Stack Size:", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    dura_label1 = Text(15, 243, 1, "Max:     ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    dura_label2 = Text(15, 273, 1, "Default: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
+                    
+                    dura = self.data["ref"].get("count")
+                    if isinstance(dura, (int, dict)):
+                        dura_cell = AttributeCell(editor, dura, "int", not locked)
+                    else:
+                        dura_cell = None
+                    
+                    dura_max = self.data["ref"].get("max_count")
+                    if isinstance(dura_max, (int, dict)):
+                        dura_max_cell = AttributeCell(editor, dura_max, "int", not locked)
+                    else:
+                        dura_max_cell = None
+                    
+                    dura_max_slot = CellSlot(self, 15+dura_label2.width, 240, 180, 24, ["int"], dura_max_cell, locked)
+                    dura_slot = CellSlot(self, 15+dura_label2.width, 270, 180, 24, ["int"], dura_cell, locked)
+                    
                     self.children += [
                         desc_label, desc_slot,
-                        dmg_label, dmg_slot
+                        dmg_label, dmg_slot,
+                        durability_label,
+                        dura_label1, dura_label2,
+                        dura_max_slot, dura_slot
                     ]
                     
                 case "ammo-instance":
@@ -394,12 +418,17 @@ class AttributePanel(UIElement):
                     locked = self.data["ref"].locked
                     id_textbox = CursorFocusTextBox(10, 6, 280, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
                     
+                    edit_box = PanelTextBox(5, 30, 285, 320, 320, self.data["ref"].get("file"), editor)
+                    
                     if locked:
                         id_textbox.text_box.allow_typing = False
                         id_textbox.set_text_color(TEXT_BG3_COLOR)
                     
                     self.children = [
                         id_textbox
+                    ]
+                    self.top_children = [
+                        edit_box
                     ]
                     
                 case _:
@@ -529,6 +558,9 @@ class AttributePanel(UIElement):
 
     def _event(self, editor, X, Y):
         if self.visible:
+            
+            for child in self.top_children[::-1]:
+                child._event(editor, self.x, self.y)
         
             for child in self.children[::-1]:
                 child._event(editor, self.x, self.y)
@@ -566,6 +598,8 @@ class AttributePanel(UIElement):
                     # self._y = self.y
                     self.x = 0
                     self.y = 0
+            
+            
 
         else:
             self.hovered = False
@@ -581,6 +615,9 @@ class AttributePanel(UIElement):
             if self.glowing:
                 editor.screen.blit(self.glow_surface, (X+self.x-(3*self.texture_scale), Y+self.y-(3*self.texture_scale)))
             editor.screen.blit(self.surface, (X+self.x, Y+self.y))
+
+            for child in self.top_children:
+                child._update(editor, X+self.x, Y+self.y)
         
     def get_collider(self):
         return (self.x, self.y, self.width, self.height)

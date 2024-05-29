@@ -230,6 +230,6 @@ class PopoutElement:
             cls._instance = super().__new__(cls)
         return cls._instance
         
-    def __call__(self, obj:type):
+    def __call__(self, obj):
         PopoutElement._elements.update({obj.__name__: obj})
         return obj

@@ -35,6 +35,8 @@ class FileEditor(UIElement):
 
             case "md":
                 self.edit_area.editable.color_text = self.md_colors
+            case _:
+                pass
 
         self.edit_area.editable.refresh_surfaces()
 

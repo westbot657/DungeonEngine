@@ -8,6 +8,7 @@ from Options import PATH, TEXT_COLOR, TEXT_BG_COLOR, TEXT_BG2_COLOR, TEXT_BG3_CO
 from AdvancedPanels.PanelPlacer import PanelPlacer
 from CursorFocusTextBox import CursorFocusTextBox
 from Text import Text
+from ContextTree import ContextTree
 
 from UIElement import UIElement
 
@@ -114,6 +115,7 @@ class AttributeCell(UIElement):
                 self.height = 24
         
     def _event(self, editor, X, Y):
+        self.editor = editor
         
         for child in self.children[::-1]:
             child._event(editor, X, Y)
@@ -132,7 +134,8 @@ class CellSlot(UIElement):
     
     lock_icon = Image(f"{PATH}/advanced_editor/lock.png", 0, 0, 20, 20)
     
-    def __init__(self, parent, x:int, y:int, width:int, height:int, data_types:list, cell=None, locked=False, generator=False, ignored_values=None):
+    def __init__(self, editor, parent, x:int, y:int, width:int, height:int, data_types:list, cell=None, locked=False, generator=False, ignored_values=None):
+        self.editor = editor
         self.parent = parent
         self.x = x
         self.y = y
@@ -145,6 +148,7 @@ class CellSlot(UIElement):
         self.empty_mouse = True
         self.generator = generator
         self.ignored_values = ignored_values or []
+        self.has_add = False
         
         if isinstance(data_types, list):
             AttributeCell._data_types.update(*data_types)
@@ -154,13 +158,53 @@ class CellSlot(UIElement):
             
         if self.generator:
             self.label = Text(2, 2, 1, "Create Reference", text_bg_color=None)
-    
+        elif not self.locked:
+            if isinstance(self.data_types, (list, tuple)) and (not any(re.findall(r"ref", t) for t in self.data_types)):
+                self.add_button = Button(2, 2, -1, 20, "+", None, hover_color=None, click_color=None)
+                self.add_button.on_left_click = self.on_add_clicked
+                fields = []
+                self.has_add = True
+                for data_type in self.data_types:
+                    def create(d):
+                        def new_of_type(*_, **__):
+                            if d in ["int", "float", "percent"]:
+                                value = 0
+                            elif d == "str":
+                                value = ""
+                            elif d == "list":
+                                value = []
+                            elif d == "dict":
+                                value = []
+                            else:
+                                raise ValueError(f"default value not implemented for type '{data_type}'")
+                            cell = AttributeCell(editor, value, d, True)
+                            self.cell = cell
+                            cell.slot = self
+                            self.ctx_tree.close()
+                            # print(f"making new '{d}' value!")
+                            def undo():
+                                self.cell = None
+                                cell.slot = None
+                            def redo():
+                                self.cell = cell
+                                cell.slot = self
+                            editor.add_history(redo, undo, "Created new value")
+                        return new_of_type
+                    fields.append({data_type: create(data_type)})
+                
+                # print(fields)
+                self.ctx_tree = ContextTree(fields, 200, 20, group="main-ctx")
+
     def get_ignored_values(self):
         out = self.ignored_values.copy()
         
         out += self.parent.get_reference_tree()
         
         return out
+    
+    def on_add_clicked(self, editor):
+        # print("open context tree?")
+        self.ctx_tree.openAtMouse(editor._instance)
     
     def _event(self, editor, X, Y):
         
@@ -172,6 +216,8 @@ class CellSlot(UIElement):
             else:
                 self.width = self._width
                 self.height = self._height
+                if (not self.locked) and self.has_add:
+                    self.add_button._event(editor, X+self.x, Y+self.y)
         
         self.hovered = False
         editor.check_hover(editor, (X+self.x, Y+self.y, self.width, self.height), self)
@@ -289,6 +335,8 @@ class CellSlot(UIElement):
             self.label._update(editor, X+self.x, Y+self.y)
         elif self.cell:
             self.cell._update(editor, X+self.x, Y+self.y)
+        elif self.has_add and not self.locked:
+            self.add_button._update(editor, X+self.x, Y+self.y)
         
         
 
@@ -725,12 +773,12 @@ class VisualLoader:
                 placer = PanelPlacer(shelf_panel)
                 shelf_panel._placer = placer
 
-        toasts.toast(f"Panels loaded!" + (f"\n{len(missing)} object{'s have' if len(missing) > 1 else " has"} broken or unloaded references." if missing else ""))
 
         # print(missing)
         # print(cls._refernce_map)
 
         if not loading_engine:
+            toasts.toast(f"Panels loaded!" + (f"\n{len(missing)} object{'s have' if len(missing) > 1 else " has"} broken or unloaded references." if missing else ""))
             with open(f"{root}/vcfg.json", "w+", encoding="utf-8") as f:
                 json.dump(config, f)
 

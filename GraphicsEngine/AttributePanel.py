@@ -138,9 +138,9 @@ class AttributePanel(UIElement):
         else:
             parent_cell = None
         
-        parent_data_cell = CellSlot(self, 15+parent_label.width, 60, 180, 24, [f"{ref_type}-ref"], parent_cell, locked, ignored_values=[self.data["ref"].uid])
+        parent_data_cell = CellSlot(editor, self, 15+parent_label.width, 60, 180, 24, [f"{ref_type}-ref"], parent_cell, locked, ignored_values=[self.data["ref"].uid])
         
-        self.generator = reference_generator = CellSlot(self, 15, 365, 132, 20, f"{ref_type}-ref", self.data["ref"].uid, False, True)
+        self.generator = reference_generator = CellSlot(editor, self, 15, 365, 132, 20, f"{ref_type}-ref", self.data["ref"].uid, False, True)
         name_textbox = CursorFocusTextBox(10, 30, 280, 25, editor, shadow_text="[unnamed]" if locked else "name...", text_size=20, content=(n if isinstance(n, str) else ""), text_bg_color=TEXT_BG2_COLOR)
         
         
@@ -166,7 +166,7 @@ class AttributePanel(UIElement):
             cell = AttributeCell(editor, val, val_type, not locked)
         else:
             cell = None
-        slot = CellSlot(self, 15+label.width+offset, y2, width, 24, data_types, cell, locked)
+        slot = CellSlot(editor, self, 15+label.width+offset, y2, width, 24, data_types, cell, locked)
         
         return label, slot
 
@@ -189,7 +189,7 @@ class AttributePanel(UIElement):
                         damage_cell = AttributeCell(editor, dmg, "int", not locked)
                     else:
                         damage_cell = None
-                    damage_slot = CellSlot(self, 15+damage_label.width, 90, 180, 24, ["int", "float"], damage_cell, locked)
+                    damage_slot = CellSlot(editor, self, 15+damage_label.width, 90, 180, 24, ["int", "float"], damage_cell, locked)
                     
                     
                     range_label = Text(15, 123, 1, "Range:  ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
@@ -198,7 +198,7 @@ class AttributePanel(UIElement):
                         range_cell = AttributeCell(editor, rng, "int", not locked)
                     else:
                         range_cell = None
-                    range_slot = CellSlot(self, 15+damage_label.width, 120, 180, 24, ["int", "float"], range_cell, locked)
+                    range_slot = CellSlot(editor, self, 15+damage_label.width, 120, 180, 24, ["int", "float"], range_cell, locked)
                     
                     
                     durability_label = Text(15, 153, 1, "Durability:", text_bg_color=None, text_color=TEXT_BG3_COLOR)
@@ -217,8 +217,8 @@ class AttributePanel(UIElement):
                     else:
                         dura_max_cell = None
                     
-                    dura_max_slot = CellSlot(self, 15+dura_label2.width, 180, 180, 24, ["int", "float"], dura_max_cell, locked)
-                    dura_slot = CellSlot(self, 15+dura_label2.width, 210, 180, 24, ["int", "float"], dura_cell, locked)
+                    dura_max_slot = CellSlot(editor, self, 15+dura_label2.width, 180, 180, 24, ["int", "float"], dura_max_cell, locked)
+                    dura_slot = CellSlot(editor, self, 15+dura_label2.width, 210, 180, 24, ["int", "float"], dura_cell, locked)
                     
                     # TODO: events sub-menu
                     
@@ -272,8 +272,8 @@ class AttributePanel(UIElement):
                     else:
                         dura_max_cell = None
                     
-                    dura_max_slot = CellSlot(self, 15+dura_label2.width, 240, 180, 24, ["int", "float"], dura_max_cell, locked)
-                    dura_slot = CellSlot(self, 15+dura_label2.width, 270, 180, 24, ["int", "float"], dura_cell, locked)
+                    dura_max_slot = CellSlot(editor, self, 15+dura_label2.width, 240, 180, 24, ["int", "float"], dura_max_cell, locked)
+                    dura_slot = CellSlot(editor, self, 15+dura_label2.width, 270, 180, 24, ["int", "float"], dura_cell, locked)
                     
                     # TODO: events sub-menu
                     
@@ -320,8 +320,8 @@ class AttributePanel(UIElement):
                     else:
                         dura_max_cell = None
                     
-                    dura_max_slot = CellSlot(self, 15+dura_label2.width, 240, 180, 24, ["int"], dura_max_cell, locked)
-                    dura_slot = CellSlot(self, 15+dura_label2.width, 270, 180, 24, ["int"], dura_cell, locked)
+                    dura_max_slot = CellSlot(editor, self, 15+dura_label2.width, 240, 180, 24, ["int"], dura_max_cell, locked)
+                    dura_slot = CellSlot(editor, self, 15+dura_label2.width, 270, 180, 24, ["int"], dura_cell, locked)
                     
                     self.children += [
                         desc_label, desc_slot,
@@ -363,7 +363,7 @@ class AttributePanel(UIElement):
                     id_textbox = CursorFocusTextBox(10, 6, 280, 19, editor, text_size=15, content=self.data["ref"].uid, text_bg_color=TEXT_BG2_COLOR)
                     n = self.data["ref"].get("name")
                     
-                    self.generator = reference_generator = CellSlot(self, 15, 365, 132, 20, "room-ref", self.data["ref"].uid, False, True)
+                    self.generator = reference_generator = CellSlot(editor, self, 15, 365, 132, 20, "room-ref", self.data["ref"].uid, False, True)
                     name_textbox = CursorFocusTextBox(10, 30, 280, 25, editor, shadow_text="[unnamed]" if locked else "name...", text_size=20, content=(n if isinstance(n, str) else ""), text_bg_color=TEXT_BG2_COLOR)
                     
                     on_enter_label = Text(15, 80,  1, "Enter Script: ", text_bg_color=None, text_color=TEXT_BG3_COLOR)
@@ -376,7 +376,7 @@ class AttributePanel(UIElement):
                     else:
                         on_enter_cell = None
                     
-                    on_enter_slot = CellSlot(self, 15, 100, 200, 24, ["script-ref"], on_enter_cell, locked)
+                    on_enter_slot = CellSlot(editor, self, 15, 100, 200, 24, ["script-ref"], on_enter_cell, locked)
                     
                     on_input = self.data["ref"].get("on_input")
                     if isinstance(on_input, dict) and "#script" in on_input:
@@ -384,7 +384,7 @@ class AttributePanel(UIElement):
                     else:
                         on_input_cell = None
                     
-                    on_input_slot = CellSlot(self, 15, 160, 200, 24, ["script-ref"], on_input_cell, locked)
+                    on_input_slot = CellSlot(editor, self, 15, 160, 200, 24, ["script-ref"], on_input_cell, locked)
                     
                     on_exit = self.data["ref"].get("on_exit")
                     if isinstance(on_exit, dict) and "#script" in on_exit:
@@ -392,7 +392,7 @@ class AttributePanel(UIElement):
                     else:
                         on_exit_cell = None
                     
-                    on_exit_slot = CellSlot(self, 15, 220, 200, 24, ["script-ref"], on_exit_cell, locked)
+                    on_exit_slot = CellSlot(editor, self, 15, 220, 200, 24, ["script-ref"], on_exit_cell, locked)
                     
                     if locked:
                         id_textbox.text_box.allow_typing = False
@@ -421,7 +421,7 @@ class AttributePanel(UIElement):
                     
                     edit_box = PanelTextBox(5, 30, 285, 320, 320, self.data["ref"].get("file"), editor)
                     
-                    self.generator = reference_generator = CellSlot(self, 15, 365, 132, 20, f"script-ref", self.data["ref"].uid, False, True)
+                    self.generator = reference_generator = CellSlot(editor, self, 15, 365, 132, 20, f"script-ref", self.data["ref"].uid, False, True)
                     
                     if locked:
                         id_textbox.text_box.allow_typing = False

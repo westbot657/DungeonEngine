@@ -24,6 +24,8 @@ from array import array
 pygame.init()
 
 class Editor:
+    
+    _instance = None
 
     def __init__(self, engine, io_hook, width=1280, height=720) -> None:
         self.screen:pygame.Surface = None
@@ -79,6 +81,8 @@ class Editor:
         self.history = []
         self.future = []
         self.history_limit = 200
+        
+        Editor._instance = self
     
     def add_history(self, action_made, inverse_action, description:str):
         self.history.append((action_made, inverse_action, description))

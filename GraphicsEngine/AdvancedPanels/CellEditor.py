@@ -36,7 +36,7 @@ class CellEditor(UIElement):
                         "  float": self.new_float,
                         # "  percent": self.new_percent,
                         "  str": self.new_str,
-                        "  list": self.new_list,
+                        "  bool": self.new_bool,
                     },
                     ContextTree.Line(),
                     {
@@ -44,7 +44,7 @@ class CellEditor(UIElement):
                         "  f(x) -> float": self.new_f_float,
                         # "  f(x) -> percent: self.new_f_percent"
                         "  f(x) -> str": self.new_f_str,
-                        "  f(x) -> list": self.new_f_list,
+                        "  f(x) -> bool": self.new_f_bool,
                     }
                 ], 200, 20, group="main-ctx", hover_color=TEXT_BG3_COLOR, click_color=TEXT_BG3_COLOR
             )
@@ -82,8 +82,8 @@ class CellEditor(UIElement):
             cell.slot = self
             self.ctx_tree.close()
             self.hist(cell, editor)
-        def new_list(self, editor):
-            cell = AttributeCell(editor, [], "list", True)
+        def new_bool(self, editor):
+            cell = AttributeCell(editor, False, "bool", True)
             self.cell = cell
             cell.slot = self
             self.ctx_tree.close()
@@ -106,8 +106,8 @@ class CellEditor(UIElement):
             cell.slot = self
             self.ctx_tree.close()
             self.hist(cell, editor)
-        def new_f_list(self, editor):
-            cell = AttributeCell(editor, {}, "list", True)
+        def new_f_bool(self, editor):
+            cell = AttributeCell(editor, {}, "bool", True)
             self.cell = cell
             cell.slot = self
             self.ctx_tree.close()

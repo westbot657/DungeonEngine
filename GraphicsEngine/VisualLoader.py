@@ -54,8 +54,16 @@ class AttributeCell(UIElement):
         match self.data_type.rsplit("-", 1)[-1]:
             case "ref":
                 return self.value.ref_id
-            case _:
-                return self.value
+            case "str":
+                self.value = self.display.get_content()
+            case "int":
+                self.value = int(self.display.get_content())
+            case "float":
+                self.value = float(self.display.get_content())
+            case "percent":
+                self.value = float(self.display.get_content())/100
+        
+        return self.value
     
     def setup_function(self, return_type):
         ico = Text(2, 3, 1, f"f(x) -> {return_type}", text_bg_color=None)
@@ -66,7 +74,7 @@ class AttributeCell(UIElement):
     def configure_value(self):
         match self.data_type.rsplit("-", 1)[-1]:
             case "str":
-                if isinstance(self.value, (str, int, float)):
+                if isinstance(self.value, (str, int, float, bool)):
                     self.display = CursorFocusTextBox(10, 3, 160, 18, self.editor, content=str(self.value), text_bg_color=None)
                     self.display.text_box.allow_typing = self.modifieable
                     self.children.append(self.display)
@@ -75,7 +83,7 @@ class AttributeCell(UIElement):
                 elif isinstance(self.value, dict):
                     self.setup_function("str")
             case "int":
-                if isinstance(self.value, (int, float)):
+                if isinstance(self.value, (int, float, bool)):
                     self.display = CursorFocusTextBox(10, 3, 160, 18, self.editor, content=str(int(self.value)), text_bg_color=None)
                     self.display.text_box.char_whitelist = [n for n in "0123456789"]
                     self.display.text_box.allow_typing = self.modifieable
@@ -85,7 +93,7 @@ class AttributeCell(UIElement):
                 elif isinstance(self.value, dict):
                     self.setup_function("int")
             case "float":
-                if isinstance(self.value, (int, float)):
+                if isinstance(self.value, (int, float, bool)):
                     self.display = CursorFocusTextBox(10, 3, 160, 18, self.editor, content=str(float(self.value)), text_bg_color=None)
                     self.display.text_box.char_whitelist = [n for n in "0123456789."]
                     self.display.text_box.allow_typing = self.modifieable
@@ -95,7 +103,7 @@ class AttributeCell(UIElement):
                 elif isinstance(self.value, dict):
                     self.setup_function("float")
             case "percent":
-                if isinstance(self.value, (int, float)):
+                if isinstance(self.value, (int, float, bool)):
                     self.display = CursorFocusTextBox(10, 3, 150, 18, self.editor, content=str(int(self.value)), text_bg_color=None)
                     self.display.text_box.char_whitelist = [n for n in "0123456789."]
                     self.display.text_box.allow_typing = self.modifieable
@@ -106,10 +114,11 @@ class AttributeCell(UIElement):
                     self.children.append(self.percent_sign)
                 elif isinstance(self.value, dict):
                     self.setup_function("percent")
-            case "dict":
-                ...
-            case "list":
-                ...
+            case "bool":
+                if isinstance(self.value, (bool, int, float)):
+                    ...
+                elif isinstance(self.value, dict):
+                    self.setup_function("bool")
             case "ref":
                 self.display = CursorFocusTextBox(10, 3, 160, 18, self.editor, content=self.value.ref_id, text_bg_color=None)
                 self.display.text_box.allow_typing = False
@@ -175,10 +184,8 @@ class CellSlot(UIElement):
                                 value = 0
                             elif d == "str":
                                 value = ""
-                            elif d == "list":
-                                value = []
-                            elif d == "dict":
-                                value = {}
+                            elif d == "bool":
+                                value = False
                             else:
                                 raise ValueError(f"default value not implemented for type '{data_type}'")
                             cell = AttributeCell(editor, value, d, True)

@@ -185,6 +185,7 @@ class CellSlot(UIElement):
                             self.cell = cell
                             cell.slot = self
                             self.ctx_tree.close()
+                            editor.sound_system.get_audio("AESA_vwoop2", "editor").play()
                             # print(f"making new '{d}' value!")
                             def undo():
                                 self.cell = None
@@ -211,6 +212,7 @@ class CellSlot(UIElement):
         # print("open context tree?")
         # self.ctx_tree.open()
         self.ctx_tree.openAtMouse(editor._e_instance)
+        
     
     # def open_edit_ctx_tree(self):
     #     ...
@@ -239,6 +241,8 @@ class CellSlot(UIElement):
                     editor.holding = True
                     editor.held = cell
                     editor.hold_offset = (editor.mouse_pos[0]-(X+self.x), editor.mouse_pos[1]-(Y+self.y))
+                    editor.sound_system.get_audio("AESA_vwoop1", "editor").play()
+                    
             elif self.cell and not self.locked:
                 if editor.left_mouse_down():
                     editor.holding = True
@@ -249,6 +253,7 @@ class CellSlot(UIElement):
                     self.cell.unfocus()
                     # self.cell.slot = None
                     self.cell = None
+                    editor.sound_system.get_audio("AESA_vwoop1", "editor").play()
                 # if editor.right_mouse_down():
                 #     self.open_edit_ctx_tree()
                 if editor.holding:
@@ -268,6 +273,8 @@ class CellSlot(UIElement):
                 self.empty_mouse = True
     
     def drop_acceptor(self, cell, editor):
+        
+        editor.sound_system.get_audio("AESA_vwoop2", "editor").play()
         
         if cell.new_ref:
             

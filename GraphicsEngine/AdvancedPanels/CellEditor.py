@@ -53,6 +53,8 @@ class CellEditor(UIElement):
             self.ctx_tree.openAtMouse(editor._e_instance)
         
         def hist(self, cell, editor):
+            editor.sound_system.get_audio("AESA_vwoop2", "editor").play()
+            
             def undo():
                 self.cell = None
                 cell.slot = None
@@ -112,6 +114,10 @@ class CellEditor(UIElement):
             self.hist(cell, editor)
             
         def drop_acceptor(self, cell, editor):
+            
+            editor.sound_system.get_audio("AESA_vwoop2", "editor").play()
+            
+            
             old_slot = cell.slot
             
             self.cell = cell
@@ -150,6 +156,8 @@ class CellEditor(UIElement):
                         editor.hold_offset = (editor.mouse_pos[0]-(X+self.x), editor.mouse_pos[1]-(Y+self.y))
                         self.cell.unfocus()
                         self.cell = None
+                        editor.sound_system.get_audio("AESA_vwoop1", "editor").play()
+                        
                     if editor.holding:
                         self.empty_mouse = False
                 elif editor.holding or editor.drop_requested:
@@ -203,11 +211,11 @@ class CellEditor(UIElement):
             self.collapsed = True
             self.collapse_time = 0
             self.hovered = False
-            
+            self.offsetY = 0
             self.children = []
             
             self.cell = None
-            self.screen = pygame.Surface((self.width, self.height-1))
+            self.screen = pygame.Surface((self.width, self.height-26))
             self.mouse_pos = [0, 0]
             
             self._canvas = ConstructionCanvas._Canvas(editor, self)
@@ -227,11 +235,26 @@ class CellEditor(UIElement):
             self.mouse_pos[1] -= self.y + Y
             self.last_X = X
             self.last_Y = Y
+        
+        def setup(self):
+            self.children.clear()
             
+            match self.cell.data_type:
+                case "str":
+                    ...
+                case "int":
+                    ...
+                case "float":
+                    ...
+                case "bool":
+                    ...
+                case _:
+                    pass
+        
         def _event(self, editor, X, Y):
             self.override_values(X, Y)
             if self.height != self._height:
-                self.screen = pygame.Surface((self.width, self.height-1))
+                self.screen = pygame.Surface((self.width, self.height-26))
             
             if self.collapse_time:
                 dt = (time.time() - self.collapse_time) * 3
@@ -246,9 +269,13 @@ class CellEditor(UIElement):
             
             handle_collision = editor.collides(editor.mouse_pos, (self.x+self.width, self.y+((self.height/2)-15), 15, 30))
             
+            if self.cell:
+                if self.cell.slot.cell is None:
+                    self.cell = None
             
             
             if self.cell:
+                
                 if handle_collision and editor.left_mouse_down():
                     self.collapsed = not self.collapsed
                     t = time.time()
@@ -257,12 +284,12 @@ class CellEditor(UIElement):
                     else:
                         self.collapse_time = t
                 
+                for child in self.children[::-1]:
+                    child._event(self._canvas, 0, 0)
             else:
                 self.x = self.base_x - self.width
                 self.collapsed = True
             
-            for child in self.children[::-1]:
-                child._event(self._canvas, 0, 0)
             
             self.hovered = False
             editor._e_instance.check_hover(editor, (self.x, self.y, self.width, self.height), self)
@@ -274,29 +301,35 @@ class CellEditor(UIElement):
             
             if self.cell:
                 editor.screen.fill(TEXT_COLOR, (self.x-dw, self.y-1, self.width+15+dw, self.height+1))
-                editor.screen.fill(TEXT_BG2_COLOR, (self.x+self.width, self.y, 14, self.height-1))
+                editor.screen.fill(TEXT_BG2_COLOR, (self.x-dw, self.y, self.width+14+dw, self.height-1))
                 if self.collapsed:
                     self.window_handles[0]._update(editor, self.x+self.width, self.y+((self.height/2)-15))
                 else:
                     self.window_handles[1]._update(editor, self.x+self.width, self.y+((self.height/2)-15))
-                    
+                
+                self.cell._update(editor, X+self.x+10, Y+self.y+5)
+                
+                for child in self.children:
+                    child._update(self._canvas, 0, 0)
+                
             else:
                 editor.screen.fill(TEXT_BG3_COLOR, (self.x-dw, self.y-1, self.width+15+dw, self.height+1))
-                editor.screen.fill(TEXT_BG2_COLOR, (self.x+self.width, self.y, 14, self.height-1))
+                editor.screen.fill(TEXT_BG2_COLOR, (self.x-dw, self.y, self.width+14+dw, self.height-1))
                 self.window_handles[2]._update(editor, self.x+self.width, self.y+((self.height/2)-15))
             
-            for child in self.children:
-                child._update(self._canvas, 0, 0)
             
-            editor.screen.blit(self.screen, (X+self.x, Y+self.y))
+            editor.screen.blit(self.screen, (X+self.x, Y+self.y+25))
+            
+            
 
     def __init__(self, editor, aesa):
         self.editor = editor
         self.aesa = aesa
         
+        self.ctx_tree: ContextTree = None
         self.transfer_slot = CellEditor.TransferSlot(self, 700, editor.height-65, 200, 24)
         
-        self.config_pane1 = CellEditor.ConfigPane(editor, self, 102-400, 0, 400, 300)
+        self.config_pane1 = CellEditor.ConfigPane(editor, self, 102-400, 21, 400, 300)
         self.config_pane2 = CellEditor.ConfigPane(editor, self, 102-400, 0, 400, 300)
         self.config_pane3 = CellEditor.ConfigPane(editor, self, 102-400, 0, 400, 300)
         
@@ -317,14 +350,20 @@ class CellEditor(UIElement):
         return func
     
     def open_in_pane1(self, cell):
+        if self.ctx_tree:
+            self.ctx_tree.close()
         self.config_pane1.cell = cell
         self.config_pane1.collapse_time = time.time()
         self.config_pane1.collapsed = False
+        self.config_pane1.setup()
     
     def open_in_pane2(self, cell):
+        if self.ctx_tree:
+            self.ctx_tree.close()
         self.config_pane2.cell = cell
         self.config_pane2.collapse_time = time.time()
         self.config_pane2.collapsed = False
+        self.config_pane2.setup()
     
     def _update_layout(self, editor):
         self.transfer_slot.y = editor.height-65
@@ -361,7 +400,8 @@ class CellEditor(UIElement):
                             fields.update({"  Edit in Pane 1": self.get_open_in_pane1(slot.cell)})
                         if self.get_pane2_open():
                             fields.update({"  Edit in Pane 2": self.get_open_in_pane2(slot.cell)})
-                        ContextTree([fields], 200, 20, group="main-ctx", hover_color=TEXT_BG2_COLOR, click_color=TEXT_BG2_COLOR).openAtMouse(editor._e_instance)
+                        self.ctx_tree = ContextTree([fields], 200, 20, group="main-ctx", hover_color=TEXT_BG2_COLOR, click_color=TEXT_BG2_COLOR)
+                        self.ctx_tree.openAtMouse(editor._e_instance)
         
         self.transfer_slot._update(editor, X, Y)
         

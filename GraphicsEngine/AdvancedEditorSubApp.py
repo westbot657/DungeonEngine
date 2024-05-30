@@ -68,6 +68,8 @@ class AdvancedEditorSubApp(UIElement):
         editor.sound_system.load(f"{PATH}/audio_assets/bloop2.wav",  "AESA_bloop2",  "editor")
         editor.sound_system.load(f"{PATH}/audio_assets/vibrate.wav", "AESA_vibrate", "editor")
         editor.sound_system.load(f"{PATH}/audio_assets/beep.wav",    "AESA_beep",    "editor")
+        editor.sound_system.load(f"{PATH}/audio_assets/vwoop1.wav",  "AESA_vwoop1",  "editor")
+        editor.sound_system.load(f"{PATH}/audio_assets/vwoop2.wav",  "AESA_vwoop2",  "editor")
         
         self.toasts = Toasts(editor.width-355, editor.height-20, 350)
         

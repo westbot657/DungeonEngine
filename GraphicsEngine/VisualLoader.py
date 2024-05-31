@@ -45,7 +45,7 @@ class AttributeCell(UIElement):
         
     def unfocus(self):
         match self.data_type.rsplit("-", 1)[-1]:
-            case "ref"|"str"|"int"|"float"|"percent":
+            case "ref"|"str"|"int"|"float":
                 if hasattr(self, "display"):
                     self.display.unfocus()
             case _:
@@ -61,9 +61,9 @@ class AttributeCell(UIElement):
                 self.value = int(self.display.get_content())
             case "float":
                 self.value = float(self.display.get_content())
-            case "percent":
-                self.value = float(self.display.get_content())/100
-        
+            case "bool":
+                self.value = self.toggle.state
+
         return self.value
     
     def setup_function(self, return_type):
@@ -85,6 +85,7 @@ class AttributeCell(UIElement):
         
     
     def configure_value(self):
+        self.children.clear()
         match self.data_type.rsplit("-", 1)[-1]:
             case "str":
                 if isinstance(self.value, (str, int, float, bool)):
@@ -115,22 +116,11 @@ class AttributeCell(UIElement):
                     self.height = 24
                 elif isinstance(self.value, dict):
                     self.setup_function("float")
-            case "percent":
-                if isinstance(self.value, (int, float, bool)):
-                    self.display = CursorFocusTextBox(10, 3, 150, 18, self.editor, content=str(int(self.value)), text_bg_color=None)
-                    self.display.text_box.char_whitelist = [n for n in "0123456789."]
-                    self.display.text_box.allow_typing = self.modifieable
-                    self.children.append(self.display)
-                    self.width = 180
-                    self.height = 24
-                    self.percent_sign = Text(160, 3, 1, "%", text_bg_color=None)
-                    self.children.append(self.percent_sign)
-                elif isinstance(self.value, dict):
-                    self.setup_function("percent")
             case "bool":
                 if isinstance(self.value, (bool, int, float)):
                     self.toggle = ToggleSwitch(10, 3, 18, 0, self.value, TEXT_COLOR, (30, 200, 30), (200, 30, 30), TEXT_COLOR, ToggleSwitch.Style.SQUARE, True)
                     self.toggle.on_state_change(self.toggle_sfx)
+                    if self.value: self.toggle.set_state(self.value)
                     self.children.append(self.toggle)
                 elif isinstance(self.value, dict):
                     self.setup_function("bool")

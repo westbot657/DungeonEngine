@@ -34,6 +34,10 @@ class CellEditor(UIElement):
             self.add_button = Button(2, 2, -1, 20, "+", None, hover_color=None, click_color=None)
             self.add_button.on_left_click = self.on_add_clicked
             
+            self.data_types = [
+                "str", "int", "float", "bool"
+            ]
+            
             self.ctx_tree = ContextTree(
                 [
                     {
@@ -379,11 +383,21 @@ class CellEditor(UIElement):
             self.offsetY = 0
             self.children = []
             
-            self.cell = None
+            self.cell: AttributeCell = None
+            self._cell = self.cell
             self.screen = pygame.Surface((self.width, self.height-31))
             self.mouse_pos = [0, 0]
             
+            self.ctx_tree = None
+            
             self._canvas = ConstructionCanvas._Canvas(editor, self)
+            
+            self._converters = {
+                "int": self._convert_int,
+                "float": self._convert_float,
+                "str": self._convert_str,
+                "bool": self._convert_bool
+            }
         
         def collides(self, mouse, rect) -> bool:
             mx, my = mouse
@@ -408,22 +422,161 @@ class CellEditor(UIElement):
             self.collapsed = True
             self.children.clear()
         
+        def hist(self, val, val_d, v, v_d):
+            
+            def redo():
+                self.cell.value = v
+                self.cell.data_type = v_d
+                self.cell.configure_value()
+            
+            def undo():
+                self.cell.value = val
+                self.cell.data_type = val_d
+                self.cell.configure_value()
+            
+            self.editor.add_history(redo, undo, "Changed Cell Type")
+            
+        
+        def _convert_int(self, *_, **__):
+            self.ctx_tree.close()
+            
+            val = self.cell.get_value()
+            
+            try:
+                v = int(val)
+            
+            except ValueError:
+                v = 0
+            
+            tp = self.cell.data_type
+            self.cell.data_type = "int"
+            self.cell.value = v
+            self.cell.configure_value()
+            
+            self.hist(val, tp, v, "int")
+            
+        
+        def _convert_float(self, *_, **__):
+            self.ctx_tree.close()
+            
+            val = self.cell.get_value()
+            
+            try:
+                v = float(val)
+            
+            except ValueError:
+                v = 0
+            
+            tp = self.cell.data_type
+            
+            self.cell.data_type = "float"
+            self.cell.value = v
+            self.cell.configure_value()
+            
+            self.hist(val, tp, v, "float")
+            
+        
+        def _convert_str(self, *_, **__):
+            self.ctx_tree.close()
+            
+            val = self.cell.get_value()
+            v = str(val)
+            
+            tp = self.cell.data_type
+            
+            self.cell.data_type = "str"
+            self.cell.value = v
+            self.cell.configure_value()
+            
+            self.hist(val, tp, v, "str")
+            
+        
+        def _convert_bool(self, *_, **__):
+            self.ctx_tree.close()
+            
+            val = self.cell.get_value()
+            
+            if isinstance(val, str):
+                if val == "True":
+                    v = True
+                else:
+                    v = False
+            else:
+                v = bool(val)
+            
+            
+            tp = self.cell.data_type
+            
+            self.cell.data_type = "bool"
+            self.cell.value = v
+            self.cell.configure_value()
+            
+            self.hist(val, tp, v, "bool")
+        
+        def _convert(self, *_, **__):
+            fields = {}
+            
+            for data_type in self.cell.slot.data_types:
+                if data_type in self._converters and data_type != self.cell.data_type:
+                    fields.update({
+                        f"  {data_type}": self._converters[data_type]
+                    })
+            if fields:
+                self.ctx_tree = ContextTree(
+                    [fields],
+                    200, 20, group="main-ctx", hover_color=TEXT_BG3_COLOR, click_color=TEXT_BG3_COLOR
+                )
+            else:
+                self.ctx_tree = ContextTree(
+                    [{
+                        "  No conversion options available": None
+                    }],
+                    200, 20, group="main-ctx", hover_color=TEXT_BG3_COLOR, click_color=TEXT_BG3_COLOR
+                )
+            
+            self.ctx_tree.openAtMouse(self.editor._e_instance)
+        
         def setup(self):
             self.children.clear()
             
-            match self.cell.data_type:
-                case "str":
-                    ...
-                case "int":
-                    ...
-                case "float":
-                    ...
-                case "bool":
-                    ...
-                case _:
-                    pass
+            self.converter_button = BorderedButton(0, 5, -1, 20, " Convert Type ")
+            self.converter_button.x = self.width - self.converter_button.width - 10
+            self.converter_button.on_left_click = self._convert
+            
+            self.children.append(self.converter_button)
+            
+            if isinstance(self.cell.value, dict):
+                match self.cell.data_type:
+                    case "str":
+                        ...
+                    case "int":
+                        ...
+                    case "float":
+                        ...
+                    case "bool":
+                        ...
+                    case _:
+                        pass
+            else:
+                match self.cell.data_type:
+                    case "str":
+                        ...
+                    case "int":
+                        ...
+                    case "float":
+                        ...
+                    case "bool":
+                        ...
+                    case _:
+                        pass
         
         def _event(self, editor, X, Y):
+            
+            if self._cell != self.cell:
+                self._cell = self.cell
+                if self.cell:
+                    self.setup()
+            
             self.override_values(X, Y)
             if self.height != self._height:
                 self.screen = pygame.Surface((self.width, self.height-31))
@@ -468,7 +621,8 @@ class CellEditor(UIElement):
             
             
             self.hovered = False
-            dw = self.base_x - self.x + self.width
+            dw = max(0, (self.x+self.width)-self.base_x)
+            # print(dw)
             editor._e_instance.check_hover(editor, (102, self.y, dw, self.height), self)
         
         def _update(self, editor, X, Y):
@@ -478,13 +632,15 @@ class CellEditor(UIElement):
             
             if self.cell:
                 editor.screen.fill(TEXT_COLOR, (self.x-dw, self.y-1, self.width+15+dw, self.height+1))
-                editor.screen.fill(TEXT_BG2_COLOR, (self.x-dw, self.y, self.width+14+dw, self.height-1))
+                editor.screen.fill(TEXT_BG2_COLOR, (self.x-dw, self.y, self.width+14+dw, 29))
+                editor.screen.fill(TEXT_BG2_COLOR, (self.x+self.width, self.y+29, 14, 1))
+                editor.screen.fill(TEXT_BG2_COLOR, (self.x-dw, self.y+30, self.width+14+dw, self.height-31))
                 if self.collapsed:
                     self.window_handles[0]._update(editor, self.x+self.width, self.y+((self.height/2)-15))
                 else:
                     self.window_handles[1]._update(editor, self.x+self.width, self.y+((self.height/2)-15))
                 
-                self.cell._update(editor, X+self.x+10, Y+self.y+5)
+                self.cell._update(editor, X+self.x+10, Y+self.y+2)
                 
                 for child in self.children:
                     child._update(self._canvas, 0, 0)
@@ -579,7 +735,7 @@ class CellEditor(UIElement):
         
         if editor._e_instance.right_mouse_down():
             if editor._hovering and isinstance(editor._hovering, CellSlot):
-                if editor._hovering.cell in [self.config_pane1.cell, self.config_pane2.cell]:
+                if editor._hovering.cell in [self.config_pane1.cell, self.config_pane2.cell] and editor._hovering.cell is not None:
                     if editor._hovering.cell is self.config_pane1.cell:
                         fields = {
                             "  Stop Editing (Pane 1)": self.close_pane1

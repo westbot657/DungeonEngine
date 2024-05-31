@@ -358,6 +358,15 @@ class Statement(Node):
     def compile(self):
         return self.node.compile()
 
+class Statements(Node):
+    def __init__(self, nodes:list[Node]):
+        self.nodes = nodes
+    
+    def compile(self):
+        return {
+            "#functions": [node.compile() for node in self.nodes]
+        }
+
 class Comp(Node):
     def __init__(self, left:Node, op:str, right:Node):
         self.left = left
@@ -753,6 +762,19 @@ class EngineScript:
                 self.compiled_script = {}
         if t and self.compiled_script == {}:
             print(f"Warning:\n    File '{self.script_file}' contained code that compiled to nothing.")
+
+    def statements(self, tokens):
+        stmts = []
+        while tokens:
+            try:
+                stmt = self.statement(tokens)
+                stmts.append(stmt)
+            except EOF as e:
+                pass
+        return Statements(stmts)
+
+    def statement(self, tokens):
+        return {}
 
 """
 statements : statement*

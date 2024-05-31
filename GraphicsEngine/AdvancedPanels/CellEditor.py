@@ -215,7 +215,8 @@ class CellEditor(UIElement):
         _drag = Image(f"{PATH}/advanced_editor/cell_storage_drag.png", 0, 0, 220, 15)
         _open = Image(f"{PATH}/advanced_editor/cell_storage_open.png", 0, 0, 15, 15)
         _close = Image(f"{PATH}/advanced_editor/cell_storage_close.png", 0, 0, 15, 15)
-        
+        _open_hovered = Image(f"{PATH}/advanced_editor/cell_storage_open_hovered.png", 0, 0, 15, 15)
+        _close_hovered = Image(f"{PATH}/advanced_editor/cell_storage_close_hovered.png", 0, 0, 15, 15)
 
         def __init__(self, editor, parent, x:int, y:int):
             self.parent = parent
@@ -326,9 +327,15 @@ class CellEditor(UIElement):
         def _update(self, editor, X, Y):
             
             if self.collapsed:
-                self._open._update(editor, X+self.x-15, Y+self.y)
+                if self.toggle_hovered:
+                    self._open_hovered._update(editor, X+self.x-15, Y+self.y)
+                else:
+                    self._open._update(editor, X+self.x-15, Y+self.y)
             else:
-                self._close._update(editor, X+self.x-15, Y+self.y)
+                if self.toggle_hovered:
+                    self._close_hovered._update(editor, X+self.x-15, Y+self.y)
+                else:
+                    self._close._update(editor, X+self.x-15, Y+self.y)
             
             if self.dp < 35:
                 self.label._update(editor, X+self.x, Y+self.y-20)

@@ -382,7 +382,9 @@ class CellEditor(UIElement):
             mx, my = mouse
             x, y, w, h = rect
             
-            if self.editor.collides(self.editor.mouse_pos, (self.x+self.last_X, self.y+self.last_Y, self.width, self.height)):
+            dw = min(0, self.x - self.base_x)
+            
+            if self.editor.collides(self.editor.mouse_pos, (self.x+self.last_X-dw, self.y+self.last_Y, self.width+dw, self.height)):
                 return x <= mx < x+w and y < my < y+h
             
             return False
@@ -459,7 +461,8 @@ class CellEditor(UIElement):
             
             
             self.hovered = False
-            editor._e_instance.check_hover(editor, (self.x, self.y, self.width, self.height), self)
+            dw = self.base_x - self.x + self.width
+            editor._e_instance.check_hover(editor, (102, self.y, dw, self.height), self)
         
         def _update(self, editor, X, Y):
             self.screen.fill(TEXT_BG2_COLOR)

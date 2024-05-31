@@ -16,6 +16,15 @@ import math
 
 class CellEditor(UIElement):
     
+    class FunctionSlot(UIElement):
+        def __init__(self, x:int, y:int, width:int, height:int, function:str):
+            self.x = x
+            self.y = y
+            self.width = width
+            self.height = height
+            self.function = function
+            
+    
     class TransferSlot(UIElement):
         def __init__(self, parent, x, y, width, height, hide_add=False):
             self.parent = parent

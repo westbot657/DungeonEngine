@@ -167,18 +167,69 @@ class DungeonLoader:
         yieldTools = YieldTools(f"DungeonLoader.generatorEvaluateFunction#{id(self)}")
         yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, data)
         return yieldTools.result()
-        # ev = self._generatorEvaluateFunction(function_memory, data)
-        # v = None
-        # try:
-        #     v = ev.send(None)
-        #     while isinstance(v, _EngineOperation):
-        #         res = yield v
-        #         v = ev.send(res)
-        # except StopIteration as e:
-        #     v = self.stopIterationEval(e.value, v)
-        # return v
 
-    def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:dict, prepEval:bool=False):
+    def _genEvalFunction(self, function_memory:FunctionMemory, data:Any, prepEval:bool=False):
+        self.gen_eval_depth += 1
+        yieldTools = YieldTools(f"DungeonLoader._genEvalFunction#{id(self)}:{self.gen_eval_depth}")
+        v = None
+        if isinstance(data, dict):
+            
+            if (script_file := data.get("#script", None)) is not None:
+                d = EngineScript(script_file)
+                data.clear()
+                data.update(d.getScript())
+                yield from yieldTools.call(self._genEvalFunction, function_memory, d.getScript())
+                self.gen_eval_depth -= 1
+                return yieldTools.result()
+            
+            elif (funcs := data.get("#functions", None)) is not None:
+                result = None
+                
+                if isinstance(funcs, list):
+                    for f in funcs:
+                        yield from yieldTools.call(self._genEvalFunction, function_memory, f)
+                        v = yieldTools.result()
+                        if v: result = v
+                    self.gen_eval_depth -= 1
+                    return result
+                
+                elif isinstance(funcs, dict):
+                    yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, funcs)
+                    self.gen_eval_depth -= 1
+                    return yieldTools.result()
+                
+            elif (func := data.get("#function", None)) is not None:
+                if f := self.loader_function.getFunction(func):
+                    f: LoaderFunction
+                    args = {}
+                    
+                    for key, item in data.items():
+                        if key in ["#function"]: continue
+                        if (isinstance(item, dict) or isinstance(item, list)) and (not prepEval) and f.pre_evaluate_args:
+                            args.update({key: self._generatorEvaluateFunction(function_memory, item)})
+                        else:
+                            args.update({key: item})
+                            
+                    r = f._call(function_memory, args)
+                    if isinstance(r, Generator):
+                        yield from yieldTools.handle(r)
+                        res = yieldTools.result()
+                    elif isinstance(r, Combat.Operation._Operation):
+                        yield r
+                        self.gen_eval_depth -= 1
+                        return
+                    else:
+                        res = r
+
+                    self.gen_eval_depth -= 1
+                    return res
+            elif (var := data.get("#ref", None)) is not None:
+                self.gen_eval_depth -= 1
+                return function_memory.ref(var)
+            
+            
+
+    def _generatorEvaluateFunction(self, function_memory:FunctionMemory, data:Any, prepEval:bool=False):
         self.gen_eval_depth += 1
         yieldTools = YieldTools(f"DungeonLoader._generatorEvaluateFunction#{id(self)}:{self.gen_eval_depth}")
         v = None
@@ -188,15 +239,6 @@ class DungeonLoader:
                 data.clear()
                 data.update(d.getScript())
                 yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, d.getScript())
-                # ev = self._generatorEvaluateFunction(function_memory, d.getScript())
-                # v = None
-                # try:
-                #     v = ev.send(None)
-                #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-                #         res = yield v
-                #         v = ev.send(res)
-                # except StopIteration as e:
-                #     v = self.stopIterationEval(e.value, v)
                 self.gen_eval_depth -= 1
                 return yieldTools.result()
             elif (funcs := data.get("functions", None)) is not None:
@@ -206,30 +248,12 @@ class DungeonLoader:
                 if isinstance(funcs, list):
                     for func in funcs:
                         yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, func)
-                        # ev = self._generatorEvaluateFunction(function_memory, func)
-                        # v = None
-                        # try:
-                        #     v = ev.send(None)
-                        #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-                        #         res = yield v
-                        #         v = ev.send(res)
-                        # except StopIteration as e:
-                        #     v = self.stopIterationEval(e.value, v)
                         v = yieldTools.result()
                         if v: result = v
                     self.gen_eval_depth -= 1
                     return result
                 elif isinstance(funcs, dict):
                     yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, funcs)
-                    # ev = self._generatorEvaluateFunction(function_memory, funcs)
-                    # v = None
-                    # try:
-                    #     v = ev.send(None)
-                    #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-                    #         res = yield v
-                    #         v = ev.send(res)
-                    # except StopIteration as e:
-                    #     v = self.stopIterationEval(e.value, v)
                     self.gen_eval_depth -= 1
                     return yieldTools.result()
             elif (func := data.get("function", None)) is not None:
@@ -242,31 +266,12 @@ class DungeonLoader:
                         if key in ["function", "#store", "predicate"]: continue
                         if (isinstance(item, dict) or (isinstance(item, list) and (not prepEval))) and f.pre_evaluate_args:
                             yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, item)
-                            # ev = self._generatorEvaluateFunction(function_memory, item)
-                            # v = None
-                            # try:
-                            #     v = ev.send(None)
-                            #     while isinstance(v, _EngineOperation):
-                            #         res = yield v
-                            #         v = ev.send(res)
-                            # except StopIteration as e:
-                            #     #if isinstance(e.value, _EngineOperation): print("\n\n\nEngine Operation\n\n\n")
-                            #     v = self.stopIterationEval(e.value, v)
                             args.update({key: yieldTools.result()})
                         else:
                             args.update({key: item})
                     r = f._call(function_memory, args)
                     if isinstance(r, Generator):
                         yield from yieldTools.handle(r)
-                        # v = None
-                        # try:
-                        #     v = r.send(None)
-                        #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-                        #         res = yield v
-                        #         v = r.send(res)
-                        # except StopIteration as e:
-                        #     v = self.stopIterationEval(e.value, v)
-                        # res = v
                         res = yieldTools.result()
                     elif isinstance(r, Combat.Operation._Operation):
                         # print(f"\033[38;2;255;0;0mCOMBAT TASK FROM FUNCTION!\033[0m")
@@ -304,28 +309,9 @@ class DungeonLoader:
                     args: dict
                     for key, val in args.items():
                         yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, val)
-                        # ev = self._generatorEvaluateFunction(function_memory, val)
-                        # v = None
-                        # try:
-                        #     v = ev.send(None)
-                        #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-                        #         res = yield v
-                        #         v = ev.send(res)
-                        # except StopIteration as e:
-                        #     v = self.stopIterationEval(e.value, v)
                         v = yieldTools.result()
                         _func_mem.update({key: v})
                 yield from yieldTools.call(_func_mem.call, func_name)
-                v = yieldTools.result()
-                # ev = _func_mem.call(func_name)
-                # v = None
-                # try:
-                #     v = ev.send(None)
-                #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-                #         res = yield v
-                #         v = ev.send(res)
-                # except StopIteration as e:
-                #     v = self.stopIterationEval(e.value, v)
                 if (store := data.get("#store", None)) is not None:
                     function_memory.update({
                         store: v
@@ -343,15 +329,6 @@ class DungeonLoader:
                         else:
                             yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, value)
                             v = yieldTools.result()
-                            # ev = self._generatorEvaluateFunction(function_memory, value)
-                            # v = None
-                            # try:
-                            #     v = ev.send(None)
-                            #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-                            #         res = yield v
-                            #         v = ev.send(res)
-                            # except StopIteration as e:
-                            #     v = self.stopIterationEval(e.value, v)
                             function_memory.store(key, v)
             elif (store := data.get("#store-player", None)) is not None:
                 if isinstance(store, dict):
@@ -360,42 +337,15 @@ class DungeonLoader:
                         if key.startswith(("#", "%")): raise MemoryError(f"Cannot create a variable with prefix '#' or '%': '{key}'")
                         function_memory.ref("#player").store(dungeon_name, key, value)
             elif (check := data.get("@check", None)) is not None:
-                yield from yieldTools.call(self._generatorEvaluateFunction)
-                # ev = self._generatorEvaluateFunction(function_memory, check)
-                # v = None
-                # try:
-                #     v = ev.send(None)
-                #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-                #         res = yield v
-                #         v = ev.send(res)
-                # except StopIteration as e:
-                #     v = self.stopIterationEval(e.value, v)
+                yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, check)
                 res = yieldTools.result()
                 if res and ((true_branch := data.get("true", None)) is not None):
                     yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, true_branch)
-                    # ev = self._generatorEvaluateFunction(function_memory, true_branch)
-                    # v = None
-                    # try:
-                    #     v = ev.send(None)
-                    #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-                    #         res = yield v
-                    #         v = ev.send(res)
-                    # except StopIteration as e:
-                    #     v = self.stopIterationEval(e.value, v)
                     v = yieldTools.result()
                     self.gen_eval_depth -= 1
                     return v
                 elif (false_branch := data.get("false", None)) is not None:
                     yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, false_branch)
-                    # ev = self._generatorEvaluateFunction(function_memory, false_branch)
-                    # v = None
-                    # try:
-                    #     v = ev.send(None)
-                    #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-                    #         res = yield v
-                    #         v = ev.send(res)
-                    # except StopIteration as e:
-                    #     v = self.stopIterationEval(e.value, v)
                     v = yieldTools.result()
                     self.gen_eval_depth -= 1
                     return v
@@ -406,15 +356,6 @@ class DungeonLoader:
                 dat = {}
                 for key, item in data.items():
                     yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, item)
-                    # ev = self._generatorEvaluateFunction(function_memory, item)
-                    # v = None
-                    # try:
-                    #     v = ev.send(None)
-                    #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-                    #         res = yield v
-                    #         v = ev.send(res)
-                    # except StopIteration as e:
-                    #     v = self.stopIterationEval(e.value, v)
                     v = yieldTools.result()
                     dat.update({key: v})
                 self.gen_eval_depth -= 1
@@ -423,30 +364,12 @@ class DungeonLoader:
             dat = []
             for item in data:
                 yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, item, True)
-                # ev = self._generatorEvaluateFunction(function_memory, item, True)
-                # v = None
-                # try:
-                #     v = ev.send(None)
-                #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-                #         res = yield v
-                #         v = ev.send(res)
-                # except StopIteration as e:
-                #     v = self.stopIterationEval(e.value, v)
                 v = yieldTools.result()
                 dat.append(v)
             self.gen_eval_depth -= 1
             return dat
         elif isinstance(data, EngineScript):
             yield from yieldTools.call(self._generatorEvaluateFunction, function_memory, data.getScript())
-            # ev = self._generatorEvaluateFunction(function_memory, data.getScript())
-            # v = None
-            # try:
-            #     v = ev.send(None)
-            #     while isinstance(v, (_EngineOperation, Combat.Operation._Operation)):
-            #         res = yield v
-            #         v = ev.send(res)
-            # except StopIteration as e:
-            #     v = self.stopIterationEval(e.value, v)
             v = yieldTools.result()
             self.gen_eval_depth -= 1
             return v

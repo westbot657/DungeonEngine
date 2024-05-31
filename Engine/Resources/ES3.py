@@ -343,6 +343,150 @@ class Node:
     def compile(self):
         return {}
 
+
+class Expression(Node):
+    def __init__(self, node:Node):
+        self.node = node
+    
+    def compile(self):
+        return self.node.compile()
+
+class Statement(Node):
+    def __init__(self, node:Node):
+        self.node = node
+    
+    def compile(self):
+        return self.node.compile()
+
+class Comp(Node):
+    def __init__(self, left:Node, op:str, right:Node):
+        self.left = left
+        self.op = op
+        self.right = right
+    
+    def compile(self):
+        return {
+            "#function": "math.compare",
+            "left": self.left.compile(),
+            "op": self.op,
+            "right": self.right.compile()
+        }
+
+class IfStatement(Node):
+    def __init__(self, condition:Node, body:Node, else_node:Node=None):
+        self.condition = condition
+        self.body = body
+        self.else_node = else_node
+    
+    def compile(self):
+        return {
+            "#check": self.condition.compile(),
+            "true": self.body.compile(),
+            "false": self.else_node.compile()
+        }
+
+class ForLoop(Node):
+    def __init__(self):
+        pass
+    
+    def compile(self):
+        pass
+
+class Scope(Node):
+    def __init__(self):
+        pass
+    
+    def compile(self):
+        pass
+
+class WhileLoop(Node):
+    def __init__(self):
+        pass
+    
+    def compile(self):
+        pass
+
+class ElseBranch(Node):
+    def __init__(self, body:Node):
+        self.body = body
+    
+    def compile(self):
+        return self.body.compile()
+
+class MatchCase(Node):
+    def __init__(self, match_value:Node, cases:list[Expression], bodies:list[Scope]):
+        self.match_value = match_value
+        self.cases = cases
+        self.bodies = bodies
+    
+    
+    def compile(self):
+        pass
+
+class ClassDef(Node):
+    def __init__(self):
+        pass
+    
+    def compile(self):
+        pass
+
+class FunctionDef(Node):
+    def __init__(self):
+        pass
+    
+    def compile(self):
+        pass
+
+class BinaryOp(Node):
+    def __init__(self):
+        pass
+    
+    def compile(self):
+        pass
+
+class MacroDef(Node):
+    def __init__(self):
+        pass
+    
+    def compile(self):
+        pass
+
+class MacroCall(Node):
+    def __init__(self):
+        pass
+    
+    def compile(self):
+        pass
+
+class MacroAssign(Node):
+    def __init__(self):
+        pass
+    
+    def compile(self):
+        pass
+
+class MacroRef(Node):
+    def __init__(self):
+        pass
+    
+    def compile(self):
+        pass
+
+class Table(Node):
+    def __init__(self):
+        pass
+    
+    def compile(self):
+        pass
+
+class Concat(Node):
+    def __init__(self):
+        pass
+    
+    def compile(self):
+        pass
+
+
 class EngineScript:
     _scripts = {}
     
@@ -609,9 +753,6 @@ class EngineScript:
                 self.compiled_script = {}
         if t and self.compiled_script == {}:
             print(f"Warning:\n    File '{self.script_file}' contained code that compiled to nothing.")
-
-    def statements(self, tokens:list[Token], ignore_macros:bool=False) -> Node:
-        return Node()
 
 """
 statements : statement*

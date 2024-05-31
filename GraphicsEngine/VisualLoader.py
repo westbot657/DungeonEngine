@@ -9,6 +9,7 @@ from AdvancedPanels.PanelPlacer import PanelPlacer
 from CursorFocusTextBox import CursorFocusTextBox
 from Text import Text
 from ContextTree import ContextTree
+from ToggleSwitch import ToggleSwitch
 
 from UIElement import UIElement
 
@@ -71,6 +72,18 @@ class AttributeCell(UIElement):
         self.width = 180
         self.height = 24
     
+    def toggle_sfx(self, state):
+        self.editor.sound_system.get_audio(f"AESA_tick{1 if state else 2}", "editor").play()
+        
+        def redo():
+            self.toggle.set_state(state)
+        
+        def undo():
+            self.toggle.set_state(not state)
+        
+        self.editor.add_history(redo, undo, "Toggled Switch")
+        
+    
     def configure_value(self):
         match self.data_type.rsplit("-", 1)[-1]:
             case "str":
@@ -116,7 +129,9 @@ class AttributeCell(UIElement):
                     self.setup_function("percent")
             case "bool":
                 if isinstance(self.value, (bool, int, float)):
-                    ...
+                    self.toggle = ToggleSwitch(10, 3, 18, 0, self.value, TEXT_COLOR, (30, 200, 30), (200, 30, 30), TEXT_COLOR, ToggleSwitch.Style.SQUARE, True)
+                    self.toggle.on_state_change(self.toggle_sfx)
+                    self.children.append(self.toggle)
                 elif isinstance(self.value, dict):
                     self.setup_function("bool")
             case "ref":
@@ -320,9 +335,14 @@ class CellSlot(UIElement):
             if cell.back_link and self.parent:
                 cell.back_link.referencers.append(self.parent)
             
+            if old_slot is self:
+                return
+            
             def undo():
-                old_slot.cell = cell
+                
                 self.cell = None
+                old_slot.cell = cell
+                cell.slot = old_slot
                 
                 if cell.back_link and self.parent:
                     cell.back_link.referencers.remove(self.parent)
@@ -330,6 +350,7 @@ class CellSlot(UIElement):
             def redo():
                 old_slot.cell = None
                 self.cell = cell
+                cell.slot = self
                 
                 if cell.back_link and self.parent:
                     cell.back_link.referencers.append(self.parent)

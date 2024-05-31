@@ -11,6 +11,7 @@ from SoundSystem import SoundSystem
 from TextBox import TextBox
 from FunctionalElements import Button
 from Text import Text
+from AdvancedPanels.CellEditor import CellEditor
 
 import os
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "hide"
@@ -300,6 +301,9 @@ class Editor:
                     self.override_cursor = True
                     pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_IBEAM)
                 
+                elif isinstance(self._hovering, CellEditor.CellStorage):
+                    self.override_cursor = True
+                    pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_SIZENS)
                 else:
                     self.override_cursor = False
 

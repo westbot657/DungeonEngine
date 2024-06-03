@@ -1,4 +1,4 @@
-# pylint: disable=W,R,C,import-error
+# pylint: disable=W,R,C,import-error,assignment-from-no-return
 
 try:
     from .EngineErrors import ScriptError, FinalScriptError, EOF
@@ -351,13 +351,6 @@ class Expression(Node):
     def compile(self):
         return self.node.compile()
 
-class Statement(Node):
-    def __init__(self, node:Node):
-        self.node = node
-    
-    def compile(self):
-        return self.node.compile()
-
 class Statements(Node):
     def __init__(self, nodes:list[Node]):
         self.nodes = nodes
@@ -495,6 +488,27 @@ class Concat(Node):
     def compile(self):
         pass
 
+class BreakNode(Node):
+    def __init__(self, token):
+        self.token = token
+    
+    def compile(self):
+        pass
+
+class ReturnNode(Node):
+    def __init__(self, token, expr:Node):
+        self.token = token
+        self.expr = expr
+    
+    def compile(self):
+        pass
+
+class PassNode(Node):
+    def __init__(self, token):
+        self.token = token
+    
+    def compile(self):
+        pass
 
 class EngineScript:
     _scripts = {}
@@ -510,7 +524,7 @@ class EngineScript:
         r"\<[^<> ]+\>": "OBJECT",
         r"(<=|>=|<|>|==|!=)": "COMP",
         r"(\.\.|::)": "CONCAT",
-        r"\b(if|elif|else|while|for|in|and|not|or|true|false|none|match|case|class|def)\b": "KEYWORD",
+        r"\b(if|elif|else|while|for|in|and|not|or|true|false|none|match|case|class|def|break|continue)\b": "KEYWORD",
         r"[a-zA-Z_][a-zA-Z0-9_]*": "WORD",
         r"(\d+(\.\d+)?|\.\d+)": "NUMBER",
         r"\*\*": "POW",
@@ -721,13 +735,18 @@ class EngineScript:
         self.line = 0
         self.col = 0
         
-        tokens = [EngineScript.Token(self, t.group()) for t in re.finditer("(?:"+"|".join(self._patterns.keys())+")", self.script)]
-
+        tokens = self.tokenize()
+        
         tokens = [t for t in tokens if t.type not in ["ignore", "context_hint"]]
-
         # print(tokens)
 
         self.build(tokens)
+    
+    def tokenize(self) -> list[Token]:
+        """
+        Returns a list of tokens from the script
+        """
+        return [EngineScript.Token(self, t.group()) for t in re.finditer("(?:"+"|".join(self._patterns.keys())+")", self.script)]
     
     def cleanup(self, ast):
         # print(f"CLEANUP: {ast}")
@@ -752,7 +771,7 @@ class EngineScript:
             return lst
         return ast
     
-    def build(self, tokens):
+    def build(self, tokens:list[Token]):
         t = bool(tokens)
         if tokens:
             try:
@@ -763,7 +782,7 @@ class EngineScript:
         if t and self.compiled_script == {}:
             print(f"Warning:\n    File '{self.script_file}' contained code that compiled to nothing.")
 
-    def statements(self, tokens):
+    def statements(self, tokens:list[Token]):
         stmts = []
         while tokens:
             try:
@@ -773,8 +792,70 @@ class EngineScript:
                 pass
         return Statements(stmts)
 
-    def statement(self, tokens):
-        return {}
+    def statement(self, tokens:list[Token]) -> Node:
+        if not tokens:
+            raise EOF()
+        
+        if tokens[0] == ("KEYWORD", "break"):
+            return BreakNode(tokens.pop(0))
+
+        elif tokens[0] == ("KEYWORD", "return"):
+            ret_token = tokens.pop(0)
+            
+            if tokens:
+                if tokens[0].line_start == ret_token.line_start:
+                    expr = self.expression(tokens)
+                else:
+                    expr = None
+            else:
+                expr = None
+
+            return ReturnNode(ret_token, expr)
+        
+        elif tokens[0] == ("KEYWORD", "pass"):
+            return PassNode(tokens.pop(0))
+    
+        elif tokens[0] == ("KEYWORD", "def"):
+            return self.function_def(tokens)
+
+        elif tokens[0] == ("KEYWORD", "class"):
+            return self.class_def(tokens)
+        
+        elif tokens[0] == ("KEYWORD", "if"):
+            return self.if_statement(tokens)
+        
+        elif tokens[0] == ("KEYWORD", "match"):
+            return self.match_case(tokens)
+        
+        elif tokens[0] == ("KEYWORD", "while"):
+            return self.while_loop(tokens)
+        
+        elif tokens[0] == ("KEYWORD", "for"):
+            return self.for_loop(tokens)
+        
+        else:
+            return self.expression(tokens)
+    
+    def expression(self, tokens:list[Token]):
+        pass
+
+    def function_def(self, tokens:list[Token]):
+        pass
+
+    def class_def(self, tokens:list[Token]):
+        pass
+
+    def if_statement(self, tokens:list[Token]):
+        pass
+
+    def match_case(self, tokens:list[Token]):
+        pass
+
+    def while_loop(self, tokens:list[Token]):
+        pass
+
+    def for_loop(self, tokens:list[Token]):
+        pass
 
 """
 statements : statement*

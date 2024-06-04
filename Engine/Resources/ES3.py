@@ -343,14 +343,6 @@ class Node:
     def compile(self):
         return {}
 
-
-class Expression(Node):
-    def __init__(self, node:Node):
-        self.node = node
-    
-    def compile(self):
-        return self.node.compile()
-
 class Statements(Node):
     def __init__(self, nodes:list[Node]):
         self.nodes = nodes
@@ -394,13 +386,6 @@ class ForLoop(Node):
     def compile(self):
         pass
 
-class Scope(Node):
-    def __init__(self):
-        pass
-    
-    def compile(self):
-        pass
-
 class WhileLoop(Node):
     def __init__(self):
         pass
@@ -408,15 +393,8 @@ class WhileLoop(Node):
     def compile(self):
         pass
 
-class ElseBranch(Node):
-    def __init__(self, body:Node):
-        self.body = body
-    
-    def compile(self):
-        return self.body.compile()
-
 class MatchCase(Node):
-    def __init__(self, match_value:Node, cases:list[Expression], bodies:list[Scope]):
+    def __init__(self, match_value:Node, cases:list[Node], bodies:list[Node]):
         self.match_value = match_value
         self.cases = cases
         self.bodies = bodies
@@ -510,6 +488,23 @@ class PassNode(Node):
     def compile(self):
         pass
 
+class ArgsDefNode(Node):
+    def __init__(self, positional:list[Node], keyword:list[tuple[Node, Node]]):
+        self.positional = positional
+        self.keyword = keyword
+    
+    def compile(self):
+        pass
+
+class FunctionDefNode(Node):
+    def __init__(self, name, args:ArgsDefNode, body:Node):
+        self.name: EngineScript.Token = name
+        self.args = args
+        self.body = body
+    
+    def compile(self):
+        pass
+
 class EngineScript:
     _scripts = {}
     
@@ -532,6 +527,37 @@ class EngineScript:
         r"\n+": "NEWLINE",
         r"[\t ]+": "ignore"
     }
+
+    class VarTable:
+        def __init__(self):
+            self.parent: EngineScript.VarTable = None
+            self.vars = {}
+        
+        def exists(self, name:str):
+            return name in self.vars or (self.parent and self.parent.exists(name))
+    
+        def get(self, name:str):
+            if name in self.vars:
+                return self.vars[name]
+            if self.parent:
+                return self.parent.get(name)
+            else:
+                return None
+        
+        def set(self, name:str, value:Any):
+            self.vars.update({name: value})
+        
+        def scope_in(self):
+            new = EngineScript.VarTable()
+            new.parent = self
+            return new
+
+        def scope_out(self):
+            return self.parent
+
+        def clear(self):
+            self.vars.clear()
+            self.parent = None
 
     class Token:
         def __init__(self, es, value:str):
@@ -591,7 +617,7 @@ class EngineScript:
         def __repr__(self):
             return f"{self.type}: {self!s}"
     
-        def unexpected(self):
+        def unexpected(self, actual:str=""):
 
             if self.line_start == self.line_end:
                 err_disp = self.es.script.split("\n")[self.line_start]
@@ -599,7 +625,7 @@ class EngineScript:
             else:
                 err_disp = ""
 
-            return ScriptError(f"Unexpected token at Line {self.line_start+1}, Column {self.col_start+1}: {self.value!r}:\n\n{err_disp}")
+            return ScriptError(f"Unexpected token at Line {self.line_start+1}, Column {self.col_start+1}: {self.value!r}:\n\n{err_disp}" + (f"  Expected: {actual}" if actual else ""))
 
         def expected(self, actual, do_quotes=True):
             if self.line_start == self.line_end:
@@ -608,6 +634,7 @@ class EngineScript:
             else:
                 err_disp = ""
             q = "'" if do_quotes else ""
+            
             return FinalScriptError(f"Expected {q}{actual}{q} at Line {self.line_start+1}, Column {self.col_start+1}, got {self.value!r} instead.\n\n{err_disp}")
 
         def get_location(self):
@@ -618,8 +645,7 @@ class EngineScript:
         def __init__(self, name, token=None):
             self.name = name
             self.token = token
-    
-    
+
     class MacroFunction:
         __slots__ = [
             "es", "name", "args", "code"
@@ -722,15 +748,11 @@ class EngineScript:
         self.compiled_script = {}
         self.do_analysis = do_analysis
         self._tokens = []
-        self.variable_table = {}
+        self.variable_table = EngineScript.VarTable()
 
     def compile(self):
         self.macro_functions.clear()
         self.macros.clear()
-        
-        self.parse()
-    
-    def parse(self):
         
         self.line = 0
         self.col = 0
@@ -840,6 +862,48 @@ class EngineScript:
         pass
 
     def function_def(self, tokens:list[Token]):
+        tokens.pop(0)
+        
+        if not tokens:
+            raise EOF()
+        
+        if tokens[0].type == "WORD":
+            name = tokens.pop(0)
+        else:
+            raise tokens[0].expected("function name", False)
+        
+        if not tokens:
+            raise EOF()
+        
+        if tokens[0] == ("LITERAL", "("):
+            args = self.param_def_list(tokens)
+        else:
+            raise tokens[0].expected("(")
+        
+        if not tokens:
+            raise EOF()
+        
+        if tokens[0] == ("LITERAL", "{"):
+            body = self.scope(tokens)
+        else:
+            raise tokens[0].unexpected("'{' or newline")
+        
+        return FunctionDefNode(name, args, body)
+    
+    def scope(self, tokens:list[Token]):
+        tokens.pop(0)
+        try:
+            body = self.statements(tokens)
+        except ScriptError as e:
+            if tokens[0] == ("LITERAL", "}"):
+                tokens.pop(0)
+            else:
+                raise FinalScriptError(*e.args)
+        
+        tokens.pop(0)
+        return body
+    
+    def param_def_list(self, tokens:list[Token]):
         pass
 
     def class_def(self, tokens:list[Token]):

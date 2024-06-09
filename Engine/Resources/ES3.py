@@ -3,9 +3,13 @@
 try:
     from .EngineErrors import ScriptError, FinalScriptError, EOF
     from .Serializer import Serializer
+    from .YieldTools import YieldTools
+    from .LoaderFunction import LoaderFunction
 except ImportError:
     from EngineErrors import ScriptError, FinalScriptError, EOF
     from Serializer import Serializer
+    from YieldTools import YieldTools
+    from LoaderFunction import LoaderFunction
     
 
 from typing import Any
@@ -361,9 +365,10 @@ class Comp(Node):
     def compile(self):
         return {
             "#function": "math.compare",
-            "left": self.left.compile(),
-            "op": self.op,
-            "right": self.right.compile()
+            self.op: [
+                self.left.compile(),
+                self.right.compile()
+            ]
         }
 
 class IfStatement(Node):
@@ -749,6 +754,40 @@ class EngineScript:
         self.do_analysis = do_analysis
         self._tokens = []
         self.variable_table = EngineScript.VarTable()
+        self.exec_depth = 0
+
+    class ExecReturn:
+        def __init__(self, type:str, value:Any):
+            self.type = type
+            self.value = value
+
+    def execute(self):
+        yt = YieldTools("ES3:execute")
+        yield from yt.call(self._execute, self.compiled_script)
+        r = yt.result()
+        print(r)
+        
+
+
+    def _execute(self, branch:Any):
+        self.exec_depth += 1
+        yt = YieldTools(f"ES3:_execute:{self.exec_depth}")
+        if isinstance(branch, dict):
+            if (function := branch.get("#function", None)) is not None:
+                ...
+            elif (funcs := branch.get("#functions", None)):
+                ...
+            elif (script := branch.get("#script", None)):
+                ...
+            elif (ref := branch.get("#ref", None)):
+                ...
+            elif (store := branch.get("#store", None)):
+                ...
+        elif isinstance(branch, list):
+            ...
+        else:
+            self.exec_depth
+            return EngineScript.ExecReturn("value", branch)
 
     def compile(self):
         self.macro_functions.clear()

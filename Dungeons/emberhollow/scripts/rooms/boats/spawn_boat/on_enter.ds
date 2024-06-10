@@ -1,12 +1,16 @@
 // quick intro of arriving at emberhollow for a new life or smth
 
 <num_players> = length(<#dungeon.player_ids>)
+// num_players = length(#dungeon.player_ids)
 
 append(<#dungeon.player_ids>, <#player.uid>)
+// #dungeon.player_ids.append(#player.uid)
 
 [engine:player/set_tag]("listening", true)
+// #player.tag: listening = true
 
 $listening = [engine:player/get_tag]("listening")
+// $listening = #player.tag: listening
 
 output("say `skip` to skip dialog")
 
@@ -21,9 +25,24 @@ output("say `skip` to skip dialog")
     "Captain Shaundyl"
 ])
 
+/*
+captain = random.choice([
+    "Captain Jack", // <-- best captain tbh
+    "Captain Hagmar",
+    "Captain Darfin",
+    "Captain Reptair",
+    "Captain Feno",
+    "Captain Elyon",
+    "Captain Ryfon",
+    "Captain Shaundyl"
+])
+
+*/
+
 <g> = [engine:random/range](9, 11)
 <s> = [engine:random/range](5, 7)
 <c> = [engine:random/range](2, 9)
+// money = new: <engine:currency> {gold: random.range(9, 11), silver: random.range(5, 7), copper: random.range(2, 9)}
 
 if ($listening) {
     output("*you find yourself on a boat. You can see docks and a town in the distance*")
@@ -33,6 +52,7 @@ $out($message, $wait_time) {
     if ($listening) {
         output(
             format($message, captain=<captain>)
+            // $message.format(:captain)
         )
         wait($wait_time)
     }
@@ -41,6 +61,7 @@ $outd($message, $wait_time) {
     if ($listening) {
         output(
             format($message, captain=<captain>, player=<#player.name>)
+            // $message.format(:captain, player=#player.name)
         )
         wait($wait_time)
     }
@@ -49,6 +70,7 @@ $outm($message, $wait_time) {
     if ($listening) {
         output(
             format($message, captain=<captain>, g=<g>, s=<s>, c=<c>)
+            // $message.format(:captain, :money)
         )
         wait($wait_time)
     }
@@ -98,9 +120,61 @@ match([engine:random/choice](%["1", "2", "3", "4"]))
         $out("`{captain}`: If ya want meh advice, go `find Phyyra at the Inn`, that money'll pay for a few nights stay.", 4)
     }
 }
+/*
+
+match random.range(1, 4) {
+    case 1 {
+        $outd("`{captain}`: Well *{player}*, there it is!", 3)
+        $out("`{captain}`: `Emberhollow`.", 8)
+        $out("`{captain}`: And as I prob'ly won' be see'n ya again, I wish ya best 'o luck on yer travels kid.", 6)
+        if <num_players == 0) {
+            $out("`{captain}`: Though, Ya aught'a `find the Inn`.\nI know the Inn-keeper family, `Phyrra`'ll take care of ya! just tell 'er I sent ya, and she migh' give ya a discount.", 7)
+            $out("{captain} hesitates", 2)
+            $out("`{captain}`: Er.. she *might*.. give ya a discount...", 3)
+            $out("`{captain}`: Ya know what, 'ow bout ya take this jus'n case.", 3)
+        }
+        else {
+            $out("`{captain}`: Oh, and 'ere, Ya migh' find more use for this than me.", 3)
+        }
+        $outm("{captain} hands you a small bag of coins\n(+{money})", 2)
+    }
+    case 2 {
+        $out("`{captain}`: We're almost to `Emberhollow`, you'd better get up.", 6)
+        if (<num_players> == 0) {
+            $out("`{captain}`: Oh, If you `find yourself at the Inn`, will you give this to `Phyyra` for me?", 2)
+        }
+        else {
+            $out("`{captain}`: Here's a little something to help you on your travels.", 3)
+        }
+        $outm("{captain} hands you a small sack of coins.\n(+{money}", 2)
+    }
+    case 3 {
+        $outd("`{captain}`: {player}, Welcome to `Emberhollow`!", 3.5)
+        if (<num_players> == 0) {
+            $out("`{captain}`: Once we land, I suggest you `find the Inn`, It's a good place to stay.", 6)
+            $out("`{captain}`: Here, this'll get you a room for a few days.", 4)
+            $outm("{captain} hands you a small pouch with some coins in it\n(+{money})", 4)
+            $out("`{captain}`: Oh, and the Innkeeper's name is `Phyyra`. if you can't find her, ask around.", 4)
+        }
+        else {
+            $out("`{captain}`: Good luck, kid! Here's something for your travels.", 4)
+            $outm("{captain} hands you a small pouch with some coins in it\n(+{money})", 4)
+        }
+    }
+    case 4 {
+        $out("`{captain}`: Well, I got ya ter `Emberhollow` didn' I.", 3)
+        $out("`{captain}`: I 'spose I owe ya fer savin me from that beast on the way 'ere.", 3.5)
+        $outm("{captain} hands you a bag of coins\n(+{money})", 3)
+        if (<num_players> == 0) {
+            $out("`{captain}`: If ya want meh advice, go `find Phyyra at the Inn`, that money'll pay for a few nights stay.", 4)
+        }
+    }
+}
+
+*/
 
 [engine:player/give_money](<g>, <s>, <c>)
-
+// #player.add_money(money)
 if ($listening) {
     wait(2)
     output("...")
@@ -112,3 +186,4 @@ output("the boat pulls into port, and you step off the boat.")
 wait(2)
 
 [engine:player/set_location]("emberhollow:rooms/docks/roads/road_4")
+// move: #player -> <emberhollow:rooms/docks/roads/road_4>

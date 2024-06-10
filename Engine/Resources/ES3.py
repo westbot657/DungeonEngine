@@ -30,10 +30,10 @@ $listening = #player.tag: listening
 
 output("say `skip` to skeip dialog")
 
-captain = random.choice([
+captain = random.choice(
     "...",
     "..."
-])
+)
 
 starting_money = new: <engine:currency> {
     gold: random.range(9, 11),
@@ -76,270 +76,9 @@ match random.choice([1, 2, 3, 4]) {
 #player.give_money(starting_money)
 
 
-#player.goto(<emberhollow:rooms/docks/roads/road_4>)
+move: #player -> <emberhollow:rooms/docks/roads/road_4>
 
 
-"""
-
-"""
-[
-    CONTEXT: '#!emberhollow/rooms/boats/spawn_boat'            (Line 2, Column 1 to 37),
-    NEWLINE
-    CONTEXT: '#!enter-script'                                  (Line 3, Column 1 to 15)
-    NEWLINE
-    WORD:    'num_players'                                     (Line 5, Column 1 to 12),
-    LITERAL: '='                                               (Line 5, Column 13 to 14),
-    WORD:    'length'                                          (Line 5, Column 15 to 21),
-    LITERAL: '('                                               (Line 5, Column 21 to 22),
-    LITERAL: '#'                                               (Line 5, Column 22 to 23),
-    WORD:    'dungeon'                                         (Line 5, Column 23 to 30),
-    LITERAL: '.'                                               (Line 5, Column 30 to 31),
-    WORD:    'player_ids'                                      (Line 5, Column 31 to 41),
-    LITERAL: ')'                                               (Line 5, Column 41 to 42),
-    NEWLINE
-    LITERAL: '#'                                               (Line 7, Column 1 to 2),
-    WORD:    'dungeon'                                         (Line 7, Column 2 to 9),
-    LITERAL: '.'                                               (Line 7, Column 9 to 10),
-    WORD:    'player_ids'                                      (Line 7, Column 10 to 20),
-    LITERAL: '.'                                               (Line 7, Column 20 to 21),
-    WORD:    'append'                                          (Line 7, Column 21 to 27),
-    LITERAL: '('                                               (Line 7, Column 27 to 28),
-    LITERAL: '#'                                               (Line 7, Column 28 to 29),
-    WORD:    'player'                                          (Line 7, Column 29 to 35),
-    LITERAL: '.'                                               (Line 7, Column 35 to 36),
-    WORD:    'uid'                                             (Line 7, Column 36 to 39),
-    LITERAL: ')'                                               (Line 7, Column 39 to 40),
-    NEWLINE
-    LITERAL: '#'                                               (Line 9, Column 1 to 2),
-    WORD:    'player'                                          (Line 9, Column 2 to 8),
-    LITERAL: '.'                                               (Line 9, Column 8 to 9),
-    WORD:    'tag'                                             (Line 9, Column 9 to 12),
-    LITERAL: ':'                                               (Line 9, Column 12 to 13),
-    WORD:    'listening'                                       (Line 9, Column 14 to 23),
-    LITERAL: '='                                               (Line 9, Column 24 to 25),
-    WORD:    'true'                                            (Line 9, Column 26 to 30),
-    NEWLINE
-    MACRO:   '$listening'                                      (Line 11, Column 1 to 11),
-    LITERAL: '='                                               (Line 11, Column 12 to 13),
-    LITERAL: '#'                                               (Line 11, Column 14 to 15),
-    WORD:    'player'                                          (Line 11, Column 15 to 21),
-    LITERAL: '.'                                               (Line 11, Column 21 to 22),
-    WORD:    'tag'                                             (Line 11, Column 22 to 25),
-    LITERAL: ':'                                               (Line 11, Column 25 to 26),
-    WORD:    'listening'                                       (Line 11, Column 27 to 36),
-    NEWLINE
-    WORD:    'output'                                          (Line 13, Column 1 to 7),
-    LITERAL: '('                                               (Line 13, Column 7 to 8),
-    STRING:  'say `skip` to skeip dialog'                      (Line 13, Column 8 to 36),
-    LITERAL: ')'                                               (Line 13, Column 36 to 37),
-    NEWLINE
-    WORD:    'captain'                                         (Line 15, Column 1 to 8),
-    LITERAL: '='                                               (Line 15, Column 9 to 10),
-    WORD:    'random'                                          (Line 15, Column 11 to 17),
-    LITERAL: '.'                                               (Line 15, Column 17 to 18),
-    WORD:    'choice'                                          (Line 15, Column 18 to 24),
-    LITERAL: '('                                               (Line 15, Column 24 to 25),
-    LITERAL: '['                                               (Line 15, Column 25 to 26),
-    NEWLINE
-    STRING:  '...'                                             (Line 16, Column 5 to 10),
-    LITERAL: ','                                               (Line 16, Column 10 to 11),
-    NEWLINE
-    STRING:  '...'                                             (Line 17, Column 5 to 10),
-    NEWLINE
-    LITERAL: ']'                                               (Line 18, Column 1 to 2),
-    LITERAL: ')'                                               (Line 18, Column 2 to 3),
-    NEWLINE
-    WORD:    'starting_money'                                  (Line 20, Column 1 to 15),
-    LITERAL: '='                                               (Line 20, Column 16 to 17),
-    WORD:    'new'                                             (Line 20, Column 18 to 21),
-    LITERAL: ':'                                               (Line 20, Column 21 to 22),
-    OBJECT: '<engine:currency>'                                (Line 20, Column 23 to 40),
-    LITERAL: '{'                                               (Line 20, Column 41 to 42),
-    NEWLINE
-    WORD:    'gold'                                            (Line 21, Column 5 to 9),
-    LITERAL: ':'                                               (Line 21, Column 9 to 10),
-    WORD:    'random'                                          (Line 21, Column 11 to 17),
-    LITERAL: '.'                                               (Line 21, Column 17 to 18),
-    WORD:    'range'                                           (Line 21, Column 18 to 23),
-    LITERAL: '('                                               (Line 21, Column 23 to 24),
-    NUMBER:  '9'                                               (Line 21, Column 24 to 25),
-    LITERAL: ','                                               (Line 21, Column 25 to 26),
-    NUMBER:  '11'                                              (Line 21, Column 27 to 29),
-    LITERAL: ')'                                               (Line 21, Column 29 to 30),
-    LITERAL: ','                                               (Line 21, Column 30 to 31),
-    NEWLINE
-    WORD:    'silver'                                          (Line 22, Column 5 to 11),
-    LITERAL: ':'                                               (Line 22, Column 11 to 12),
-    WORD:    'random'                                          (Line 22, Column 13 to 19),
-    LITERAL: '.'                                               (Line 22, Column 19 to 20),
-    WORD:    'range'                                           (Line 22, Column 20 to 25),
-    LITERAL: '('                                               (Line 22, Column 25 to 26),
-    NUMBER:  '5'                                               (Line 22, Column 26 to 27),
-    LITERAL: ','                                               (Line 22, Column 27 to 28),
-    NUMBER:  '7'                                               (Line 22, Column 29 to 30),
-    LITERAL: ')'                                               (Line 22, Column 30 to 31),
-    LITERAL: ','                                               (Line 22, Column 31 to 32),
-    NEWLINE
-    WORD:    'copper'                                          (Line 23, Column 5 to 11),
-    LITERAL: ':'                                               (Line 23, Column 11 to 12),
-    WORD:    'random'                                          (Line 23, Column 13 to 19),
-    LITERAL: '.'                                               (Line 23, Column 19 to 20),
-    WORD:    'range'                                           (Line 23, Column 20 to 25),
-    LITERAL: '('                                               (Line 23, Column 25 to 26),
-    NUMBER:  '2'                                               (Line 23, Column 26 to 27),
-    LITERAL: ','                                               (Line 23, Column 27 to 28),
-    NUMBER:  '9'                                               (Line 23, Column 29 to 30),
-    LITERAL: ')'                                               (Line 23, Column 30 to 31),
-    NEWLINE
-    LITERAL: '}'                                               (Line 24, Column 1 to 2),
-    NEWLINE
-    WORD:    'if'                                              (Line 26, Column 1 to 3),
-    LITERAL: '('                                               (Line 26, Column 4 to 5),
-    MACRO:   '$listening'                                      (Line 26, Column 5 to 15),
-    LITERAL: ')'                                               (Line 26, Column 15 to 16),
-    LITERAL: '{'                                               (Line 26, Column 17 to 18),
-    NEWLINE
-    WORD:    'output'                                          (Line 27, Column 5 to 11),
-    LITERAL: '('                                               (Line 27, Column 11 to 12),
-    STRING:  '...'                                             (Line 27, Column 12 to 17),
-    LITERAL: ')'                                               (Line 27, Column 17 to 18),
-    NEWLINE
-    WORD:    'wait'                                            (Line 28, Column 5 to 9),
-    LITERAL: '('                                               (Line 28, Column 9 to 10),
-    NUMBER:  '2'                                               (Line 28, Column 10 to 11),
-    LITERAL: ')'                                               (Line 28, Column 11 to 12),
-    NEWLINE
-    LITERAL: '}'                                               (Line 29, Column 1 to 2),
-    NEWLINE
-    MACRO:   '$out'                                            (Line 31, Column 1 to 5),
-    LITERAL: '('                                               (Line 31, Column 5 to 6),
-    MACRO:   '$message'                                        (Line 31, Column 6 to 14),
-    LITERAL: ','                                               (Line 31, Column 14 to 15),
-    MACRO:   '$wait_time'                                      (Line 31, Column 16 to 26),
-    LITERAL: ')'                                               (Line 31, Column 26 to 27),
-    LITERAL: '{'                                               (Line 31, Column 28 to 29),
-    NEWLINE
-    WORD:    'if'                                              (Line 32, Column 5 to 7),
-    LITERAL: '('                                               (Line 32, Column 8 to 9),
-    MACRO:   '$listening'                                      (Line 32, Column 9 to 19),
-    LITERAL: ')'                                               (Line 32, Column 19 to 20),
-    LITERAL: '{'                                               (Line 32, Column 21 to 22),
-    NEWLINE
-    WORD:    'output'                                          (Line 33, Column 9 to 15),
-    LITERAL: '('                                               (Line 33, Column 15 to 16),
-    NEWLINE
-    WORD:    'format'                                          (Line 34, Column 13 to 19),
-    LITERAL: '('                                               (Line 34, Column 19 to 20),
-    MACRO:   '$message'                                        (Line 34, Column 20 to 28),
-    LITERAL: ','                                               (Line 34, Column 28 to 29),
-    WORD:    'captain'                                         (Line 34, Column 30 to 37),
-    LITERAL: '='                                               (Line 34, Column 37 to 38),
-    WORD:    'captain'                                         (Line 34, Column 38 to 45),
-    LITERAL: ')'                                               (Line 34, Column 45 to 46),
-    NEWLINE
-    LITERAL: ')'                                               (Line 35, Column 9 to 10),
-    NEWLINE
-    WORD:    'wait'                                            (Line 36, Column 9 to 13), 
-    LITERAL: '('                                               (Line 36, Column 13 to 14),
-    MACRO:   '$wait_time'                                      (Line 36, Column 14 to 24),
-    LITERAL: ')'                                               (Line 36, Column 24 to 25),
-    NEWLINE
-    LITERAL: '}'                                               (Line 37, Column 5 to 6),
-    NEWLINE
-    LITERAL: '}'                                               (Line 38, Column 1 to 2),
-    NEWLINE
-    MACRO:   '$outm'                                           (Line 40, Column 1 to 6),
-    LITERAL: '('                                               (Line 40, Column 6 to 7),
-    MACRO:   '$message'                                        (Line 40, Column 7 to 15),
-    LITERAL: ','                                               (Line 40, Column 15 to 16),
-    MACRO:   '$wait_time'                                      (Line 40, Column 17 to 27),
-    LITERAL: ')'                                               (Line 40, Column 27 to 28),
-    LITERAL: '{'                                               (Line 40, Column 29 to 30),
-    NEWLINE
-    WORD:    'if'                                              (Line 41, Column 5 to 7),
-    LITERAL: '('                                               (Line 41, Column 8 to 9),
-    MACRO:   '$listening'                                      (Line 41, Column 9 to 19),
-    LITERAL: ')'                                               (Line 41, Column 19 to 20),
-    LITERAL: '{'                                               (Line 41, Column 21 to 22),
-    NEWLINE
-    WORD:    'output'                                          (Line 42, Column 9 to 15),
-    LITERAL: '('                                               (Line 42, Column 15 to 16),
-    NEWLINE
-    WORD:    'format'                                          (Line 43, Column 13 to 19),
-    LITERAL: '('                                               (Line 43, Column 19 to 20),
-    MACRO:   '$message'                                        (Line 43, Column 20 to 28),
-    LITERAL: ','                                               (Line 43, Column 28 to 29),
-    WORD:    'captain'                                         (Line 43, Column 30 to 37),
-    LITERAL: '='                                               (Line 43, Column 37 to 38),
-    WORD:    'captain'                                         (Line 43, Column 38 to 45),
-    LITERAL: ','                                               (Line 43, Column 45 to 46),
-    WORD:    'money'                                           (Line 43, Column 47 to 52),
-    LITERAL: '='                                               (Line 43, Column 52 to 53),
-    WORD:    'starting_money'                                  (Line 43, Column 53 to 67),
-    LITERAL: '.'                                               (Line 43, Column 67 to 68),
-    WORD:    'total'                                           (Line 43, Column 68 to 73),
-    LITERAL: ')'                                               (Line 43, Column 73 to 74),
-    NEWLINE
-    LITERAL: ')'                                               (Line 44, Column 9 to 10),
-    NEWLINE
-    WORD:    'wait'                                            (Line 45, Column 9 to 13),
-    LITERAL: '('                                               (Line 45, Column 13 to 14),
-    MACRO:   '$wait_time'                                      (Line 45, Column 14 to 24),
-    LITERAL: ')'                                               (Line 45, Column 24 to 25),
-    NEWLINE
-    LITERAL: '}'                                               (Line 46, Column 5 to 6),
-    NEWLINE
-    LITERAL: '}'                                               (Line 47, Column 1 to 2),
-    NEWLINE
-    WORD:    'match'                                           (Line 51, Column 1 to 6),
-    WORD:    'random'                                          (Line 51, Column 7 to 13),
-    LITERAL: '.'                                               (Line 51, Column 13 to 14),
-    WORD:    'choice'                                          (Line 51, Column 14 to 20),
-    LITERAL: '('                                               (Line 51, Column 20 to 21),
-    LITERAL: '['                                               (Line 51, Column 21 to 22),
-    NUMBER:  '1'                                               (Line 51, Column 22 to 23),
-    LITERAL: ','                                               (Line 51, Column 23 to 24),
-    NUMBER:  '2'                                               (Line 51, Column 25 to 26),
-    LITERAL: ','                                               (Line 51, Column 26 to 27),
-    NUMBER:  '3'                                               (Line 51, Column 28 to 29),
-    LITERAL: ','                                               (Line 51, Column 29 to 30),
-    NUMBER:  '4'                                               (Line 51, Column 31 to 32),
-    LITERAL: ']'                                               (Line 51, Column 32 to 33),
-    LITERAL: ')'                                               (Line 51, Column 33 to 34),
-    LITERAL: '{'                                               (Line 51, Column 35 to 36),
-    NEWLINE
-    WORD:    'case'                                            (Line 52, Column 5 to 9),
-    NUMBER:  '1'                                               (Line 52, Column 10 to 11),
-    LITERAL: '{'                                               (Line 52, Column 12 to 13),
-    NEWLINE
-    MACRO:   '$outm'                                           (Line 54, Column 9 to 14),
-    LITERAL: '('                                               (Line 54, Column 14 to 15),
-    STRING:  '{captain} hands you a bag of coins.\n(+{money})' (Line 54, Column 15 to Line 55, Column 12),
-    NEWLINE
-    LITERAL: ')'                                               (Line 55, Column 12 to 13),
-    NEWLINE
-    LITERAL: '}'                                               (Line 56, Column 5 to 6),
-    NEWLINE
-    LITERAL: '}'                                               (Line 57, Column 1 to 2),
-    NEWLINE
-    LITERAL: '#'                                               (Line 59, Column 1 to 2),
-    WORD:    'player'                                          (Line 59, Column 2 to 8),
-    LITERAL: '.'                                               (Line 59, Column 8 to 9),
-    WORD:    'give_money'                                      (Line 59, Column 9 to 19),
-    LITERAL: '('                                               (Line 59, Column 19 to 20),
-    WORD:    'starting_money'                                  (Line 59, Column 20 to 34),
-    LITERAL: ')'                                               (Line 59, Column 34 to 35),
-    NEWLINE
-    LITERAL: '#'                                               (Line 62, Column 1 to 2),
-    WORD:    'player'                                          (Line 62, Column 2 to 8),
-    LITERAL: '.'                                               (Line 62, Column 8 to 9),
-    WORD:    'goto'                                            (Line 62, Column 9 to 13),
-    LITERAL: '('                                               (Line 62, Column 13 to 14),
-    OBJECT: '<emberhollow:rooms/docks/roads/road_4>'           (Line 62, Column 14 to 52),
-    LITERAL: ')'                                               (Line 62, Column 52 to 53)
-    NEWLINE
-    EOF
-]
 """
 
 
@@ -409,13 +148,6 @@ class MatchCase(Node):
         pass
 
 class ClassDef(Node):
-    def __init__(self):
-        pass
-    
-    def compile(self):
-        pass
-
-class FunctionDef(Node):
     def __init__(self):
         pass
     
@@ -568,6 +300,7 @@ class EngineScript:
         def __init__(self, es, value:str):
             self.es = es
             self.value = value
+            self.raw = value
             
             for pattern, token_type in EngineScript._patterns.items():
                 if re.fullmatch(pattern, self.value):
@@ -587,6 +320,8 @@ class EngineScript:
 
             if self.type == "NUMBER":
                 self.value = float(self.value) if "." in self.value else int(self.value)
+            elif self.type == "OBJECT":
+                self.value = self.value[1:-1]
             elif self.type == "STRING":
 
                 if not self.value.startswith(("\"", "'")):
@@ -642,14 +377,21 @@ class EngineScript:
             
             return FinalScriptError(f"Expected {q}{actual}{q} at Line {self.line_start+1}, Column {self.col_start+1}, got {self.value!r} instead.\n\n{err_disp}")
 
+        def syntax(self, msg:str):
+            # if self.col_start <= 4:
+            out = f"Ln {self.line_start: <5} | {" "*self.col_start}{self.raw}"
+            out2 = f"           {" "*self.col_start}{"~"*len(self.raw)}"
+            return FinalScriptError(f"{msg}\nAt:\n{out}\n{out2}")
+                
+
         def get_location(self):
             return f"Line {self.line_start+1}, Column {self.col_start+1}"
 
     class Macro:
         __slots__ = ["name", "token"]
         def __init__(self, name, token=None):
-            self.name = name
-            self.token = token
+            self.name:str = name
+            self.token:EngineScript.Token = token
 
     class MacroFunction:
         __slots__ = [
@@ -769,7 +511,7 @@ class EngineScript:
         
 
 
-    def _execute(self, branch:Any):
+    def _execute(self, branch:Any, context_object:Any=None):
         self.exec_depth += 1
         yt = YieldTools(f"ES3:_execute:{self.exec_depth}")
         if isinstance(branch, dict):
@@ -778,6 +520,8 @@ class EngineScript:
             elif (funcs := branch.get("#functions", None)):
                 ...
             elif (script := branch.get("#script", None)):
+                ...
+            elif (call := branch.get("#call", None)) is not None:
                 ...
             elif (ref := branch.get("#ref", None)):
                 ...
@@ -850,7 +594,10 @@ class EngineScript:
                 stmt = self.statement(tokens)
                 stmts.append(stmt)
             except EOF as e:
-                pass
+                break
+            except ScriptError as e:
+                if tokens and tokens[0] == ("LITERAL", "}"):
+                    break
         return Statements(stmts)
 
     def statement(self, tokens:list[Token]) -> Node:
@@ -901,10 +648,10 @@ class EngineScript:
         pass
 
     def function_def(self, tokens:list[Token]):
-        tokens.pop(0)
+        d = tokens.pop(0) # pop the 'def' keyword
         
-        if not tokens:
-            raise EOF()
+        if not tokens: # there is no situation in which 'def' shouldn't be immediately followed by a word
+            raise FinalScriptError(f"Expected function name after def keyword @ {d.get_location()}")
         
         if tokens[0].type == "WORD":
             name = tokens.pop(0)
@@ -912,10 +659,14 @@ class EngineScript:
             raise tokens[0].expected("function name", False)
         
         if not tokens:
-            raise EOF()
+            raise EOF() # blank definition at EOF doesn't make much sense, but I guess it's fine. (might be good for dse files)
         
         if tokens[0] == ("LITERAL", "("):
             args = self.param_def_list(tokens)
+        elif tokens[0] == ("LITERAL", ";"):
+            args = ArgsDefNode([], [])
+            body = Statements([])
+            return FunctionDefNode(name, args, body)
         else:
             raise tokens[0].expected("(")
         
@@ -930,23 +681,27 @@ class EngineScript:
         return FunctionDefNode(name, args, body)
     
     def scope(self, tokens:list[Token]):
-        tokens.pop(0)
-        try:
-            body = self.statements(tokens)
-        except ScriptError as e:
-            if tokens[0] == ("LITERAL", "}"):
-                tokens.pop(0)
-            else:
-                raise FinalScriptError(*e.args)
+        open = tokens.pop(0) # pop '{'
+        body = self.statements(tokens)
         
-        tokens.pop(0)
-        return body
+        if tokens and tokens[0] == ("LITERAL", "}"):
+            tokens.pop(0)
+            return body
+        elif tokens:
+            return tokens[0].expected("}")
+        else:
+            raise FinalScriptError(f"no valid closing bracket found for open bracket @ {open.get_location()}")
     
     def param_def_list(self, tokens:list[Token]):
         pass
 
     def class_def(self, tokens:list[Token]):
-        pass
+        clss = tokens.pop(0)
+        
+        if tokens and tokens[0].type == "OBJECT":
+            name = tokens.pop(0)
+            
+        
 
     def if_statement(self, tokens:list[Token]):
         pass
@@ -957,7 +712,7 @@ class EngineScript:
     def while_loop(self, tokens:list[Token]):
         pass
 
-    def for_loop(self, tokens:list[Token]):
+    def for_loop(self, tokens:list[Token]): # I kinda want support for python-style and C-style for loops...
         pass
 
 """

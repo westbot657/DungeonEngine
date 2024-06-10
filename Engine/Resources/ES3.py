@@ -273,13 +273,13 @@ class EngineScript:
         def exists(self, name:str):
             return name in self.vars or (self.parent and self.parent.exists(name))
     
-        def get(self, name:str):
+        def get(self, name:str, default):
             if name in self.vars:
                 return self.vars[name]
             if self.parent:
-                return self.parent.get(name)
+                return self.parent.get(name, default)
             else:
-                return None
+                return default
         
         def set(self, name:str, value:Any):
             self.vars.update({name: value})
@@ -518,7 +518,11 @@ class EngineScript:
             if (function := branch.get("#function", None)) is not None:
                 ...
             elif (funcs := branch.get("#functions", None)):
-                ...
+                if isinstance(funcs, list):
+                    ...
+                elif isinstance(funcs, dict):
+                    
+                    yield from yt.call(self._execute, )
             elif (script := branch.get("#script", None)):
                 ...
             elif (call := branch.get("#call", None)) is not None:

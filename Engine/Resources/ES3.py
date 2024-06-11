@@ -155,8 +155,18 @@ class ClassDef(Node):
         pass
 
 class BinaryOp(Node):
-    def __init__(self):
+    def __init__(self, left:Node, op, right:Node):
+        self.left = left
+        self.op = op
+        self.right = right
+    
+    def compile(self):
         pass
+
+class UnaryOp(Node):
+    def __init__(self, op, right:Node):
+        self.op = op
+        self.right = right
     
     def compile(self):
         pass
@@ -197,8 +207,9 @@ class Table(Node):
         pass
 
 class Concat(Node):
-    def __init__(self):
-        pass
+    def __init__(self, args:list[Node], sep:Node|None):
+        self.args = args
+        self.sep = sep
     
     def compile(self):
         pass
@@ -233,6 +244,14 @@ class ArgsDefNode(Node):
     def compile(self):
         pass
 
+class AccessNode(Node):
+    def __init__(self, obj, attr):
+        self.obj = obj
+        self.attr = attr
+
+    def compile(self):
+        pass
+
 class FunctionDefNode(Node):
     def __init__(self, name, args:ArgsDefNode, body:Node):
         self.name: EngineScript.Token = name
@@ -242,6 +261,13 @@ class FunctionDefNode(Node):
     def compile(self):
         pass
 
+class NotNode(Node):
+    def __init__(self, node:Node):
+        self.node = node
+    
+    def compile(self):
+        return {"#not": self.node.compile()}
+    
 class EngineScript:
     _scripts = {}
     
@@ -497,6 +523,12 @@ class EngineScript:
         self._tokens = []
         self.variable_table = EngineScript.VarTable()
         self.exec_depth = 0
+        
+    def snapshot(self, tokens):
+        return len(tokens)
+
+    def load_snapshot(self, snapshot) -> list[Token]:
+        return self._tokens[len(self._tokens)-snapshot:]
 
     class ExecReturn:
         def __init__(self, type:str, value:Any):
@@ -649,7 +681,7 @@ class EngineScript:
             return self.expression(tokens)
     
     def expression(self, tokens:list[Token]):
-        pass
+        return self.comp(tokens)
 
     def function_def(self, tokens:list[Token]):
         d = tokens.pop(0) # pop the 'def' keyword
@@ -704,8 +736,6 @@ class EngineScript:
         
         if tokens and tokens[0].type == "OBJECT":
             name = tokens.pop(0)
-            
-        
 
     def if_statement(self, tokens:list[Token]):
         pass
@@ -719,6 +749,145 @@ class EngineScript:
     def for_loop(self, tokens:list[Token]): # I kinda want support for python-style and C-style for loops...
         pass
 
+    def comp(self, tokens:list[Token]):
+        if tokens:
+            if tokens[0] == ("KEYWORD", "NOT"):
+                tokens.pop(0)
+                c = self.comp(tokens)
+                return NotNode(c)
+            else:
+                snap = self.snapshot(tokens)
+                try:
+                    a = self.arith(tokens)
+
+                    if tokens:
+                        if tokens[0] == ("LITERAL", ("<=", "<", ">=", ">", "!=", "==")):
+                            op = tokens.pop(0)
+                            
+                            a2 = self.arith(tokens)
+                            
+                            return Comp(a, op, a2)
+                            
+                        else:
+                            raise ScriptError()
+                        
+                        
+                    else:
+                        return a
+                
+                except ScriptError as e:
+                    
+                    tokens.clear()
+                    tokens.extend(self.load_snapshot(snap))
+                    
+                    try:
+                        c = self.comp(tokens)
+                        
+                        if tokens and tokens[0] == ("KEYWORD", ("and", "or")):
+                            op = tokens.pop(0)
+                            
+                            c2 = self.comp(tokens)
+                            
+                            return Comp(c, op, c2)
+                        else:
+                            raise ScriptError()
+                    
+                    except ScriptError as e:
+                        tokens.clear()
+                        tokens.extend(self.load_snapshot(snap))
+                        return self.arith(tokens)
+                
+        else:
+            raise EOF()
+
+    def arith(self, tokens:list[Token]):
+        left = self.mul(tokens)
+        while tokens and tokens[0] == ("LITERAL", ("+", "-")):
+            op = tokens.pop(0)
+            right = self.mul(tokens)
+            
+            left = BinaryOp(left, op, right)
+        
+        return left
+    
+    def mul(self, tokens:list[Token]):
+        left = self.pow(tokens)
+        while tokens and tokens[0] == ("LITERAL", ("*", "/", "%")):
+            op = tokens.pop(0)
+            right = self.pow(tokens)
+            
+            left = BinaryOp(left, op, right)
+            
+        return left
+    
+    def pow(self, tokens:list[Token]):
+        left = self.concat(tokens)
+        while tokens and tokens[0] == ("LITERAL", "^"):
+            op = tokens.pop(0)
+            right = self.concat(tokens)
+            
+            left = BinaryOp(left, op, right)
+        return left
+
+    def concat(self, tokens):
+        args = [self.atom(tokens)]
+        while tokens and tokens[0] == ("LITERAL", ".."):
+            tokens.pop(0)
+            a = self.atom(tokens)
+            args.append(a)
+        
+        if tokens and tokens[0] == ("LITERAL", "::"):
+            tokens.pop(0)
+            sep = self.atom(tokens)
+        else:
+            sep = None
+        
+        return Concat(args, sep)
+            
+    def atom(self, tokens:list[Token]):
+        snap = self.snapshot(tokens)
+        if tokens:
+            if tokens[0].type == "WORD":
+                return self.var(tokens)
+            elif tokens[0] == ("LITERAL", "-"):
+                op = tokens.pop(0)
+                
+                right = self.atom(tokens)
+                
+                return UnaryOp(op, right)
+            elif tokens[0] == ("LITERAL", "("):
+                lp = tokens.pop(0)
+
+                expr = self.expression(tokens)
+                
+                if tokens:
+                    if tokens[0] == ("LITERAL", ")"):
+                        return expr
+                    else:
+                        raise tokens[0].expected(")")
+                else:
+                    raise FinalScriptError(f"No valid closing parenthesis found for open parenthesis @ {lp.get_location()}")
+    
+    def var(self, tokens:list[Token]):
+        if tokens[0].type == "WORD":
+            obj = tokens.pop(0)
+            
+            while tokens and tokens[0] == ("LITERAL", "."):
+                dot = tokens.pop(0)
+                if tokens:
+                    if tokens[0].type == "WORD":
+                        attr = tokens.pop(0)
+                    else:
+                        raise tokens[0].expected("attribute", False)
+                else:
+                    raise dot.unexpected()
+                
+                obj = AccessNode(obj, attr)
+            
+            # TODO: list getitem syntax (var["key"])
+                
+
+
 """
 statements : statement*
 
@@ -731,6 +900,7 @@ statement : BREAK
           | match_case
           | while_loop
           | for_loop
+          | assign
           | expression
 
 expression : comp
@@ -767,10 +937,11 @@ mul : pow (('*'|'/'|'%') pow)*
 
 pow : concat ('^' concat)*
 
-concat : var (CONCAT var)? (CONCATSEP var)?
+concat : atom (CONCAT atom)? (CONCATSEP atom)?
 
-atom : var '=' expression
-     | var
+assign : var '=' expression
+
+atom : var
      | '-' atom
      | '(' expression ')'
      | (NUMBER|BOOL|STRING|OBJECT|table|WORD|scope|macro|function_call)

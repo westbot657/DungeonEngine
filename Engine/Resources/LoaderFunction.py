@@ -1,9 +1,14 @@
 # pylint: disable=[W,R,C,import-error]
-
-from .Identifier import Identifier
-from .EngineDummy import Engine
-from .Logger import Log
-from .FunctionMemory import FunctionMemory
+try:
+    from .Identifier import Identifier
+    from .EngineDummy import Engine
+    from .Logger import Log
+    from .FunctionMemory import FunctionMemory
+except ImportError as e:
+    from Identifier import Identifier
+    from EngineDummy import Engine
+    from Logger import Log
+    from FunctionMemory import FunctionMemory
 
 from typing import Any
 

@@ -7,8 +7,12 @@
 # what can live where
 # other descriptors, made as needed
 
-from .Util import Util
-from .Serializer import Serializer, Serializable
+try:
+    from .Util import Util
+    from .Serializer import Serializer, Serializable
+except ImportError as e:
+    from Util import Util
+    from Serializer import Serializer, Serializable
     
 
 @Serializable("Environment")

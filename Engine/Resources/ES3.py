@@ -252,11 +252,27 @@ class AccessNode(Node):
     def compile(self):
         pass
 
+class GetItemNode(Node):
+    def __init__(self, obj, key):
+        self.obj = obj,
+        self.key = key
+    
+    def compile(self):
+        pass
+
 class FunctionDefNode(Node):
     def __init__(self, name, args:ArgsDefNode, body:Node):
         self.name: EngineScript.Token = name
         self.args = args
         self.body = body
+    
+    def compile(self):
+        pass
+
+class CallNode(Node):
+    def __init__(self, obj, args):
+        self.obj = obj
+        self.args = args
     
     def compile(self):
         pass
@@ -578,8 +594,8 @@ class EngineScript:
         
         tokens = self.tokenize()
         
-        tokens = [t for t in tokens if t.type not in ["ignore", "context_hint"]]
-        # print(tokens)
+        tokens = [t for t in tokens if t.type not in ["ignore", "context_hint", "NEWLINE"]]
+        print(tokens)
 
         self.build(tokens)
     
@@ -617,6 +633,7 @@ class EngineScript:
         if tokens:
             try:
                 ast = self.statements(tokens)
+                print(ast)
                 self.compiled_script = self.cleanup(ast.compile())
             except EOF:
                 self.compiled_script = {}
@@ -831,18 +848,24 @@ class EngineScript:
 
     def concat(self, tokens):
         args = [self.atom(tokens)]
+        do_concat = False
         while tokens and tokens[0] == ("LITERAL", ".."):
+            do_concat = True
             tokens.pop(0)
             a = self.atom(tokens)
             args.append(a)
         
         if tokens and tokens[0] == ("LITERAL", "::"):
+            do_concat = True
             tokens.pop(0)
             sep = self.atom(tokens)
         else:
             sep = None
         
-        return Concat(args, sep)
+        if do_concat:
+            return Concat(args, sep)
+        else:
+            return args[0]
             
     def atom(self, tokens:list[Token]):
         snap = self.snapshot(tokens)
@@ -867,25 +890,61 @@ class EngineScript:
                         raise tokens[0].expected(")")
                 else:
                     raise FinalScriptError(f"No valid closing parenthesis found for open parenthesis @ {lp.get_location()}")
+            elif tokens[0] == ("LITERAL", ("{", "[")):
+                return self.table(tokens)
+
+            elif tokens[0].type in ["STRING", "BOOLEAN", "NUMBER"]:
+                ...
+                
+
     
     def var(self, tokens:list[Token]):
-        if tokens[0].type == "WORD":
+        if tokens and tokens[0].type == "WORD":
             obj = tokens.pop(0)
             
-            while tokens and tokens[0] == ("LITERAL", "."):
-                dot = tokens.pop(0)
-                if tokens:
-                    if tokens[0].type == "WORD":
-                        attr = tokens.pop(0)
+            while tokens and tokens[0] == ("LITERAL", (".", "[", "(")):
+                if tokens[0] == ("LITERAL", "."):
+                    dot = tokens.pop(0)
+                    if tokens:
+                        if tokens[0].type == "WORD":
+                            attr = tokens.pop(0)
+                        else:
+                            raise tokens[0].expected("attribute", False)
                     else:
-                        raise tokens[0].expected("attribute", False)
-                else:
-                    raise dot.unexpected()
+                        raise dot.unexpected()
+                    
+                    obj = AccessNode(obj, attr)
                 
-                obj = AccessNode(obj, attr)
-            
-            # TODO: list getitem syntax (var["key"])
-                
+                elif tokens[0] == ("LITERAL", "["):
+                    lb = tokens.pop(0)
+                    key = self.expression(tokens)
+                    
+                    if tokens:
+                        if tokens[0] == ("LITERAL", "]"):
+                            rb = tokens.pop(0)
+                        
+                        else:
+                            raise tokens[0].expected("]")
+                    else:
+                        raise FinalScriptError(f"No valid closing brace found for open brace @ {lb.get_location()}")
+                    
+                    obj = GetItemNode(obj, key)
+                elif tokens[0] == ("LITERAL", "("):
+                    args = self.call_args(tokens)
+                    obj = CallNode(obj, args)
+            return obj
+        elif tokens:
+            raise tokens[0].expected("variable name", False)
+        else:
+            raise FinalScriptError("Expected variable name")
+
+    def table(self, tokens:list[Token]):
+        ...
+    
+    def call_args(self, tokens:list[Token]) -> list[Node]:
+        if tokens:
+            if tokens[0] == ("LITERAL", "("):
+                lp = tokens.pop(0)
 
 
 """
@@ -941,17 +1000,16 @@ concat : atom (CONCAT atom)? (CONCATSEP atom)?
 
 assign : var '=' expression
 
-atom : var
-     | '-' atom
+atom : '-' atom
      | '(' expression ')'
-     | (NUMBER|BOOL|STRING|OBJECT|table|WORD|scope|macro|function_call)
+     | (NUMBER|BOOL|STRING|OBJECT|table|scope|macro|function_call)
 
 var : WORD (('.' WORD)* ('[' expression ']')*)
 
 table : '[' comma_expressions ']'
       | '{' table_contents '}'
 
-function_call : var parameters scope?
+function_call : var (parameters scope?)?
               | 'new' ':' OBJECT scope
 
 table_contents : (expression ':' expression ','?)*

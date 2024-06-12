@@ -71,7 +71,7 @@ $outm($message, $wait_time) {
 match random.choice([1, 2, 3, 4]) {
     case 1 {
         // ...
-        $outm("{captain} hands you a bag of coins.\n(+{money})")
+        $outm("{captain} hands you a bag of coins.\n(+{money})", 2)
     }
 }
 
@@ -88,6 +88,9 @@ class Node:
     def compile(self):
         return {}
 
+    def display(self, depth:int=0) -> str:
+        return f"{" "*depth*2}Node"
+
 class Statements(Node):
     def __init__(self, nodes:list[Node]):
         self.nodes = nodes
@@ -96,6 +99,15 @@ class Statements(Node):
         return {
             "#functions": [node.compile() for node in self.nodes]
         }
+
+    def display(self, depth=0):
+        out = [f"{" "*depth*2}Statements("]
+        
+        for node in self.nodes:
+            out.append(node.display(depth+1))
+        
+        out.append(f"{" "*depth*2})")
+        return "\n".join(out)
 
 class Comp(Node):
     def __init__(self, left:Node, op:str, right:Node):
@@ -112,6 +124,10 @@ class Comp(Node):
             ]
         }
 
+    def display(self, depth:int=0) -> str:
+        return f"{" "*depth*2}Comp [ {self.op} ] (\n{self.left.display(depth+1)}\n{self.right.display(depth+1)}\n{" "*depth*2})"
+        
+
 class IfStatement(Node):
     def __init__(self, condition:Node, body:Node, else_node:Node=None):
         self.condition = condition
@@ -125,16 +141,26 @@ class IfStatement(Node):
             "false": self.else_node.compile()
         }
 
-class ForLoop(Node):
-    def __init__(self):
-        pass
+class ForLoopC(Node):
+    def __init__(self, initializer, step, end_condition, body):
+        self.initializer = initializer
+        self.step = step
+        self.end_condition = end_condition
+        self.body = body
     
     def compile(self):
         pass
 
+class ForLoopPy(Node):
+    def __init__(self, unpack, iterable, body):
+        self.unpack = unpack
+        self.iterable = iterable
+        self.body = body
+
 class WhileLoop(Node):
-    def __init__(self):
-        pass
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
     
     def compile(self):
         pass
@@ -164,7 +190,10 @@ class BinaryOp(Node):
     
     def compile(self):
         pass
-
+    
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}BinOp [ {self.op} ] (\n{self.left.display(depth+1)}\n{self.right.display(depth+1)}\n{" "*depth*2})"
+        
 class UnaryOp(Node):
     def __init__(self, op, right:Node):
         self.op = op
@@ -173,30 +202,40 @@ class UnaryOp(Node):
     def compile(self):
         pass
 
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}Unary [ {self.op} ] (\n{self.right.display(depth+1)}\n{" "*depth*2})"
+
 class MacroDef(Node):
-    def __init__(self):
-        pass
+    def __init__(self, name, args, body):
+        self.name = name
+        self.args = args
+        self.body = body
     
     def compile(self):
         pass
 
 class MacroCall(Node):
-    def __init__(self):
-        pass
+    def __init__(self, token, args):
+        self.token = token
+        self.args = args
     
     def compile(self):
         pass
 
 class MacroAssign(Node):
-    def __init__(self):
-        pass
+    def __init__(self, token, node):
+        self.token = token
+        self.node = node
+    
+    def get(self):
+        return self.node
     
     def compile(self):
         pass
 
 class MacroRef(Node):
-    def __init__(self):
-        pass
+    def __init__(self, token):
+        self.token = token
     
     def compile(self):
         pass
@@ -273,6 +312,9 @@ class ReferenceNode(Node):
             return {"#ref": f"#{self.token.value}"}
         return {"#ref": self.token.value}
 
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}ref: {"#" if self.global_ else ""}{self.token.value}"
+
 class AccessNode(Node):
     def __init__(self, obj, attr):
         self.obj = obj
@@ -288,6 +330,9 @@ class AssignNode(Node):
     
     def compile(self):
         pass
+
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}Assign [\n{self.ref_node.display(depth+1)}\n{" "*depth*2}] (\n{self.val.display(depth+1)}\n{" "*depth*2})"
 
 class GetItemNode(Node):
     def __init__(self, obj, key):
@@ -307,12 +352,15 @@ class FunctionDefNode(Node):
         pass
 
 class CallNode(Node):
-    def __init__(self, obj, args):
+    def __init__(self, obj:Node, args:Node):
         self.obj = obj
         self.args = args
     
     def compile(self):
         pass
+
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}Call [\n{self.obj.display(depth+1)}\n{" "*depth*2}] (\n{self.args.display(depth+1)}{" "*depth*2}\n)"
 
 class NotNode(Node):
     def __init__(self, node:Node):
@@ -353,6 +401,41 @@ class DictNode(Node):
             out.update({k.compile(): v.compile()})
 
         return out
+
+class NewNode(Node):
+    def __init__(self, obj, args):
+        self.obj = obj
+        self.args = args
+    
+    def compile(self):
+        pass
+
+class MoveNode(Node):
+    def __init__(self, obj: Node, dest):
+        self.obj = obj
+        self.dest = dest
+    
+    def compile(self):
+        pass
+
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}move: [\n{self.obj.display(depth+1)}\n{" "*depth*2}] -> {self.dest.value}"
+
+class UnpackNode(Node):
+    def __init__(self, unpack:list[Node]):
+        self.unpack = unpack
+    
+    def compile(self):
+        pass
+
+    def display(self, depth:int=0):
+        out = [f"{" "*depth*2}Unpack("]
+        
+        for node in self.unpack:
+            out.append(node.display(depth+1))
+        
+        out.append(f"{" "*depth*2})")
+        return "\n".join(out)
 
 class EngineScript:
     _scripts = {}
@@ -419,6 +502,7 @@ class EngineScript:
             for pattern, token_type in EngineScript._patterns.items():
                 if re.fullmatch(pattern, self.value):
                     self.type = token_type
+                    break
 
             self.line_start = es.line
             self.col_start = es.col
@@ -613,6 +697,12 @@ class EngineScript:
         self._tokens = []
         self.variable_table = EngineScript.VarTable()
         self.exec_depth = 0
+        self.parsing_macro = False
+        self.curr_macro_args = []
+        self.commands = {
+            "new": self.parse_cmd_new,
+            "move": self.parse_cmd_move
+        }
         
     def snapshot(self, tokens):
         return len(tokens)
@@ -632,6 +722,63 @@ class EngineScript:
         print(r)
         
 
+    def parse_cmd_new(self, tokens:list[Token]):
+        tokens.pop(0)
+        if tokens and tokens[0] == ("LITERAL", ":"):
+            tokens.pop(0)
+            
+            if tokens and tokens[0].type == "OBJECT":
+                obj = tokens.pop(0)
+                
+                if tokens and tokens[0] == ("LITERAL", "{"):
+                    args = self.call_args(tokens)
+                    
+                    return NewNode(obj, args)
+                
+                elif tokens:
+                    raise tokens[0].expected("{")
+                else:
+                    raise FinalScriptError("Unexpected EOF while parsing 'new' command")
+                
+            elif tokens:
+                raise tokens[0].expected("object", False)
+            else:
+                raise FinalScriptError("Unexpected EOF while parsing 'new' command")
+            
+        elif tokens:
+            raise tokens[0].expected(":")
+        else:
+            raise FinalScriptError("Unexpected EOF after 'new' command")
+    
+    def parse_cmd_move(self, tokens:list[Token]):
+        tokens.pop(0)
+        
+        if tokens and tokens[0] == ("LITERAL", ":"):
+            tokens.pop(0)
+            
+            obj = self.atom(tokens)
+            
+            if len(tokens) >= 2 and tokens[0] == ("LITERAL", "-") and tokens[1] == ("COMP", ">"):
+                tokens.pop(0)
+                tokens.pop(0)
+                
+                if tokens and tokens[0].type == "OBJECT":
+                    dest = tokens.pop(0)
+                    
+                    return MoveNode(obj, dest)
+                elif tokens:
+                    raise tokens[0].expected("object", False)
+                else:
+                    raise FinalScriptError("Unexpected EOF while parsing 'move' command")
+            elif tokens:
+                raise tokens[0].expected("->")
+            else:
+                raise FinalScriptError("Unexpected EOF while parsing 'move' command")
+        elif tokens:
+            raise tokens[0].expected(":")
+        else:
+            raise FinalScriptError("Unexpected EOF after 'move' command")
+        
 
     def _execute(self, branch:Any, context_object:Any=None):
         self.exec_depth += 1
@@ -709,7 +856,7 @@ class EngineScript:
         if tokens:
             try:
                 ast = self.statements(tokens)
-                print(ast)
+                print(ast.display())
                 self.compiled_script = self.cleanup(ast.compile())
             except EOF:
                 self.compiled_script = {}
@@ -718,7 +865,7 @@ class EngineScript:
 
     def statements(self, tokens:list[Token]):
         stmts = []
-        while tokens:
+        while tokens and tokens[0] != ("LITERAL", ("}", ")", "]")):
             try:
                 stmt = self.statement(tokens)
                 if stmt:
@@ -777,8 +924,75 @@ class EngineScript:
             # print(f"CONTEXT: {ctx}")
             return None
         
+        elif tokens[0].type == "MACRO":
+            snap = self.snapshot(tokens)
+            macro = tokens.pop(0)
+            if tokens:
+                if tokens[0] == ("LITERAL", "("):
+                    try:
+                        args = self.macro_args(tokens)
+                    
+                        if tokens[0] == ("LITERAL", "{"):
+                            if self.parsing_macro:
+                                raise FinalScriptError(f"Cannot define nested macro definitions. @ {macro.get_location()}")
+                            
+                            self.parsing_macro = True
+                            self.curr_macro_args = args
+                            body = self.scope(tokens)
+                            self.parsing_macro = False
+                            self.curr_macro_args = []
+                        else:
+                            raise ScriptError()
+                        
+                        md = MacroDef(macro, args, body)
+                        self.variable_table.set(macro.value, md)
+                        return None #md
+                    
+                    except ScriptError as e:
+                        tokens.clear()
+                        tokens.extend(self.load_snapshot(snap))
+                        return self.expression(tokens)
+                
+                elif tokens[0] == ("LITERAL", "="):
+                    tokens.pop(0)
+                    expr = self.expression(tokens)
+                    ma = MacroAssign(macro, expr)
+                    self.variable_table.set(macro.value, ma)
+                    return None #ma
+                
+                else:
+                    tokens.insert(0, macro)
+                    return self.expression(tokens)
+            else:
+                return MacroRef(macro)
         else:
             return self.expression(tokens)
+    
+    def macro_args(self, tokens:list[Token]):
+        lp = tokens.pop(0)
+        
+        args = []
+        while tokens and not (tokens[0] == ("LITERAL", ")")):
+            if tokens[0].type == "MACRO":
+                args.append(tokens.pop(0))
+            else:
+                raise ScriptError(f"Expected macro name @ {tokens[0].get_location()}")
+            
+            if tokens:
+                if tokens[0] == ("LITERAL", ","):
+                    tokens.pop(0)
+                elif tokens[0] == ("LITERAL", ")"):
+                    break
+                else:
+                    raise ScriptError(f"Expected ',' or ')' @ {tokens[0].get_location()}")
+            else:
+                raise FinalScriptError(f"Unexpected EOF while parsing macro def/call")
+        
+        if not tokens:
+            raise FinalScriptError(f"Unexpected EOF while parsing macro def/call")
+        
+        tokens.pop(0)
+        return args
     
     def expression(self, tokens:list[Token]):
         return self.comp(tokens)
@@ -838,16 +1052,204 @@ class EngineScript:
             name = tokens.pop(0)
 
     def if_statement(self, tokens:list[Token]):
-        pass
+        tokens.pop(0)
+        if tokens and tokens[0] == ("LITERAL", "("):
+            tokens.pop(0)
+            condition = self.expression(tokens)
+            
+            if tokens and tokens[0] == ("LITERAL", ")"):
+                tokens.pop(0)
+                
+                if tokens and tokens[0] == ("LITERAL", "{"):
+                    body = self.scope(tokens)
+                elif tokens:
+                    raise tokens[0].expected("{")
+                else:
+                    raise FinalScriptError("Unexpected EOF while parsing if-statement")
+                
+                stmt = IfStatement(condition, body)
+                
+                while tokens and tokens[0] == ("KEYWORD", "elif"):
+                    tokens.pop(0)
+                    
+                    if tokens and tokens[0] == ("LITERAL", "("):
+                        tokens.pop(0)
+                        condition = self.expression(tokens)
+                        if tokens and tokens[0] == ("LITERAL", ")"):
+                            tokens.pop(0)
+                            if tokens and tokens[0] == ("LITERAL", "{"):
+                                body = self.scope(tokens)
+                            elif tokens:
+                                raise tokens[0].expected("{")
+                            else:
+                                raise FinalScriptError("Unexpected EOF while parsing elif-statement")
+                            st = IfStatement(condition, body)
+                            stmt.else_node = st
+                            stmt = st
+                        elif tokens:
+                            raise tokens[0].expected(")")
+                        else:
+                            raise FinalScriptError("Unexpected EOF while parsing elif-statement")
+                    elif tokens:
+                        raise tokens[0].expected("(")
+                    else:
+                        raise FinalScriptError("Unexpected EOF while parsing elif-statement")
+                
+                if tokens and tokens[0] == ("KEYWORD", "else"):
+                    tokens.pop(0)
+                    if tokens and tokens[0] == ("LITERAL", "{"):
+                        body = self.scope(tokens)
+                    elif tokens:
+                        raise tokens[0].expected("{")
+                    else:
+                        raise FinalScriptError(f"Unexpected EOF while parsing else-statement")
+                    
+                    stmt.else_node = body
+                
+                return stmt
+
+                
+            elif tokens:
+                raise tokens[0].expected(")")
+            else:
+                raise FinalScriptError("Unexpected EOF while parsing if-statement")
+            
+        elif tokens:
+            raise tokens[0].expected("(")
+        else:
+            raise FinalScriptError("Unexpected EOF while parsing if-statement")
 
     def match_case(self, tokens:list[Token]):
-        pass
+        tokens.pop(0)
+        
+        matching = self.expression(tokens)
+        
+        if tokens and tokens[0] == ("LITERAL", "{"):
+            tokens.pop(0)
+            cases = []
+            bodies = []
+            while tokens and not (tokens[0] == ("LITERAL", "}")):
+                if tokens[0] == ("KEYWORD", "case"):
+                    tokens.pop(0)
+                    case = self.expression(tokens)
+                    if tokens and tokens[0] == ("LITERAL", "{"):
+                        body = self.scope(tokens)
+                        
+                        cases.append(case)
+                        bodies.append(body)
+                        
+                    elif tokens:
+                        raise tokens[0].expected("{")
+                    else:
+                        raise FinalScriptError("Unexpected EOF while parsing match-case-statement")
+                
+                else:
+                    raise tokens[0].expected("case")
+            
+            if not tokens:
+                raise FinalScriptError("Unexpected EOF while parsing match-case-statement")
+            
+            tokens.pop(0)
+            
+            return MatchCase(matching, cases, bodies)
+            
+        elif tokens:
+            raise tokens[0].expected("{")
+        else:
+            raise FinalScriptError("Unexpected EOF while parsing match-case-statement")
+            
 
     def while_loop(self, tokens:list[Token]):
-        pass
+        tokens.pop(0)
+        condition = self.expression(tokens)
+        
+        if tokens and tokens[0] == ("LITERAL", "{"):
+            body = self.scope(tokens)
+        else:
+            body = None
+        
+        return WhileLoop(condition, body)
 
     def for_loop(self, tokens:list[Token]): # I kinda want support for python-style and C-style for loops...
-        pass
+        tokens.pop(0)
+        
+        if tokens and tokens[0] == ("LITERAL", "["):
+            tokens.pop(0)
+            init = self.expression(tokens)
+            
+            if tokens and tokens[0] == ("LITERAL", ";"):
+                tokens.pop(0)
+                
+                step = self.expression(tokens)
+                
+                if tokens and tokens[0] == ("LITERAL", ";"):
+                    tokens.pop(0)
+                    
+                    end = self.expression(tokens)
+                    
+                    if tokens and tokens[0] == ("LITERAL", "]"):
+                        tokens.pop(0)
+                        
+                        if tokens and tokens[0] == ("LITERAL", "{"):
+                            body = self.scope(tokens)
+                            
+                            return ForLoopC(init, step, end, body)
+                        elif tokens:
+                            raise tokens[0].expected("{")
+                    elif tokens:
+                        raise tokens[0].expected("]")
+                elif tokens:
+                    raise tokens[0].expected(";")
+            elif tokens:
+                raise tokens[0].expected(";")
+            
+            raise FinalScriptError("Unexpected EOF while parsing for-loop")
+            
+        else:
+            unpack = self.unpacker(tokens)
+            
+            if tokens and tokens[0] == ("KEYWORD", "in"):
+                tokens.pop(0)
+                
+                expr = self.expression(tokens)
+                
+                if tokens and tokens[0] == ("LITERAL", "{"):
+                    body = self.scope(tokens)
+                
+                    return ForLoopPy(unpack, expr, body)
+                
+                elif tokens:
+                    raise tokens[0].expected("{")
+                else:
+                    raise FinalScriptError("Unexpected EOF while parsing for-loop")
+            elif tokens:
+                raise tokens[0].expected("in")
+            else:
+                raise FinalScriptError("Unexpected EOF while parsing for-loop")
+            
+    def unpacker(self, tokens:list[Token]):
+        unpacks = []
+        while tokens and not (tokens[0] == ("LITERAL", ("{", ")"))):
+            if tokens[0].type == "WORD":
+                unpacks.append(ReferenceNode(tokens.pop(0)))
+            elif tokens[0] == ("LITERAL", "("):
+                tokens.pop(0)
+                
+                unpacks.append(self.unpacker(tokens))
+                
+                if tokens and tokens[0] == ("LITERAL", ")"):
+                    tokens.pop(0)
+                elif tokens:
+                    raise tokens[0].expected(")")
+                else:
+                    raise FinalScriptError("Unexpected EOF while parsing unpack-expression")
+            
+            if tokens and tokens[0] == ("LITERAL", ","):
+                tokens.pop(0)
+            else:
+                break
+        
+        return UnpackNode(unpacks)
 
     def comp(self, tokens:list[Token]):
         if tokens:
@@ -874,6 +1276,7 @@ class EngineScript:
                         return Comp(c, op, c2)
                     else:
                         return a
+                return a
                 
         else:
             raise EOF("<TODO: EOF in comp method>")
@@ -958,7 +1361,68 @@ class EngineScript:
                 return ValueNode(tokens.pop(0))
             elif tokens[0] == ("KEYWORD", "none"):
                 return NoneNode(tokens.pop(0))
+            elif tokens[0].type == "MACRO":
+                macro = tokens.pop(0)
+                
+                if tokens and tokens[0] == ("LITERAL", "("):
+                    if self.variable_table.exists(macro.value):
+                        node = self.variable_table.get(macro.value, None)
+                        
+                        if isinstance(node, MacroDef):
+                            args = self.macro_params(tokens)
+                            
+                            if len(node.args) != len(args):
+                                raise FinalScriptError(f"Invalid number of arguments passed to function-macro @ {macro.get_location()}")
+                            
+                            return MacroCall(macro, args)
+                        
+                        else:
+                            raise FinalScriptError(f"Macro '{macro.value}' is a value-macro and cannot be called as a function")
+                    
+                    elif self.parsing_macro and macro.value in [m.value for m in self.curr_macro_args]:
+                        args = self.macro_params(tokens)
+                        return MacroCall(macro, args)
+                    
+                    else:
+                        raise FinalScriptError(f"Macro '{macro.value}' @ {macro.get_location()} is undefined.")
+                
+                else:
+                    if self.variable_table.exists(macro.value):
+                        node = self.variable_table.get(macro.value, None)
+                        
+                        if isinstance(node, MacroAssign):
+                            return MacroRef(macro)
+                        else:
+                            raise FinalScriptError(f"Macro '{macro.value}' is a function-macro and connot be referenced plainly.")
+                        
+                        
+                    elif self.parsing_macro and macro.value in [m.value for m in self.curr_macro_args]:
+                        return MacroRef(macro)
+                    else:
+                        raise FinalScriptError(f"Macro '{macro.value}' @ {macro.get_location()} is undefined.")
 
+            elif tokens[0].type == "COMMAND":
+                return self.commands[tokens[0].value](tokens)
+
+
+    def macro_params(self, tokens:list[Token]):
+        tokens.pop(0)
+        args = []
+        while tokens and not (tokens[0] == ("LITERAL", ")")):
+            expr = self.expression(tokens)
+            args.append(expr)
+            if tokens:
+                if tokens[0] == ("LITERAL", ","):
+                    tokens.pop(0)
+                elif tokens[0] == ("LITERAL", ")"):
+                    break
+                else:
+                    raise tokens[0].expected("',' or ')'", False)
+            else:
+                raise FinalScriptError("unexpected EOF while parsing macro paramaters")
+        
+        tokens.pop(0)
+        return args
     
     def var(self, tokens:list[Token]):
         if tokens:
@@ -1044,6 +1508,7 @@ class EngineScript:
     def table(self, tokens:list[Token]):
         if tokens:
             if tokens[0] == ("LITERAL", "["):
+                tokens.pop(0)
                 ls = []
                 while tokens and not (tokens[0] == ("LITERAL", "]")):
                     expr = self.expression(tokens)
@@ -1061,6 +1526,7 @@ class EngineScript:
                 return ListNode(ls)
                             
             elif tokens[0] == ("LITERAL", "{"):
+                tokens.pop(0)
                 keys = []
                 vals = []
                 while tokens and not (tokens[0] == ("LITERAL", "}")):
@@ -1096,7 +1562,7 @@ class EngineScript:
                 args = []
                 kwargs = {}
                 in_args = True
-                while tokens and not (tokens[0] == ("LITERAL", ")")):
+                while tokens and not ((p and tokens[0] == ("LITERAL", ")")) or ((not p) and tokens[0] == ("LITERAL", "}"))):
                     if tokens[0].type == "WORD":
                         if len(tokens) >= 2:
                             if tokens[1] == ("LITERAL", ":"):
@@ -1110,7 +1576,7 @@ class EngineScript:
                                 
                                 kwargs.update({keyword.value: value})
                                 
-                            elif tokens[1] == ("LITERAL", ")"):
+                            elif (p and tokens[1] == ("LITERAL", ")")) or ((not p) and tokens[1] == ("LITERAL", "}")):
                                 if in_args:
                                     args.append(ReferenceNode(tokens.pop(0)))
                                     tokens.pop(0)
@@ -1143,14 +1609,14 @@ class EngineScript:
                     if tokens:
                         if tokens[0] == ("LITERAL", ","):
                             tokens.pop(0)
-                            if tokens[0] == ("LITERAL", ")"):
+                            if (p and tokens[0] == ("LITERAL", ")")) or ((not p) and tokens[0] == ("LITERAL", "}")):
                                 tokens.pop(0)
                                 return ArgsCallNode(args, kwargs)
-                        elif tokens[0] == ("LITERAL", ")"):
+                        elif (p and tokens[0] == ("LITERAL", ")")) or ((not p) and tokens[0] == ("LITERAL", "}")):
                             tokens.pop(0)
                             return ArgsCallNode(args, kwargs)
                         else:
-                            raise FinalScriptError(f"Expected comma or closing parenthesis @ {tokens[0].get_location()}")
+                            raise FinalScriptError(f"Expected comma or closing {"parenthesis" if p else "bracket"} @ {tokens[0].get_location()}")
                     else:
                         raise FinalScriptError("Unexpected EOF while trying to parse arguments.")
 

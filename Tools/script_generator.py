@@ -32,12 +32,12 @@ def script_gen(namespace: str):
         if not os.path.exists(f"./Dungeons/{namespace}/scripts/{r}/on_enter.ds"):
             
             with open(f"./Dungeons/{namespace}/scripts/{r}/on_enter.ds", "w+", encoding="utf-8") as f:
-                f.write("// on_enter script")
+                f.write(f"#!{namespace}/{r}\n#!enter-script")
             data["events"].update({"on_enter": {"#script": f"{namespace}/scripts/{r}/on_enter"}})
             
         if not os.path.exists(f"./Dungeons/{namespace}/scripts/{r}/on_input.ds"):
             with open(f"./Dungeons/{namespace}/scripts/{r}/on_input.ds", "w+", encoding="utf-8") as f:
-                f.write("// on_input script")
+                f.write(f"#!{namespace}/{r}\n#!input-script")
             data["events"].update({"on_input": {"#script": f"{namespace}/scripts/{r}/on_input"}})
 
         with open(room_json, "w+", encoding="utf-8") as f:

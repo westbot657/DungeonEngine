@@ -5,3 +5,12 @@ output(
         "`"..<#enemy.name>.."` takes a bite at `"..<target.name>.."` and deals "..<damage>.." damage"::""
     ])
 )
+
+#!~/attacks/bite
+#!attack-hit-script
+output(
+    random.choice([
+        "`"..#enemy.name.."` bites `"..#target.name.."`, dealing "..#damage.." damage"::"",
+        "`"..#enemy.name.."` takes a bite at `"..#target.name.."` and deals "..#damage.." damage"::""
+    ])
+)

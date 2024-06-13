@@ -9,3 +9,19 @@ if (<.blocked>) {
     }
     [engine:player/set_location](<.target>)
 }
+
+
+#!~/interactable/passage
+#!interaction-script
+#![passage]
+
+if (#passage.blocked) {
+    if (#passage.blocked_message) {
+        output(#passage.blocked_message)
+    }
+} else {
+    if (#passage.travel_message) {
+        output(#passage.travel_message)
+    }
+    move: #player -> #passage.target
+}

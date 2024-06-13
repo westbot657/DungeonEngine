@@ -14,5 +14,12 @@
 // output(<item>)
 
 
+item = new: <engine:weapon> {
+    parent: <engine:weapons/sword>,
+    name: "Excaliber",
+    description: "A perfectly normal sword."
+}
+#player.give(item)
+
 
 

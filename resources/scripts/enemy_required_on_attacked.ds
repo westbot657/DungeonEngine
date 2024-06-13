@@ -1,7 +1,5 @@
 
 [engine:enemy/damage](<#damage>)
-
-
 output(
     "You attack `"
     ..<#enemy.name>
@@ -10,7 +8,6 @@ output(
     .." damage!"
     ::""
 )
-
 if (<#enemy.health> <= 0) {
     [engine:combat/kill_enemy](<.uid>)
 
@@ -20,11 +17,18 @@ if (<#enemy.health> <= 0) {
     )
 
 }
-
-
-
-
 combat.next_turn()
 
 
 // [engine:debug/memory]
+
+
+
+#!enemy-combat-script
+
+output("You attack `"..#enemy.name.."`, dealing "..#damage.." damage!"::"")
+if (#enemy.health <= 0) {
+    #enemy.remove()
+    output("`"..#enemy.name.."` has been defeated."::"")
+}
+#combat.next_turn()

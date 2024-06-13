@@ -18,3 +18,15 @@ for <enemy> in <.enemies> {
     }
 }
 
+
+for enemy in #combat.enemies {
+    if (#combat.turn_order.contains(enemy)) {
+        lower_text = #text.lower().replace(" +", " ")
+        if (regex.matches(enemy.name.lower(), lower_text)) {
+            if (regex.matches("(attack|fight|stab|shoot|hit|hurt)", lower_text)) {
+                #player.attack(enemy)
+            }
+        }
+    }
+}
+

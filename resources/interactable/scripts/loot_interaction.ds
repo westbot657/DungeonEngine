@@ -16,3 +16,19 @@ if ((not <.picked_up>)) { // once inventory has a space limit, add check for it 
     )
 }
 
+
+#!~/interactable/loot
+#!interaction-script
+#![loot]
+
+if (not #loot.picked_up) {
+    
+    item = #loot.loot.copy()
+
+    #player.give(item)
+
+    output(#loot.pickup_message.format(loot: item.name))
+    
+    #loot.picked_up = true
+
+}

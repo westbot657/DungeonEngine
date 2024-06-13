@@ -26,8 +26,10 @@ class ESFunction:
         return cls._instance
 
     def __call__(self, callable):
-        callable.metadata = self.metadata
+        callable.metadata = self.metadata # pylint: disable=access-member-before-definition
+        self.metadata = None
         ESFunction.funcs.update({callable.__name__: callable})
+        return callable
 
 class ESClass:
     classes = {}
@@ -43,6 +45,10 @@ class ESClass:
 class ESPlayer(ESClass):
     def __init__(self, player):
         self.player = player
+        
+        self.attrs = {
+            "tag": self.tag
+        }
 
     @staticmethod
     def _tag_parser(tokens:list, es3) -> dict:
@@ -73,15 +79,19 @@ class ESPlayer(ESClass):
     def tag(self, data:dict):
         ...
 
-
+class ESDungeon(ESClass):
+    def __init__(self, dungeon):
+        self.dungeon = dungeon
+    
+    
 
 
 # print(ESClass.classes)
 
-for name, cls in ESClass.classes.items():
-    print(name)
-    for n, f in cls._functions.items():
-        print(f"{n}: {f}  {f.metadata}")
+# for name, cls in ESClass.classes.items():
+#     print(name)
+#     for n, f in cls._functions.items():
+#         print(f"{n}: {f}  {f.metadata}")
 
 
 

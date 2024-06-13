@@ -17,6 +17,7 @@ except ImportError:
 from typing import Any
 
 import re
+import json
 
 test_script = """
 #!emberhollow/rooms/boats/spawn_boat
@@ -30,7 +31,7 @@ num_players = length(#dungeon.player_ids)
 
 $listening = #player.tag$[listening]
 
-output("say `skip` to skeip dialog")
+output("say `skip` to skip dialog")
 
 captain = random.choice(
     "...",
@@ -89,7 +90,7 @@ class Node:
         return {}
 
     def display(self, depth:int=0) -> str:
-        return f"{" "*depth*2}Node"
+        return f"{" "*depth*2}{self}"
 
 class Statements(Node):
     def __init__(self, nodes:list[Node]):
@@ -126,7 +127,6 @@ class Comp(Node):
 
     def display(self, depth:int=0) -> str:
         return f"{" "*depth*2}Comp [ {self.op} ] (\n{self.left.display(depth+1)}\n{self.right.display(depth+1)}\n{" "*depth*2})"
-        
 
 class IfStatement(Node):
     def __init__(self, condition:Node, body:Node, else_node:Node=None):
@@ -138,8 +138,11 @@ class IfStatement(Node):
         return {
             "#check": self.condition.compile(),
             "true": self.body.compile(),
-            "false": self.else_node.compile()
+            "false": self.else_node.compile() if self.else_node else None
         }
+
+    def display(self, depth:int=0):
+        return f"{" "*depth*2}IfStatement(\n{" "*depth*2}  condition [\n{self.condition.display(depth+2)}\n{" "*depth*2}  ] true {{\n{self.body.display(depth+2)}\n{" "*depth*2}  }} false {{\n{self.else_node.display(depth+1) if self.else_node else f"{" "*depth*2}    [no else branch]"}\n{" "*depth*2}  }}\n{" "*depth*2})"
 
 class ForLoopC(Node):
     def __init__(self, initializer, step, end_condition, body):
@@ -149,13 +152,27 @@ class ForLoopC(Node):
         self.body = body
     
     def compile(self):
-        pass
+        return {
+            "#for": "C-type",
+            "init": self.initializer.compile(),
+            "step": self.step.compile(),
+            "stop": self.end_condition.compile(),
+            "body": self.body.compile()
+        }
 
 class ForLoopPy(Node):
     def __init__(self, unpack, iterable, body):
         self.unpack = unpack
         self.iterable = iterable
         self.body = body
+    
+    def compile(self):
+        return {
+            "#for": "Py-type",
+            "unpack": self.unpack.compile(),
+            "iter": self.iterable.compile(),
+            "body": self.body.compile()
+        }
 
 class WhileLoop(Node):
     def __init__(self, condition, body):
@@ -163,7 +180,10 @@ class WhileLoop(Node):
         self.body = body
     
     def compile(self):
-        pass
+        return {
+            "#while": self.condition.compile(),
+            "body": self.body.compile()
+        }
 
 class MatchCase(Node):
     def __init__(self, match_value:Node, cases:list[Node], bodies:list[Node]):
@@ -171,9 +191,22 @@ class MatchCase(Node):
         self.cases = cases
         self.bodies = bodies
     
-    
     def compile(self):
         pass
+
+    def display(self, depth: int = 0) -> str:
+        out = [f"{" "*depth*2}MatchCase ["]
+        out.append(self.match_value.display(depth+1))
+        out.append(f"{" "*depth*2}] {{")
+        
+        for case, body in zip(self.cases, self.bodies):
+            out.append(f"{" "*depth*2}  case [")
+            out.append(case.display(depth+2))
+            out.append(f"{" "*depth*2}  ] {{")
+            out.append(body.display(depth+2))
+            out.append(f"{" "*depth*2}  }}")
+
+        return "\n".join(out)
 
 class ClassDef(Node):
     def __init__(self):
@@ -189,7 +222,12 @@ class BinaryOp(Node):
         self.right = right
     
     def compile(self):
-        pass
+        return {
+            "#function": "math.eval",
+            self.op: [
+                self.left.compile(), self.right.compile()
+            ]
+        }
     
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}BinOp [ {self.op} ] (\n{self.left.display(depth+1)}\n{self.right.display(depth+1)}\n{" "*depth*2})"
@@ -200,7 +238,13 @@ class UnaryOp(Node):
         self.right = right
     
     def compile(self):
-        pass
+        return {
+            "#function": "math.eval",
+            self.op: [
+                0,
+                self.right
+            ]
+        }
 
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}Unary [ {self.op} ] (\n{self.right.display(depth+1)}\n{" "*depth*2})"
@@ -211,19 +255,34 @@ class MacroDef(Node):
         self.args = args
         self.body = body
     
-    def compile(self):
-        pass
+    def compile(self, args):
+        print(args, self.args, self.body)
+
+    def display(self, depth:int=0):
+        return f"{" "*depth*2}MacroDef [ {self.name.value} ] (\n{"\n".join(f"{" "*depth*2}  {a.value}" for a in self.args)}\n{" "*depth*2}) {{\n{self.body.display(depth+1)}\n{" "*depth*2}}}"
 
 class MacroCall(Node):
-    def __init__(self, token, args):
+    def __init__(self, token, args:list[Node], es3):
         self.token = token
         self.args = args
+        self.es3 = es3
     
     def compile(self):
-        pass
+        print(f"fetch function-macro?")
+        return self.es3.function_macros.get(self.token.value).compile(self.args)
+
+    def display(self, depth: int = 0) -> str:
+        out = [f"{" "*depth*2}fill: [ {self.token.value} ] ("]
+
+        for arg in self.args:
+            out.append(arg.display(depth+2))
+        
+        out.append(f"{" "*depth*2})")
+
+        return "\n".join(out)
 
 class MacroAssign(Node):
-    def __init__(self, token, node):
+    def __init__(self, token, node:Node):
         self.token = token
         self.node = node
     
@@ -231,21 +290,24 @@ class MacroAssign(Node):
         return self.node
     
     def compile(self):
-        pass
+        return self.node.compile()
+
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}{self.token.value} = (\n{self.node.display(depth+1)}\n{" "*depth*2})"
 
 class MacroRef(Node):
-    def __init__(self, token):
+    def __init__(self, token, es3):
         self.token = token
+        self.es3 = es3
     
     def compile(self):
-        pass
+        print(f"fetch macro reference?")
+        print(self.es3.macros, self.token.value)
+        print(self.es3.macros.get(self.token.value).compile())
+        return self.es3.macros.get(self.token.value).compile()
 
-class Table(Node):
-    def __init__(self):
-        pass
-    
-    def compile(self):
-        pass
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}replace: {self.token.value}"
 
 class Concat(Node):
     def __init__(self, args:list[Node], sep:Node|None):
@@ -256,20 +318,28 @@ class Concat(Node):
         pass
 
 class MacroStack(Node):
-    def __init__(self, obj, tokens:list, last_token):
+    def __init__(self, obj, tokens:list, last_token, es3):
         self.obj = obj
         self.tokens = tokens
         self.last_token = last_token
+        self.es3 = es3
+        self._compiler = None
+    
+    def default_compiler(self, tokens:list):
+        raise FinalScriptError("Undefined procedural macro")
     
     def compile(self):
         pass # TODO: this compile method is probably one of the most complicated ones
+
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}MacroStack [\n{self.obj.display(depth+1)}\n{" "*depth*2}] <- [{", ".join(str(t) for t in self.tokens)}]"
 
 class BreakNode(Node):
     def __init__(self, token):
         self.token = token
     
     def compile(self):
-        pass
+        return {"#break": 1}
 
 class ReturnNode(Node):
     def __init__(self, token, expr:Node):
@@ -277,14 +347,14 @@ class ReturnNode(Node):
         self.expr = expr
     
     def compile(self):
-        pass
+        return {"#return": self.expr.compile() if self.expr else None}
 
 class PassNode(Node):
     def __init__(self, token):
         self.token = token
     
     def compile(self):
-        pass
+        return None
 
 class ArgsDefNode(Node):
     def __init__(self, positional:list[Node], keyword:list[tuple[Node, Node]]):
@@ -300,7 +370,32 @@ class ArgsCallNode(Node):
         self.kwargs = kwargs
     
     def compile(self):
-        pass
+        
+        kwrds = {}
+        
+        for name, val in self.kwargs.items():
+            kwrds.update({name: val.compile()})
+        
+        out = {
+            "args": [a.compile() for a in self.args],
+            "kwargs": kwrds
+        }
+        if not out["args"]:
+            out.pop("args")
+        if not out["kwargs"]:
+            out.pop("kwargs")
+        
+        return out
+
+    def display(self, depth: int = 0) -> str:
+        out = [f"{" "*depth*2}Args: Positional ("]
+        for arg in self.args:
+            out.append(arg.display(depth+1))
+        out.append(f"{" "*depth*2}) Keyword {{")
+        for name, kwrd in self.kwargs.items():
+            out.append(f"{" "*depth*2}{name}: [\n{kwrd.display(depth+1)}\n{" "*depth*2}  ]")
+        out.append(f"{" "*depth*2}}}")
+        return "\n".join(out)
 
 class ReferenceNode(Node):
     def __init__(self, token, global_=False):
@@ -316,12 +411,15 @@ class ReferenceNode(Node):
         return f"{" "*depth*2}ref: {"#" if self.global_ else ""}{self.token.value}"
 
 class AccessNode(Node):
-    def __init__(self, obj, attr):
+    def __init__(self, obj: Node, attr):
         self.obj = obj
         self.attr = attr
 
     def compile(self):
-        pass
+        return {"#access": self.attr.value, "from": self.obj.compile()}
+
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}Access [\n{self.obj.display(depth+1)}\n{" "*depth*2}] (\n{" "*depth*2}  attr: {self.attr.value}\n{" "*depth*2})"
 
 class AssignNode(Node):
     def __init__(self, ref_node:Node, val:Node):
@@ -329,7 +427,8 @@ class AssignNode(Node):
         self.val = val
     
     def compile(self):
-        pass
+        if isinstance(self.ref_node, ReferenceNode):
+            return {"#store": {f"{"#" if self.ref_node.global_ else ""}{self.ref_node.token.value}": self.val.compile()}}
 
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}Assign [\n{self.ref_node.display(depth+1)}\n{" "*depth*2}] (\n{self.val.display(depth+1)}\n{" "*depth*2})"
@@ -357,10 +456,13 @@ class CallNode(Node):
         self.args = args
     
     def compile(self):
-        pass
+        out = {"#call": self.obj.compile()}
+        out.update(self.args.compile())
+        
+        return out
 
     def display(self, depth: int = 0) -> str:
-        return f"{" "*depth*2}Call [\n{self.obj.display(depth+1)}\n{" "*depth*2}] (\n{self.args.display(depth+1)}{" "*depth*2}\n)"
+        return f"{" "*depth*2}Call [\n{self.obj.display(depth+1)}\n{" "*depth*2}] (\n{self.args.display(depth+1)}\n{" "*depth*2})"
 
 class NotNode(Node):
     def __init__(self, node:Node):
@@ -369,12 +471,18 @@ class NotNode(Node):
     def compile(self):
         return {"#not": self.node.compile()}
 
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}not(\n{self.node.display(depth+1)}\n{" "*depth*2})"
+
 class ValueNode(Node):
     def __init__(self, token):
         self.token = token
     
     def compile(self):
         return self.token.value
+
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}Value( {self.token.type} ) [ {self.token.value!r} ]"
 
 class NoneNode(Node):
     def __init__(self, token):
@@ -383,12 +491,18 @@ class NoneNode(Node):
     def compile(self):
         return None
 
+    def display(self, depth:int=0):
+        return f"{" "*depth*2}none"
+
 class ListNode(Node):
     def __init__(self, values:list[Node]):
         self.values = values
     
     def compile(self):
         return [v.compile() for v in self.values]
+
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}List[\n{ "\n".join(f"{val.display(depth+1)}" for val in self.values) }\n{" "*depth*2}]"
 
 class DictNode(Node):
     def __init__(self, keys:list[Node], values:list[Node]):
@@ -409,6 +523,9 @@ class NewNode(Node):
     
     def compile(self):
         pass
+
+    def display(self, depth: int = 0) -> str:
+        return f"{" "*depth*2}new: {self.obj.value} {{\n{self.args.display(depth+1)}\n{" "*depth*2}}}"
 
 class MoveNode(Node):
     def __init__(self, obj: Node, dest):
@@ -550,9 +667,9 @@ class EngineScript:
 
         def __str__(self):
             if self.line_start == self.line_end:
-                return f"'{self.value}' (Line {self.line_start+1}, Column {self.col_start+1} to {self.col_end+1})"
+                return f"'{self.raw}' (Line {self.line_start+1}, Column {self.col_start+1} to {self.col_end+1})"
             else:
-                return f"'{self.value}' (Line {self.line_start+1}, Column {self.col_start+1} to Line {self.line_end+1}, Column {self.col_end+1})"
+                return f"'{self.raw}' (Line {self.line_start+1}, Column {self.col_start+1} to Line {self.line_end+1}, Column {self.col_end+1})"
 
         def __repr__(self):
             return f"{self.type}: {self!s}"
@@ -582,7 +699,6 @@ class EngineScript:
             out = f"Ln {self.line_start: <5} | {" "*self.col_start}{self.raw}"
             out2 = f"           {" "*self.col_start}{"~"*len(self.raw)}"
             return FinalScriptError(f"{msg}\nAt:\n{out}\n{out2}")
-                
 
         def get_location(self):
             return f"Line {self.line_start+1}, Column {self.col_start+1}"
@@ -816,7 +932,7 @@ class EngineScript:
         tokens = self.tokenize()
         
         tokens = [t for t in tokens if t.type not in ["ignore", "context_hint", "NEWLINE"]]
-        print(tokens)
+        # print(tokens)
         
         self._tokens = tokens.copy()
 
@@ -831,12 +947,18 @@ class EngineScript:
     def cleanup(self, ast):
         # print(f"CLEANUP: {ast}")
         if isinstance(ast, dict):
-            if "functions" in ast and ast["functions"] == []:
-                ast.pop("functions")
-            if "true" in ast and ast["true"] == {"functions": []}:
+            if "#functions" in ast and ast["#functions"] == []:
+                ast.pop("#functions")
+            if "true" in ast and ast["true"] in [{"#functions": []}, None]:
                 ast.update({"true": {}})
-            if "false" in ast and ast["false"] == {"functions": []}:
+            if "false" in ast and ast["false"] in [{"#functions": []}, None]:
                 ast.update({"false": {}})
+            # if "#check" in ast and ast["#check"] in [{"#functions": []}, None]:
+            #     ast.pop("false")
+            #     t = ast.pop("true")
+            #     ast.pop("#check")
+            #     if t != {}:
+            #         ast.update(t)
             out = {}
             for k, v in ast.items():
                 x = self.cleanup(v)
@@ -846,7 +968,7 @@ class EngineScript:
             lst = []
             for l in ast:
                 x = self.cleanup(l)
-                if not any(x == h for h in (None, {})):
+                if not x in [None, {}]:
                     lst.append(x)
             return lst
         return ast
@@ -857,6 +979,10 @@ class EngineScript:
             try:
                 ast = self.statements(tokens)
                 print(ast.display())
+                # for macro, val in self.macros.items():
+                #     print(f"\nmacro: {macro} :\n{val.display()}")
+                # for macro, val in self.macro_functions.items():
+                #     print(f"\nmacro: {macro} :\n{val.display()}")
                 self.compiled_script = self.cleanup(ast.compile())
             except EOF:
                 self.compiled_script = {}
@@ -919,9 +1045,31 @@ class EngineScript:
             return self.for_loop(tokens)
         
         elif tokens[0].type == "CONTEXT":
-            ctx = tokens.pop(0)
+            ctx_tok = tokens.pop(0)
+            ctx = ctx_tok.value
             # TODO: do stuff with this context object (primarily just populate variable tables)
             # print(f"CONTEXT: {ctx}")
+            
+            if ctx == "#!enter-script":
+                print("ENTER SCRIPT")
+            elif ctx == "#!exit-script":
+                print("EXIT SCRIPT")
+            elif ctx == "#input-script":
+                print("INPUT SCRIPT")
+            elif ctx == "#!combat-script":
+                print("COMBAT SCRIPT")
+            elif ctx == "#!item-use-script":
+                print("ITEM USE SCRIPT")
+            elif ctx == "#!tool-use-script":
+                print("TOOL USE SCRIPT")
+            elif ctx == "#!interaction-script":
+                print("INTERACTION SCRIPT")
+            elif ctx == "#!weapon-use-script":
+                print("WEAPON USE SCRIPT")
+            elif "/" in ctx:
+                data_dir = ctx.replace("#!", "", 1)
+                print(f"get data from dir: {data_dir}")
+            
             return None
         
         elif tokens[0].type == "MACRO":
@@ -945,6 +1093,7 @@ class EngineScript:
                             raise ScriptError()
                         
                         md = MacroDef(macro, args, body)
+                        self.macro_functions.update({macro.value: md})
                         self.variable_table.set(macro.value, md)
                         return None #md
                     
@@ -957,6 +1106,7 @@ class EngineScript:
                     tokens.pop(0)
                     expr = self.expression(tokens)
                     ma = MacroAssign(macro, expr)
+                    self.macros.update({macro.value: ma})
                     self.variable_table.set(macro.value, ma)
                     return None #ma
                 
@@ -964,7 +1114,7 @@ class EngineScript:
                     tokens.insert(0, macro)
                     return self.expression(tokens)
             else:
-                return MacroRef(macro)
+                return MacroRef(macro, self)
         else:
             return self.expression(tokens)
     
@@ -1374,14 +1524,14 @@ class EngineScript:
                             if len(node.args) != len(args):
                                 raise FinalScriptError(f"Invalid number of arguments passed to function-macro @ {macro.get_location()}")
                             
-                            return MacroCall(macro, args)
+                            return MacroCall(macro, args, self)
                         
                         else:
                             raise FinalScriptError(f"Macro '{macro.value}' is a value-macro and cannot be called as a function")
                     
                     elif self.parsing_macro and macro.value in [m.value for m in self.curr_macro_args]:
                         args = self.macro_params(tokens)
-                        return MacroCall(macro, args)
+                        return MacroCall(macro, args, self)
                     
                     else:
                         raise FinalScriptError(f"Macro '{macro.value}' @ {macro.get_location()} is undefined.")
@@ -1391,13 +1541,13 @@ class EngineScript:
                         node = self.variable_table.get(macro.value, None)
                         
                         if isinstance(node, MacroAssign):
-                            return MacroRef(macro)
+                            return MacroRef(macro, self)
                         else:
                             raise FinalScriptError(f"Macro '{macro.value}' is a function-macro and connot be referenced plainly.")
                         
                         
                     elif self.parsing_macro and macro.value in [m.value for m in self.curr_macro_args]:
-                        return MacroRef(macro)
+                        return MacroRef(macro, self)
                     else:
                         raise FinalScriptError(f"Macro '{macro.value}' @ {macro.get_location()} is undefined.")
 
@@ -1486,7 +1636,7 @@ class EngineScript:
                                 raise FinalScriptError(f"Unexpected EOF while parsing macro function")
                             if tokens[0] == ("LITERAL", "]"):
                                 last = tokens.pop(0)
-                                obj = MacroStack(obj, toks, last)
+                                obj = MacroStack(obj, toks, last, self)
                             else:
                                 raise FinalScriptError(f"you have reached an impossible state! congrats!")
                         else:
@@ -1554,7 +1704,7 @@ class EngineScript:
                 tokens.pop(0)
                 return DictNode(keys, vals)
     
-    def call_args(self, tokens:list[Token]) -> list[Node]:
+    def call_args(self, tokens:list[Token]) -> ArgsCallNode:
         if tokens:
             if tokens[0] == ("LITERAL", ("(", "{")):
                 lp = tokens.pop(0)
@@ -1710,3 +1860,5 @@ if __name__ == "__main__":
     es = EngineScript.inline_script(test_script)
     
     es.compile()
+    
+    print(json.dumps(es.compiled_script, indent=4))

@@ -629,7 +629,7 @@ class Poly3D(UIElement):
 
                 angle = math.degrees(math.acos(diff))
             else:
-                ...
+                angle = 0
                 # print("LIGTHING ERROR: d == 0!!")
         except Exception as e:
             # print(f"{d=}, {dot=}, {mag1=}, {mag2=}, {normal=}, {dot/d=}, {diff=}")

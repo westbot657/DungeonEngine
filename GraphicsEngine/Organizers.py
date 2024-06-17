@@ -278,6 +278,7 @@ class Link(UIElement):
     def _event(self, editor, X, Y):
         if self.parent_attr and hasattr(self.parent, self.parent_attr): val = getattr(self.parent, self.parent_attr)
         elif self.parent_method and hasattr(self.parent, self.parent_method): val = getattr(self.parent, self.parent_method)(editor)
+        else: val = None # this branch is theoretically unreachable.
         val = self.link_handler(val)
         if self.child_attr and hasattr(self.child, self.child_attr): setattr(self.child, self.child_attr, val)
         elif self.child_method and hasattr(self.child, self.child_method): getattr(self.child, self.child_method)(editor, val)

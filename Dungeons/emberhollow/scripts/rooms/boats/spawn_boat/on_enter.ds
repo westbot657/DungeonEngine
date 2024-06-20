@@ -174,7 +174,7 @@ match random.range(1, 4) {
 */
 
 [engine:player/give_money](<g>, <s>, <c>)
-// #player.add_money(money)
+// #player.money.add(money)
 if ($listening) {
     wait(2)
     output("...")

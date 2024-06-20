@@ -31,6 +31,11 @@ class ESFunction:
         ESFunction.funcs.update({callable.__name__: callable})
         return callable
 
+
+
+    
+
+
 class ESClass:
     classes = {}
     
@@ -40,7 +45,13 @@ class ESClass:
         ESClass.classes.update({cls.__name__: cls})
 
 
-
+class ESString(ESClass):
+    def __init__(self, string:str):
+        self.string = string
+    
+    @ESFunction({"returns": "list[str]"})
+    def split(self, sep:str|None=None, maxsplit:int=-1):
+        return self.string.split(sep, maxsplit)
 
 class ESPlayer(ESClass):
     def __init__(self, player):
@@ -75,7 +86,7 @@ class ESPlayer(ESClass):
         else:
             raise FinalScriptError("Expected tag label @ {tlast_location}")
 
-    @ESFunction({"macro-parser": _tag_parser})
+    @ESFunction({"macro-parser": _tag_parser, "returns": "str|number|boolean"})
     def tag(self, data:dict):
         ...
 

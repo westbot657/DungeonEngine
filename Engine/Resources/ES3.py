@@ -92,6 +92,15 @@ class Node:
     def display(self, depth:int=0) -> str:
         return f"{" "*depth*2}{self}"
 
+    def set_ret_type(self, type):
+        self.ret_type = type
+    
+    def get_ret_type(self):
+        if hasattr(self, "ret_type"):
+            return self.ret_type
+        else:
+            return None
+
 class Statements(Node):
     def __init__(self, nodes:list[Node]):
         self.nodes = nodes
@@ -109,6 +118,11 @@ class Statements(Node):
         
         out.append(f"{" "*depth*2})")
         return "\n".join(out)
+
+    def get_ret_type(self):
+        if self.nodes:
+            return self.nodes[-1].get_ret_type()
+        return None
 
 class Comp(Node):
     def __init__(self, left:Node, op:str, right:Node):
@@ -128,6 +142,9 @@ class Comp(Node):
     def display(self, depth:int=0) -> str:
         return f"{" "*depth*2}Comp [ {self.op} ] (\n{self.left.display(depth+1)}\n{self.right.display(depth+1)}\n{" "*depth*2})"
 
+    def get_ret_type(self):
+        return "boolean"
+
 class IfStatement(Node):
     def __init__(self, condition:Node, body:Node, else_node:Node=None):
         self.condition = condition
@@ -143,6 +160,19 @@ class IfStatement(Node):
 
     def display(self, depth:int=0):
         return f"{" "*depth*2}IfStatement(\n{" "*depth*2}  condition [\n{self.condition.display(depth+2)}\n{" "*depth*2}  ] true {{\n{self.body.display(depth+2)}\n{" "*depth*2}  }} false {{\n{self.else_node.display(depth+1) if self.else_node else f"{" "*depth*2}    [no else branch]"}\n{" "*depth*2}  }}\n{" "*depth*2})"
+
+    def get_ret_type(self):
+        tp1 = self.body.get_ret_type()
+        tp2 = self.else_node.get_ret_type()
+        if tp1 == tp2:
+            return tp1
+        else:
+            if tp1 is not None:
+                if tp2 is not None:
+                    return tp1 + "|" + tp2 if tp1 != tp2 else tp1
+                else:
+                    return tp1
+            return tp2
 
 class ForLoopC(Node):
     def __init__(self, initializer, step, end_condition, body):
@@ -160,6 +190,9 @@ class ForLoopC(Node):
             "body": self.body.compile()
         }
 
+    def get_ret_type(self):
+        return self.body.get_ret_type()
+
 class ForLoopPy(Node):
     def __init__(self, unpack, iterable, body):
         self.unpack = unpack
@@ -174,6 +207,9 @@ class ForLoopPy(Node):
             "body": self.body.compile()
         }
 
+    def get_ret_type(self):
+        return self.body.get_ret_type()
+
 class WhileLoop(Node):
     def __init__(self, condition, body):
         self.condition = condition
@@ -184,6 +220,9 @@ class WhileLoop(Node):
             "#while": self.condition.compile(),
             "body": self.body.compile()
         }
+
+    def get_ret_type(self):
+        return self.body.get_ret_type()
 
 class MatchCase(Node):
     def __init__(self, match_value:Node, cases:list[Node], bodies:list[Node]):
@@ -208,6 +247,14 @@ class MatchCase(Node):
 
         return "\n".join(out)
 
+    def get_ret_type(self):
+        tps = set()
+        
+        for body in self.bodies:
+            tps.add(body.get_ret_type())
+        
+        return "|".join(tps)
+
 class ClassDef(Node):
     def __init__(self):
         pass
@@ -231,7 +278,10 @@ class BinaryOp(Node):
     
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}BinOp [ {self.op} ] (\n{self.left.display(depth+1)}\n{self.right.display(depth+1)}\n{" "*depth*2})"
-        
+    
+    def get_ret_type(self):
+        return "number"
+    
 class UnaryOp(Node):
     def __init__(self, op, right:Node):
         self.op = op
@@ -248,6 +298,9 @@ class UnaryOp(Node):
 
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}Unary [ {self.op} ] (\n{self.right.display(depth+1)}\n{" "*depth*2})"
+
+    def get_ret_type(self):
+        return "number"
 
 class MacroDef(Node):
     def __init__(self, name, args, body):
@@ -281,6 +334,9 @@ class MacroCall(Node):
 
         return "\n".join(out)
 
+    def get_ret_type(self):
+        return self.es3.function_macros.get(self.token.value).get_ret_type()
+
 class MacroAssign(Node):
     def __init__(self, token, node:Node):
         self.token = token
@@ -309,6 +365,9 @@ class MacroRef(Node):
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}replace: {self.token.value}"
 
+    def get_ret_type(self):
+        return self.es3.macros.get(self.token.value).get_ret_type()
+
 class Concat(Node):
     def __init__(self, args:list[Node], sep:Node|None):
         self.args = args
@@ -316,6 +375,9 @@ class Concat(Node):
     
     def compile(self):
         pass
+
+    def get_ret_type(self):
+        return "string"
 
 class MacroStack(Node):
     def __init__(self, obj, tokens:list, last_token, es3):
@@ -334,6 +396,9 @@ class MacroStack(Node):
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}MacroStack [\n{self.obj.display(depth+1)}\n{" "*depth*2}] <- [{", ".join(str(t) for t in self.tokens)}]"
 
+    def get_ret_type(self):
+        return None
+
 class BreakNode(Node):
     def __init__(self, token):
         self.token = token
@@ -348,6 +413,11 @@ class ReturnNode(Node):
     
     def compile(self):
         return {"#return": self.expr.compile() if self.expr else None}
+
+    def get_ret_type(self):
+        if self.expr:
+            return self.expr.get_ret_type()
+        return None
 
 class PassNode(Node):
     def __init__(self, token):
@@ -410,6 +480,19 @@ class ReferenceNode(Node):
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}ref: {"#" if self.global_ else ""}{self.token.value}"
 
+    def get_ret_type(self):
+        match self.token.type:
+            case "OBJECT":
+                return "object:" + self.token.value
+            case "NUMBER":
+                return "number"
+            case "STRING":
+                return "string"
+            case "BOOLEAN":
+                return "boolean"
+            case _:
+                return None
+
 class AccessNode(Node):
     def __init__(self, obj: Node, attr):
         self.obj = obj
@@ -420,6 +503,11 @@ class AccessNode(Node):
 
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}Access [\n{self.obj.display(depth+1)}\n{" "*depth*2}] (\n{" "*depth*2}  attr: {self.attr.value}\n{" "*depth*2})"
+
+    def get_ret_type(self):
+        tp = self.obj.get_ret_type()
+        
+        
 
 class AssignNode(Node):
     def __init__(self, ref_node:Node, val:Node):

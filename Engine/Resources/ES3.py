@@ -685,6 +685,10 @@ class EngineScript:
         def set(self, name:str, value:Any):
             self.vars.update({name: value})
         
+        def remove(self, name:str):
+            if name in self.vars:
+                return self.vars.pop(name)
+        
         def scope_in(self):
             new = EngineScript.VarTable()
             new.parent = self
@@ -908,6 +912,7 @@ class EngineScript:
             "move": self.parse_cmd_move
         }
         
+        
     def snapshot(self, tokens):
         return len(tokens)
 
@@ -1091,6 +1096,78 @@ class EngineScript:
                     break
         return Statements(stmts)
 
+    def get_context(self, ctx_type:str):
+        match ctx_type:
+            case "str":
+                return {
+                    "split": {
+                        "type": "function",
+                        "function": ESClass.classes["ESString"],
+                        "returns": "list[str]"
+                    }
+                }
+            case "boolean":
+                return {}
+            case "number":
+                return {}
+            case "Inventory":
+                return {}
+            case "Location":
+                return {}
+            case "Currency":
+                return {}
+            case "StatusEffects":
+                return {}
+            case "StatusEffect":
+                return {}
+            case "Position":
+                return {}
+
+    def add_base_context(self):
+        self.variable_table.vars = {
+            "#player": {
+                "type": "Player",
+                "attrs": {
+                    "inventory": {
+                        "type": "Inventory",
+                        "attrs": self.get_context("Inventory")
+                    },
+                    "name": {
+                        "type": "str",
+                        "attrs": self.get_context("str")
+                    },
+                    "health": {
+                        "type": "number",
+                        "attrs": self.get_context("number")
+                    },
+                    "max_health": {
+                        "type": "number",
+                        "attrs": self.get_context("number")
+                    },
+                    "location": {
+                        "type": "Location",
+                        "attrs": self.get_context("Location")
+                    },
+                    "money": {
+                        "type": "Currency",
+                        "attrs": self.get_context("Currency")
+                    },
+                    "status_effects": {
+                        "type": "StatusEffects",
+                        "attrs": self.get_context("StatusEffects")
+                    },
+                    "in_combat": {
+                        "type": "boolean",
+                        "attrs": self.get_context("boolean")
+                    },
+                    "position": {
+                        "type": "Position",
+                        "attrs": self.get_context("Position")
+                    }
+                }
+            }
+        }
+
     def statement(self, tokens:list[Token]) -> Node:
         if not tokens:
             raise EOF()
@@ -1138,22 +1215,76 @@ class EngineScript:
             # TODO: do stuff with this context object (primarily just populate variable tables)
             # print(f"CONTEXT: {ctx}")
             
+            self.add_base_context()
+            
             if ctx == "#!enter-script":
                 print("ENTER SCRIPT")
             elif ctx == "#!exit-script":
                 print("EXIT SCRIPT")
             elif ctx == "#input-script":
                 print("INPUT SCRIPT")
-            elif ctx == "#!combat-script":
-                print("COMBAT SCRIPT")
-            elif ctx == "#!item-use-script":
-                print("ITEM USE SCRIPT")
-            elif ctx == "#!tool-use-script":
-                print("TOOL USE SCRIPT")
-            elif ctx == "#!interaction-script":
-                print("INTERACTION SCRIPT")
-            elif ctx == "#!weapon-use-script":
-                print("WEAPON USE SCRIPT")
+            elif (m := re.match(r"(?P<obj>[a-zA-Z_]+)-(?P<act>[a-zA-Z_]+)-script", ctx)):
+                m: re.Match
+                d = m.groupdict()
+                obj = d["obj"]
+                act = d["act"]
+                
+                
+                
+                match obj:
+                    case "weapon":
+                        match act:
+                            case "use":
+                                ...
+                            case "damaged":
+                                ...
+                            case "broken":
+                                ...
+                            case "equip":
+                                ...
+                            case "unequip":
+                                ...
+                            case "repair":
+                                ...
+                            case "player_hit":
+                                ...
+                            case _: pass
+                    case "armor":
+                        match act:
+                            case "equip":
+                                ...
+                            case "unequip":
+                                ...
+                            case "player_hit":
+                                ...
+                            case "damaged":
+                                ...
+                            case "broken":
+                                ...
+                            case _: pass
+                    case "tool":
+                        ...
+                    case "item":
+                        ...
+                    case "ammo":
+                        ...
+                    case "interactable":
+                        ...
+                    case "enemy":
+                        ...
+                    case "attack":
+                        ...
+                    case "combat":
+                        ...
+                    case "status_effect":
+                        ...
+                    case "dungeon":
+                        ...
+                    case "room":
+                        ...
+                    case _:
+                        pass
+                
             elif "/" in ctx:
                 data_dir = ctx.replace("#!", "", 1)
                 print(f"get data from dir: {data_dir}")

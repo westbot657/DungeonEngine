@@ -13,6 +13,8 @@
 
 // output(<item>)
 
+#!~/tools/test_tool
+#!tool-use-script
 
 item = new: <engine:weapon> {
     parent: <engine:weapons/sword>,

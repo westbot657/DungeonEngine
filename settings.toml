@@ -2,7 +2,9 @@
 
 [Game Settings]
 game_volume = 100%
+seen_tutorial = False
 
 [Editor Settings]
 editor_history_limit = 200
 editor_volume = 35%
+seen_tutorial = False

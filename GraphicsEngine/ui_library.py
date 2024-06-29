@@ -819,24 +819,28 @@ if __name__ == "__main__":
     # elif platform.system() == "Darwin":
     #     macOSfocusWindow("Insert Dungeon Name Here")
     try:
-        from Engine import Engine
-    except ImportError:
-        sys.path.append("./Engine")
-        _Engine = SourceFileLoader("Engine", "./Engine/Engine.py").load_module() # pylint: disable=no-value-for-parameter
-        Engine = _Engine.Engine
-    io_hook = IOHook()
-    engine = Engine(io_hook, is_ui=True)
-    editor = Editor(engine, io_hook)
-    c = CodeEditor(editor.width, editor.height, editor)
-    editor.layers[0] += [
-        c
-    ]
-    
-    if loader.loading:
+        try:
+            from Engine import Engine
+        except ImportError:
+            sys.path.append("./Engine")
+            _Engine = SourceFileLoader("Engine", "./Engine/Engine.py").load_module() # pylint: disable=no-value-for-parameter
+            Engine = _Engine.Engine
+        io_hook = IOHook()
+        engine = Engine(io_hook, is_ui=True)
+        editor = Editor(engine, io_hook)
+        c = CodeEditor(editor.width, editor.height, editor)
+        editor.layers[0] += [
+            c
+        ]
+        
+        if loader.loading:
+            loader.loading = False
+            while not loader.done: pass
+            # time.sleep(2)
+        editor.run()
+    except Exception as e:
         loader.loading = False
-        while not loader.done: pass
-        # time.sleep(2)
-    editor.run()
+        raise
 
 """
 # │┤╡╢╖╕╣║╗╝╜╛┐└┴┬├─┼╞╟╚╔╩╦╠═╬╧╨╤╥╙╘╒╓╫╪┘┌

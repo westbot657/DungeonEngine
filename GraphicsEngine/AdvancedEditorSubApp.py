@@ -57,6 +57,7 @@ class AdvancedEditorSubApp(UIElement):
         self.editor = editor
         self.children = []
         self.popouts = {}
+        self.seen_tutorial = False
         
         editor.sound_system.load(f"{PATH}/audio_assets/pick_up.wav", "AESA_pick_up", "editor")
         editor.sound_system.load(f"{PATH}/audio_assets/drop.wav",    "AESA_drop",    "editor")

@@ -390,7 +390,7 @@ class Combat(FunctionalElement):
                     i = r
                     if r <= self.current_turn:
                         self.current_turn += 1
-                else: I = 0 # this branch is unreachable
+                else: i = 0 # this branch is unreachable
                 
                 # reset turn to player if player is first to join/is re-joining combat
                 if len([a for a in self.turn_order if isinstance(a, Player)]) == 1:

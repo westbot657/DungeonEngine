@@ -64,7 +64,7 @@ class AdvancedEditorSubApp(UIElement):
         self.y = 21
         self.width = editor.width - 107
         self.height = editor.height - 42
-        self.tutorial = EditorTutorial(self)
+        
         # self._tutorial_event = False
         
         editor.sound_system.load(f"{PATH}/audio_assets/pick_up.wav", "AESA_pick_up", "editor")
@@ -189,6 +189,8 @@ class AdvancedEditorSubApp(UIElement):
         # self.create_stashed_panel("weapon", (300, 400), "Broadsword", True, ["weapon", "melee"])
         # self.create_stashed_panel("weapon", (300, 400), "Bow", True, ["weapon", "ranged"])
         # self.create_stashed_panel("weapon", (300, 400), "Crossbow", True, ["weapon", "ranged"])
+    
+        self.tutorial = EditorTutorial(self)
     
     def get_directory_task_thread(self):
         self.getting_directory = True

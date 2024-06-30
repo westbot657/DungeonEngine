@@ -56,6 +56,8 @@ class SettingsApp(UIElement):
                     
                     self.config[category].update({attr: val})
     
+        SettingsApp.DEFAULT_CONFIG["Editor Settings"]["seen_tutorial"] = self.config["Editor Settings"]["seen_tutorial"]
+    
     def save_config(self):
         lines = []
         for category, vals in self.config.items():
@@ -83,6 +85,7 @@ class SettingsApp(UIElement):
         self.editor_volume_text_box.set_content(str(int(editor_vol*100)))
         
         self.code_editor.editor_app.sub_app_advanced_editor.seen_tutorial = self.config["Editor Settings"]["seen_tutorial"]
+        self.seen_tutorial_toggle.set_state(self.config["Editor Settings"]["seen_tutorial"])
         
 
     def save_component_values(self):
@@ -90,6 +93,7 @@ class SettingsApp(UIElement):
         ### XXX Editor Settings XXX ###
         self.config["Editor Settings"]["editor_history_limit"] = int(float(self.editor_history_limit_textbox.get_content()))
         self.config["Editor Settings"]["editor_volume"] = self.editor_volume_slider.get_percent()
+        self.config["Editor Settings"]["seen_tutorial"] = self.seen_tutorial_toggle.state
 
     def reset_config(self, *_, **__):
         self.config = merge({}, self.DEFAULT_CONFIG)
@@ -173,6 +177,7 @@ class SettingsApp(UIElement):
         
         self.editor.history_limit = self.config["Editor Settings"]["editor_history_limit"]
         self.editor_history_limit_label = Text(20, y_offset, 1, "Undo/Redo History Limit", text_size=20)
+        self.editor_history_limit_label._alt_text = "The number of undo/redo actions\nthat can be stored in the editor."
         self.children.append(self.editor_history_limit_label)
         self.editor_history_limit_textbox = MultilineTextBox(self.editor_history_limit_label.width + 70, y_offset, 100, 20, content=str(self.editor.history_limit), text_size=20, single_line=True)
         self.editor_history_limit_textbox.char_whitelist = [c for c in "1234567890"]
@@ -182,6 +187,7 @@ class SettingsApp(UIElement):
         
         editor_vol = self.config["Editor Settings"]["editor_volume"]
         self.editor_volume_label = Text(20, y_offset, 1, "Editor Volume", text_size=20)
+        self.editor_volume_label._alt_text = "The volume of sounds played in the editor."
         self.children.append(self.editor_volume_label)
         self.editor_volume_slider = Slider(self.editor_volume_label.width+70, y_offset+10, 300, 0, editor_vol, 6)
         self.children.append(self.editor_volume_slider)
@@ -193,8 +199,10 @@ class SettingsApp(UIElement):
         
         seen_tutorial = self.config["Editor Settings"]["seen_tutorial"]
         self.seen_tutorial_label = Text(20, y_offset, 1, "Seen Tutorial", text_size=20)
+        self.seen_tutorial_label._alt_text = "Have you seen the tutorial on the editor?"
         self.seen_tutorial_toggle = ToggleSwitch(20 + self.seen_tutorial_label.width + 40, y_offset+2, 18, 0, seen_tutorial, style=ToggleSwitch.Style.SQUARE, on_color=(30, 200, 30), off_color=(200, 30, 30), toggle_color=TEXT_COLOR)
         self.seen_tutorial_toggle.do_event_override = True
+        self.seen_tutorial_toggle.on_state_change(self.seen_tutorial_toggle_change)
         
         self.children.append(self.seen_tutorial_label)
         self.children.append(self.seen_tutorial_toggle)
@@ -228,6 +236,9 @@ class SettingsApp(UIElement):
         num = min(max(0, num), 100)
         textbox.set_content(str(num))
         self.editor_volume_slider.set_percent(num/100)
+
+    def seen_tutorial_toggle_change(self, state):
+        self.code_editor.editor_app.sub_app_advanced_editor.seen_tutorial = state
 
     def position_objects(self, editor):
         # y_offset = 20

@@ -200,7 +200,7 @@ class ConstructionCanvas(UIElement):
                     if viewport_rect.colliderect(child.get_collider()):
                         child._event(self.canvas, -self.offsetX, -self.offsetY)
         
-        if editor.collides((mx, my), (self.x, self.y, self.width, self.height)):
+        if editor.collides((mx, my), (self.x, self.y, self.width, self.height)) and not editor._hovered:
             self.canvas_hovered = True
             if editor.middle_mouse_down():
                 self.stopMove()

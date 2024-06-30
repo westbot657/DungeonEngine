@@ -37,8 +37,8 @@ class MultilineText(UIElement):
         self.surfaces = []
         self.surface = None
 
-        self._text_width = self.min_width
-        self._text_height = self.min_height
+        self._text_width = self.width = self.min_width
+        self._text_height = self.height = self.min_height
 
         self.refresh_surfaces()
         # for line in content.split("\n"):
@@ -60,9 +60,9 @@ class MultilineText(UIElement):
             s = pygame.Surface([a+5, b], pygame.SRCALPHA) # pylint: disable=no-member
             # s.fill(tuple(self.text_bg_color))
             sl.append(s)
-            self._text_width = max(self._text_width, s.get_width(), self.min_width)
+            self._text_width = self.width = max(self._text_width, s.get_width(), self.min_width)
             self._text_height += s.get_height()
-        self._text_height = max(self._text_height, self.min_height)
+        self._text_height = self.height = max(self._text_height, self.min_height)
         
         # self.surface = pygame.Surface((self._text_width, self._text_height), pygame.SRCALPHA, 32)
         

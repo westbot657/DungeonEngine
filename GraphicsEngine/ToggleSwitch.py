@@ -95,8 +95,9 @@ class ToggleSwitch(UIElement):
         Returns:
             None
         """
-        self.state = state
-        self.transition_time = time.time()
+        if self.state != state:
+            self.state = state
+            self.transition_time = time.time()
 
     def on_state_change(self, callable):
         self.state_change_listener = callable
@@ -131,6 +132,11 @@ class ToggleSwitch(UIElement):
                 self.toggle_pos = math.sin(math.pi * (dt/2)) * self.size
             else:
                 self.toggle_pos = (1 - math.sin(math.pi * (dt/2))) * self.size
+        else:
+            if self.state:
+                self.toggle_pos = self.size
+            else:
+                self.toggle_pos = 0
 
 
     def _update(self, editor, X, Y):

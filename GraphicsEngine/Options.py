@@ -28,6 +28,7 @@ TEXT_BG_COLOR = tuple(SETTINGS["text_bg_color"])
 TEXT_BG2_COLOR = tuple(SETTINGS["text_bg2_color"])
 TEXT_BG3_COLOR = tuple(SETTINGS["text_bg3_color"])
 TEXT_HIGHLIGHT = tuple(SETTINGS["text_highlight"])
+HYPERLINK_COLOR = tuple(SETTINGS["hyperlink_color"])
 TAB_SIZE = 4
 CURSOR_BLINK_TIME = 50
 CURSOR_COLOR = (190, 190, 190)

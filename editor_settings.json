@@ -5,6 +5,7 @@
     "text_bg2_color": [31, 31, 31],
     "text_bg3_color": [100, 100, 100],
     "text_highlight": [0, 122, 204, 127],
+    "hyperlink_color": [0, 122, 204],
     "icons": {
         "engine:object/weapon": "sword_icon",
         "engine:object/ammo": "ammo_icon",

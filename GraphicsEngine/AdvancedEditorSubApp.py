@@ -18,6 +18,8 @@ from MultilineTextBox import MultilineTextBox
 from AdvancedPanels.PanelPlacer import PanelPlacer
 from AdvancedPanels.CellEditor import CellEditor
 
+from EditorTutorial import EditorTutorial
+
 from threading import Thread
 import tkinter.filedialog
 import tkinter
@@ -58,6 +60,12 @@ class AdvancedEditorSubApp(UIElement):
         self.children = []
         self.popouts = {}
         self.seen_tutorial = False
+        self.x = 102
+        self.y = 21
+        self.width = editor.width - 107
+        self.height = editor.height - 42
+        self.tutorial = EditorTutorial(self)
+        # self._tutorial_event = False
         
         editor.sound_system.load(f"{PATH}/audio_assets/pick_up.wav", "AESA_pick_up", "editor")
         editor.sound_system.load(f"{PATH}/audio_assets/drop.wav",    "AESA_drop",    "editor")
@@ -329,6 +337,10 @@ class AdvancedEditorSubApp(UIElement):
         editor.add_history(redo, undo, "Removed attribute")
 
     def _update_layout(self, editor):
+        
+        self.width = editor.width - 107
+        self.height = editor.height - 42
+        
         for button, _ in self.visibility_toggles.values():
             button.y = editor.height-100
         for blank in self.empty_visibility_toggle_spots:
@@ -349,21 +361,36 @@ class AdvancedEditorSubApp(UIElement):
         self.open_dungeon_button.y = editor.height - 45
         self.toasts.x = editor.width-355
         self.toasts.y = editor.height-20
+        
+        if not self.seen_tutorial:
+            self.tutorial._update_layout(editor)
 
     def _event(self, editor, X, Y):
+        
+        if editor._do_layout_update:
+            self._update_layout(editor)
+            
+            
+        if not self.seen_tutorial:
+            self.tutorial._event(editor, X, Y)
+            # if self._tutorial_event:
+            #     for child in self.children[::-1]:
+            #         if hasattr(child, "_update_layout"):
+            #             child._update_layout(editor)
+            #     return
+            # self._tutorial_event = True
+            
         
         if self.selected_directory:
             self.selected_directory = False
             if self.to_open:
                 self.load_dungeon()
         
-        if editor._do_layout_update:
-            self._update_layout(editor)
         
         for child in self.children[::-1]:
             child._event(editor, X, Y)
             
-        if MultilineTextBox._focused is None:
+        if MultilineTextBox._focused is None and self.seen_tutorial:
             for key in editor.typing:
                 if key == "\x1a":
                     if pygame.K_LSHIFT in editor.keys:
@@ -429,6 +456,9 @@ class AdvancedEditorSubApp(UIElement):
         if self.shelf_action_hint_fade:
             editor.screen.blit(self.shelf_action_hint_mask, (self.object_tree.x, self.search_box.y-5))
             self.shelf_action_hint._update(editor, self.object_tree.x+(self.object_tree.width/2)-(27.5), self.search_box.y+((self.search_box.height+self.object_tree.height)/2)-(27.5))
-            
+        
+        if not self.seen_tutorial:
+            self.tutorial._update(editor, X, Y)
+        
         self.toasts._update(editor, X, Y)
 

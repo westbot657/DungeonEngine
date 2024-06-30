@@ -279,7 +279,7 @@ class CellEditor(UIElement):
             
             self.toggle_hovered = editor.collides(editor.mouse_pos, (X+self.x-15, Y+self.y, 15, 15))
 
-            if self.toggle_hovered:
+            if self.toggle_hovered and not editor._hovered:
                 if editor.left_mouse_down():
                     self.collapsed = not self.collapsed
                     self.collapse_time = time.time()
@@ -340,12 +340,12 @@ class CellEditor(UIElement):
         def _update(self, editor, X, Y):
             
             if self.collapsed:
-                if self.toggle_hovered:
+                if self.toggle_hovered and not editor._hovered:
                     self._open_hovered._update(editor, X+self.x-15, Y+self.y)
                 else:
                     self._open._update(editor, X+self.x-15, Y+self.y)
             else:
-                if self.toggle_hovered:
+                if self.toggle_hovered and not editor._hovered:
                     self._close_hovered._update(editor, X+self.x-15, Y+self.y)
                 else:
                     self._close._update(editor, X+self.x-15, Y+self.y)
@@ -661,8 +661,8 @@ class CellEditor(UIElement):
             
             
             editor.screen.blit(self.screen, (X+self.x, Y+self.y+30))
-            
-            
+
+
 
     def __init__(self, editor, aesa):
         self.editor = editor

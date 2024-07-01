@@ -9,7 +9,7 @@ import pygame
 import time
 
 class Outliner(UIElement):
-    def __init__(self, x, y, width, height, color, start_angle=90, direction=1, thickness=1, animation_time=1):
+    def __init__(self, x, y, width, height, color, start_angle=90, direction=1, thickness=1, animation_time=1, animation_delay=0):
         self.x = x
         self.y = y
         self.width = width
@@ -20,6 +20,7 @@ class Outliner(UIElement):
         self.thickness = thickness
         self.animation_time = animation_time
         self.start_time = 0
+        self.animation_delay = animation_delay
         
         self.last_angle = 0
         self.surface = pygame.Surface((self.width+self.thickness, self.height+self.thickness), pygame.SRCALPHA, 32)
@@ -33,7 +34,7 @@ class Outliner(UIElement):
         self.start_point = self.get_perimeter_point(self.start_angle)
         self.last_point = self.start_point
         
-        self.subsection_size = 0.1
+        self.subsection_size = 0.5
         
         self.br_corner = (
             self.width,
@@ -132,7 +133,7 @@ class Outliner(UIElement):
     def start_animation(self, delay=0):
         self.last_angle = self.start_angle
         self.last_point = self.start_point
-        self.start_time = time.time() + delay
+        self.start_time = time.time() + delay + self.animation_delay
         self.surface = pygame.Surface((self.width+self.thickness, self.height+self.thickness), pygame.SRCALPHA, 32)
         
     
@@ -173,38 +174,12 @@ class Outliner(UIElement):
                     self.start_time = 0
                 angle = (self.start_angle + (easeInOutCirc(dt) * 360)) % 360
                 
-                subsection_count = int((angle - self.last_angle) / self.subsection_size)
-                for i in range(subsection_count):
-                    subsection_angle = self.last_angle + (i * self.subsection_size / subsection_count)
-                    self.draw_segment(subsection_angle)
+                while (angle - self.last_angle) % 360 > self.subsection_size or (angle - (self.last_angle + 360)) % 360 > self.subsection_size:
+                    la = (self.last_angle + self.subsection_size) % 360
+                    self.draw_segment(la)
+                    self.last_angle = la
                 self.draw_segment(angle)
-                
-            elif self.direction == -1: # counterclockwise
-                dt = (time.time() - self.start_time) / self.animation_time
-                if dt >= 1:
-                    dt = 1
-                    self.start_time = 0
-                angle = (self.start_angle - (360 * math.sin(dt/2 * math.pi))) % 360
-                
-                x = self.width/2 + math.cos(math.radians(angle)) * self.width/2
-                y = self.height/2 + math.sin(math.radians(angle)) * self.height/2
-                new_point = (min(max(x, 0), self.width), min(max(y, 0), self.height)) # (x, y)
-                
-                if angle <= self.top_right <= self.last_angle:
-                    pygame.draw.line(self.surface, self.color, self.last_point, self.top_right, self.thickness)
-                    self.last_angle = self.top_right
-                elif angle <= self.top_left <= self.last_angle:
-                    pygame.draw.line(self.surface, self.color, self.last_point, self.top_left, self.thickness)
-                    self.last_angle = self.top_left
-                elif angle <= self.bottom_left <= self.last_angle:
-                    pygame.draw.line(self.surface, self.color, self.last_point, self.bottom_left, self.thickness)
-                    self.last_angle = self.bottom_left
-                elif angle <= self.bottom_right <= self.last_angle:
-                    pygame.draw.line(self.surface, self.color, self.last_point, self.bottom_right, self.thickness)
-                    self.last_angle = self.bottom_right
-                pygame.draw.line(self.surface, self.color, self.last_point, new_point, self.thickness)
-                self.last_point = new_point
-                self.last_angle = angle
+
 
     def _update(self, editor, X, Y):
         editor.screen.blit(self.surface, (X+self.x, Y+self.y))

@@ -66,7 +66,7 @@ class EditorTutorial(UIElement):
         
         self.p2_canvas_outliner = Outliner(0, 0, 0, 0, color=(255, 255, 28), thickness=2, direction=1, animation_time=2, start_angle=90)
         
-        self.p2_shelf_outliner = Outliner(0, 0, 0, 0, color=(255, 127, 39), thickness=2, direction=1, animation_time=2, start_angle=90)
+        self.p2_shelf_outliner = Outliner(0, 0, 0, 0, color=(255, 127, 39), thickness=2, direction=1, animation_time=2, start_angle=90, animation_delay=0.5)
         
         self.masks.update({2: self.page2_mask_draw})
         self.pages.update({2: [p2_title_text, p2_text1, self.p2_canvas_outliner, self.p2_shelf_outliner]})
@@ -107,7 +107,7 @@ class EditorTutorial(UIElement):
     ### PAGE 2 ###
     def open2(self):
         self.p2_canvas_outliner.start_animation()
-        self.p2_shelf_outliner.start_animation(0.5)
+        self.p2_shelf_outliner.start_animation()
     
     def page2_mask_draw(self):
         self.mask = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)

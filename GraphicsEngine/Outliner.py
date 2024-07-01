@@ -33,6 +33,8 @@ class Outliner(UIElement):
         self.start_point = self.get_perimeter_point(self.start_angle)
         self.last_point = self.start_point
         
+        self.subsection_size = 0.1
+        
         self.br_corner = (
             self.width,
             self.height
@@ -92,13 +94,74 @@ class Outliner(UIElement):
 
         return (edgePoint[0] + (self.width/2), edgePoint[1] + (self.height/2))
 
+    def resize(self, width, height):
+        if self.width != width or self.height != height:
+            self.width = width
+            self.height = height
+            self.surface = pygame.Surface((self.width+self.thickness, self.height+self.thickness), pygame.SRCALPHA, 32)
+            self.bottom_right = math.degrees(math.atan2(self.height/2, self.width/2)) % 360
+            self.top_right = math.degrees(math.atan2(-self.height/2, self.width/2)) % 360
+            self.bottom_left = math.degrees(math.atan2(self.height/2, -self.width/2)) % 360
+            self.top_left = math.degrees(math.atan2(-self.height/2, -self.width/2)) % 360
 
+            # print(self.bottom_right, self.top_right, self.bottom_left, self.top_left)
+
+            self.start_point = self.get_perimeter_point(self.start_angle)
+            self.last_point = self.start_point
+            
+            self.br_corner = (
+                self.width,
+                self.height
+            )
+            self.bl_corner = (
+                0,
+                self.height
+            )
+            self.tr_corner = (
+                self.width,
+                0
+            )
+            self.tl_corner = (
+                0,
+                0
+            )
+            # self.subsection_size = (self.width*2 + self.height*2) / 30
+            
+            self.start_animation(0)
 
     def start_animation(self, delay=0):
         self.last_angle = self.start_angle
+        self.last_point = self.start_point
         self.start_time = time.time() + delay
         self.surface = pygame.Surface((self.width+self.thickness, self.height+self.thickness), pygame.SRCALPHA, 32)
         
+    
+    def draw_segment(self, angle):
+        new_point = self.get_perimeter_point(angle)
+        if new_point:
+            # print(self.last_point, new_point)
+            
+            if angle >= self.bottom_right and (self.bottom_right > self.last_angle or self.last_angle > self.top_right):
+                pygame.draw.line(self.surface, self.color, self.last_point, self.br_corner, self.thickness)
+                self.last_angle = self.bottom_right
+                self.last_point = self.br_corner
+            elif angle >= self.bottom_left >= self.last_angle:
+                pygame.draw.line(self.surface, self.color, self.last_point, self.bl_corner, self.thickness)
+                self.last_angle = self.bottom_left
+                self.last_point = self.bl_corner
+            elif self.top_right >= self.last_angle and (angle >= self.top_right or angle <= self.bottom_right):
+                pygame.draw.line(self.surface, self.color, self.last_point, self.tr_corner, self.thickness)
+                self.last_angle = self.top_right
+                self.last_point = self.tr_corner
+            elif angle >= self.top_left >= self.last_angle:
+                pygame.draw.line(self.surface, self.color, self.last_point, self.tl_corner, self.thickness)
+                self.last_angle = self.top_left
+                self.last_point = self.tl_corner
+            
+            
+            pygame.draw.line(self.surface, self.color, self.last_point, new_point, self.thickness)
+            self.last_point = new_point
+            self.last_angle = angle
     
     def _event(self, editor, X, Y):
         if self.start_time > 0:
@@ -109,32 +172,12 @@ class Outliner(UIElement):
                     dt = 1
                     self.start_time = 0
                 angle = (self.start_angle + (easeInOutCirc(dt) * 360)) % 360
-                # print(angle)
-                new_point = self.get_perimeter_point(angle)
-                if new_point:
-                    # print(self.last_point, new_point)
-                    
-                    if angle >= self.bottom_right and (self.bottom_right > self.last_angle or self.last_angle > self.top_right):
-                        pygame.draw.line(self.surface, self.color, self.last_point, self.br_corner, self.thickness)
-                        self.last_angle = self.bottom_right
-                        self.last_point = self.br_corner
-                    elif angle >= self.bottom_left >= self.last_angle:
-                        pygame.draw.line(self.surface, self.color, self.last_point, self.bl_corner, self.thickness)
-                        self.last_angle = self.bottom_left
-                        self.last_point = self.bl_corner
-                    elif self.top_right >= self.last_angle and (angle >= self.top_right or angle <= self.bottom_right):
-                        pygame.draw.line(self.surface, self.color, self.last_point, self.tr_corner, self.thickness)
-                        self.last_angle = self.top_right
-                        self.last_point = self.tr_corner
-                    elif angle >= self.top_left >= self.last_angle:
-                        pygame.draw.line(self.surface, self.color, self.last_point, self.tl_corner, self.thickness)
-                        self.last_angle = self.top_left
-                        self.last_point = self.tl_corner
-                    
-                    
-                    pygame.draw.line(self.surface, self.color, self.last_point, new_point, self.thickness)
-                    self.last_point = new_point
-                    self.last_angle = angle
+                
+                subsection_count = int((angle - self.last_angle) / self.subsection_size)
+                for i in range(subsection_count):
+                    subsection_angle = self.last_angle + (i * self.subsection_size / subsection_count)
+                    self.draw_segment(subsection_angle)
+                self.draw_segment(angle)
                 
             elif self.direction == -1: # counterclockwise
                 dt = (time.time() - self.start_time) / self.animation_time

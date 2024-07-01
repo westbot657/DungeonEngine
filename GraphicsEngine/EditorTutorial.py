@@ -26,6 +26,8 @@ class EditorTutorial(UIElement):
         self.mask_opacity = 200
     
         self.page = 0
+        self.x = aesa.x
+        self.y = aesa.y
         
         self.animation = 0
         self.animation_state = 0
@@ -57,6 +59,17 @@ class EditorTutorial(UIElement):
         self.pages.update({1: [p1_title_text, p1_text1, self.p1_open_button_outliner, self.p1_fake_open_button, self.p1_create_button_outliner, self.p1_fake_create_button]})
         
         ### PAGE 2 ###
+        p2_title_text = MultilineText(self.aesa.x+70, self.aesa.y+30, 1, 1, "Editing an object", text_size=40, text_bg_color=None)
+        
+        p2_text1 = MultilineText(self.aesa.x+70, p2_title_text.y+p2_title_text.height+30, 1, 1, "", text_size=20, text_bg_color=None)
+        p2_text1.set_colored_content("To edit an object,\ndrag it from the \033[38;2;255;127;39mshelf\033[0m to the \033[38;2;255;255;28mconstruction canvas\033[0m.")
+        
+        self.p2_canvas_outliner = Outliner(0, 0, 0, 0, color=(255, 255, 28), thickness=2, direction=1, animation_time=2, start_angle=90)
+        
+        self.p2_shelf_outliner = Outliner(0, 0, 0, 0, color=(255, 127, 39), thickness=2, direction=1, animation_time=2, start_angle=90)
+        
+        self.masks.update({2: self.page2_mask_draw})
+        self.pages.update({2: [p2_title_text, p2_text1, self.p2_canvas_outliner, self.p2_shelf_outliner]})
         
         ### PAGE 3 ###
         
@@ -93,8 +106,30 @@ class EditorTutorial(UIElement):
     
     ### PAGE 2 ###
     def open2(self):
-        ...
+        self.p2_canvas_outliner.start_animation()
+        self.p2_shelf_outliner.start_animation(0.5)
     
+    def page2_mask_draw(self):
+        self.mask = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
+        pygame.draw.polygon(self.mask, (0, 0, 0, self.mask_opacity), [
+            (0, 0), 
+            (self.width, 0),
+            (self.width, self.aesa.object_tree.y - self.y),
+            (self.aesa.object_tree.x - self.x + 5, self.aesa.object_tree.y - self.y),
+            (self.aesa.object_tree.x - self.x + 5, self.aesa.object_tree.y + self.aesa.object_tree.height - self.y),
+            (self.aesa.object_tree.x + self.aesa.object_tree.width - self.x - 15, self.aesa.object_tree.y + self.aesa.object_tree.height - self.y),
+            (self.aesa.object_tree.x + self.aesa.object_tree.width - self.x - 15, self.aesa.object_tree.y - self.y),
+            (self.width, self.aesa.object_tree.y - self.y),
+            (self.width, self.height),
+            (0, self.height),
+            (0, self.aesa.construction_canvas.y - self.y + 180),
+            (self.aesa.construction_canvas.x - self.x + 20, self.aesa.construction_canvas.y - self.y + 180),
+            (self.aesa.construction_canvas.x - self.x + 20, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 15),
+            (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 20, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 15),
+            (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 20, self.aesa.construction_canvas.y - self.y + 180),
+            (0, self.aesa.construction_canvas.y - self.y + 180),
+            (0, 0)
+        ])
     
     ### PAGE 3 ###
     def open3(self):
@@ -125,6 +160,8 @@ class EditorTutorial(UIElement):
         self.mask = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
         self.mask.fill((0, 0, 0, self.mask_opacity))
     
+
+    
     def _update_layout(self, editor):
         if editor._do_layout_update:
             self.width = self.aesa.width
@@ -145,6 +182,14 @@ class EditorTutorial(UIElement):
                     
                     self.p1_fake_open_button.y = self.aesa.open_dungeon_button.y
                     self.p1_fake_create_button.y = self.aesa.create_dungeon_button.y
+                case 2:
+                    self.p2_canvas_outliner.x = self.aesa.construction_canvas.x + 20 - 6
+                    self.p2_canvas_outliner.y = self.aesa.construction_canvas.y + 180 - 6
+                    self.p2_canvas_outliner.resize(self.aesa.construction_canvas.width - 40 + 12, self.aesa.construction_canvas.height - 15 - 180 + 12)
+                    
+                    self.p2_shelf_outliner.x = self.aesa.object_tree.x - 1
+                    self.p2_shelf_outliner.y = self.aesa.object_tree.y - 6
+                    self.p2_shelf_outliner.resize(self.aesa.object_tree.width - 8, self.aesa.object_tree.height + 12)
                     
 
     def _event(self, editor, X, Y):

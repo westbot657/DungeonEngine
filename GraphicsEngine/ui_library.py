@@ -276,6 +276,10 @@ class CodeEditor(UIElement):
         self.game_app = GameApp(self, editor)
         self.editor_app = EditorApp(self, editor)
         self.settings_app = SettingsApp(self, editor)
+        
+        self.settings_app.load_config()
+        self.settings_app.load_component_values()
+        
         self._is_fullscreen = False
         self._fullscreen = Image(f"{PATH}/full_screen.png", 0, 0, 26, 20)
         self._fullscreen_hovered = Image(f"{PATH}/full_screen_hovered.png", 0, 0, 26, 20)

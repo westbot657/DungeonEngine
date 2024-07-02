@@ -71,6 +71,9 @@ def easeInOutCirc(x: float) -> float:
     else:
         return (math.sqrt(1 - (-2 * x + 2) ** 2) + 1) / 2
 
+def interpolate2D(a:tuple[float, float], b:tuple[float, float], t:float) -> tuple[float, float]:
+    return (a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t)
+
 
 
 # def rectangularEase(x:float, a:float, b:float, easing) -> float:

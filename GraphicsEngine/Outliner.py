@@ -53,6 +53,10 @@ class Outliner(UIElement):
             0
         )
 
+    def clear(self):
+        self.start_time = 0
+        self.surface = pygame.Surface((self.width+self.thickness, self.height+self.thickness), pygame.SRCALPHA, 32)
+
     def get_perimeter_point(self, angle):
         theta = math.radians(angle)
 

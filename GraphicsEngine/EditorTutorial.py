@@ -6,7 +6,8 @@ from FunctionalElements import Button, BorderedButton
 from MultilineText import MultilineText
 
 from Outliner import Outliner
-
+from RenderPrimitives import Image
+from AttributePanel import AttributePanel
 
 from Hyperlink import Hyperlink
 
@@ -14,6 +15,44 @@ import pygame
 import math
 import time
 
+
+class TutorialPanelPlacer(UIElement):
+    
+    packaged_panel = (
+        Image(f"{PATH}/advanced_editor/panel_crate.png", 0, 0, 33, 33),
+        Image(f"{PATH}/advanced_editor/panel_crate_hovered.png", 0, 0, 33, 33),
+        Image(f"{PATH}/advanced_editor/panel_crate_selected.png", 0, 0, 33, 33),
+        Image(f"{PATH}/advanced_editor/panel_crate_selected_hovered.png", 0, 0, 33, 33)
+    )
+    
+    def __init__(self, tutorial):
+        self.tutorial = tutorial
+        self.width = 33
+        self.height = 33
+        self.frame = 0
+        self.hovered = False
+        self._alt_text = "Drag & drop panel on to\nconstruction canvas"
+        
+    def _event(self, editor, X, Y):
+        # print(f"event: {X}, {Y}")
+        editor.check_hover(editor, (X, Y, self.width, self.height), self)
+        
+        if self.hovered:
+            self.frame = 1
+            if editor.left_mouse_down():
+                editor.sound_system.get_audio("AESA_pick_up", "editor").play()
+                self.frame = 2
+                editor.holding = True
+                editor.held = self
+                self.tutorial.shelf_placer = None
+                editor.hold_offset = (editor.mouse_pos[0]-X, editor.mouse_pos[1]-Y)
+        else:
+            self.frame = 0
+            self.hovered = False
+        
+    
+    def _update(self, editor, X, Y):
+        TutorialPanelPlacer.packaged_panel[self.frame]._update(editor, X, Y)
 
 
 class EditorTutorial(UIElement):
@@ -67,9 +106,15 @@ class EditorTutorial(UIElement):
         self.p2_canvas_outliner = Outliner(0, 0, 0, 0, color=(255, 255, 28), thickness=2, direction=1, animation_time=2, start_angle=90)
         
         self.p2_shelf_outliner = Outliner(0, 0, 0, 0, color=(255, 127, 39), thickness=2, direction=1, animation_time=2, start_angle=90, animation_delay=0.5)
+        self.shelf_panel = Image(f"{PATH}/advanced_editor/tutorial_shelf_panel.png", self.aesa.object_tree.x+10, self.aesa.object_tree.y+5, 320, 35)
+        
+        self.placer_pos = (self.shelf_panel.x+284, self.shelf_panel.y+1)
+        self.placer = self.shelf_placer = TutorialPanelPlacer(self)
+        self.panel_showing = False
+        self.canvas_panel = AttributePanel(self.aesa.editor, None, self.x+280, self.y+190, 300, 400, True)
         
         self.masks.update({2: self.page2_mask_draw})
-        self.pages.update({2: [p2_title_text, p2_text1, self.p2_canvas_outliner, self.p2_shelf_outliner]})
+        self.pages.update({2: [p2_title_text, p2_text1, self.p2_canvas_outliner, self.p2_shelf_outliner, self.shelf_panel]})
         
         ### PAGE 3 ###
         
@@ -108,11 +153,13 @@ class EditorTutorial(UIElement):
     def open2(self):
         self.p2_canvas_outliner.start_animation()
         self.p2_shelf_outliner.start_animation()
+        self.shelf_placer = self.placer
+        self.panel_showing = False
     
     def page2_mask_draw(self):
         self.mask = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
         pygame.draw.polygon(self.mask, (0, 0, 0, self.mask_opacity), [
-            (0, 0), 
+            (0, 0),
             (self.width, 0),
             (self.width, self.aesa.object_tree.y - self.y),
             (self.aesa.object_tree.x - self.x + 5, self.aesa.object_tree.y - self.y),
@@ -130,6 +177,14 @@ class EditorTutorial(UIElement):
             (0, self.aesa.construction_canvas.y - self.y + 180),
             (0, 0)
         ])
+    
+    def p2_canvas_acceptor(self, obj, editor):
+        self.panel_showing = True
+        editor.sound_system.get_audio("AESA_thud", "editor").play()
+    
+    def p2_default_acceptor(self, obj, editor):
+        self.shelf_placer = obj
+        editor.sound_system.get_audio("AESA_drop", "editor").play()
     
     ### PAGE 3 ###
     def open3(self):
@@ -191,6 +246,10 @@ class EditorTutorial(UIElement):
                     self.p2_shelf_outliner.y = self.aesa.object_tree.y - 6
                     self.p2_shelf_outliner.resize(self.aesa.object_tree.width - 8, self.aesa.object_tree.height + 12)
                     
+                    self.shelf_panel.x = self.aesa.object_tree.x+10
+                    self.shelf_panel.y = self.aesa.object_tree.y+5
+                    self.placer_pos = (self.shelf_panel.x+284, self.shelf_panel.y+1)
+                    
 
     def _event(self, editor, X, Y):
         self.back_button._event(editor, X, Y)
@@ -200,6 +259,18 @@ class EditorTutorial(UIElement):
         for child in self.pages.get(self.page, [])[::-1]:
             child._event(editor, X, Y)
     
+        if self.page == 2:
+            if self.shelf_placer:
+                self.shelf_placer._event(editor, X+self.placer_pos[0], Y+self.placer_pos[1])
+            
+            if editor.drop_requested:
+                canvas_collision = editor.collides(editor.mouse_pos, (self.aesa.construction_canvas.x, self.aesa.construction_canvas.y, self.aesa.construction_canvas.width, self.aesa.construction_canvas.height))
+    
+                if isinstance(editor.held, TutorialPanelPlacer) and canvas_collision:
+                    editor.accept_drop(0, self.p2_canvas_acceptor)
+    
+                elif isinstance(editor.held, TutorialPanelPlacer):
+                    editor.accept_drop(0, self.p2_default_acceptor)
     
         if not editor._hovered:
             mx, my = editor.mouse_pos
@@ -220,7 +291,12 @@ class EditorTutorial(UIElement):
         
         for child in self.pages.get(self.page, []):
             child._update(editor, X, Y)
-            
+        
+        if self.page == 2:
+            if self.panel_showing:
+                self.canvas_panel._update(editor, X, Y)
+            if self.shelf_placer:
+                self.shelf_placer._update(editor, X+self.placer_pos[0], Y+self.placer_pos[1])
              
         self.back_button._update(editor, X, Y)
         self.next_button._update(editor, X, Y)

@@ -190,30 +190,33 @@ class CodeEditor(UIElement):
         self.children.append(self.top_bar)
         self.top_bar_icon = Image(f"{PATH}/dungeon_game_icon.png", 2, 2, 16, 16)
         self.children.append(self.top_bar_icon)
-        self.new_file_display = Text(25, 5, 1, "Enter new file path/name:", text_size=13)
-        self.new_file_input_box = MultilineTextBox(25, 25, 350, 16, "", text_bg_color=(31, 31, 31))
-        self.new_file_input_box.single_line = True
-        self.new_file_input_box.on_enter(self.create_new_file)
-        self.new_file_popup = Popup(400, 50).add_children(
-            self.new_file_display,
-            self.new_file_input_box
-        )
-        self.delete_file_display = Text(25, 5, 1, "Delete File:", text_size=13)
-        self.delete_file_input_box = MultilineTextBox(25, 25, 350, 16, "", text_bg_color=(31, 31, 31))
-        self.delete_file_confirm_display = Text(25, 45, 1, "Re-enter file name to delete:", text_size=13)
-        self.delete_file_confirm_input_box = MultilineTextBox(25, 65, 350, 16, "", text_bg_color=(31, 31, 31))
-        self.delete_file_err = MultilineText(25, 80, 350, 32, "", text_color=(255, 180, 180), text_bg_color=None, text_size=13)
-        self.delete_file_input_box.single_line = True
-        self.delete_file_input_box.on_enter(self.delete_focus_confirm_file)
-        self.delete_file_confirm_input_box.single_line = True
-        self.delete_file_confirm_input_box.on_enter(self.delete_file)
-        self.delete_file_popup = Popup(400, 120).add_children(
-            self.delete_file_display,
-            self.delete_file_input_box,
-            self.delete_file_confirm_display,
-            self.delete_file_confirm_input_box,
-            self.delete_file_err
-        )
+        self.top_bar_title = Text(20, 2, 1, "Insert Dungeon Name Here", text_size=13, text_bg_color=None)
+        self.children.append(self.top_bar_title)
+        
+        # self.new_file_display = Text(25, 5, 1, "Enter new file path/name:", text_size=13)
+        # self.new_file_input_box = MultilineTextBox(25, 25, 350, 16, "", text_bg_color=(31, 31, 31))
+        # self.new_file_input_box.single_line = True
+        # self.new_file_input_box.on_enter(self.create_new_file)
+        # self.new_file_popup = Popup(400, 50).add_children(
+        #     self.new_file_display,
+        #     self.new_file_input_box
+        # )
+        # self.delete_file_display = Text(25, 5, 1, "Delete File:", text_size=13)
+        # self.delete_file_input_box = MultilineTextBox(25, 25, 350, 16, "", text_bg_color=(31, 31, 31))
+        # self.delete_file_confirm_display = Text(25, 45, 1, "Re-enter file name to delete:", text_size=13)
+        # self.delete_file_confirm_input_box = MultilineTextBox(25, 65, 350, 16, "", text_bg_color=(31, 31, 31))
+        # self.delete_file_err = MultilineText(25, 80, 350, 32, "", text_color=(255, 180, 180), text_bg_color=None, text_size=13)
+        # self.delete_file_input_box.single_line = True
+        # self.delete_file_input_box.on_enter(self.delete_focus_confirm_file)
+        # self.delete_file_confirm_input_box.single_line = True
+        # self.delete_file_confirm_input_box.on_enter(self.delete_file)
+        # self.delete_file_popup = Popup(400, 120).add_children(
+        #     self.delete_file_display,
+        #     self.delete_file_input_box,
+        #     self.delete_file_confirm_display,
+        #     self.delete_file_confirm_input_box,
+        #     self.delete_file_err
+        # )
         # self.top_bar_file = ContextTree.new(
         #     25, 0, 40, 20, "File", [
         #         {
@@ -400,77 +403,77 @@ class CodeEditor(UIElement):
         pygame.quit()
         sys.exit()
 
-    def create_new_file(self, text_box):
-        c = text_box.get_content()
-        text_box.set_colored_content("")
-        comps = c.strip().replace("\\", "/").split("/")
-        file_name = comps.pop(-1)
+    # def create_new_file(self, text_box):
+    #     c = text_box.get_content()
+    #     text_box.set_colored_content("")
+    #     comps = c.strip().replace("\\", "/").split("/")
+    #     file_name = comps.pop(-1)
 
-        if comps[0] == "Dungeons":
-            comps.pop(0)
+    #     if comps[0] == "Dungeons":
+    #         comps.pop(0)
 
-        path = "./Dungeons/"
-        a = {"DUNGEONS": {}}
-        b = a["DUNGEONS"]
+    #     path = "./Dungeons/"
+    #     a = {"DUNGEONS": {}}
+    #     b = a["DUNGEONS"]
 
-        while comps:
-            b.update({comps[0]: {}})
-            b = b[comps[0]]
-            path += comps.pop(0) + "/"
+    #     while comps:
+    #         b.update({comps[0]: {}})
+    #         b = b[comps[0]]
+    #         path += comps.pop(0) + "/"
 
-            try:
-                os.mkdir(path)
+    #         try:
+    #             os.mkdir(path)
 
-            except:
-                pass
+    #         except:
+    #             pass
 
-        if os.path.exists(path+file_name):
-            err = "Error: file already exists:"
-            w = max(len(path+file_name), len(err))
-            self.popupError(f"{err: ^{w}}\n{path+file_name: ^{w}}")
-            return
+    #     if os.path.exists(path+file_name):
+    #         err = "Error: file already exists:"
+    #         w = max(len(path+file_name), len(err))
+    #         self.popupError(f"{err: ^{w}}\n{path+file_name: ^{w}}")
+    #         return
         
-        else:
-            open(path+file_name, "w+", encoding="utf-8").close()
+    #     else:
+    #         open(path+file_name, "w+", encoding="utf-8").close()
 
-        self.editor_app.sub_app_file_editor.open_folder("./Dungeons", self.editor_app.sub_app_file_editor.file_opener_getter, self.editor)
-        self.editor_app.sub_app_file_editor.file_opener_getter(path+file_name, self.editor)()
-        self.editor_app.sub_app_file_editor.dir_tree.expand_tree(a)
+    #     self.editor_app.sub_app_file_editor.open_folder("./Dungeons", self.editor_app.sub_app_file_editor.file_opener_getter, self.editor)
+    #     self.editor_app.sub_app_file_editor.file_opener_getter(path+file_name, self.editor)()
+    #     self.editor_app.sub_app_file_editor.dir_tree.expand_tree(a)
 
-    def delete_focus_confirm_file(self, text_box):
-        text_box.focused = False
-        text_box._cursor_visible = False
-        self.delete_file_confirm_input_box.focused = True
-        self.delete_file_confirm_input_box.cursor_location.col = len(self.delete_file_confirm_input_box.get_content())
+    # def delete_focus_confirm_file(self, text_box):
+    #     text_box.focused = False
+    #     text_box._cursor_visible = False
+    #     self.delete_file_confirm_input_box.focused = True
+    #     self.delete_file_confirm_input_box.cursor_location.col = len(self.delete_file_confirm_input_box.get_content())
     
-    def delete_file(self, text_box):
-        txt = self.delete_file_input_box.get_content().strip()
-        txt2 = text_box.get_content().strip()
+    # def delete_file(self, text_box):
+    #     txt = self.delete_file_input_box.get_content().strip()
+    #     txt2 = text_box.get_content().strip()
         
-        if txt == txt2 and txt:
-            self.delete_file_input_box.set_content("")
-            text_box.set_content("")
+    #     if txt == txt2 and txt:
+    #         self.delete_file_input_box.set_content("")
+    #         text_box.set_content("")
 
-            try:
-                os.remove(f"./Dungeons/{txt}")
-                self.editor_app.sub_app_file_editor.open_folder("./Dungeons", self.editor_app.sub_app_file_editor.file_opener_getter, self.editor)
+    #         try:
+    #             os.remove(f"./Dungeons/{txt}")
+    #             self.editor_app.sub_app_file_editor.open_folder("./Dungeons", self.editor_app.sub_app_file_editor.file_opener_getter, self.editor)
 
-            except Exception as e:
-                self.popupError("Error: " + "\n".join(str(a) for a in e.args))
+    #         except Exception as e:
+    #             self.popupError("Error: " + "\n".join(str(a) for a in e.args))
 
-        else:
+    #     else:
 
-            if txt and (not txt2):
-                self.delete_file_err.set_colored_content("Please re-enter file name in second text box")
+    #         if txt and (not txt2):
+    #             self.delete_file_err.set_colored_content("Please re-enter file name in second text box")
 
-            elif txt2 and (not txt):
-                self.delete_file_err.set_colored_content("Please enter file name in first text box")
+    #         elif txt2 and (not txt):
+    #             self.delete_file_err.set_colored_content("Please enter file name in first text box")
 
-            elif txt and txt2:
-                self.delete_file_err.set_colored_content("File names do not match")
+    #         elif txt and txt2:
+    #             self.delete_file_err.set_colored_content("File names do not match")
 
-            else:
-                self.delete_file_err.set_colored_content("Please enter name of file to delete")
+    #         else:
+    #             self.delete_file_err.set_colored_content("Please enter name of file to delete")
                 
     # def top_bar_file_new_file(self, *_, **__):
     #     self.top_bar_file.children[0].toggle_visibility()
@@ -607,16 +610,16 @@ class CodeEditor(UIElement):
             pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         if self.selected_drag in ["bottom_drag", "bottom_right_drag", "bottom_left_drag"]:
-            editor.height = max(600, rmy - rsy)
+            editor.height = max(720, rmy - rsy)
             self._update_layout(editor)
 
         if self.selected_drag in ["left_drag", "bottom_left_drag"]:
             editor.set_window_location(min (rmx, self.drag_offset[0]-100), self.drag_offset[1])
-            editor.width = max(1200, self.drag_offset[0] - rmx)
+            editor.width = max(1280, self.drag_offset[0] - rmx)
             self._update_layout(editor)
 
         if self.selected_drag in ["right_drag", "bottom_right_drag"]:
-            editor.width = max(1200, rmx - rsx)
+            editor.width = max(1280, rmx - rsx)
             self._update_layout(editor)
 
         if (not editor.mouse[0]) and editor.previous_mouse[0]:

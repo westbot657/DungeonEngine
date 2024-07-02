@@ -14,7 +14,7 @@ class Outliner(UIElement):
         self.y = y
         self.width = width
         self.height = height
-        self.color = color
+        self.color = self._color = color
         self.start_angle = start_angle
         self.direction = direction
         self.thickness = thickness
@@ -135,11 +135,17 @@ class Outliner(UIElement):
             self.start_animation(0)
 
     def start_animation(self, delay=0):
+        self.color = self._color
         self.last_angle = self.start_angle
         self.last_point = self.start_point
         self.start_time = time.time() + delay + self.animation_delay
         self.surface = pygame.Surface((self.width+self.thickness, self.height+self.thickness), pygame.SRCALPHA, 32)
-        
+    
+    def animate_out(self, delay=0):
+        self.last_angle = self.start_angle
+        self.last_point = self.start_point
+        self.start_time = time.time() + delay + self.animation_delay
+        self.color = (0,0,0,0)
     
     def draw_segment(self, angle):
         new_point = self.get_perimeter_point(angle)

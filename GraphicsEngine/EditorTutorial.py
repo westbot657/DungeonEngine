@@ -179,7 +179,7 @@ class EditorTutorial(UIElement):
         self.p3_info_text = MultilineText(self.aesa.x+self.aesa.width-350, self.p3_title_text.y+self.p3_title_text.height+120, 1, 1, "- Middle mouse button: Pan\n- Scroll wheel: Zoom in/out\n- R-click: Open context menu\n- L-click the edge of a\n  panel to drag it around or\n  move it back to the shelf\n\n(controls are disabled in\nthe tutorial)\n\n\nPress Next to continue.", text_size=20, text_bg_color=None)
         
         self.masks.update({3: self.page2_mask_draw})
-        self.background_objects.update({3: [self.shelf_panel2]})
+        self.background_objects.update({3: [self.shelf_panel2], 4: [self.shelf_panel2]})
         self.pages.update({3: [self.canvas_panel, self.p3_title_text, self.p3_info_text, self.p2_canvas_outliner]})
         
         
@@ -189,13 +189,27 @@ class EditorTutorial(UIElement):
         self.panel_rect = (105, 195, 290, 390)
         self.outline_rect = (95, 185, 310, 410)
         self.current_rect = [0, 0, 0, 0]
+        self.panel_pos = (0, 0)
+        self.panel_current = (0, 0)
+        
         self.infill_rect = [0, 0, 0, 0]
         self.p4_animation_surface = pygame.Surface((self.aesa.editor.width, self.aesa.editor.height), pygame.SRCALPHA, 32)
         self.p4_animation_surface.set_alpha(self.mask_opacity)
         
+        self.p4_info_text1 = MultilineText(415+self.x, 197+self.y, 1, 1, "- \033[38;2;200;60;39mObject ID\033[0m", text_size=20, text_bg_color=None)
+        self.p4_info_text2 = MultilineText(415+self.x, 227+self.y, 1, 1, "- \033[38;2;255;127;39mObject Label\033[0m", text_size=20, text_bg_color=None)
+        self.p4_info_text3 = MultilineText(415+self.x, 257+self.y, 1, 1, "- \033[38;2;100;220;40mObject Attributes\033[0m", text_size=20, text_bg_color=None)
+        
+        self.p4_panel_id = MultilineText(self.panel_rect[0]+10+self.x, self.panel_rect[1]+1+self.y, 1, 1, "tutorial:weapons/example", text_bg_color=None, text_size=15)
+        self.p4_panel_label = MultilineText(self.panel_rect[0]+10+self.x, self.panel_rect[1]+30+self.y, 280, 25, "Example", text_bg_color=None, text_size=20)
+        
+        self.p4_panel_id_outliner = Outliner(self.panel_rect[0]-6+self.x, self.p4_panel_id.y-5, self.panel_rect[2]+11, self.p4_panel_id.height+10, (200, 60, 39), thickness=2)
+        self.p4_panel_label_outliner = Outliner(self.panel_rect[0]-6+self.x, self.p4_panel_label.y-5, self.panel_rect[2]+11, self.p4_panel_label.height+10, (255, 127, 39), animation_delay=0.25, thickness=2)
+        self.p4_panel_attributes_outliner = Outliner(self.panel_rect[0]-6+self.x, self.p4_panel_label.y+32, self.panel_rect[2]+11, 330, (100, 220, 40), animation_delay=0.5, thickness=2)
+        
         
         self.masks.update({4: self.page4_mask_draw})
-        self.pages.update({4: [self.p4_title_text]})
+        self.pages.update({4: [self.p4_title_text, self.p4_info_text1, self.p4_info_text2, self.p4_info_text3, self.p4_panel_id, self.p4_panel_label, self.p4_panel_id_outliner, self.p4_panel_label_outliner, self.p4_panel_attributes_outliner]})
         ### General ###
         
         self.mask = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
@@ -264,19 +278,25 @@ class EditorTutorial(UIElement):
     
     def page4_mask_draw(self):
         self.mask = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
-        pygame.draw.polygon(self.mask, (0, 0, 0, self.mask_opacity), [
-            (0, 0),
-            (self.width, 0),
-            (self.width, self.height),
-            (0, self.height),
-            (0, self.aesa.construction_canvas.y - self.y + 180),
-            (self.aesa.construction_canvas.x - self.x + 20, self.aesa.construction_canvas.y - self.y + 180),
-            (self.aesa.construction_canvas.x - self.x + 20, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 15),
-            (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 20, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 15),
-            (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 20, self.aesa.construction_canvas.y - self.y + 180),
-            (0, self.aesa.construction_canvas.y - self.y + 180),
-            (0, 0)
-        ])
+        if self.animation and self.state == 0:
+            pygame.draw.polygon(self.mask, (0, 0, 0, self.mask_opacity), [
+                (0, 0),
+                (self.width, 0),
+                (self.width, self.height),
+                (0, self.height),
+                (0, self.aesa.construction_canvas.y - self.y + 180),
+                (self.aesa.construction_canvas.x - self.x + 20, self.aesa.construction_canvas.y - self.y + 180),
+                (self.aesa.construction_canvas.x - self.x + 20, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 15),
+                (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 20, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 15),
+                (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 20, self.aesa.construction_canvas.y - self.y + 180),
+                (0, self.aesa.construction_canvas.y - self.y + 180),
+                (0, 0)
+            ])
+        else:
+            if self.state == 1:
+                self.state = 2
+                self.animation = time.time()
+            self.mask.fill((0, 0, 0, self.mask_opacity))
     
     def p2_canvas_acceptor(self, obj, editor):
         self.panel_showing = True
@@ -300,6 +320,17 @@ class EditorTutorial(UIElement):
     def open4(self):
         self.animation = time.time()
         self.state = 0
+        self.p4_info_text1.surface.set_alpha(0)
+        self.p4_panel_id.surface.set_alpha(0)
+        self.p4_info_text2.surface.set_alpha(0)
+        self.p4_panel_label.surface.set_alpha(0)
+        self.p4_info_text3.surface.set_alpha(0)
+        
+        self.p4_panel_id_outliner.clear()
+        self.p4_panel_label_outliner.clear()
+        self.p4_panel_attributes_outliner.clear()
+        
+        self.p2_canvas_outliner.x = self.p4_
 
     ### General ###
     
@@ -311,15 +342,21 @@ class EditorTutorial(UIElement):
         self.page = 0
         self.aesa.search_box.set_content("")
     
-    def back_button_event(self, *_, **__):
+    def back_button_event(self, editor, *_, **__):
         if self.page > 0:
             self.page -= 1
             self.openers.get(self.page, self.open0)()
+            self._event(editor, 0, 0)
+            self._update_layout(editor)
+            self._update(editor, 0, 0)
     
-    def next_button_event(self, *_, **__):
+    def next_button_event(self, editor, *_, **__):
         if self.page < len(self.pages) - 1:
             self.page += 1
             self.openers.get(self.page, self.open0)()
+            self._event(editor, 0, 0)
+            self._update_layout(editor)
+            self._update(editor, 0, 0)
             
     
     def plain_mask_draw(self):
@@ -380,8 +417,13 @@ class EditorTutorial(UIElement):
                     self.canvas_panel.x = self.aesa.construction_canvas.x + (self.aesa.construction_canvas.width - 300) // 2
                     self.canvas_panel.y = self.aesa.construction_canvas.y + 170 + ((self.aesa.construction_canvas.height - 170) - 400) // 2
                 case 4:
-                    self.p4_animation_surface = pygame.Surface((self.aesa.editor.width, self.aesa.editor.height), pygame.SRCALPHA, 32)
                     
+                    self.p4_animation_surface = pygame.Surface((self.aesa.editor.width, self.aesa.editor.height), pygame.SRCALPHA, 32)
+                    self.canvas_panel.x = self.canvas_panel.y = 0
+                    self.panel_pos = (
+                        self.aesa.construction_canvas.x + (self.aesa.construction_canvas.width - 300) // 2,
+                        self.aesa.construction_canvas.y + 170 + ((self.aesa.construction_canvas.height - 170) - 400) // 2
+                    )
 
     def _event(self, editor, X, Y):
         self.back_button._event(editor, X, Y)
@@ -410,6 +452,9 @@ class EditorTutorial(UIElement):
                     self.animation = 0
                     self.page = 3
                     self.open3()
+                    self._event(editor, 0, 0)
+                    self._update_layout(editor)
+                    self._update(editor, 0, 0)
                 self.p2_title_text.surface.set_alpha(255 * (1-easeInOutSine(dt)))
                 self.p2_text1.surface.set_alpha(255 * (1-easeInOutSine(dt)))
             
@@ -433,31 +478,62 @@ class EditorTutorial(UIElement):
                     self.animation_state = 0
                 self.p3_info_text.surface.set_alpha(255 * easeInOutSine(dt))
         elif self.page == 4:
+            self.p2_canvas_outliner._event(editor, X, Y)
             if self.animation:
-                dt = (time.time() - self.animation) / 1.5
-                if dt > 1:
-                    dt = 1
-                    self.animation = 0
-                dt = easeInOutSine(dt)
-                # (self.aesa.construction_canvas.x - self.x + 20, self.aesa.construction_canvas.y - self.y + 180),
-                # (self.aesa.construction_canvas.x - self.x + 20, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 15),
-                # (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 20, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 15),
-                # (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 20, self.aesa.construction_canvas.y - self.y + 180),
-    
-                top_left = (self.aesa.construction_canvas.x - self.x + 21, self.aesa.construction_canvas.y - self.y + 181)
-                bottom_left = (self.aesa.construction_canvas.x - self.x + 21, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 16)
-                bottom_right = (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 21, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 16)
-                top_right = (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 21, self.aesa.construction_canvas.y - self.y + 181)
-                
-                self.infill_rect = [*top_left, (top_right[0] - top_left[0]), (bottom_right[1] - top_right[1])]
-                
-                
-                top_left = interpolate2D(top_left, (self.panel_rect[0], self.panel_rect[1]), dt)
-                top_right = interpolate2D(top_right, (self.panel_rect[0] + self.panel_rect[2], self.panel_rect[1]), dt)
-                bottom_right = interpolate2D(bottom_right, (self.panel_rect[0] + self.panel_rect[2], self.panel_rect[1] + self.panel_rect[3]), dt)
-                bottom_left = interpolate2D(bottom_left, (self.panel_rect[0], self.panel_rect[1] + self.panel_rect[3]), dt)
-                
-                self.current_rect = [*top_left, (top_right[0] - top_left[0]), (bottom_right[1] - top_right[1])]
+                if self.state == 0:
+                    dt = (time.time() - self.animation) / 1.5
+                    if dt > 1:
+                        dt = 1
+                        self.animation = 0
+                        self.state = 1
+                        self.p2_canvas_outliner.animation_time = 0.0001
+                        self.p2_canvas_outliner.start_animation()
+                    dt = easeInOutSine(dt)
+                    # (self.aesa.construction_canvas.x - self.x + 20, self.aesa.construction_canvas.y - self.y + 180),
+                    # (self.aesa.construction_canvas.x - self.x + 20, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 15),
+                    # (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 20, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 15),
+                    # (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 20, self.aesa.construction_canvas.y - self.y + 180),
+        
+                    top_left = (self.aesa.construction_canvas.x - self.x + 21, self.aesa.construction_canvas.y - self.y + 181)
+                    bottom_left = (self.aesa.construction_canvas.x - self.x + 21, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 16)
+                    bottom_right = (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 21, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 16)
+                    top_right = (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 21, self.aesa.construction_canvas.y - self.y + 181)
+                    
+                    self.infill_rect = [*top_left, (top_right[0] - top_left[0]), (bottom_right[1] - top_right[1])]
+                    
+                    self.panel_current = interpolate2D(self.panel_pos, (self.panel_rect[0]-5+self.x, self.panel_rect[1]-5+self.y), dt)
+                    
+                    top_left = interpolate2D(top_left, (self.panel_rect[0], self.panel_rect[1]), dt)
+                    top_right = interpolate2D(top_right, (self.panel_rect[0] + self.panel_rect[2], self.panel_rect[1]), dt)
+                    bottom_right = interpolate2D(bottom_right, (self.panel_rect[0] + self.panel_rect[2], self.panel_rect[1] + self.panel_rect[3]), dt)
+                    bottom_left = interpolate2D(bottom_left, (self.panel_rect[0], self.panel_rect[1] + self.panel_rect[3]), dt)
+                    
+                    self.current_rect = [*top_left, (top_right[0] - top_left[0]), (bottom_right[1] - top_right[1])]
+                elif self.state == 1:
+                    self.state = 2
+                    self.animation = time.time()
+                elif self.state == 2:
+                    dt = (time.time() - self.animation) / 1.5
+                    dt1 = min(max(0, dt/0.75), 1)
+                    dt2 = min(max(0, (dt-0.25)/0.75), 1)
+                    dt3 = min(max(0, (dt-0.5)/0.75), 1)
+                    
+                    if dt > 1.5:
+                        dt = 1
+                        self.animation = 0
+                        self.state = 0
+                    if dt <= 0.1 and not self.p4_panel_id_outliner.start_time:
+                        self.p4_panel_id_outliner.start_animation()
+                        self.p4_panel_label_outliner.start_animation()
+                        self.p4_panel_attributes_outliner.start_animation()
+                        self.p2_canvas_outliner.animate_out(-self.p2_canvas_outliner.animation_delay)
+                        
+                    dt = min(dt, 1)
+                    self.p4_info_text1.surface.set_alpha(255 * easeInOutSine(dt1))
+                    self.p4_panel_id.surface.set_alpha(255 * easeInOutSine(dt1))
+                    self.p4_info_text2.surface.set_alpha(255 * easeInOutSine(dt2))
+                    self.p4_panel_label.surface.set_alpha(255 * easeInOutSine(dt2))
+                    self.p4_info_text3.surface.set_alpha(255 * easeInOutSine(dt3))
     
         if not editor._hovered:
             mx, my = editor.mouse_pos
@@ -500,30 +576,33 @@ class EditorTutorial(UIElement):
                 self.p3_animation_surface.fill((0, 0, 0), (self.p3_collapse_x+7, self.p3_collapse_y_start+7, self.aesa.object_tree.width - 8-13, self.p3_collapse_y_height-13))
                 editor.screen.blit(self.p3_animation_surface, (0, 0))
         elif self.page == 4:
-            self.p4_animation_surface.fill((0, 0, 0, 0))
-            pygame.draw.polygon(self.p4_animation_surface, (0, 0, 0), [
-                (self.infill_rect[0], self.infill_rect[1]),
-                (self.infill_rect[0] + self.infill_rect[2], self.infill_rect[1]),
-                (self.infill_rect[0] + self.infill_rect[2], self.infill_rect[1] + self.infill_rect[3]),
-                (self.infill_rect[0], self.infill_rect[1] + self.infill_rect[3]),
-                (self.infill_rect[0], self.infill_rect[1]),
-                (self.current_rect[0], self.current_rect[1]),
-                (self.current_rect[0], self.current_rect[1] + self.current_rect[3]),
-                (self.current_rect[0] + self.current_rect[2], self.current_rect[1] + self.current_rect[3]),
-                (self.current_rect[0] + self.current_rect[2], self.current_rect[1]),
-                (self.current_rect[0], self.current_rect[1])
-            ])
-            self.p4_animation_surface.set_alpha(self.mask_opacity)
-            editor.screen.blit(self.p4_animation_surface, (self.aesa.x, self.aesa.y))
+            if (self.animation and self.state == 0) or self.state == 1:
+                self.p4_animation_surface.fill((0, 0, 0, 0))
+                pygame.draw.polygon(self.p4_animation_surface, (0, 0, 0), [
+                    (self.infill_rect[0], self.infill_rect[1]),
+                    (self.infill_rect[0] + self.infill_rect[2], self.infill_rect[1]),
+                    (self.infill_rect[0] + self.infill_rect[2], self.infill_rect[1] + self.infill_rect[3]),
+                    (self.infill_rect[0], self.infill_rect[1] + self.infill_rect[3]),
+                    (self.infill_rect[0], self.infill_rect[1]),
+                    (self.current_rect[0], self.current_rect[1]),
+                    (self.current_rect[0], self.current_rect[1] + self.current_rect[3]),
+                    (self.current_rect[0] + self.current_rect[2], self.current_rect[1] + self.current_rect[3]),
+                    (self.current_rect[0] + self.current_rect[2], self.current_rect[1]),
+                    (self.current_rect[0], self.current_rect[1])
+                ])
+                self.p4_animation_surface.set_alpha(self.mask_opacity)
+                editor.screen.blit(self.p4_animation_surface, (self.aesa.x, self.aesa.y))
             
-            pygame.draw.lines(editor.screen, (255, 255, 28), True, [
-                (min(self.current_rect[0]-5, self.panel_rect[0]-10) + self.aesa.x, min(self.current_rect[1]-5, self.panel_rect[1]-10) + self.aesa.y),
-                (max(self.current_rect[0]+self.current_rect[2]+5, self.panel_rect[0]+self.panel_rect[2]+10) + self.aesa.x, min(self.current_rect[1]-5, self.panel_rect[1]-10) + self.aesa.y),
-                (max(self.current_rect[0]+self.current_rect[2]+5, self.panel_rect[0]+self.panel_rect[2]+10) + self.aesa.x, max(self.current_rect[1]+self.current_rect[3]+5, self.panel_rect[1]+self.panel_rect[3]+10) + self.aesa.y),
-                (min(self.current_rect[0]-5, self.panel_rect[0]-10) + self.aesa.x, max(self.current_rect[1]+self.current_rect[3]+5, self.panel_rect[1]+self.panel_rect[3]+10) + self.aesa.y)
-            ])
+                pygame.draw.lines(editor.screen, (255, 255, 28), True, [
+                    (min(self.current_rect[0]-6, self.panel_rect[0]-11) + self.aesa.x, min(self.current_rect[1]-6, self.panel_rect[1]-11) + self.aesa.y),
+                    (max(self.current_rect[0]+self.current_rect[2]+5, self.panel_rect[0]+self.panel_rect[2]+10) + self.aesa.x, min(self.current_rect[1]-6, self.panel_rect[1]-11) + self.aesa.y),
+                    (max(self.current_rect[0]+self.current_rect[2]+5, self.panel_rect[0]+self.panel_rect[2]+10) + self.aesa.x, max(self.current_rect[1]+self.current_rect[3]+5, self.panel_rect[1]+self.panel_rect[3]+10) + self.aesa.y),
+                    (min(self.current_rect[0]-6, self.panel_rect[0]-11) + self.aesa.x, max(self.current_rect[1]+self.current_rect[3]+5, self.panel_rect[1]+self.panel_rect[3]+10) + self.aesa.y)
+                ], 2)
+            else:
+                self.p2_canvas_outliner._update(editor, X, Y)
             
-            
+            self.canvas_panel._update(editor, X+self.panel_current[0], Y+self.panel_current[1])
         
         
         for child in self.pages.get(self.page, []):

@@ -1,210 +1,47 @@
 
-# How to Run the game
+# Insert Dungeon Name Here
 
-READ CAREFULLY!!
+### A text-adventure style multiplayer game engine
 
-1. make sure you have all the files on your computer with the same file structure as in this repo
-2. remove all files within [save_data/](./save_data/)
-3. remove/modify any file contents under the [Dungeons/](./Dungeons/) folder (DO NOT change or remove anything in the [Dungeons/world/](./Dungeons/world/) folder though, that stuff is important for the Engine to run (see [dungeon building](#dungeon-building) for help on safely modifying the game))
-4. run `Insert Dungeon Name Here.exe`
-5. If you have issues, there's an issues page on github, but to be fair, idk how it works, so yeah.
-6. This Engine is still under development, don't expect much to work
+**CURRENTLY IN BETA**
 
+## Installing and running
 
-# tutorial (until I make an actual tutorial in-game)
-1. once the game has fully loaded, type `[0]: engine:new-player <id> <max_health> <name>`
-  note:
-    - \<id> may not be 0
-    - \<max_health> will eventually be removed once I find a good default (try 20 for now if you're unsure)
-    - \<name> can contain spaces if surrounded by quotes (ex: "Example name idk")
-2. this will create a new player (whaaAAA????)
-3. now when you intend to type text as your player, start each message with `[<player_id>]: ` (including the trailing space)
-4. `[0]: ...` is reserved for running commands
-5. more coming soon
+1. Download the latest zip file release
+2. unzip into whatever directory you see fit.
+3. run `Insert Dungeon Name Here.exe`
 
+The game can also be run in the command line by running
+`Insert Dungeon Name Here cmd.exe`
 
-# Dungeon Building  
+**For linux/mac:**
 
-Note: This is going to be a VERY long, detailed, guide to creating a dungeon and all it's components  
+1. (linux) things do exist that let you run windows executables
+2. download/clone the repo, and run in python (version 3.12+)
+    - run the file `GraphicsEngine/ui_library.py`
+3. download and build (via [pyinstaller](https://pypi.org/project/pyinstaller/)) for your platform
+4. official builds may be downloadable at some point in the future, once I figure out a reliable way to build for other platforms
 
----
-[File Structure](#file-structure)  
-[Dungeons](#dungeons) | [Rooms](#rooms) | [Interactions](#interactions)  
-[Weapons](#weapons) | [Ammo](#ammo) | [Armor](#armor)  
-[Items](#items) | [Tools](#tools)  
-[StatusEffects](#status-effects)  
-[Enemies](#enemies) | [Attacks](#attacks) | [Entities](#entities) | [Combats](#combats)  
-[Interactable Types](#interactable-types)  
+## Playing the game
 
-[Dungeon Script](./Dungeon%20Script.md)  
-[Engine Code](#engine-code)  
+**THE GAME IS NOT CURRENTLY IN A PLAYABLE STATE**  
+(building dungeons works fine)
 
-Here's a handy tool to help you get started with dungeon building:  
-[Dungeon Generation Tool](./Tools/room_generator.py)
+### Playing via the app
 
-## File Structure
-```file_tree
-Dungeons/
-├─ <dungeon_id>/
-│  ├─ resources/
-│  │  ├─ ammo/
-│  │  ├─ armor/
-│  │  ├─ enemies/
-│  │  ├─ items/
-│  │  ├─ tools/
-│  │  └─ weapons/
-│  ├─ scripts/
-│  │  ├─ rooms/
-│  │  └─ <dungeon_id>/
-│  ├─ rooms/
-│  ├─ combats/
-│  ├─ <dungeon_id>.json
-│  └─ ec_functions.json
-:
-```
+1. Click on the game tab on the left (top icon)
+2. Click either the multiplayer or singleplayer play button (Multiplayer button is currently broken)
+3. Make a new player with the `+ New Player` button (bottom left of the screen)
+4. Note that nearly all buttons will display a quick description if hovered for a second or so.
 
-## Dungeons
+### Playing via the console
 
-Base JSON values:
-```json
-{
-  "name": <text>,
-  "version": <number>,
-  "entry_point": <room identifier>,
-  "events": {
-    "on_enter": {engine code},
-    "on_exit": {engine code}
-  }
-  "data": {
-    "<name>": <value>|{boot engine code}
-  }
-}
-```
+1. type `[0]: engine:new-player <id> <max_health> <name>`
+    - `id` must be a number larger than 9
+    - `max_health` will be removed when I find a good default, (around 20 is ideal for the main story dungeon that is currently in development)
+2. pre-fix any messages as your new player with the id you used for creation (`[<id>]: whatever you want to say`)
+3. Note that ids 0-9 are reservered for the game system
 
-More comming soon!  
+## Dungeon Building
 
-
-## Rooms
-
-```json
-{
-  "name": <text>,
-  "interactions": [
-    // interactions will be explained below
-  ],
-  "events": {
-    "on_enter": {engine code},
-    "on_exit": {engine code},
-    "on_input": {engine code}
-  }
-}
-```
-
-## Interactions
-for interactable types, go [here](#interactable-types).  
-
-
-Door Interaction JSON:  
-```json
-{
-  "type": "engine:door",
-  "id": <text>,
-  "target": <room identifier>,
-  "travel_message": <text>|{engine code},
-  "lock_message": <text>|{engine code},
-  "locked": <boolean>,
-  "open_message": <text>|{engine code},
-  "disengage_message": <text>|{engine code}
-}
-```
-
-## Weapons
-WIP  
-
-## Ammo
-WIP  
-
-## Armor
-WIP  
-
-## Items
-```json
-{
-  "parent": <item identifier>,
-  "name": <text>|{boot engine code},
-  "max_count": <int>,
-  "count": <int>|{boot engine code},
-  "data": {
-    "<name>": {boot engine code}
-  },
-  "events": {
-    "on_use": {engine code},
-    "on_expended": {engine code}
-  }
-}
-```
-
-
-## Tools
-```json
-{
-  "parent": <tool identifier>,
-  "name": <text>|{boot engine code},
-  "max_durability": <int>,
-  "durability": <int>|{boot engine code},
-  "data": {
-    "<name>": {boot engine code}
-  },
-  "events": {
-    "on_use": {engine code},
-    "on_equip": {engine code},
-    "on_unequip": {engine code},
-    "on_damaged": {engine code},
-    "on_break": {engine code}
-  }
-}
-```
-
-
-## Status Effects
-WIP  
-
-## Enemies
-WIP  
-
-## Attacks
-WIP  
-
-## Entities
-WIP  
-
-## Interactable Types
-WIP  
-see the [door](./resources/interactable_types/door.json) interactable type as an example  
-
-## Combats
-WIP  
-
-
-## Engine Code
-WIP  
-
-Engine Code is the scripting language used for events and operations within user-made dungeons.  
-
-note:  
-`boot engine code` is evaluated on dungeon load up. This means the functions you can use in it are limited  
-`engine code` is evaluated as needed during runtime, it is not evaluated on load up.  
-
-to use a dungeon script instead of writing engine code, reference the script with:
-`{"#script": "path/to/script"}`
-the path doesn't have to be absolute, nor does it require you to write the ds/dungeon_script extension in the file name, however, make sure the path cant be mistaken for another script file. (The compiler will look in every dungeon folder, until it finds something that matches the path) 
-
-ie: referencing `scripts/rooms/room1/on_enter`
-may match `your_dungeon/scripts/rooms/room1/on_enter.ds`
-or `my_dungeon/script/rooms/room1/on_enter.ds`
-so it is recommended that you have your dungeon namespace present in the path somewhere
-
-
-
-
-
+see the [wiki](https://github.com/westbot657/DungeonEngine/wiki)

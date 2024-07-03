@@ -120,7 +120,7 @@ class EditorTutorial(UIElement):
         self.width = aesa.width
         self.height = aesa.height
         
-        ### PAGE 0 ###
+        ### PAGE 0 #############################
         p0_intro_text = MultilineText(self.aesa.x+70, self.aesa.y+30, 1, 1, "Welcome to the\nDungeon Editor!", text_size=40, text_bg_color=None)
         
         p0_text1 = MultilineText(self.aesa.x+70, p0_intro_text.y+p0_intro_text.height+30, 1, 1, "This tutorial will show you how to use the editor.\nIf you already know how to use the editor, you can skip this tutorial.\n\nIf you find part of this tutorial to be confusing,\nyou can create an issue on the Github     .\n\n\nPress Next to continue.", text_size=20, text_bg_color=None)
@@ -129,7 +129,7 @@ class EditorTutorial(UIElement):
         
         self.pages.update({0: [p0_intro_text, p0_text1, p0_github_link]})
     
-        ### PAGE 1 ### Opening a dungeon project
+        ### PAGE 1 ############################# Opening a dungeon project
         p1_title_text = MultilineText(self.aesa.x+70, self.aesa.y+30, 1, 1, "Opening a dungeon", text_size=40, text_bg_color=None)
         
         p1_text1 = MultilineText(self.aesa.x+70, p1_title_text.y+p1_title_text.height+30, 1, 1, "To open an existing project, press the Open Dungeon button in the bottom left corner.\nOutside the tutorial, this button will open a folder selection prompt.\n\nTo create a new project, click the Create Dungeon button.\n\n\nPress Next to continue.", text_size=20, text_bg_color=None)
@@ -142,7 +142,7 @@ class EditorTutorial(UIElement):
         
         self.pages.update({1: [p1_title_text, p1_text1, self.p1_open_button_outliner, self.p1_fake_open_button, self.p1_create_button_outliner, self.p1_fake_create_button]})
         
-        ### PAGE 2 ###
+        ### PAGE 2 #############################
         self.p2_title_text = MultilineText(self.aesa.x+70, self.aesa.y+30, 1, 1, "Editing an object", text_size=40, text_bg_color=None)
         
         self.p2_text1 = MultilineText(self.aesa.x+70, self.p2_title_text.y+self.p2_title_text.height+30, 1, 1, "", text_size=20, text_bg_color=None)
@@ -164,7 +164,7 @@ class EditorTutorial(UIElement):
         self.masks.update({2: self.page2_mask_draw})
         self.pages.update({2: [self.p2_title_text, self.p2_text1, self.p2_canvas_outliner, self.p2_shelf_outliner, self.shelf_panel, self.shelf_panel2, self.placer_outliner]})
         
-        ### PAGE 3 ###
+        ### PAGE 3 #############################
         
         self.p3_collapse_y = self.p3_collapse_y_start = self.aesa.object_tree.y-6
         self.p3_collapse_y_height = self.aesa.object_tree.height+12
@@ -183,7 +183,7 @@ class EditorTutorial(UIElement):
         self.pages.update({3: [self.canvas_panel, self.p3_title_text, self.p3_info_text, self.p2_canvas_outliner]})
         
         
-        ### PAGE 4 ###
+        ### PAGE 4 #############################
         self.p4_title_text = MultilineText(self.aesa.x+70, self.aesa.y+30, 1, 1, "Object Properties", text_size=40, text_bg_color=None)
         
         self.panel_rect = (105, 195, 290, 390)
@@ -210,7 +210,14 @@ class EditorTutorial(UIElement):
         
         self.masks.update({4: self.page4_mask_draw})
         self.pages.update({4: [self.p4_title_text, self.p4_info_text1, self.p4_info_text2, self.p4_info_text3, self.p4_panel_id, self.p4_panel_label, self.p4_panel_id_outliner, self.p4_panel_label_outliner, self.p4_panel_attributes_outliner]})
-        ### General ###
+        
+        ### PAGE 5 #############################
+        self.p5_title_text = MultilineText(self.aesa.x+70, self.aesa.y+30, 1, 1, "Object Properties", text_size=40, text_bg_color=None)
+        
+        
+        self.pages.update({5: [self.p5_title_text]})
+        
+        ### General ############################
         
         self.mask = pygame.Surface((self.width, self.height), pygame.SRCALPHA, 32)
         self.mask.fill((0, 0, 0, self.mask_opacity))

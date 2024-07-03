@@ -65,6 +65,11 @@ def rotate3DV(origin, vertices, angle):
     """rotates a collection of points around an origin in 3D space"""
     return [rotate3D(origin, point, angle) for point in vertices]
 
+def getRotator(origin, angle):
+    def _rotate(poly3d):
+        poly3d.vertices = rotate3DV(origin, poly3d.vertices, angle)
+    return _rotate
+
 def quad_to_tris(quad):
     """converts a quad into 2 tris"""
     if len(quad) == 4:

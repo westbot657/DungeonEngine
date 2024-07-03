@@ -231,17 +231,17 @@ class EditorTutorial(UIElement):
         self.openers.update({0: self.open0, 1: self.open1, 2: self.open2, 3: self.open3, 4: self.open4})
     
     
-    ### PAGE 0 ###
+    ### PAGE 0 ################################
     def open0(self):
         pass
     
     
-    ### PAGE 1 ###
+    ### PAGE 1 ################################
     def open1(self):
         self.p1_open_button_outliner.start_animation()
         self.p1_create_button_outliner.start_animation(0.25)
     
-    ### PAGE 2 ###
+    ### PAGE 2 ################################
     def open2(self):
         self.animation = 0
         self.p2_canvas_outliner.start_animation()
@@ -309,14 +309,16 @@ class EditorTutorial(UIElement):
         self.placer_outliner.start_animation(-self.placer_outliner.animation_delay)
         self.shelf_panel2.show_buttons = False
     
-    ### PAGE 3 ###
+    ### PAGE 3 ################################
     def open3(self):
         # print("OPENING PAGE 3")
         self.animation = time.time()
         self.p3_info_text.surface.set_alpha(0)
         self.p3_title_text.surface.set_alpha(0)
+        self.p2_canvas_outliner.animation_time = 1.5
+        
 
-    ### PAGE 4 ###
+    ### PAGE 4 ################################
     def open4(self):
         self.animation = time.time()
         self.state = 0
@@ -330,9 +332,16 @@ class EditorTutorial(UIElement):
         self.p4_panel_label_outliner.clear()
         self.p4_panel_attributes_outliner.clear()
         
-        self.p2_canvas_outliner.x = self.p4_
+        # self.p2_canvas_outliner.x = self.panel_rect[0]-5
+        # self.p2_canvas_outliner.y = self.panel_rect[1]-5
+        # self.p2_canvas_outliner.resize(self.panel_rect[2]+10, self.panel_rect[3]+10)
+        
+        self.p2_canvas_outliner.x = self.panel_rect[0]-11 + self.aesa.x
+        self.p2_canvas_outliner.y = self.panel_rect[1]-11 + self.aesa.y
+        self.p2_canvas_outliner.resize(self.panel_rect[2]+20, self.panel_rect[3]+20)
+        # print(self.p2_canvas_outliner.x, self.p2_canvas_outliner.y, self.p2_canvas_outliner.width, self.p2_canvas_outliner.height)
 
-    ### General ###
+    ### General ###############################
     
     def skip_button_event(self, *_, **__):
         self.aesa.seen_tutorial = True
@@ -481,19 +490,17 @@ class EditorTutorial(UIElement):
             self.p2_canvas_outliner._event(editor, X, Y)
             if self.animation:
                 if self.state == 0:
+                        
                     dt = (time.time() - self.animation) / 1.5
+                    if not self.p2_canvas_outliner.start_time and dt <= 0.2:
+                        self.p2_canvas_outliner.animation_time = 0.1
+                        self.p2_canvas_outliner.start_animation()
                     if dt > 1:
                         dt = 1
                         self.animation = 0
                         self.state = 1
-                        self.p2_canvas_outliner.animation_time = 0.0001
-                        self.p2_canvas_outliner.start_animation()
+                        
                     dt = easeInOutSine(dt)
-                    # (self.aesa.construction_canvas.x - self.x + 20, self.aesa.construction_canvas.y - self.y + 180),
-                    # (self.aesa.construction_canvas.x - self.x + 20, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 15),
-                    # (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 20, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 15),
-                    # (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 20, self.aesa.construction_canvas.y - self.y + 180),
-        
                     top_left = (self.aesa.construction_canvas.x - self.x + 21, self.aesa.construction_canvas.y - self.y + 181)
                     bottom_left = (self.aesa.construction_canvas.x - self.x + 21, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 16)
                     bottom_right = (self.aesa.construction_canvas.x + self.aesa.construction_canvas.width - self.x - 21, self.aesa.construction_canvas.y + self.aesa.construction_canvas.height - self.y - 16)
@@ -526,6 +533,7 @@ class EditorTutorial(UIElement):
                         self.p4_panel_id_outliner.start_animation()
                         self.p4_panel_label_outliner.start_animation()
                         self.p4_panel_attributes_outliner.start_animation()
+                        self.p2_canvas_outliner.animation_time = 1.5
                         self.p2_canvas_outliner.animate_out(-self.p2_canvas_outliner.animation_delay)
                         
                     dt = min(dt, 1)
@@ -599,7 +607,7 @@ class EditorTutorial(UIElement):
                     (max(self.current_rect[0]+self.current_rect[2]+5, self.panel_rect[0]+self.panel_rect[2]+10) + self.aesa.x, max(self.current_rect[1]+self.current_rect[3]+5, self.panel_rect[1]+self.panel_rect[3]+10) + self.aesa.y),
                     (min(self.current_rect[0]-6, self.panel_rect[0]-11) + self.aesa.x, max(self.current_rect[1]+self.current_rect[3]+5, self.panel_rect[1]+self.panel_rect[3]+10) + self.aesa.y)
                 ], 2)
-            else:
+            if self.state != 0:
                 self.p2_canvas_outliner._update(editor, X, Y)
             
             self.canvas_panel._update(editor, X+self.panel_current[0], Y+self.panel_current[1])

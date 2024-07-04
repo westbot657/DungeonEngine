@@ -212,7 +212,7 @@ class EditorTutorial(UIElement):
         self.pages.update({4: [self.p4_title_text, self.p4_info_text1, self.p4_info_text2, self.p4_info_text3, self.p4_panel_id, self.p4_panel_label, self.p4_panel_id_outliner, self.p4_panel_label_outliner, self.p4_panel_attributes_outliner]})
         
         ### PAGE 5 #############################
-        self.p5_title_text = MultilineText(self.aesa.x+70, self.aesa.y+30, 1, 1, "Object Properties", text_size=40, text_bg_color=None)
+        self.p5_title_text = MultilineText(self.aesa.x+70, self.aesa.y+30, 1, 1, "Attributes", text_size=40, text_bg_color=None)
         
         
         self.pages.update({5: [self.p5_title_text]})

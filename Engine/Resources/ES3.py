@@ -118,7 +118,7 @@ class EngineScript:
         r"\b(if|elif|else|while|for|in|and|not|or|none|match|case|class|def|break|continue)\b": "KEYWORD",
         r"[a-zA-Z_][a-zA-Z0-9_]*": "WORD",
         r"(\d+(\.\d+)?|\.\d+)": "NUMBER",
-        r"\*\*": "POW",
+        # r"\*\*": "POW",
         r"[=\-+*/()&\[\]{},#%:|^\.\$;~`]": "LITERAL",
         r"\n+": "NEWLINE",
         r"[\t ]+": "ignore"

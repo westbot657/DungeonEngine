@@ -3,7 +3,10 @@
 
 ### A text-adventure style multiplayer game engine
 
-**CURRENTLY IN BETA**
+**CURRENTLY IN BETA**  
+
+Join [the discord](https://discord.gg/cj77mFZ8eh) for development updates, to give feedback, report bugs and issues, and share your custom dungeons with others!
+The discord is also where you can find help on anything related to IDNH.  
 
 ## Installing and running
 

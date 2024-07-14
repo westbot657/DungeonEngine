@@ -66,7 +66,7 @@ class AbstractDungeon:
         files: list[str] = glob.glob("./Dungeons/**/*.json")#, recursive=True)
 
         for file in files.copy():
-            if file.endswith(("ec_functions.json", "editor_data.json")):
+            if file.endswith(("ec_functions.json", "editor_data.json", "vcfg.json")):
                 files.remove(file)
 
         Log["loadup"]["dungeon"](f"Loading {len(files)} dungeons...")

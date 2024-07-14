@@ -6,6 +6,7 @@ output(
     ])
 )
 
+/*
 #!~/attacks/bite
 #!attack-hit-script
 output(
@@ -14,3 +15,4 @@ output(
         "`"..#enemy.name.."` takes a bite at `"..#target.name.."` and deals "..#damage.." damage"::""
     ])
 )
+*/

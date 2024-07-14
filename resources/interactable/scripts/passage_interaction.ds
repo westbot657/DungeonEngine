@@ -10,7 +10,7 @@ if (<.blocked>) {
     [engine:player/set_location](<.target>)
 }
 
-
+/*
 #!~/interactable/passage
 #!interaction-script
 #![passage]
@@ -25,3 +25,4 @@ if (#passage.blocked) {
     }
     move: #player -> #passage.target
 }
+*/

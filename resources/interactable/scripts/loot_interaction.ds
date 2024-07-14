@@ -18,6 +18,7 @@ if ((not <.picked_up>)) { // once inventory has a space limit, add check for it 
 
 // =================================================================================================================== //
 
+/*
 #!~/interactable/loot
 #!interaction-script
 #![loot]
@@ -33,3 +34,4 @@ if (not #loot.picked_up) {
     #loot.picked_up = true
 
 }
+*/

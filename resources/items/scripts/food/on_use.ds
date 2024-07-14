@@ -4,7 +4,9 @@ output(
     "You ate `"..<#item.name>.."`, healing you by *"..<#item.heal_amount>.."* hp!"::""
 )
 
+/*
 #!~/items/food
 #!item-use-script
 #player.heal(#item.heal_amount)
 output("You ate `"..#item.name.."`, healing you by *"..#item.heal_amount.."* hp!"::"")
+*/

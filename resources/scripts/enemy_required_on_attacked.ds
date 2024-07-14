@@ -23,7 +23,7 @@ combat.next_turn()
 // [engine:debug/memory]
 
 
-
+/*
 #!enemy-combat-script
 
 output("You attack `"..#enemy.name.."`, dealing "..#damage.." damage!"::"")
@@ -32,3 +32,4 @@ if (#enemy.health <= 0) {
     output("`"..#enemy.name.."` has been defeated."::"")
 }
 #combat.next_turn()
+*/

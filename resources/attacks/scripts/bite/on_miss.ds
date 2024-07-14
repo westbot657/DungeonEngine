@@ -5,7 +5,7 @@ output(
         <#enemy.name>.."takes a bite at"..<target.name>.."but misses"
     ])
 )
-
+/*
 #!~/attacks/bite
 #!attack-miss-script
 output(
@@ -14,3 +14,4 @@ output(
         #enemy.name.."takes a bite at"..#target.name.."but misses"
     ])
 )
+*/

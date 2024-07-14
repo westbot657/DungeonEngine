@@ -47,4 +47,38 @@ The game can also be run in the command line by running
 
 ## Dungeon Building
 
-see the [wiki](https://github.com/westbot657/DungeonEngine/wiki)
+See the [wiki](https://github.com/westbot657/DungeonEngine/wiki) for the (eventually) in-depth guide to building a dungeon.
+
+## Versioning system
+
+```ascii
+0.0.0.0
+^ ^ ^ ^
+│ │ │ └───────────────────────────────────────────────────┐
+│ │ └────────────────────────────────┐                    │
+│ └─────────────┐                    │                    │
+Major version   Engine Sub Version   Editor Sub Version   Story Version
+```
+
+### Major Version
+
+- This number represents a version that is incompatible with a prior version in a breaking way.  
+- ie: v0.0.0.0 is incompatible with v1.0.0.0
+
+### Engine Sub Version
+
+- this number represents the version of the game engine in relation to the Major Version.  (this number restarts at 0 when the Major Version Changes)
+- content made for a lower engine sub version will always be compatible with versions after it, but not vice versa.
+- ie: a dungeon for v0.1.0.0 should work in v0.2.0.0 but a dungeon for v0.2.0.0 is not likely to work for v0.1.0.0
+
+### Editor Sub Version
+
+- this represents the version of the editor relative to the Major version (restarts at 0 when Major version changes)
+- changes in this version number only impact your experience for editing a dungeon, and have no compatibility issues (given that other version numbers are matching compatibility)
+
+### Story Version
+
+- this number will never reset after a Major Version change.
+- this version is just an indication of how much content is available in the main story and has no impact on compatibility.
+
+

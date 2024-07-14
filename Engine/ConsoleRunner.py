@@ -18,8 +18,12 @@ import random
 
 from Engine import Engine
 
-
-# os.system('') # this fixes console ansi colors for some reason # NOTE: comment out when compiling VS version, it causes Windows to think the exe is a virus
+# DO NOT MODIFY THE LINES BELOW
+# this fixes console ansi colors for some reason
+# NOTE: comment out when compiling VS version, it causes Windows to think the exe is a virus
+### COMPILER MARKER ###
+# os.system('')
+### END COMPILER MARKER ###
 
 try:
     _IOHook = SourceFileLoader("IOHook", "./IOHook.py").load_module() # pylint: disable=no-value-for-parameter

@@ -13,20 +13,13 @@ UI/UX Design
 
 ---
 
-### Devin
+### Altin
 - Dungeoneer  
 - Alpha Tester  
 
 Design  
 
 [<img src="./ui_resources/credits/github-mark-white.png" alt="Github" width=15/>](https://github.com/altincloak)
-
----
-
-### Kiera
-Story Design  
-
-[<img src="./ui_resources/credits/github-mark-white.png" alt="Github" width=15/>](https://github.com/pennythoughts1)
 
 ---
 

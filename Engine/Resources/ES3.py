@@ -373,7 +373,7 @@ class EngineScript:
     def get_type_ref_tree(self, value):
         print(f"ES3: get value of {value}")
         
-        return self.get_context(value)
+        return None
 
     def get_type_from_obj(self, obj):
         print(f"ES3: get type of {obj}")
@@ -503,34 +503,34 @@ class EngineScript:
         """
         return [EngineScript.Token(self, t.group()) for t in re.finditer("(?:"+"|".join(self._patterns.keys())+")", self.script)]
     
-    def cleanup(self, ast):
-        # print(f"CLEANUP: {ast}")
-        if isinstance(ast, dict):
-            if "#functions" in ast and ast["#functions"] == []:
-                ast.pop("#functions")
-            if "true" in ast and ast["true"] in [{"#functions": []}, None]:
-                ast.update({"true": {}})
-            if "false" in ast and ast["false"] in [{"#functions": []}, None]:
-                ast.update({"false": {}})
-            # if "#check" in ast and ast["#check"] in [{"#functions": []}, None]:
-            #     ast.pop("false")
-            #     t = ast.pop("true")
-            #     ast.pop("#check")
-            #     if t != {}:
-            #         ast.update(t)
-            out = {}
-            for k, v in ast.items():
-                x = self.cleanup(v)
-                out.update({k: x})
-            return out
-        elif isinstance(ast, list):
-            lst = []
-            for l in ast:
-                x = self.cleanup(l)
-                if not x in [None, {}]:
-                    lst.append(x)
-            return lst
-        return ast
+    # def cleanup(self, ast):
+    #     # print(f"CLEANUP: {ast}")
+    #     if isinstance(ast, dict):
+    #         if "#functions" in ast and ast["#functions"] == []:
+    #             ast.pop("#functions")
+    #         if "true" in ast and ast["true"] in [{"#functions": []}, None]:
+    #             ast.update({"true": {}})
+    #         if "false" in ast and ast["false"] in [{"#functions": []}, None]:
+    #             ast.update({"false": {}})
+    #         # if "#check" in ast and ast["#check"] in [{"#functions": []}, None]:
+    #         #     ast.pop("false")
+    #         #     t = ast.pop("true")
+    #         #     ast.pop("#check")
+    #         #     if t != {}:
+    #         #         ast.update(t)
+    #         out = {}
+    #         for k, v in ast.items():
+    #             x = self.cleanup(v)
+    #             out.update({k: x})
+    #         return out
+    #     elif isinstance(ast, list):
+    #         lst = []
+    #         for l in ast:
+    #             x = self.cleanup(l)
+    #             if not x in [None, {}]:
+    #                 lst.append(x)
+    #         return lst
+    #     return ast
     
     def build(self, tokens:list[Token]):
         t = bool(tokens)
@@ -544,7 +544,7 @@ class EngineScript:
                 #     print(f"\nmacro: {macro} :\n{val.display()}")
                 # for macro, val in self.macro_functions.items():
                 #     print(f"\nmacro: {macro} :\n{val.display()}")
-                self.compiled_script = self.cleanup(ast.compile())
+                self.compiled_script = ast.compile()
             except EOF:
                 self.compiled_script = {}
         if t and self.compiled_script == {}:
@@ -564,81 +564,8 @@ class EngineScript:
                     break
         return Statements(stmts)
 
-    def get_context(self, ctx_type:str):
-        match ctx_type:
-            case "str":
-                return {
-                    "split": {
-                        "type": "function",
-                        "function": ESClass.classes["ESString"],
-                        "returns": "list[str]"
-                    }
-                }
-            case "boolean":
-                return {}
-            case "number":
-                return {}
-            case "Inventory":
-                return {}
-            case "Location":
-                return {}
-            case "Currency":
-                return {}
-            case "StatusEffects":
-                return {}
-            case "StatusEffect":
-                return {}
-            case "Position":
-                return {}
-            case "dungeon":
-                return {}
-            case _:
-                raise Exception(f"forgot to implement context type '{ctx_type}'")
-
     def add_base_context(self):
-        self.variable_table.vars = {
-            "#player": {
-                "type": "Player",
-                "attrs": {
-                    "inventory": {
-                        "type": "Inventory",
-                        "attrs": self.get_context("Inventory")
-                    },
-                    "name": {
-                        "type": "str",
-                        "attrs": self.get_context("str")
-                    },
-                    "health": {
-                        "type": "number",
-                        "attrs": self.get_context("number")
-                    },
-                    "max_health": {
-                        "type": "number",
-                        "attrs": self.get_context("number")
-                    },
-                    "location": {
-                        "type": "Location",
-                        "attrs": self.get_context("Location")
-                    },
-                    "money": {
-                        "type": "Currency",
-                        "attrs": self.get_context("Currency")
-                    },
-                    "status_effects": {
-                        "type": "StatusEffects",
-                        "attrs": self.get_context("StatusEffects")
-                    },
-                    "in_combat": {
-                        "type": "boolean",
-                        "attrs": self.get_context("boolean")
-                    },
-                    "position": {
-                        "type": "Position",
-                        "attrs": self.get_context("Position")
-                    }
-                }
-            }
-        }
+        ...
 
     def statement(self, tokens:list[Token]) -> Node:
         if not tokens:

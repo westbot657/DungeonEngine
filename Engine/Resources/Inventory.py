@@ -17,15 +17,15 @@ from .Serializer import Serializer, Serializable
 
 @Serializable("Inventory")
 class Inventory(FunctionalElement):
-    _default_equips = {}
+    _default_equips: dict[str, AbstractGameObject] = {}
 
     def __init__(self, function_memory, contents:list[GameObject]):
         self.parent = None
-        self.contents = contents
-        self.equips = {}
-        self.defaults = {}
+        self.contents: list[GameObject] = contents
+        self.equips: dict[str, GameObject|None] = {}
+        self.defaults: dict[str, GameObject] = {}
         self.function_memory = function_memory
-        self.slots = 50
+        self.slots: int = 50
         for key, abstract in Inventory._default_equips.items():
             self.defaults.update({key: abstract.createInstance(function_memory)})
             self.equips.update({key: self.defaults[key]})
@@ -93,6 +93,7 @@ class Inventory(FunctionalElement):
 
         if hasattr(game_object, "count"):
             for obj in self.contents:
+                obj: Ammo|Item
                 if obj.abstract == game_object.abstract:
                     if obj.count < obj.max_count == game_object.max_count:
                         diff = obj.max_count - obj.count

@@ -25,7 +25,6 @@ test_script = """
 #!enter-script
 
 num_players = length(#dungeon.player_ids)
-
 #dungeon.player_ids.append(#player.uid)
 
 #player.tag$[listening = true]
@@ -79,7 +78,6 @@ match random.choice([1, 2, 3, 4]) {
 
 #player.give_money(starting_money)
 
-
 move: #player -> <emberhollow:rooms/docks/roads/road_4>
 
 
@@ -99,7 +97,7 @@ class Type:
         return self.tp
 
 class EngineScript:
-    
+    engine = None
     
     _scripts = {}
     
@@ -377,7 +375,18 @@ class EngineScript:
 
     def get_type_from_obj(self, obj):
         print(f"ES3: get type of {obj}")
-        
+    
+    @classmethod
+    def load(cls):
+        pass
+    
+    @classmethod
+    def unload(cls):
+        pass
+    
+    @classmethod
+    def preCompileAll(cls):
+        pass
         
     def snapshot(self, tokens):
         return len(tokens)

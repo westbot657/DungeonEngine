@@ -63,7 +63,10 @@ class Comp(Node):
     
     def compile(self):
         return {
-            "#function": "math.compare",
+            "#call": {
+                "#access": "compare",
+                "from": {"#ref": "math"}
+            },
             self.op: [
                 self.left.compile(),
                 self.right.compile()
@@ -355,6 +358,7 @@ class Concat(Node):
 
 class MacroStack(Node):
     def __init__(self, obj, tokens:list, last_token, es3):
+        # last_token is the closing bracket/brace of the macro
         self.obj = obj
         self.tokens = tokens
         self.last_token = last_token
@@ -365,7 +369,14 @@ class MacroStack(Node):
         raise FinalScriptError("Undefined procedural macro")
     
     def compile(self):
-        pass # TODO: this compile method is probably one of the most complicated ones
+        tp = self.obj.getType(self.es3)
+        
+        if tp.is_macro():
+            return tp.compile(self.es3, self.tokens)
+        
+        else:
+            raise self.obj.error("Not a macro")
+        
 
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}MacroStack [\n{self.obj.display(depth+1)}\n{" "*depth*2}] <- [{", ".join(str(t) for t in self.tokens)}]"
@@ -588,12 +599,17 @@ class DictNode(Node):
         return out
 
 class NewNode(Node):
-    def __init__(self, obj, args):
+    def __init__(self, obj, args:ArgsCallNode):
         self.obj = obj
         self.args = args
     
     def compile(self):
-        pass
+        out = {
+            "#new": self.obj.value
+        }
+        out.update(self.args.compile())
+
+        return out
 
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}new: {self.obj.value} {{\n{self.args.display(depth+1)}\n{" "*depth*2}}}"
@@ -604,7 +620,10 @@ class MoveNode(Node):
         self.dest = dest
     
     def compile(self):
-        pass
+        return {
+            "#move": self.obj.compile(),
+            "to": self.dest.value
+        }
 
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}move: [\n{self.obj.display(depth+1)}\n{" "*depth*2}] -> {self.dest.value}"

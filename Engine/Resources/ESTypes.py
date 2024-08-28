@@ -1,9 +1,14 @@
 # pylint: disable=W,R,C,import-error
 
 
-
 class ESType:
     _types = {}
+
+    class _type:
+        def __init__(self, name:str, sub_types:list):
+            self.name = name
+            self.sub_types = sub_types
+
 
     def __init__(self, name:str, data_table:dict[str, tuple[str, str, str|tuple[str, str]]]):
         self.name = name
@@ -17,7 +22,9 @@ class ESType:
         
         self.data_table = data_table
 
-
+    @classmethod
+    def getDataType(cls, table, attr):
+        pass
 
     @classmethod
     def init(cls):
@@ -95,7 +102,7 @@ class ESType:
             "currency":       ("currency",       "object", ("rw", "currency")),
             # "status_effects": ("status_effects", "object", "r"),
             "in_combat":      ("bool",           "object", "r"),
-            "tag":            ("any",            "macro",  "r"),
+            "tag":            ("any",            ("macro", ),  "r"),
         })
         
         cls.t_Inventory = cls("inventory", {
@@ -162,8 +169,18 @@ class ESType:
         # cls.t_Map = cls("map", {
         # })
 
-
-
+class TypePlayer:
+    
+    def __init__(self, player_object):
+        self.player_object = player_object
+        
+    def is_macro(self):
+        return False
+    
+    def getAttrType(self, attr:str):
+        if attr in ESType.t_Player.data_table:
+            ESType.getDataType(ESType.t_Player.data_table, attr)
+        
 
 
 

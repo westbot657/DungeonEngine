@@ -1,112 +1,99 @@
-# pylint: disable=W,R,C,import-error,no-member
+# pylint: disable=[W,R,C,import-error]
 
-
-import time
-import re
 import math
 import random
 
-from typing import Any
-
-try:
-    from .EngineErrors import FinalScriptError, ScriptError, EOF
-except ImportError as e:
-    from EngineErrors import FinalScriptError, ScriptError, EOF
+class MultistepFunction:
     
+    def __init__(self, start, continuation):
+        """
+        `start` and `continuation` must be functions
+        that return a tuple of (return_value:Any, continuation_environment:Any)
+        the `continuation` function must have the first parameter
+        take in the continuation_environment
+        """
+        
+        self.start = start
+        self.continuation = continuation
+
+
+class ESBuiltin:
+    _classes = {}
+
+    @classmethod
+    def register(cls, name:str):
+        def decorator(clas):
+            cls._classes[name] = clas
+            return cls
+        return decorator
 
 class ESFunction:
-    funcs = {}
-    
-    _instance = None
-    
-    def __new__(cls, metadata=None):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        cls._instance.metadata = metadata
-        return cls._instance
+    _functions = {}
 
-    def __call__(self, callable):
-        callable.metadata = self.metadata # pylint: disable=access-member-before-definition
-        self.metadata = None
-        ESFunction.funcs.update({callable.__name__: callable})
-        return callable
-
-
-
-    
-
+    @classmethod
+    def register(cls, name:str):
+        def decorator(fun):
+            cls._functions[name] = fun
+            return cls
+        return decorator
 
 class ESClass:
-    classes = {}
+    _classes = {}
+
+    @classmethod
+    def register(cls, name:str):
+        def decorator(clas):
+            cls._classes[name] = clas
+            return cls
+        return decorator
+
+
+@ESBuiltin.register("math")
+class Math:
+
+    @classmethod
+    def compare(cls, op, x, y):
+        match op:
+            case ">":
+                return x > y
+            case ">=":
+                return x >= y
+            case "<":
+                return x < y
+            case "<=":
+                return x <= y
+            case "==":
+                return x == y
+            case "!=":
+                return x != y
+            case "and":
+                return x and y
+            case "or":
+                return x or y
     
-    def __init_subclass__(cls) -> None:
-        cls._functions = ESFunction.funcs
-        ESFunction.funcs = {}
-        ESClass.classes.update({cls.__name__: cls})
-
-
-class ESString(ESClass):
-    def __init__(self, string:str):
-        self.string = string
+    registry = {
+        "sin": math.sin,
+        "cos": math.cos,
+        "tan": math.tan,
+        "compare": compare,
+        "abs": abs,
+        "sqrt": math.sqrt,
+        "floor": math.floor,
+        "ceil": math.ceil
+    }
     
-    @ESFunction({"returns": "list[str]"})
-    def split(self, sep:str|None=None, maxsplit:int=-1):
-        return self.string.split(sep, maxsplit)
-
-class ESPlayer(ESClass):
-    def __init__(self, player):
-        self.player = player
-        
-        self.attrs = {
-            "tag": self.tag
-        }
-
-    @staticmethod
-    def _tag_parser(tokens:list, es3) -> dict:
-        
-        if tokens and tokens[0].type in ["WORD", "KEYWORD", "COMMAND"]:
-            name = tokens[0].pop().value
-        
-            if tokens and tokens[0] == ("LITERAL", "="):
-                eq = tokens.pop(0)
-                if tokens:
-                    expr = es3.expression(tokens)
-                    
-                    return {"tag-assign": [name.value, expr]}
-                else:
-                    raise FinalScriptError(f"expected expression after '=' @ {eq.get_location()}")
-            
-            elif tokens:
-                raise tokens[0].expected("'=' or end of expression", False)
-            else:
-                return {"tag-ref": name.value}
-        
-        elif tokens:
-            raise FinalScriptError(f"Expected tag label @ {tokens[0].get_location()}")
-        else:
-            raise FinalScriptError("Expected tag label @ {tlast_location}")
-
-    @ESFunction({"macro-parser": _tag_parser, "returns": "str|number|boolean"})
-    def tag(self, data:dict):
-        ...
-
-class ESDungeon(ESClass):
-    def __init__(self, dungeon):
-        self.dungeon = dungeon
+@ESBuiltin.register("random")
+class Random:
     
-    
+    registry = {
+        "choice": random.choice,
+        "range": random.randint
+    }
 
 
-# print(ESClass.classes)
-
-# for name, cls in ESClass.classes.items():
-#     print(name)
-#     for n, f in cls._functions.items():
-#         print(f"{n}: {f}  {f.metadata}")
+ESFunction.register("length")(len)
 
 
-
-
-
-
-
+@ESFunction.register("output")
+def output(es3, message):
+    es3.engine.sendOutput()

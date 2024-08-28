@@ -539,7 +539,6 @@ class EngineScript:
                 ast: Node = self.statements(tokens)
                 print(ast.display())
                 
-                ast.get_ret_type()
                 # for macro, val in self.macros.items():
                 #     print(f"\nmacro: {macro} :\n{val.display()}")
                 # for macro, val in self.macro_functions.items():

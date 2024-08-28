@@ -22,14 +22,6 @@ class Node:
     def display(self, depth:int=0) -> str:
         return f"{" "*depth*2}{self}"
 
-    def set_ret_type(self, type):
-        self.ret_type = type
-    
-    def get_ret_type(self):
-        if hasattr(self, "ret_type"):
-            return self.ret_type
-        else:
-            return None
 
 class Statements(Node):
     def __init__(self, nodes:list[Node]):
@@ -49,11 +41,6 @@ class Statements(Node):
         out.append(f"{" "*depth*2})")
         return "\n".join(out)
 
-    def get_ret_type(self):
-        n = None
-        for node in self.nodes:
-            n =node.get_ret_type()
-        return n
 
 class Comp(Node):
     def __init__(self, left:Node, op:str, right:Node):
@@ -76,10 +63,6 @@ class Comp(Node):
     def display(self, depth:int=0) -> str:
         return f"{" "*depth*2}Comp [ {self.op} ] (\n{self.left.display(depth+1)}\n{self.right.display(depth+1)}\n{" "*depth*2})"
 
-    def get_ret_type(self):
-        self.left.get_ret_type()
-        self.right.get_ret_type()
-        return "boolean"
 
 class IfStatement(Node):
     def __init__(self, condition:Node, body:Node, else_node:Node=None):
@@ -97,21 +80,6 @@ class IfStatement(Node):
     def display(self, depth:int=0):
         return f"{" "*depth*2}IfStatement(\n{" "*depth*2}  condition [\n{self.condition.display(depth+2)}\n{" "*depth*2}  ] true {{\n{self.body.display(depth+2)}\n{" "*depth*2}  }} false {{\n{self.else_node.display(depth+1) if self.else_node else f"{" "*depth*2}    [no else branch]"}\n{" "*depth*2}  }}\n{" "*depth*2})"
 
-    def get_ret_type(self):
-        tp1 = self.body.get_ret_type()
-        if self.else_node:
-            tp2 = self.else_node.get_ret_type()
-        else:
-            tp2 = tp1
-        if tp1 == tp2:
-            return tp1
-        else:
-            if tp1 is not None:
-                if tp2 is not None:
-                    return tp1 + "|" + tp2 if tp1 != tp2 else tp1
-                else:
-                    return tp1
-            return tp2
 
 class ForLoopC(Node):
     def __init__(self, initializer, step, end_condition, body):
@@ -129,11 +97,6 @@ class ForLoopC(Node):
             "body": self.body.compile()
         }
 
-    def get_ret_type(self):
-        self.initializer.get_ret_type()
-        self.step.get_ret_type()
-        self.end_condition.get_ret_type()
-        return self.body.get_ret_type()
 
 class ForLoopPy(Node):
     def __init__(self, unpack, iterable, body):
@@ -149,10 +112,6 @@ class ForLoopPy(Node):
             "body": self.body.compile()
         }
 
-    def get_ret_type(self):
-        self.unpack.get_ret_type()
-        self.iterable.get_ret_type()
-        return self.body.get_ret_type()
 
 class WhileLoop(Node):
     def __init__(self, condition, body):
@@ -165,9 +124,6 @@ class WhileLoop(Node):
             "body": self.body.compile()
         }
 
-    def get_ret_type(self):
-        self.condition.get_ret_type()
-        return self.body.get_ret_type()
 
 class MatchCase(Node):
     def __init__(self, match_value:Node, cases:list[Node], bodies:list[Node]):
@@ -191,22 +147,6 @@ class MatchCase(Node):
             out.append(f"{" "*depth*2}  }}")
 
         return "\n".join(out)
-
-    def get_ret_type(self):
-        
-        check_type:str = self.match_value.get_ret_type()
-        
-        for case in self.cases:
-            tp = case.get_ret_type()
-            
-            if tp not in check_type.split("|"):
-                raise FinalScriptError(f"Match case type '{tp}' does not match check type '{check_type}'")
-        
-        tps = set()
-        for body in self.bodies:
-            tps.add(body.get_ret_type())
-        
-        return "|".join(tps)
 
 class ClassDef(Node):
     def __init__(self):
@@ -232,13 +172,6 @@ class BinaryOp(Node):
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}BinOp [ {self.op} ] (\n{self.left.display(depth+1)}\n{self.right.display(depth+1)}\n{" "*depth*2})"
     
-    def get_ret_type(self):
-        
-        self.left.get_ret_type()
-        self.right.get_ret_type()
-        
-        return "number"
-    
 class UnaryOp(Node):
     def __init__(self, op, right:Node):
         self.op = op
@@ -256,10 +189,6 @@ class UnaryOp(Node):
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}Unary [ {self.op} ] (\n{self.right.display(depth+1)}\n{" "*depth*2})"
 
-    def get_ret_type(self):
-        self.right.get_ret_type()
-        
-        return "number"
 
 class MacroDef(Node):
     def __init__(self, name, args:list[Node], body):
@@ -273,12 +202,6 @@ class MacroDef(Node):
     def display(self, depth:int=0):
         return f"{" "*depth*2}MacroDef [ {self.name.value} ] (\n{"\n".join(f"{" "*depth*2}  {a.value}" for a in self.args)}\n{" "*depth*2}) {{\n{self.body.display(depth+1)}\n{" "*depth*2}}}"
 
-    def get_ret_type(self):
-        
-        for arg in self.args:
-            arg.get_ret_type()
-        
-        return self.body.get_ret_type()
 
 class MacroCall(Node):
     def __init__(self, token, args:list[Node], es3):
@@ -299,13 +222,6 @@ class MacroCall(Node):
         out.append(f"{" "*depth*2})")
 
         return "\n".join(out)
-
-    def get_ret_type(self):
-        
-        for arg in self.args:
-            arg.get_ret_type()
-        
-        return self.es3.function_macros.get(self.token.value).get_ret_type()
 
 class MacroAssign(Node):
     def __init__(self, token, node:Node):
@@ -335,9 +251,6 @@ class MacroRef(Node):
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}replace: {self.token.value}"
 
-    def get_ret_type(self):
-        return self.es3.macros.get(self.token.value).get_ret_type()
-
 class Concat(Node):
     def __init__(self, args:list[Node], sep:Node|None):
         self.args = args
@@ -345,16 +258,6 @@ class Concat(Node):
     
     def compile(self):
         pass
-
-    def get_ret_type(self):
-        
-        for args in self.args:
-            args.get_ret_type()
-        
-        if self.sep is not None:
-            self.sep.get_ret_type()
-        
-        return "string"
 
 class MacroStack(Node):
     def __init__(self, obj, tokens:list, last_token, es3):
@@ -381,10 +284,6 @@ class MacroStack(Node):
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}MacroStack [\n{self.obj.display(depth+1)}\n{" "*depth*2}] <- [{", ".join(str(t) for t in self.tokens)}]"
 
-    def get_ret_type(self):
-        print(f"MacroStack ret type: {self.obj.get_ret_type()}")
-        return None
-
 class BreakNode(Node):
     def __init__(self, token):
         self.token = token
@@ -399,11 +298,6 @@ class ReturnNode(Node):
     
     def compile(self):
         return {"#return": self.expr.compile() if self.expr else None}
-
-    def get_ret_type(self):
-        if self.expr:
-            return self.expr.get_ret_type()
-        return None
 
 class PassNode(Node):
     def __init__(self, token):
@@ -468,15 +362,6 @@ class ReferenceNode(Node):
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}ref: {"#" if self.global_ else ""}{self.token.value}"
 
-    def get_ret_type(self):
-        if self.type_annotation:
-            return str(self.type_annotation)
-        else:
-            return self.es3.get_type_from_obj(self.token.value)
-    
-    def get_type_ref_tree(self):
-        return self.es3.get_type_ref_tree(self.token.value)
-
 class AccessNode(Node):
     def __init__(self, obj: Node, attr):
         self.obj = obj
@@ -487,13 +372,6 @@ class AccessNode(Node):
 
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}Access [\n{self.obj.display(depth+1)}\n{" "*depth*2}] (\n{" "*depth*2}  attr: {self.attr.value}\n{" "*depth*2})"
-
-    def get_ret_type(self):
-        tp = self.obj.get_ret_type()
-    
-    def get_type_ref_tree(self):
-        return self.obj.get_type_ref_tree()[self.attr.value]
-        
 
 class AssignNode(Node):
     def __init__(self, ref_node:Node, val:Node):
@@ -539,12 +417,6 @@ class CallNode(Node):
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}Call [\n{self.obj.display(depth+1)}\n{" "*depth*2}] (\n{self.args.display(depth+1)}\n{" "*depth*2})"
 
-    def get_ret_type(self):
-        tp = self.obj.get_type_ref_tree()
-        
-        print(f"CallNode obj: {self.obj} type: {tp}")
-        # self.es3.get_type(tp)
-        
 
 class NotNode(Node):
     def __init__(self, node:Node):

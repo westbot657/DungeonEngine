@@ -272,13 +272,14 @@ class MacroStack(Node):
         raise FinalScriptError("Undefined procedural macro")
     
     def compile(self):
-        tp = self.obj.getType(self.es3)
+        return None
+        # tp = self.obj.getType(self.es3)
         
-        if tp.is_macro():
-            return tp.compile(self.es3, self.tokens)
+        # if tp.is_macro():
+        #     return tp.compile(self.es3, self.tokens)
         
-        else:
-            raise self.obj.error("Not a macro")
+        # else:
+        #     raise self.obj.error("Not a macro")
         
 
     def display(self, depth: int = 0) -> str:

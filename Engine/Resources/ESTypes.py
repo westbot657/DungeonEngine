@@ -2,14 +2,66 @@
 
 from typing import Callable
 
+class CompileError(Exception):
+    def __init__(self, *args):
+        super().__init__(*args)
+    
+    def __repr__(self):
+        return f"CompileError: {"".join(self.args)}"
 
 class DataType:
     def __init__(self):
         self.attrs = {}
+    
+    def getAttrs(self) -> dict:
+        return self.attrs
 
 class CallableType(DataType):
     def __init__(self, retTypes):
         self.retTypes = retTypes
+    
+    def getAttrs(self):
+        attrs = {}
+        for tp in self.retTypes:
+            tp: DataType
+            tp_attrs = tp.getAttrs()
+            for k, v in tp_attrs.items():
+                if k in attrs:
+                    _v = attrs[k]
+                    if not isinstance(_v, list):
+                        _v = [_v]
+                    _v.append(v)
+                    attrs.update({k: _v})
+                else:
+                    attrs.update({k: v})
+        return attrs
+
+class UnknownType(DataType):
+    _instance = None
+    
+    def __new__(cls):
+        if cls._instance == None:
+            cls._instance = super().__new__(cls)
+            cls._instance.init()
+        return cls._instance
+    
+    def init(self):
+        self.attrs = self
+
+    def __getitem__(self, idx):
+        return self
+    
+    def getAttrs(self) -> dict:
+        return self
+
+    def update(self, *_):
+        pass
+    
+    def get(self, *_):
+        return self
+
+    def keys(self):
+        return []
 
 class NullType(DataType):
     _instance = None
@@ -129,11 +181,48 @@ class MacroStackType(DataType):
     def compile(self, tokens):
         return self.compiler(tokens)
 
+class RandomClassType(DataType):
+    _instance = None
+    
+    def __new__(cls):
+        if cls._instance == None:
+            cls._instance = super().__new__(cls)
+            cls._instance.init()
+        return cls._instance
+    
+    def init(self):
+        self.attrs = {
+            "choice": CallableType(UnknownType()),
+            "range": CallableType(IntType())
+        }
+
 class PlayerType(DataType):
     
     @staticmethod
-    def tag_compiler(tokens):
-        ...
+    def tag_compiler(es3, compiled_reference, tokens:list):
+        if len(tokens) >= 3:
+            t1 = tokens.pop()
+            t2 = tokens.pop()
+            if t1.type == "WORD" and t2 == ("LITERAL", "="):
+                value = es3.expression(tokens)
+                return {
+                    "#set_player_tag": t1.value,
+                    "of_player": compiled_reference,
+                    "with_value": value.compile()
+                }
+            else:
+                raise CompileError(f"tag macro expected pattern: WORD '=' expression. received pattern: ({t1}) ({t2}) ...")
+            
+        elif len(tokens) == 1:
+            t = tokens[0]
+            if t.type != "WORD":
+                raise CompileError(f"tag macro expected a WORD token. received token type: {t.type}")
+            return {
+                "#get_player_tag": t.value,
+                "from": compiled_reference
+            }
+        else:
+            raise CompileError(f"tag macro only takes 1 or 3 tokens. received {len(tokens)} tokens")
     
     def __init__(self):
         self.attrs = {
@@ -160,10 +249,11 @@ class TypeHelper:
     
     @classmethod
     def typesHaveAttr(cls, types:DataType|list[DataType], attr:str):
+        if isinstance(types, UnknownType):
+            return False
         if isinstance(types, list): # ALL types must have `attr` for this to return true
             return all(
-                (attr in list(t.attrs.keys())) for t in types # change this to get types from CallableType
+                (attr in list(t.getAttrs().keys())) for t in types
             )
-        else:
-            return attr in list(types.attrs.keys())
+        return attr in list(types.getAttrs().keys())
 

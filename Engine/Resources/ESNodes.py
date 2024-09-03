@@ -7,11 +7,13 @@ try:
     from .YieldTools import YieldTools
     # from .LoaderFunction import LoaderFunction
     from .ESFunctions import ESFunction, ESClass
+    from .ESTypes import *
 except ImportError:
     from EngineErrors import ScriptError, FinalScriptError, EOF
     from Serializer import Serializer
     from YieldTools import YieldTools
     from ESFunctions import ESFunction, ESClass
+    from ESTypes import *
     # from LoaderFunction import LoaderFunction
     
 

@@ -15,6 +15,9 @@ class DataType:
     
     def getAttrs(self) -> dict:
         return self.attrs
+    
+    def called(self):
+        raise CompileError("object cannot be called")
 
 class CallableType(DataType):
     def __init__(self, retTypes):
@@ -35,6 +38,9 @@ class CallableType(DataType):
                 else:
                     attrs.update({k: v})
         return attrs
+
+    def called(self):
+        return self.getAttrs()
 
 class UnknownType(DataType):
     _instance = None
@@ -178,8 +184,8 @@ class MacroStackType(DataType):
     def __init__(self, compiler:Callable):
         self.compiler = compiler
     
-    def compile(self, tokens):
-        return self.compiler(tokens)
+    def compile(self, es3, ref, tokens):
+        return self.compiler(es3, ref, tokens)
 
 class RandomClassType(DataType):
     _instance = None
@@ -196,13 +202,22 @@ class RandomClassType(DataType):
             "range": CallableType(IntType())
         }
 
+class CurrencyType(DataType):
+    def __init__(self):
+        self.attrs = {
+            "gold": IntType(),
+            "silver": IntType(),
+            "copper": IntType(),
+            "to_string": CallableType(StringType())
+        }
+
 class PlayerType(DataType):
     
     @staticmethod
     def tag_compiler(es3, compiled_reference, tokens:list):
         if len(tokens) >= 3:
-            t1 = tokens.pop()
-            t2 = tokens.pop()
+            t1 = tokens.pop(0)
+            t2 = tokens.pop(0)
             if t1.type == "WORD" and t2 == ("LITERAL", "="):
                 value = es3.expression(tokens)
                 return {
@@ -222,7 +237,7 @@ class PlayerType(DataType):
                 "from": compiled_reference
             }
         else:
-            raise CompileError(f"tag macro only takes 1 or 3 tokens. received {len(tokens)} tokens")
+            raise CompileError(f"tag macro only takes 1 or 3+ tokens. received {len(tokens)} tokens")
     
     def __init__(self):
         self.attrs = {
@@ -232,17 +247,18 @@ class PlayerType(DataType):
 
 class DungeonType(DataType):
     def __init__(self):
-        ...
+        self.attrs = {
+            "player_ids": ListType(IntType())
+        }
 
 
 class Globals:
-    def __init__(self):
-        self.attrs = {
-            "wait": CallableType(NullType()),
-            "output": CallableType(NullType()),
-            "format": CallableType(StringType()),
-            "random": ...
-        }
+    attrs = {
+        "wait": CallableType(NullType()),
+        "output": CallableType(NullType()),
+        "format": CallableType(StringType()),
+        "random": RandomClassType()
+    }
 
 
 class TypeHelper:
@@ -257,3 +273,12 @@ class TypeHelper:
             )
         return attr in list(types.getAttrs().keys())
 
+    @classmethod
+    def getAttrType(cls, base_type:DataType, attr:str):
+        if isinstance(base_type, list):
+            return cls.getAttrType(base_type[0], attr)
+        if attr in base_type.getAttrs().keys():
+            tp = base_type.getAttrs().get(attr)
+            if isinstance(tp, Callable): # process lambda
+                tp = tp()
+            return tp

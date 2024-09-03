@@ -5,13 +5,11 @@ try:
     from .Serializer import Serializer
     from .YieldTools import YieldTools
     # from .LoaderFunction import LoaderFunction
-    from .ESFunctions import ESFunction, ESClass
     from .ESNodes import *
 except ImportError:
     from EngineErrors import ScriptError, FinalScriptError, EOF
     from Serializer import Serializer
     from YieldTools import YieldTools
-    from ESFunctions import ESFunction, ESClass
     # from LoaderFunction import LoaderFunction
     from ESNodes import *
 
@@ -61,7 +59,7 @@ $out($message, $wait_time) {
 $outm($message, $wait_time) {
     if ($listening) {
         output(
-            format($message, captain: captain, money: starting_money.total)
+            format($message, captain: captain, money: starting_money.to_string())
         )
         wait($wait_time)
     }
@@ -180,6 +178,9 @@ class EngineScript:
             
             self.line_end = es.line
             self.col_end = es.col
+
+            if self.type == "CONTEXT":
+                es.process_context(self.value)
 
             if self.type == "NUMBER":
                 self.value = float(self.value) if "." in self.value else int(self.value)
@@ -368,6 +369,15 @@ class EngineScript:
             "move": self.parse_cmd_move
         }
         
+        self.type_table = Globals.attrs.copy()
+    
+    def process_context(self, ctx):
+        if ctx == "#!enter-script":
+            self.type_table.update({
+                "#player": PlayerType(),
+                "#dungeon": DungeonType()
+            })
+    
     def get_type_ref_tree(self, value):
         print(f"ES3: get value of {value}")
         
@@ -511,35 +521,6 @@ class EngineScript:
         Returns a list of tokens from the script
         """
         return [EngineScript.Token(self, t.group()) for t in re.finditer("(?:"+"|".join(self._patterns.keys())+")", self.script)]
-    
-    # def cleanup(self, ast):
-    #     # print(f"CLEANUP: {ast}")
-    #     if isinstance(ast, dict):
-    #         if "#functions" in ast and ast["#functions"] == []:
-    #             ast.pop("#functions")
-    #         if "true" in ast and ast["true"] in [{"#functions": []}, None]:
-    #             ast.update({"true": {}})
-    #         if "false" in ast and ast["false"] in [{"#functions": []}, None]:
-    #             ast.update({"false": {}})
-    #         # if "#check" in ast and ast["#check"] in [{"#functions": []}, None]:
-    #         #     ast.pop("false")
-    #         #     t = ast.pop("true")
-    #         #     ast.pop("#check")
-    #         #     if t != {}:
-    #         #         ast.update(t)
-    #         out = {}
-    #         for k, v in ast.items():
-    #             x = self.cleanup(v)
-    #             out.update({k: x})
-    #         return out
-    #     elif isinstance(ast, list):
-    #         lst = []
-    #         for l in ast:
-    #             x = self.cleanup(l)
-    #             if not x in [None, {}]:
-    #                 lst.append(x)
-    #         return lst
-    #     return ast
     
     def build(self, tokens:list[Token]):
         t = bool(tokens)

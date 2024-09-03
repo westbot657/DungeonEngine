@@ -6,13 +6,11 @@ try:
     from .Serializer import Serializer
     from .YieldTools import YieldTools
     # from .LoaderFunction import LoaderFunction
-    from .ESFunctions import ESFunction, ESClass
     from .ESTypes import *
 except ImportError:
     from EngineErrors import ScriptError, FinalScriptError, EOF
     from Serializer import Serializer
     from YieldTools import YieldTools
-    from ESFunctions import ESFunction, ESClass
     from ESTypes import *
     # from LoaderFunction import LoaderFunction
     
@@ -24,6 +22,8 @@ class Node:
     def display(self, depth:int=0) -> str:
         return f"{" "*depth*2}{self}"
 
+    def getDataType(self, es3):
+        raise Exception(f"getDataType() not implemented for '{self}'")
 
 class Statements(Node):
     def __init__(self, nodes:list[Node]):
@@ -212,7 +212,7 @@ class MacroCall(Node):
         self.es3 = es3
     
     def compile(self):
-        print(f"fetch function-macro?")
+        # print(f"fetch function-macro?")
         return self.es3.function_macros.get(self.token.value).compile(self.args)
 
     def display(self, depth: int = 0) -> str:
@@ -245,9 +245,9 @@ class MacroRef(Node):
         self.es3 = es3
     
     def compile(self):
-        print(f"fetch macro reference?")
-        print(self.es3.macros, self.token.value)
-        print(self.es3.macros.get(self.token.value).compile())
+        # print(f"fetch macro reference?")
+        # print(self.es3.macros, self.token.value)
+        # print(self.es3.macros.get(self.token.value).compile())
         return self.es3.macros.get(self.token.value).compile()
 
     def display(self, depth: int = 0) -> str:
@@ -262,7 +262,7 @@ class Concat(Node):
         pass
 
 class MacroStack(Node):
-    def __init__(self, obj, tokens:list, last_token, es3):
+    def __init__(self, obj:Node, tokens:list, last_token, es3):
         # last_token is the closing bracket/brace of the macro
         self.obj = obj
         self.tokens = tokens
@@ -274,14 +274,15 @@ class MacroStack(Node):
         raise FinalScriptError("Undefined procedural macro")
     
     def compile(self):
-        return None
-        # tp = self.obj.getType(self.es3)
-        
-        # if tp.is_macro():
-        #     return tp.compile(self.es3, self.tokens)
-        
-        # else:
-        #     raise self.obj.error("Not a macro")
+        tp = self.obj.getDataType(self.es3)
+        if isinstance(tp, MacroStackType):
+            tp: MacroStackType
+            if isinstance(self.obj, AccessNode):
+                ref = self.obj.obj.compile()
+            else:
+                ref = None
+            return tp.compile(self.es3, ref, self.tokens)
+        raise CompileError("Object is not a macro")
         
 
     def display(self, depth: int = 0) -> str:
@@ -365,6 +366,13 @@ class ReferenceNode(Node):
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}ref: {"#" if self.global_ else ""}{self.token.value}"
 
+    def getDataType(self, es3):
+        v = f"{'#' if self.global_ else ''}{self.token.value}"
+        if v in es3.type_table:
+            return es3.type_table[v]
+        else:
+            raise CompileError(f"Undefined variable: {self.token.value}")
+
 class AccessNode(Node):
     def __init__(self, obj: Node, attr):
         self.obj = obj
@@ -375,6 +383,13 @@ class AccessNode(Node):
 
     def display(self, depth: int = 0) -> str:
         return f"{" "*depth*2}Access [\n{self.obj.display(depth+1)}\n{" "*depth*2}] (\n{" "*depth*2}  attr: {self.attr.value}\n{" "*depth*2})"
+
+    def getDataType(self, es3):
+        base = self.obj.getDataType(es3)
+        if TypeHelper.typesHaveAttr(base, self.attr.value):
+            return TypeHelper.getAttrType(base, self.attr.value)
+        else:
+            raise CompileError(f"type {base} does not have attribute '{self.attr.value}'")
 
 class AssignNode(Node):
     def __init__(self, ref_node:Node, val:Node):

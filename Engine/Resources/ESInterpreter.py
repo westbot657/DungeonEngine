@@ -50,6 +50,9 @@ class ESInterpreter:
                 if funcs := script.get("#functions", None):
                     pass
                 
+                elif func := script.get("#function", None):
+                    pass
+                
                 elif store := script.get("#store", None):
                     pass
                 

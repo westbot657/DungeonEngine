@@ -5,6 +5,9 @@ try:
 except ImportError as e:
     from Logger import Log
 
+
+from mergedeep import merge
+from typing import Any
 from enum import Enum, auto
 
 class ESInterpreter:
@@ -33,55 +36,21 @@ class ESInterpreter:
                 return self._value_ == other._value_
             return False
     
-    @classmethod
-    def execute(cls, script, execution_point:list|None = None, execute_from:list|None=None, execute_data=None):
-        """
-        script: a json-like data structure (created by compiling ES3 code)
-        execution_point: a list of nested keys in the script determining where execution is currently happening
-        execute_from: used after pausing to tell the script where to continue executing from
-        execute_data: data to use to continue executing with after a pause
-        """
-        if execution_point is None: execution_point = []
+    def __init__(self, script:dict):
+        self.script = script
+        self.memory = {}
+        self.pointer = []
+    
+    def nav(self, ptr):
+        branch = merge({}, self.script)
+        for key in ptr:
+            branch = branch[ptr]
+        return branch
+    
+    def execute(self, return_data=None):
+        branch = self.nav(self.pointer)
         
-        if execute_from:
-            return cls.execute(script[execute_from[0]], execution_point+[execute_from[0]], execute_from[1:], execute_data)
-        else:
-            if isinstance(script, dict):
-                if funcs := script.get("#functions", None):
-                    pass
-                
-                elif func := script.get("#function", None):
-                    pass
-                
-                elif store := script.get("#store", None):
-                    pass
-                
-                elif ref := script.get("#ref", None):
-                    pass
-                
-                elif access := script.get("#access", None):
-                    frm = script.get("from")
-                    
-                elif call := script.get("#call", None):
-                    args = script.get("args", [])
-                    kwargs = script.get("kwargs", {})
-                    
-                elif spt := script.get("#get_player_tag"):
-                    of_player = script.get("of_player")
-                    with_value = script.get("with_value")
-                    
-                elif new := script.get("#new"):
-                    args = script.get("args", [])
-                    kwargs = script.get("kwargs", {})
-                    
-                elif check := script.get("#check"):
-                    tbranch = script.get("true")
-                    fbranch = script.get("false")
-                    
-            elif isinstance(script, list):
-                pass
-            else:
-                return script
+        
     
     
 if __name__ == "__main__":

@@ -134,7 +134,18 @@ class MatchCase(Node):
         self.bodies = bodies
     
     def compile(self):
-        pass
+        out = {
+            "#match": self.match_value.compile(),
+            "cases": []
+        }
+        
+        for case, body in zip(self.cases, self.bodies):
+            out["cases"].append({
+                "#case": case.compile(),
+                "#body": body.compile()
+            })
+        
+        return out
 
     def display(self, depth: int = 0) -> str:
         out = [f"{" "*depth*2}MatchCase ["]
@@ -193,13 +204,19 @@ class UnaryOp(Node):
 
 
 class MacroDef(Node):
-    def __init__(self, name, args:list[Node], body):
+    def __init__(self, es3, name, args:list[Node], body):
+        self.es3 = es3
         self.name = name
         self.args = args
         self.body = body
     
     def compile(self, args):
         print(args, self.args, self.body)
+        self.es3.macro_fillins.clear()
+        for mc, val in zip(self.args, args):
+            self.es3.macro_fillins.update({mc.value: val})
+        
+        return self.body.compile()
 
     def display(self, depth:int=0):
         return f"{" "*depth*2}MacroDef [ {self.name.value} ] (\n{"\n".join(f"{" "*depth*2}  {a.value}" for a in self.args)}\n{" "*depth*2}) {{\n{self.body.display(depth+1)}\n{" "*depth*2}}}"
@@ -213,7 +230,7 @@ class MacroCall(Node):
     
     def compile(self):
         # print(f"fetch function-macro?")
-        return self.es3.function_macros.get(self.token.value).compile(self.args)
+        return self.es3.macro_functions.get(self.token.value).compile(self.args)
 
     def display(self, depth: int = 0) -> str:
         out = [f"{" "*depth*2}fill: [ {self.token.value} ] ("]
@@ -248,6 +265,8 @@ class MacroRef(Node):
         # print(f"fetch macro reference?")
         # print(self.es3.macros, self.token.value)
         # print(self.es3.macros.get(self.token.value).compile())
+        if m := self.es3.macro_fillins.get(self.token.value, None):
+            return m.compile()
         return self.es3.macros.get(self.token.value).compile()
 
     def display(self, depth: int = 0) -> str:

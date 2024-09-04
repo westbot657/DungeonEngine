@@ -47,6 +47,8 @@ if ($listening) {
     wait(2)
 }
 
+// compiling seems to stop here
+
 $out($message, $wait_time) {
     if ($listening) {
         output(
@@ -364,6 +366,7 @@ class EngineScript:
         self.exec_depth = 0
         self.parsing_macro = False
         self.curr_macro_args = []
+        self.macro_fillins = {}
         self.commands = {
             "new": self.parse_cmd_new,
             "move": self.parse_cmd_move
@@ -598,85 +601,7 @@ class EngineScript:
             return self.for_loop(tokens)
         
         elif tokens[0].type == "CONTEXT":
-            ctx_tok = tokens.pop(0)
-            ctx = ctx_tok.value
-            # TODO: do stuff with this context object (primarily just populate variable tables)
-            # print(f"CONTEXT: {ctx}")
-            
-            self.add_base_context()
-            
-            if ctx == "#!enter-script":
-                print("ENTER SCRIPT")
-            elif ctx == "#!exit-script":
-                print("EXIT SCRIPT")
-            elif ctx == "#input-script":
-                print("INPUT SCRIPT")
-            elif (m := re.match(r"(?P<obj>[a-zA-Z_]+)-(?P<act>[a-zA-Z_]+)-script", ctx)):
-                m: re.Match
-                d = m.groupdict()
-                obj = d["obj"]
-                act = d["act"]
-                
-                
-                
-                match obj:
-                    case "weapon":
-                        match act:
-                            case "use":
-                                ...
-                            case "damaged":
-                                ...
-                            case "broken":
-                                ...
-                            case "equip":
-                                ...
-                            case "unequip":
-                                ...
-                            case "repair":
-                                ...
-                            case "player_hit":
-                                ...
-                            case _: pass
-                    case "armor":
-                        match act:
-                            case "equip":
-                                ...
-                            case "unequip":
-                                ...
-                            case "player_hit":
-                                ...
-                            case "damaged":
-                                ...
-                            case "broken":
-                                ...
-                            case _: pass
-                    case "tool":
-                        ...
-                    case "item":
-                        ...
-                    case "ammo":
-                        ...
-                    case "interactable":
-                        ...
-                    case "enemy":
-                        ...
-                    case "attack":
-                        ...
-                    case "combat":
-                        ...
-                    case "status_effect":
-                        ...
-                    case "dungeon":
-                        ...
-                    case "room":
-                        ...
-                    case _:
-                        pass
-                
-            elif "/" in ctx:
-                data_dir = ctx.replace("#!", "", 1)
-                print(f"get data from dir: {data_dir}")
-            
+            tokens.pop(0)
             return None
         
         elif tokens[0].type == "MACRO":
@@ -699,7 +624,7 @@ class EngineScript:
                         else:
                             raise ScriptError()
                         
-                        md = MacroDef(macro, args, body)
+                        md = MacroDef(self, macro, args, body)
                         self.macro_functions.update({macro.value: md})
                         self.variable_table.set(macro.value, md)
                         return None #md
@@ -842,7 +767,7 @@ class EngineScript:
             tokens.pop(0)
             return body
         elif tokens:
-            return tokens[0].expected("}")
+            raise tokens[0].expected("}")
         else:
             raise FinalScriptError(f"no valid closing bracket found for open bracket @ {open.get_location()}")
     
@@ -1423,6 +1348,10 @@ class EngineScript:
                             raise FinalScriptError(f"Expected comma or closing {"parenthesis" if p else "bracket"} @ {tokens[0].get_location()}")
                     else:
                         raise FinalScriptError("Unexpected EOF while trying to parse arguments.")
+
+                if (p and tokens[0] == ("LITERAL", ")")) or ((not p) and tokens[0] == ("LITERAL", "}")):
+                    tokens.pop(0)
+                    return ArgsCallNode(args, kwargs)
 
             else:
                 raise tokens[0].expected("'(' or '{'", False)

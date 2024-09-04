@@ -34,7 +34,7 @@ class ESInterpreter:
             return False
     
     @classmethod
-    def execute(cls, script, execution_point:list = None, execute_from:list|None=None, execute_data=None):
+    def execute(cls, script, execution_point:list|None = None, execute_from:list|None=None, execute_data=None):
         if execution_point is None: execution_point = []
         
         if execute_from:
@@ -43,11 +43,45 @@ class ESInterpreter:
             if isinstance(script, dict):
                 if funcs := script.get("#functions", None):
                     pass
-                elif call := script.get("#call", None):
+                
+                elif store := script.get("#store", None):
                     pass
+                
+                elif ref := script.get("#ref", None):
+                    pass
+                
+                elif access := script.get("#access", None):
+                    frm = script.get("from")
+                    
+                elif call := script.get("#call", None):
+                    args = script.get("args", [])
+                    kwargs = script.get("kwargs", {})
+                    
+                elif spt := script.get("#get_player_tag"):
+                    of_player = script.get("of_player")
+                    with_value = script.get("with_value")
+                    
+                elif new := script.get("#new"):
+                    args = script.get("args", [])
+                    kwargs = script.get("kwargs", {})
+                    
+                elif check := script.get("#check"):
+                    tbranch = script.get("true")
+                    fbranch = script.get("false")
+                    
             elif isinstance(script, list):
                 pass
             else:
                 return script
     
     
+if __name__ == "__main__":
+    from ES3 import EngineScript, test_script
+    
+    es = EngineScript.inline_script(test_script)
+    
+    es.compile()
+    
+    breakpoint()
+    ESInterpreter.execute(es.compiled_script)
+

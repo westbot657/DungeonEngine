@@ -601,8 +601,8 @@ class EngineScript:
             return self.for_loop(tokens)
         
         elif tokens[0].type == "CONTEXT":
-            tokens.pop(0)
-            return None
+            ctx = tokens.pop(0)
+            return None#Context(ctx)
         
         elif tokens[0].type == "MACRO":
             snap = self.snapshot(tokens)

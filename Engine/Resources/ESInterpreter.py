@@ -36,23 +36,16 @@ class ESInterpreter:
                 return self._value_ == other._value_
             return False
     
-    def __init__(self, script:dict):
+    def __init__(self, script:dict=None):
         self.script = script
-        self.memory = {}
-        self.pointer = []
-    
-    def nav(self, ptr):
-        branch = merge({}, self.script)
-        for key in ptr:
-            branch = branch[ptr]
-        return branch
-    
-    def execute(self, return_data=None):
-        branch = self.nav(self.pointer)
-        
-        
-    
-    
+        self.memory = {
+            "#vars": {},
+            "#data": {}
+        }
+
+
+
+
 if __name__ == "__main__":
     from ES3 import EngineScript, test_script
     
@@ -61,5 +54,4 @@ if __name__ == "__main__":
     es.compile()
     
     breakpoint()
-    ESInterpreter.execute(es.compiled_script)
 

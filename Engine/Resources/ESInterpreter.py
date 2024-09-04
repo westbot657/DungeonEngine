@@ -35,6 +35,12 @@ class ESInterpreter:
     
     @classmethod
     def execute(cls, script, execution_point:list|None = None, execute_from:list|None=None, execute_data=None):
+        """
+        script: a json-like data structure (created by compiling ES3 code)
+        execution_point: a list of nested keys in the script determining where execution is currently happening
+        execute_from: used after pausing to tell the script where to continue executing from
+        execute_data: data to use to continue executing with after a pause
+        """
         if execution_point is None: execution_point = []
         
         if execute_from:

@@ -211,7 +211,6 @@ class MacroDef(Node):
         self.body = body
     
     def compile(self, args):
-        print(args, self.args, self.body)
         self.es3.macro_fillins.clear()
         for mc, val in zip(self.args, args):
             self.es3.macro_fillins.update({mc.value: val})

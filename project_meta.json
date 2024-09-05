@@ -1,0 +1,6 @@
+{
+    "_comment": "this file contains meta data for my website",
+    "description": "A multiplayer text adventure game",
+    "languages": ["python"],
+    "version": "BETA 0.0.0.0"
+}

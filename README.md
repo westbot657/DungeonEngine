@@ -47,7 +47,7 @@ The game can also be run in the command line by running
 
 ## Dungeon Building
 
-See the [wiki](https://github.com/westbot657/DungeonEngine/wiki) for the (eventually) in-depth guide to building a dungeon.
+See the [wiki](https://westbot657.github.io/wiki/idnh/home) for the (eventually) in-depth guide to building a dungeon.
 
 ## Versioning system
 

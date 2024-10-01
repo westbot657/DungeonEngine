@@ -63,20 +63,48 @@ class ESInterpreter:
             "#data": {}
         }
         self.pointer = 0
+        self.last_value = None
         self.instructions = []
 
     def assemble(self):
         self.instructions.clear()
         self._assemble(self.script)
 
+    # STORAGE SCHEME:
+    # V0: latest value of any kind
+    # V1: latest referenced value
+    # V2: latest function call return point
+    # V3: loop break points
     def _assemble(self, branch):
         if isinstance(branch, dict):
             if funcs := branch.get("#functions", None):
                 self._assemble(funcs)
             elif br := branch.get("#access", None):
-                ...
+                frm: dict = branch.get("from", None)
+                if not frm:
+                    raise Exception(f"Malformed engine script json at #access: {br}")
+                self._assemble(frm)
+                self.instructions.append(ReferenceI(br, "V1"))
             elif br := branch.get("#call", None):
-                ...
+                
+                args:list = branch.get("args", [])
+                kwargs:dict = branch.get("kwargs", {})
+                
+                self.instructions.append(PrepArgsI())
+                
+                i = 0
+                for a in args:
+                    self._assemble(a)
+                    self.instructions.append(SetArgI(f":{i}", "V0"))
+                    i += 1
+                
+                for k, v in kwargs.items():
+                    self._assemble(v)
+                    self.instructions.append(SetArgI(k, "V0"))
+                
+                self._assemble(br)
+                self.instructions.append(CallI("V0"))
+                
             elif br := branch.get("#check", None):
                 ...
             elif br := branch.get("#for", None):
@@ -92,9 +120,17 @@ class ESInterpreter:
             elif br := branch.get("#return", None):
                 ...
             elif br := branch.get("#ref", None):
-                ...
+                self.instructions.append(ReferenceI(br, "V1"))
             elif br := branch.get("#store", None):
-                ...
+                if not isinstance(br, dict):
+                    raise Exception(f"Malformed engine script json at #store: {br}")
+                br: dict
+                for k, v in br.items():
+                    self._assemble(v)
+                    self.instructions.append(
+                        StoreI(MemoryObject(k), "V0") # V0 means most recently processed value
+                    )
+                    
             elif br := branch.get("#not", None):
                 ...
             elif br := branch.get("#new", None):
@@ -116,5 +152,6 @@ if __name__ == "__main__":
     
     es.compile()
     
-    breakpoint()
+    esi = ESInterpreter(es.compiled_script)
+    esi.assemble()
 

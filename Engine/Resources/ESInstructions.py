@@ -175,3 +175,13 @@ class MoveI(Instruction):
     def assemble(self, line_number):
         self.line_number = line_number
         return f"MOVE {self.entity} {self.destination}"
+
+class ReferenceI(Instruction):
+    def __init__(self, var_name, parent):
+        self.line_number = -1
+        self.var_name = var_name
+        self.parent = parent
+    
+    def assemble(self, line_number):
+        self.line_number = line_number
+        return f"REF {self.parent} {self.var_name}"
